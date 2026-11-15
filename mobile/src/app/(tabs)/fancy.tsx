@@ -24,7 +24,7 @@ import { MatchChips } from "@/ui/match-chip";
 import { Working } from "@/ui/motion";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, font, radius, space, type } from "@/ui/tokens";
+import { color, font, radius, space, type, surface } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   emptyPad: { paddingTop: space.snug },
   filters: { marginHorizontal: -space.gutter, marginBottom: space.snug },
   // Same shell as FixtureCard / web Fancy from md: card fill, radius, overflow for zoned header/footer.
-  card: { backgroundColor: color.card, borderRadius: radius.card, overflow: "hidden", marginBottom: space.stack },
+  card: { ...surface.card, overflow: "hidden", marginBottom: space.stack },
   top: { paddingHorizontal: space.inset, paddingVertical: space.inset, gap: space.snug, backgroundColor: color["surface-raised"] },
   meta: { flexDirection: "row", alignItems: "center", gap: space.tight },
   metaDot: { ...type.footnote, color: color["muted-foreground"] },
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   lost: { color: color["muted-foreground"] },
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
-  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
   rows: {},
   foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingHorizontal: space.inset, paddingVertical: space.stack, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, backgroundColor: color.surface },
   status: { flex: 1, minWidth: 0 },

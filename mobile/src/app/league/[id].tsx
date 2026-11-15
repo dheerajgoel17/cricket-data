@@ -15,10 +15,10 @@ import { ListRow } from "@/ui/list";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
-import { Segmented } from "@/ui/segmented";
+import { LineTabs } from "@/ui/line-tabs";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
-import { color, space, type, tonal, radius } from "@/ui/tokens";
+import { color, space, type, radius, surface, rhythm } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** One competition: its season's stats, the summary markets, each side's record and the latest results (the site's `LeaguePage`). */
@@ -45,11 +45,10 @@ export default function League() {
           <View style={styles.hero}>
             <LeagueBadge name={name} size={56} />
             <View style={{ flex: 1, gap: 2 }}>
-              <Text style={styles.name}>{name}</Text>
               <Text style={styles.sub}>{data.fmtName} · {data.tt.size} teams</Text>
             </View>
           </View>
-          <Segmented<string> items={[["stats", "Stats"], ["markets", "Markets"], ["teams", "Teams"], ["results", "Results"]]} value={tab} onChange={setTab} label="Sections" />
+          <View style={styles.bleedRow}><LineTabs items={[["stats", "Stats"], ["markets", "Markets"], ["teams", "Teams"], ["results", "Results"]]} value={tab} onChange={setTab} label="Sections" /></View>
           {tab === "stats" ? <TournamentStats eventIdx={e} season={season} onSeason={setSeason} /> : null}
           {tab === "markets" ? (
             <View style={{ gap: space.snug }}>
@@ -77,11 +76,12 @@ export default function League() {
 }
 
 const styles = StyleSheet.create({
-  body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
+  body: { gap: rhythm.between, paddingHorizontal: rhythm.inline, paddingTop: rhythm.top },
   hero: { flexDirection: "row", alignItems: "center", gap: space.stack },
+  bleedRow: { marginHorizontal: -rhythm.inline },
   name: { ...type.title, color: color.foreground },
   sub: { ...type.callout, color: color["muted-foreground"] },
   note: { ...type.footnote, color: color["muted-foreground"] },
   empty: { ...type.callout, color: color["muted-foreground"], padding: space.gutter },
-  box: { ...tonal, borderRadius: radius.card, overflow: "hidden" },
+  box: { ...surface.card, overflow: "hidden" },
 });

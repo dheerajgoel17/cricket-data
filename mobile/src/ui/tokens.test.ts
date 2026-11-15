@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { control, fs, HEADER_HEIGHT, radius, space, tint, type } from "./tokens";
+import { control, fs, HEADER_HEIGHT, radius, rhythm, space, tint, type } from "./tokens";
 
 const src = join(__dirname, "..");
 const files = (dir: string): string[] => readdirSync(dir).flatMap((n) => { const p = join(dir, n); return statSync(p).isDirectory() ? files(p) : /\.tsx$/.test(n) && !/\.test\./.test(n) ? [p] : []; });
@@ -39,5 +39,15 @@ describe("tokens derived from tokens.json", () => {
     const hits = (re: RegExp, allow: RegExp) => files(src).filter((f) => !allow.test(f)).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (re.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
     expect(hits(/<Modal\b/, /(ui\/sheet|ui\/sign-in-sheet)\.tsx$/)).toEqual([]);
     expect(hits(/width: 40, height: 40/, /(ui\/round-button|ui\/empty-state)\.tsx$/)).toEqual([]);
+  });
+
+  it("keeps one surface recipe and one scrolling-row component", () => {
+    const hits = (re: RegExp, allow?: RegExp) => files(src).filter((f) => !allow?.test(f)).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (re.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
+    expect(hits(/\btonal\b/)).toEqual([]);
+    expect(hits(/backgroundColor: color\.card, borderRadius: radius\.card|borderRadius: radius\.card, backgroundColor: color\.card/, /skeletons\.tsx$/)).toEqual([]);
+    expect(hits(/<ScrollView[^>]*\bhorizontal\b/, /(ui\/h-scroll|ui\/grid-table|ui\/charts|ui\/tournament-stats)\.tsx$/)).toEqual([]);
+  });
+  it("derives the page rhythm from the space roles", () => {
+    expect(rhythm).toEqual({ within: 10, between: 16, section: 32, top: 16, inline: 14 });
   });
 });

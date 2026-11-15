@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ScrollRow } from "@/components/app/scroll-row";
 import { AdjustmentsHorizontalIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
@@ -91,10 +92,10 @@ export function GridFilterBar({ stat, line, games, hit, items, setQ }: {
         </Button>
       </div>
       {active.length > 0 && (
-        <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+        <ScrollRow className="-mx-gutter flex items-center gap-snug px-gutter" aria-label="Active filters">
           {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => clearKey(f.key)} />)}
           <button type="button" onClick={() => setQ({ line: "", n: "", ...(hit !== undefined ? { hit: "" } : {}) })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-        </div>
+        </ScrollRow>
       )}
       <GridLineSheet open={open} onOpenChange={setOpen} line={line} games={games} hit={hit}
         onApply={({ line: l, games: g, hit: h }) => setQ({ line: l === DEFAULT_LINE ? "" : l, n: g === DEFAULT_GAMES ? "" : g, ...(hit !== undefined ? { hit: h === DEFAULT_HIT ? "" : h } : {}) })} />

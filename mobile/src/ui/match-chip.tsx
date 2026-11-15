@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { HScroll } from "@/ui/h-scroll";
 import { Platform, ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { AnimatedText, Text } from "@/ui/text";
@@ -8,7 +9,7 @@ import { abbr } from "@site/lib/format";
 import { dayLabel, localTime } from "@/lib/format";
 import { fixtureStart } from "@/lib/rail";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, control, font, radius, space, tint, type } from "@/ui/tokens";
+import { color, control, font, radius, space, tint, type, duration } from "@/ui/tokens";
 
 type Fx = { id: string; a: string; b: string; fmt?: string; start?: string };
 
@@ -42,9 +43,7 @@ const SUB_ON = tint.hex(color["primary-foreground"], 0.7);
 
 export function MatchChips({ items, value, onChange, tags, all }: { items: Fx[]; value: string; onChange: (id: string) => void; tags?: Record<string, Tag>; /** Lead with an "All" chip whose id is `all` (the Player props match filter). */ all?: boolean }) {
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
+    <HScroll
       contentContainerStyle={styles.row}
       accessibilityRole="tablist"
       decelerationRate={Platform.OS === "ios" ? "fast" : 0.9}
@@ -55,7 +54,7 @@ export function MatchChips({ items, value, onChange, tags, all }: { items: Fx[];
       {items.map((f) => (
         <MatchChip key={f.id} f={f} tag={tags?.[f.id]} on={f.id === value} onPress={() => { if (f.id !== value) { void tick(); onChange(f.id); } }} />
       ))}
-    </ScrollView>
+    </HScroll>
   );
 }
 
@@ -69,7 +68,7 @@ function AllChip({ on, onPress }: { on: boolean; onPress: () => void }) {
 
 function MatchChip({ f, on, onPress, tag }: { f: Fx; on: boolean; onPress: () => void; tag?: Tag }) {
   const p = useSharedValue(on ? 1 : 0);
-  useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: 150 }); }, [on, p]);
+  useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: duration.fast }); }, [on, p]);
   const box = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [color.card, color.primary]) }));
   const title = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color.foreground, color["primary-foreground"]]) }));
   const sub = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], SUB_ON]) }));

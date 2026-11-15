@@ -10,7 +10,7 @@ import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { barState } from "@cricket/engine/windows.js";
 import { abbr, shortDate as shortDateRaw } from "@site/lib/format";
-import { color, font, space, type, fs, tint } from "@/ui/tokens";
+import { color, font, space, type, fs, tint, duration } from "@/ui/tokens";
 
 /** "06/09" as "6/9": the labels under the bars are short enough to show whole, as in the reference app. */
 const shortDate = (d: string) => String(shortDateRaw(d)).replace(/\b0(\d)/g, "$1");
@@ -23,7 +23,7 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 /** A ring segment that draws itself from nothing to its length on the UI thread. */
 function Arc({ r, start, dash, total, stroke, delay = 0, round }: { r: number; start: number; dash: number; total: number; stroke: string; delay?: number; round?: boolean }) {
   const g = useSharedValue(0);
-  useEffect(() => { g.value = withDelay(delay, withTiming(1, { duration: 900, easing: Easing.out(Easing.cubic) })); }, [g, delay]);
+  useEffect(() => { g.value = withDelay(delay, withTiming(1, { duration: duration.slow, easing: Easing.out(Easing.cubic) })); }, [g, delay]);
   const props = useAnimatedProps(() => ({ strokeDasharray: [dash * g.value, total] }));
   return <AnimatedCircle cx={24} cy={24} r={r} fill="none" stroke={stroke} strokeWidth={4} strokeLinecap={round ? "round" : "butt"} animatedProps={props} transform={`rotate(${start} 24 24)`} />;
 }
@@ -103,14 +103,14 @@ export function ChartBars({ entries, line, side, height = 240, onSelect }: { ent
     .enabled(!wide && plotW > 0)
     .activeOffsetX([-6, 6])
     .failOffsetY([-14, 14])
-    .onStart((e) => { tipShow.value = withTiming(1, { duration: 120 }); void e; })
+    .onStart((e) => { tipShow.value = withTiming(1, { duration: duration.fast }); void e; })
     .onUpdate((e) => {
       const bw = (plotW - GAP * (n - 1)) / n;
       const i = Math.max(0, Math.min(n - 1, Math.floor((e.x + GAP / 2) / (bw + GAP))));
       if (i !== active.value) { active.value = i; tip.value = labels[i]; runOnJS(tick)(); }
       tipX.value = Math.max(0, Math.min(plotW - TIP_W, i * (bw + GAP) + bw / 2 - TIP_W / 2));
     })
-    .onFinalize(() => { active.value = -1; tipShow.value = withTiming(0, { duration: 180 }); });
+    .onFinalize(() => { active.value = -1; tipShow.value = withTiming(0, { duration: duration.base }); });
   const tipStyle = useAnimatedStyle(() => ({ opacity: tipShow.value, transform: [{ translateX: tipX.value }, { translateY: -6 * (1 - tipShow.value) }] }));
 
   return (
@@ -150,7 +150,7 @@ export function ChartBars({ entries, line, side, height = 240, onSelect }: { ent
 /** One bar: a flat solid that grows from the floor (staggered), with its value inside; dims while a finger is on another bar. */
 function Bar({ i, pct, tone, text, value, active }: { i: number; pct: number; tone: "hit" | "miss" | "push"; text: string; value: number; active: SharedValue<number> }) {
   const g = useSharedValue(0);
-  useEffect(() => { g.value = withDelay(Math.min(i * 14, 420), withTiming(1, { duration: 520, easing: Easing.out(Easing.cubic) })); }, [g, i]);
+  useEffect(() => { g.value = withDelay(Math.min(i * 14, 420), withTiming(1, { duration: duration.slow, easing: Easing.out(Easing.cubic) })); }, [g, i]);
   const style = useAnimatedStyle(() => ({ transform: [{ scaleY: g.value }], opacity: active.value < 0 || active.value === i ? 1 : 0.38 }));
   return (
     <Animated.View style={[styles.bar, { height: `${pct}%`, backgroundColor: TONE[tone] }, style, { transformOrigin: "bottom" } as any]}>
@@ -179,13 +179,13 @@ const styles = StyleSheet.create({
   line: { position: "absolute", left: 0, right: 0, zIndex: 2, borderTopWidth: StyleSheet.hairlineWidth, borderStyle: "dashed", borderColor: tint.white(0.35) },
   bars: { ...StyleSheet.absoluteFill, flexDirection: "row", alignItems: "flex-end", gap: GAP },
   center: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "center" },
-  centerText: { fontSize: fs.body, lineHeight: 18, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },
+  centerText: { fontSize: fs.body, lineHeight: 18, fontFamily: font.dataLight, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },
   tip: { position: "absolute", top: -4, left: 0, width: TIP_W, alignItems: "center", backgroundColor: tint.hex(color.popover, 0.96), borderRadius: 10, paddingVertical: 4, borderWidth: StyleSheet.hairlineWidth, borderColor: tint.white(0.18), zIndex: 5 },
-  tipText: { fontSize: fs.callout, fontFamily: font.data, color: color.foreground, textAlign: "center", width: "100%" },
+  tipText: { fontSize: fs.callout, fontFamily: font.dataLight, color: color.foreground, textAlign: "center", width: "100%" },
   slot: { height: "100%", justifyContent: "flex-end" },
   stub: { height: 22, width: "100%" },
   bar: { width: "100%", justifyContent: "flex-end", alignItems: "center", paddingBottom: 4, overflow: "hidden" },
-  barText: { fontSize: fs.callout, width: "100%", textAlign: "center", fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  barText: { fontSize: fs.callout, width: "100%", textAlign: "center", fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
   xRow: { flexDirection: "row", gap: 4, paddingTop: 6 },
   x: { alignItems: "center" },
   xText: { width: 44, textAlign: "center", fontSize: fs.caption, lineHeight: 13, fontFamily: font.medium, color: color["muted-foreground"] },

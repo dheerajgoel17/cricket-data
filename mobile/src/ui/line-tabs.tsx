@@ -4,10 +4,10 @@ import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSprin
 import * as Haptics from "expo-haptics";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, space, type } from "@/ui/tokens";
+import { color, font, space, type, spring } from "@/ui/tokens";
 
 /** The underline's glide: a spring with a little life in it, settled in about a third of a second. */
-const GLIDE = { duration: 350, dampingRatio: 0.85 };
+const GLIDE = spring.settle;
 
 /**
  * Underline tabs on a hairline (the site's `Tabs variant="line"`: Home's In play / Pre-match / Completed, a player's formats): text tabs as wide as their labels, the chosen one in

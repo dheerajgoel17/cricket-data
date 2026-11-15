@@ -1,7 +1,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import Animated, { useReducedMotion } from "react-native-reanimated";
-import { color, radius, space, tint } from "@/ui/tokens";
+import { color, radius, space, tint, surface } from "@/ui/tokens";
 
 /**
  * Page-shaped loading placeholders. Each matches the real layout (prop rows, fancy cards,
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   skSide: { alignItems: "flex-end", gap: 8 },
   skEdge: { width: 46, height: 18, borderRadius: 6 },
   skTag: { width: 28, height: 9, borderRadius: 4.5 },
-  skCard: { flexShrink: 0, height: 190, backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, justifyContent: "space-between" },
+  skCard: { flexShrink: 0, height: 190, ...surface.card, padding: space.inset, justifyContent: "space-between" },
   skMeta: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   skSides: { gap: space.snug },
   skSide2: { flexDirection: "row", alignItems: "center", gap: space.snug },
@@ -340,17 +340,17 @@ const styles = StyleSheet.create({
   notch: { position: "absolute", width: 16, height: 16, borderRadius: 8, backgroundColor: color.background, top: 2 },
   notchL: { left: -8 },
   notchR: { right: -8 },
-  fancyCard: { backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  fancyCard: { ...surface.card, padding: space.inset, gap: space.snug },
   fancyRows: { marginTop: space.tight },
   fancyRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: space.snug },
-  matchBox: { backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug, marginHorizontal: space.gutter },
-  gaugeCard: { backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.stack, marginHorizontal: space.gutter },
+  matchBox: { ...surface.card, padding: space.inset, gap: space.snug, marginHorizontal: space.gutter },
+  gaugeCard: { ...surface.card, padding: space.inset, gap: space.stack, marginHorizontal: space.gutter },
   gaugeRow: { flexDirection: "row", gap: space.snug },
   gaugeRing: { width: 88, height: 88, borderRadius: 44, alignSelf: "center" },
   segRow: { flexDirection: "row", gap: space.snug, paddingHorizontal: space.gutter },
-  gridBox: { marginHorizontal: space.gutter, backgroundColor: color.card, borderRadius: radius.card, overflow: "hidden" },
+  gridBox: { marginHorizontal: space.gutter, ...surface.card, overflow: "hidden" },
   gridRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.inset, paddingVertical: space.snug },
-  listBox: { marginHorizontal: space.gutter, backgroundColor: color.card, borderRadius: radius.card, overflow: "hidden" },
+  listBox: { marginHorizontal: space.gutter, ...surface.card, overflow: "hidden" },
   listRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.inset, paddingVertical: space.snug },
   chips: { flexDirection: "row", gap: space.snug, paddingHorizontal: space.gutter },
   twoCol: { flexDirection: "row", flexWrap: "wrap", gap: space.snug, paddingHorizontal: space.gutter },

@@ -30,7 +30,7 @@ import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
 import { Bleed } from "@/ui/bleed";
-import { cap, color, font, num, radius, space, type, tonal, fs } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, type, fs, surface } from "@/ui/tokens";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
 const PAGE = 8;
@@ -330,14 +330,14 @@ const styles = StyleSheet.create({
   pad: { paddingHorizontal: space.gutter },
   stack: { gap: space.stack },
   intro: { paddingTop: space.tight, paddingBottom: space.stack },
-  hero: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },
+  hero: { ...surface.card, padding: space.inset, gap: space.stack },
   heroHead: { flexDirection: "row", alignItems: "flex-start", gap: space.snug },
   heroText: { flex: 1, minWidth: 0, gap: space.hair },
   sectionBar: { backgroundColor: color.background, paddingVertical: space.hair },
   filters: { paddingTop: space.stack, paddingBottom: space.group },
   conditions: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug, gap: space.hair },
   match: { gap: space.hair },
-  marketCard: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.stack },
+  marketCard: { ...surface.card, padding: space.inset, gap: space.stack },
   pin: { width: 42, height: 42, borderRadius: radius.control, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   kicker: { ...type.footnote, ...cap, color: color.primary },
   name: { ...type.display, color: color.foreground },
@@ -355,15 +355,15 @@ const styles = StyleSheet.create({
   kpiV: { ...num, fontSize: fs.figure, color: color.foreground },
   warn: { ...type.footnote, color: color.amber },
   note: { ...type.footnote, color: color["muted-foreground"] },
-  tour: { ...tonal, borderRadius: radius.card, padding: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug },
+  tour: { ...surface.card, padding: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug },
   crests: { flexDirection: "row", alignItems: "center" },
   tourName: { ...type.callout, fontFamily: font.medium, color: color.foreground },
   status: { ...cap },
   titleRow: { flexDirection: "row", alignItems: "baseline", justifyContent: "space-between", gap: space.snug },
-  h2: { ...type.title, color: color.foreground },
+  h2: { ...type.heading, color: color.foreground },
   h3: { flexShrink: 1, ...type.body, fontFamily: font.medium, color: color.foreground },
   count: { ...num, fontSize: fs.body, color: color["muted-foreground"] },
-  more: { ...tonal, borderRadius: radius.card, height: 44, alignItems: "center", justifyContent: "center" },
+  more: { ...surface.card, height: 44, alignItems: "center", justifyContent: "center" },
   moreText: { ...type.callout, color: color.foreground },
   stats: { flexDirection: "row", alignItems: "flex-end", gap: space.group },
   statKey: { ...type.footnote, color: color["muted-foreground"] },

@@ -32,10 +32,13 @@ export const num = { fontFamily: font.dataDefault, fontVariant: ["tabular-nums" 
 export const numLg = { fontFamily: font.dataDefault, fontVariant: ["tabular-nums" as const], letterSpacing: -0.4 };
 
 /**
- * A tonal surface (a card): a faint light wash over the black with a thin ring whose top edge is the brightest, as if lit from above. Quieter than a grey block and it reads as raised.
- * Spread it, then give the radius: `{ ...tonal, borderRadius: radius.card }`.
+ * Surfaces: the one set of boxes the app uses (web `Card` / flat bleed). `card` is the solid raised group (a fixture block, a stats group, a list box): the card colour, the card radius,
+ * nothing else; spread it and add padding / `overflow: "hidden"` where the content needs it. A table or list that spans the page is not a card: it is flat, full-bleed, with hairlines
+ * (`Bleed`). Never write a surface by hand (`tokens.test.ts` fails on a wash + ring recipe or a `card` colour + radius pair).
  */
-export const tonal = { backgroundColor: "rgba(255,255,255,0.045)", borderWidth: StyleSheet.hairlineWidth, borderColor: "rgba(255,255,255,0.09)", borderTopColor: "rgba(255,255,255,0.2)" } as const;
+export const surface = {
+  card: { backgroundColor: color.card, borderRadius: remPx(tokens.size["card-radius"]) },
+} as const;
 
 /** Hex token → rgba for heat cells, active chips, and row highlight (avoid copying primary/miss/amber rgba by hand). */
 function hexAlpha(hex: string, a: number) {
@@ -73,6 +76,9 @@ export const space = {
   gutter: remPx(Z.gutter),
 };
 
+/** The page rhythm, one set of gaps for every screen (tokens.json `rhythm`; web: gap-snug / gap-stack / gap-section). A screen picks a role here and never a raw `space.*` for page-level gaps. */
+export const rhythm = { within: space.snug, between: space.stack, section: space.section, top: space.stack, inline: space.gutter } as const;
+
 export const radius = {
   /** Web `--radius-sm` (control radius − 4): small tiles, tags, tooltips. */
   sm: remPx(Z.radius) - 4,
@@ -89,6 +95,16 @@ export const ease = {
   inOut: [0.77, 0, 0.175, 1] as const,
   drawer: [0.32, 0.72, 0, 1] as const,
 };
+
+/**
+ * Motion durations in ms (tokens.json `motion`, same names as the web's `--duration-*`): instant 80 (press-in, tiny state), fast 150 (colour / opacity changes, chips), base 220
+ * (thumbs, underlines, accordions, sheets), moderate 300 (entrances, page fades), flash 450 (a price that moved), slow 500 (big reveals). Never write a literal `duration`.
+ */
+export const duration = Object.fromEntries(Object.entries(tokens.motion).filter(([k]) => k.startsWith("duration-")).map(([k, v]) => [k.slice(9), parseInt(String(v), 10)])) as Record<"instant" | "fast" | "base" | "moderate" | "flash" | "slow", number>;
+
+/** Spring presets (tokens.json `spring`): settle (an indicator gliding), roll (a figure rolling in), enter (a card rising). */
+const sp = ({ duration, dampingRatio }: { duration: number; dampingRatio: number }) => ({ duration, dampingRatio });
+export const spring = { settle: sp(tokens.spring.settle), roll: sp(tokens.spring.roll), enter: sp(tokens.spring.enter) } as const;
 
 const lh = (size: number, ratio: string) => Math.round(size * parseFloat(ratio));
 const ls = (size: number, em: string | undefined) => (em ? Math.round(size * parseFloat(em) * 1000) / 1000 : 0);
@@ -108,6 +124,8 @@ export const type = {
   body: { fontFamily: font.regular, fontSize: body, lineHeight: lh(body, T["fs-body-lh"]), letterSpacing: ls(body, T["fs-body-ls"]) },
   callout: { fontFamily: font.regular, fontSize: callout, lineHeight: lh(callout, T["fs-callout-lh"]), letterSpacing: ls(callout, T["fs-callout-ls"]) },
   footnote: { fontFamily: font.regular, fontSize: footnote, lineHeight: lh(footnote, T["fs-footnote-lh"]), letterSpacing: 0 },
+  /** Section / card / sheet title: title size at the label weight (web `h3 text-title font-label`). `title` (bold) is for a page's own headline. */
+  heading: { fontFamily: font.medium, fontSize: title, lineHeight: lh(title, T["fs-title-lh"]), letterSpacing: ls(title, T["fs-title-ls"]) },
   caption: { fontFamily: font.regular, fontSize: caption, lineHeight: lh(caption, T["fs-caption-lh"]), letterSpacing: ls(caption, T["fs-caption-ls"]) },
 };
 

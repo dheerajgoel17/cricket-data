@@ -6,7 +6,7 @@ import { shortDate } from "@site/lib/format";
 import { INFO } from "@/lib/info";
 import { goBack } from "@/lib/nav";
 import { EmptyState } from "@/ui/empty-state";
-import { color, space, type } from "@/ui/tokens";
+import { color, space, type, rhythm } from "@/ui/tokens";
 
 type Params = { topic: string; n?: string; d?: string; o?: string; v?: string; x?: string; l?: string; a?: string; p?: string };
 
@@ -44,9 +44,9 @@ export default function InfoSheet() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.popover, paddingTop: space.stack },
   head: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingHorizontal: space.group, paddingBottom: space.snug },
-  title: { ...type.title, color: color.foreground, flex: 1 },
+  title: { ...type.heading, color: color.foreground, flex: 1 },
   done: { ...type.body, color: color.primary },
-  body: { gap: space.stack, paddingHorizontal: space.group, paddingVertical: space.snug, paddingBottom: space.section },
+  body: { gap: rhythm.between, paddingHorizontal: rhythm.inline, paddingTop: rhythm.within, paddingBottom: rhythm.section },
   point: { gap: 2 },
   term: { ...type.callout, color: color.foreground },
   text: { ...type.callout, color: color["muted-foreground"] },

@@ -2,9 +2,9 @@ import { useEffect, useState, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import Animated, { Easing, interpolate, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import { ChevronRight } from "@/ui/icons";
-import { color } from "@/ui/tokens";
+import { color, duration } from "@/ui/tokens";
 
-const DURATION = 240;
+const DURATION = duration.base;
 const EASE = Easing.bezier(0.23, 1, 0.32, 1);
 
 /**

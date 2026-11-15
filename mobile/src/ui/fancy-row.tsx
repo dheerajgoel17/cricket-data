@@ -67,7 +67,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset }: 
                 <Text style={{ color: under ? color.miss : color.primary, fontFamily: font.bold }}>{lean}</Text>
                 {" "}
                 <Text style={{ fontFamily: font.bold }}>{leanLine}</Text>
-                {typeof r.innScope === "string" && r.innScope ? <Text style={{ fontFamily: font.bold }}> {r.innScope}</Text> : null}
+                {typeof r.innScope === "string" && r.innScope ? <Text style={{ fontFamily: font.medium }}> {r.innScope}</Text> : null}
                 {price > 1 ? <Text style={styles.odds}> {odds(price)}</Text> : null}
               </Text>
               {stamp ? <ResultStamp kind={stamp} /> : null}
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   sub: { ...type.footnote, color: color["muted-foreground"] },
   priceRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.hair, rowGap: 2 },
   priceLine: { ...type.callout, fontFamily: font.bold, color: color.foreground, flexShrink: 1 },
-  odds: { fontFamily: font.data, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
+  odds: { fontFamily: font.dataLight, fontVariant: ["tabular-nums"], color: color["muted-foreground"] },
   edge: { width: 44, alignItems: "center", gap: space.hair, paddingHorizontal: space.tight },
   edgeLabel: { ...type.caption, textTransform: "uppercase", letterSpacing: 0.4, color: color["muted-foreground"] },
   edgeValue: { ...figure },
@@ -111,5 +111,5 @@ const styles = StyleSheet.create({
   moreBtn: { flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start", paddingHorizontal: space.gutter },
   more: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"] },
   bookRow: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter },
-  bookPrice: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  bookPrice: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
 });

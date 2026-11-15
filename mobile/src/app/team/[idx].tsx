@@ -19,12 +19,12 @@ import { GridFilters, GridTable } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
-import { Segmented } from "@/ui/segmented";
+import { LineTabs } from "@/ui/line-tabs";
 import { StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
 import { EntityHeroWash, PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
 import { useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
-import { color, font, space, type } from "@/ui/tokens";
+import { color, font, space, type, rhythm } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const MARKETS: [string, string][] = [["", "All markets"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_runs", "Runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "Highest runs in an over"], ["max_conceded", "Most conceded"], ["top_score", "Top score"]];
@@ -85,8 +85,8 @@ export default function Team() {
           >
             <View style={styles.hero}><TeamBadge name={store.teams[i].n} size={56} /><Text style={styles.name}>{name}</Text></View>
           </EntityHeroWash>
-          <Segmented<string> items={FORMATS.map((f: string) => [f, f] as [string, string])} value={fmt} onChange={setFmt} label="Format" />
-          <Segmented<string> items={[["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]]} value={tab} onChange={setTab} label="Sections" />
+          <View style={styles.bleedRow}><Chips items={FORMATS.map((f: string) => [f, f] as [string, string])} value={fmt} onChange={setFmt} /></View>
+          <View style={styles.bleedRow}><LineTabs items={[["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]]} value={tab} onChange={setTab} label="Sections" /></View>
           {tab === "grid" ? (
             <>
               <GridFilters stat={stat} line={line} games={games} onStat={setStat} onLine={setLine} onGames={setGames} />
@@ -146,9 +146,10 @@ export default function Team() {
 }
 
 const styles = StyleSheet.create({
-  body: { gap: space.stack, paddingHorizontal: space.gutter },
+  body: { gap: rhythm.between, paddingHorizontal: rhythm.inline },
   heroBand: { marginHorizontal: -space.gutter, paddingHorizontal: space.gutter, paddingBottom: space.stack },
   hero: { flexDirection: "row", alignItems: "center", gap: space.stack },
+  bleedRow: { marginHorizontal: -rhythm.inline },
   name: { ...type.display, color: color.foreground, flex: 1 },
   bleed: { marginHorizontal: -space.gutter },
   headline: { ...type.body, color: color.foreground },

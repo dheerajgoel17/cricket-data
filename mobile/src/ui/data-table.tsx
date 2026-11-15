@@ -73,11 +73,11 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", minHeight: 44, gap: space.tight },
   on: { backgroundColor: tint.row, marginHorizontal: -space.tight, paddingHorizontal: space.tight, borderRadius: radius.sm },
   pill: { borderRadius: radius.sm, paddingVertical: 3, alignItems: "center" },
-  pillText: { fontFamily: font.data, fontSize: fs.body, fontVariant: ["tabular-nums"] },
+  pillText: { fontFamily: font.dataLight, fontSize: fs.body, fontVariant: ["tabular-nums"] },
   sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   /** Web `TABLE_HEAD` twin: footnote + label-cap (not caption / BOARD_HEAD). */
   head: { ...type.footnote, color: color["muted-foreground"], ...cap },
-  cell: { ...type.callout, fontFamily: font.data, fontSize: fs.body, color: color.foreground, fontVariant: ["tabular-nums"] },
+  cell: { ...type.callout, fontFamily: font.dataLight, fontSize: fs.body, color: color.foreground, fontVariant: ["tabular-nums"] },
   first: { fontFamily: font.regular, fontSize: fs.callout, lineHeight: 18 },
   note: { flexDirection: "row", gap: space.snug, borderLeftWidth: 2, borderLeftColor: color.hairline, paddingLeft: space.snug },
   noteTitle: { ...type.callout, color: tint.white(0.8), ...cap },

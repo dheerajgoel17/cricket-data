@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   moreBtn: { alignSelf: "center", marginLeft: "auto", width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
   sheet: { backgroundColor: color.popover, paddingHorizontal: space.inset, paddingTop: space.snug, gap: 0 },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.group },
-  sheetTitle: { ...type.title, color: color.foreground },
+  sheetTitle: { ...type.heading, color: color.foreground },
   done: { ...type.body, fontFamily: font.medium, color: color.primary },
   links: { gap: space.hair, paddingBottom: space.snug },
   link: { minHeight: 44, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 12, borderRadius: radius.control },

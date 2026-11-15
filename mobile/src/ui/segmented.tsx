@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Text } from "@/ui/text";
-import { color, font, type, tint } from "@/ui/tokens";
+import { color, font, type, tint, duration } from "@/ui/tokens";
 
 export interface SegmentedProps<T extends string> {
   items: [id: T, label: string][];
@@ -24,7 +24,7 @@ export function Segmented<T extends string>({ items, value, onChange, label, wid
   const [w, setW] = useState(0);
   const index = Math.max(0, items.findIndex(([id]) => id === value));
   const x = useSharedValue(index);
-  useEffect(() => { x.value = withTiming(index, { duration: 220, easing: Easing.out(Easing.cubic) }); }, [index, x]);
+  useEffect(() => { x.value = withTiming(index, { duration: duration.base, easing: Easing.out(Easing.cubic) }); }, [index, x]);
   const seg = w ? (w - 4) / items.length : 0;
   const thumb = useAnimatedStyle(() => ({ transform: [{ translateX: x.value * seg }] }));
   return (

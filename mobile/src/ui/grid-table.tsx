@@ -1,5 +1,6 @@
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { HScroll } from "@/ui/h-scroll";
 import { Sheet } from "@/ui/sheet";
 import { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
@@ -22,7 +23,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { MiniBars } from "@/ui/mini-bars";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, control, font, num, numLg, radius, space, type, tonal, tint, fs } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, surface } from "@/ui/tokens";
 
 export const STAT_ITEMS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label as string]);
 export const GAMES = [5, 10, 15, 20, 30];
@@ -58,12 +59,12 @@ export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, o
         </Press>
       </View>
       {activeN > 0 ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
+        <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
           {line !== DEFAULT_LINE ? <ActiveChip label={`Line O ${line}`} onClear={() => onLine(DEFAULT_LINE)} /> : null}
           {games !== DEFAULT_GAMES ? <ActiveChip label={`Window L${games}`} onClear={() => onGames(DEFAULT_GAMES)} /> : null}
           {withHit && hit !== DEFAULT_HIT ? <ActiveChip label={`Hit ${HITS.find(([v]) => v === hit)?.[1] ?? hit}`} onClear={() => onHit!(DEFAULT_HIT)} /> : null}
           <Press scale={1} onPress={() => { onLine(DEFAULT_LINE); onGames(DEFAULT_GAMES); if (withHit) onHit!(DEFAULT_HIT); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
-        </ScrollView>
+        </HScroll>
       ) : null}
       <Sheet visible={open} onClose={() => setOpen(false)} label="Close filters">
           <View style={styles.sheetHead}>
@@ -194,20 +195,20 @@ const styles = StyleSheet.create({
   activeRow: { gap: space.snug, paddingVertical: space.tight },
   clearAll: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
-  sheetTitle: { ...type.title, color: color.foreground },
+  sheetTitle: { ...type.heading, color: color.foreground },
   sheetSec: { ...type.body, fontFamily: font.medium, color: color.foreground, marginTop: space.snug },
   sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
   sheetClear: { flex: 1, height: 48, borderRadius: 999, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   sheetClearTxt: { ...type.body, color: color.foreground },
   sheetApply: { flex: 2, height: 48, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
   sheetApplyTxt: { ...type.body, fontFamily: font.medium, color: color.background },
-  table: { flexDirection: "row", ...tonal, borderRadius: radius.card, overflow: "hidden" },
+  table: { flexDirection: "row", ...surface.card, overflow: "hidden" },
   cell: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline, paddingHorizontal: space.tight },
   rowStart: { height: ROW_H, flexDirection: "row", alignItems: "center" },
   th: { ...type.footnote, ...cap, color: color["muted-foreground"] },
   name: { ...type.callout, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
   hit: { ...num, fontSize: fs.body, textAlign: "center", color: color.primary },
-  date: { ...type.caption, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  date: { ...type.caption, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
   value: { minWidth: 32, height: 28, borderRadius: radius.sm, paddingHorizontal: 6, alignItems: "center", justifyContent: "center" },
   valueText: { ...num, fontSize: fs.body },
   void: { ...type.caption, color: color.amber, borderWidth: 1, borderStyle: "dashed", borderColor: tint.amber(0.6), borderRadius: 5, paddingHorizontal: 3, paddingVertical: 1 },

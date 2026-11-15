@@ -20,7 +20,7 @@ import { ListRow, Section } from "@/ui/list";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, font, space, type } from "@/ui/tokens";
+import { color, font, space, type, rhythm } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Account Saved (server). Recently viewed stays on this device. */
@@ -109,8 +109,8 @@ function Saved() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  sections: { gap: space.group, paddingTop: space.snug },
-  line: { color: color.primary, fontFamily: font.data },
+  sections: { gap: rhythm.between, paddingTop: rhythm.top },
+  line: { color: color.primary, fontFamily: font.dataLight },
   remove: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
   gate: { paddingTop: space.section, gap: space.stack, paddingHorizontal: space.gutter },
   signBtn: { alignSelf: "center", height: 44, minWidth: 160, paddingHorizontal: space.group, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },

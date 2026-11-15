@@ -59,5 +59,5 @@ const styles = StyleSheet.create({
   headCell: { ...type.footnote, ...cap, fontFamily: font.medium, color: color["muted-foreground"], width: 52, textAlign: "right" },
   bookCol: { flex: 1 },
   row: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingVertical: 2 },
-  price: { ...type.footnote, fontFamily: font.data, width: 52, textAlign: "right", color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
+  price: { ...type.footnote, fontFamily: font.dataLight, width: 52, textAlign: "right", color: color["muted-foreground"], fontVariant: ["tabular-nums"] },
 });

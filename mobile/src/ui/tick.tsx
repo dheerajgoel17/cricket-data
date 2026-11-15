@@ -4,12 +4,12 @@ import { Text } from "@/ui/text";
 import Animated, { Easing, interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { stillNeed } from "@cricket/engine/tape.js";
 import { ArrowDown, ArrowUp } from "@/ui/icons";
-import { color, font, space, tint, type, radius } from "@/ui/tokens";
+import { color, font, space, tint, type, radius, duration, spring } from "@/ui/tokens";
 
 /** Colour/arrow hold after a move — stock-ticker brief (~1 s), not sticky. */
 const HOLD_MS = 1000;
 /** How long the wash of colour takes to fade, and how far (pt) the new figure travels as it rolls in. */
-const WASH_MS = 450, ROLL = 14;
+const WASH_MS = duration.flash, ROLL = 14;
 // Precomputed outside worklets — calling `tint.*` inside useAnimatedStyle hits the JS runtime ("Tried to synchronously call a Remote Function").
 const FLASH_RISE = [tint.primary(0), tint.primary(0.24)] as const;
 const FLASH_FALL = [tint.miss(0), tint.miss(0.24)] as const;
@@ -60,7 +60,7 @@ function Flash({ dir, value, calm, children }: { dir: -1 | 0 | 1; value: number 
     flash.value = 1;
     flash.value = withTiming(0, { duration: WASH_MS, easing: Easing.out(Easing.cubic) });
     y.value = dir * ROLL;
-    y.value = withSpring(0, { duration: 420, dampingRatio: 0.8 });
+    y.value = withSpring(0, spring.roll);
   }, [dir, value, flash, y, calm]);
   const colors = dir === -1 ? FLASH_FALL : FLASH_RISE;
   const bg = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(flash.value, [0, 1], colors) }));
@@ -90,6 +90,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 2, borderRadius: radius.sm, paddingHorizontal: 2 },
   clip: { overflow: "hidden" },
   rollRow: { flexDirection: "row", alignItems: "center", gap: 2 },
-  text: { ...type.callout, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  text: { ...type.callout, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
   void: { ...type.caption, color: color.amber, borderWidth: StyleSheet.hairlineWidth, borderColor: color.amber, borderRadius: 4, paddingHorizontal: space.hair, borderStyle: "dashed" },
 });

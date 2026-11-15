@@ -7,7 +7,7 @@ import { Text } from "@/ui/text";
 import { AppHeader } from "@/ui/brand";
 import { useScreenInsets } from "@/ui/insets";
 import { TabFade } from "@/ui/tab-fade";
-import { color, font, numLg, radius, space, type, tonal, fs } from "@/ui/tokens";
+import { color, font, numLg, radius, space, type, fs, surface } from "@/ui/tokens";
 
 const INBOX = "tech@fancy.cash";
 
@@ -68,14 +68,14 @@ function ContactScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   lead: { ...type.body, color: color["muted-foreground"] },
-  hero: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  hero: { ...surface.card, padding: space.inset, gap: space.snug },
   heroIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   cap: { ...type.footnote, fontFamily: font.dataLight, letterSpacing: 0.44, color: color["muted-foreground"] },
   email: { ...numLg, fontSize: fs.display, letterSpacing: -0.5, color: color.primary },
   btn: { marginTop: space.tight, height: 44, borderRadius: 999, backgroundColor: color.primary, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: space.tight, paddingHorizontal: space.stack },
   btnTxt: { ...type.body, fontFamily: font.medium, color: color["primary-foreground"] },
-  section: { ...type.title, color: color.foreground, marginTop: space.snug },
-  card: { ...tonal, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  section: { ...type.heading, color: color.foreground, marginTop: space.snug },
+  card: { ...surface.card, padding: space.inset, gap: space.snug },
   cardIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   cardTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
   cardBlurb: { ...type.callout, color: color["muted-foreground"] },

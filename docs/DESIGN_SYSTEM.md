@@ -32,6 +32,14 @@ Use the shared weight roles from `tokens.json`: editorial (300), copy (400), lab
 
 Radii: `radius-sm` 8 · `radius` 12 (`radius.control`) · card 16 · sheet 24 · chip 999 (`radius.sm` / `control` / `card` / `sheet` / `chip` in the app). Spacing: `hair` 4 · `tight` 6 · `snug` 10 · `inset`/`gutter` 14 · `stack` 16 · `group` 20 · `section` 32 (the web widens the gutter at `md` / `lg`; a phone keeps 14). Surfaces and washes come from `color.*` (`control-fill`, `control-ring`, `tile`, `segment-track`, `segment-thumb`, `chrome-solid`, `skeleton`, `ink-soft`, `text-soft`) and `tint.*`; a screen never writes a hex / rgba literal or a numeric `fontSize` (`mobile/src/ui/tokens.test.ts` fails the build, the web has `design-tokens.test.ts`).
 
+### Rhythm, weight, surface (the three rules that make pages look alike)
+
+**Rhythm** (`tokens.json` → `rhythm`; app `rhythm`; web `gap-*`): inside one group `snug` 10; between blocks on a page `stack` 16; between major sections `section` 32 (24 at `lg`); under the header `stack` 16; page side inset `gutter` 14 (wider on web at `md` / `lg`). A page body uses these and never a raw gap, so Home, Props, Fancy, fixture, player, team, league, Saved and Search all breathe the same.
+
+**Weight** (bold where hierarchy needs it, never as default): *emphasis* 700 is for identity and the one key figure: team and player names, scores and totals, a row's hero line and its price, status tags, a page's own headline. *label* 500 is for section / card / sheet titles (`type.heading`), secondary numbers (`font.dataLight`), controls and chips. *copy* 400 is body text; *editorial* 300 is for light tabular figures. If everything in a row is bold, nothing is.
+
+**Surface**: a grouped block is `surface.card` (solid card colour, card radius). A table or list that spans the page is flat, full-bleed, with hairlines. There is no third recipe (the old `tonal` wash and ring is gone). Horizontally scrolling rows (chips, tabs, active filters) use `HScroll` (app) / `ScrollRow` + `PillGroup` (web): the content fades at an edge that has more behind it (a gradient or mask, never a live blur).
+
 ### Platform conventions (one design, three native idioms)
 
 Same tokens, same jobs; the idiom of the platform decides the feel. Values live in `tokens.json` → `platform` and `mobile/src/ui/platform.ts`.

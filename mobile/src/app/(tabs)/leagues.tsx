@@ -1,4 +1,5 @@
 import { mark } from "@/lib/perf";
+import { HScroll } from "@/ui/h-scroll";
 import { lazyTab } from "@/ui/lazy-tab";
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -20,7 +21,7 @@ import { ChevronRight } from "@/ui/icons";
 import { Working } from "@/ui/motion";
 import { LeagueBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
-import { cap, color, font, radius, space, type, fs } from "@/ui/tokens";
+import { cap, color, font, radius, space, type, fs, rhythm } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Listed first, in this order, when they are live or due to start: Big Bash on top (the women's season live, the men's due). */
@@ -48,7 +49,7 @@ function Leagues() {
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
         {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store || !matchesReady ? <Working label="Loading leagues…" fill shape="league" /> : e == null ? <View style={styles.emptyPad}><EmptyState title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." /></View> : (
           <>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+            <HScroll contentContainerStyle={styles.chips}>
               {(featured.some((x) => x.e === e) ? featured : [{ e, name: store.events[e], tag: "" as const }, ...featured]).map((x) => {
                 const on = x.e === e;
                 return (
@@ -59,7 +60,7 @@ function Leagues() {
                   </Press>
                 );
               })}
-            </ScrollView>
+            </HScroll>
             <View style={styles.body}>
               <View style={styles.leagueHead}>
                 <LeagueBadge name={store.events[e]} size={40} />
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   chipText: { ...type.callout, fontFamily: font.medium, color: color.foreground, maxWidth: 180 },
   tag: { borderRadius: 999, paddingHorizontal: 6, height: 16, justifyContent: "center" },
   tagText: { ...cap, fontFamily: font.data, fontSize: fs.caption, color: color.background },
-  body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
+  body: { gap: rhythm.between, paddingHorizontal: rhythm.inline, paddingTop: rhythm.top },
   leagueHead: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leagueName: { ...type.title, color: color.foreground, flex: 1 },
 });

@@ -26,5 +26,5 @@ const styles = StyleSheet.create({
   pill: { height: control, flexDirection: "row", alignItems: "center", backgroundColor: color.card, borderRadius: radius.chip },
   btn: { width: control, height: control, alignItems: "center", justifyContent: "center", borderRadius: radius.chip },
   pressed: { backgroundColor: color["surface-raised"] },
-  value: { ...type.callout, minWidth: 64, textAlign: "center", color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  value: { ...type.callout, minWidth: 64, textAlign: "center", color: color.foreground, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
 });

@@ -11,7 +11,7 @@ import { InfoButton } from "@/ui/info-button";
 import { Segmented } from "@/ui/segmented";
 import { PlayerFace } from "@/ui/player-avatar";
 import { Tick } from "@/ui/tick";
-import { cap, color, control, font, numLg, radius, space, type, tonal, fs, tint } from "@/ui/tokens";
+import { cap, color, control, font, numLg, radius, space, type, fs, tint, surface } from "@/ui/tokens";
 
 export type TapeRow = { idx: number; pid: string; name: string; stat: string; line: number; over: number; fmt: string; inn?: number; verdict: "cleared" | "missed" | "push" | null; v?: number };
 
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   verdictHit: { ...cap, color: color["primary-foreground"] },
   who: { flex: 1, minWidth: 0, gap: 2 },
   card: { borderRadius: radius.card, padding: space.inset, gap: space.snug },
-  missCard: { ...tonal },
+  missCard: { ...surface.card },
   segRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   head: { flexDirection: "row", alignItems: "center", gap: space.tight },
   title: { ...type.body, color: color.foreground },

@@ -18,7 +18,7 @@ import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, tonal, fs, tint } from "@/ui/tokens";
+import { cap, color, font, FIXTURE_CARD_SHARE, metric, num, numLg, radius, space, type, fs, tint, surface, rhythm } from "@/ui/tokens";
 
 const SHOWN = 5;
 const day = (d: string, year: boolean) => new Date(`${d}T12:00:00`).toLocaleDateString(undefined, { day: "numeric", month: "short", ...(year ? { year: "numeric" } : {}) });
@@ -208,16 +208,16 @@ function Trends({ points, current, onPick }: { points: any[]; current: string; o
 }
 
 const styles = StyleSheet.create({
-  root: { gap: space.stack },
+  root: { gap: rhythm.between },
   bleed: { marginHorizontal: -space.gutter },
   meta: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   metaText: { ...type.callout, color: color["muted-foreground"] },
-  box: { ...type.callout, color: color["muted-foreground"], ...tonal, borderRadius: radius.card, padding: space.stack },
+  box: { ...type.callout, color: color["muted-foreground"], ...surface.card, padding: space.stack },
   callout: { ...type.callout, color: color.foreground },
-  errorBox: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, backgroundColor: color.card, borderRadius: radius.card, padding: space.stack },
+  errorBox: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, ...surface.card, padding: space.stack },
   retry: { height: 36, paddingHorizontal: space.stack, borderRadius: radius.chip, backgroundColor: color.foreground, justifyContent: "center" },
   retryText: { ...type.callout, color: color.background },
-  facts: { flexDirection: "row", ...tonal, borderRadius: radius.card, paddingVertical: space.snug },
+  facts: { flexDirection: "row", ...surface.card, paddingVertical: space.snug },
   fact: { flex: 1, minWidth: 0, gap: 2, paddingHorizontal: space.snug },
   factSep: { borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: color.hairline },
   factNum: { ...metric, color: color.foreground },
@@ -225,23 +225,23 @@ const styles = StyleSheet.create({
   loading: { gap: space.snug },
   track: { height: 4, borderRadius: 2, backgroundColor: color.hairline, overflow: "hidden", marginHorizontal: space.stack },
   bar: { height: "100%", backgroundColor: color.primary, borderRadius: 2 },
-  leader: { ...tonal, borderRadius: radius.card, padding: space.stack, gap: space.snug },
+  leader: { ...surface.card, padding: space.stack, gap: space.snug },
   leaderRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   leaderName: { ...type.body, fontFamily: font.medium, color: color.foreground },
   leaderNum: { ...numLg, fontFamily: font.data, fontSize: fs.stat, letterSpacing: -0.6, lineHeight: 32, color: color.primary },
   sub: { ...type.footnote, color: color["muted-foreground"] },
   subSmall: { ...type.caption, color: color["muted-foreground"] },
-  card: { ...tonal, borderRadius: radius.card, paddingTop: space.snug, paddingBottom: space.tight, overflow: "hidden", gap: space.tight },
+  card: { ...surface.card, paddingTop: space.snug, paddingBottom: space.tight, overflow: "hidden", gap: space.tight },
   cardHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: space.stack },
   cardTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
   tr: { flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.stack, minHeight: 28 },
   trSep: { minHeight: 52, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   th: { ...type.caption, ...cap, color: color["muted-foreground"] },
   numCol: { width: 52, textAlign: "right" },
-  rank: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  rank: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
   who: { flex: 1, minWidth: 0, flexDirection: "row", alignItems: "center", gap: space.snug },
   name: { ...type.callout, fontFamily: font.medium, color: color.foreground },
-  value: { ...num, fontFamily: font.data, fontSize: fs.title, color: color.foreground },
+  value: { ...num, fontFamily: font.dataLight, fontSize: fs.title, color: color.foreground },
   extra: { ...num, fontSize: fs.body, color: color["muted-foreground"] },
   more: { height: 44, alignItems: "center", justifyContent: "center", borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   moreText: { ...type.callout, fontFamily: font.medium, color: color["muted-foreground"] },

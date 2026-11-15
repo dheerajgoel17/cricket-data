@@ -134,7 +134,7 @@ export { clearFilter };
 
 const styles = StyleSheet.create({
   head: { height: 56, flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: space.gutter, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
-  title: { ...type.title, color: color.foreground },
+  title: { ...type.heading, color: color.foreground },
   round: { width: control, height: control, borderRadius: control / 2, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
   body: { flex: 1, paddingHorizontal: space.gutter },
   wrap: { flexDirection: "row", flexWrap: "wrap", gap: space.snug, paddingBottom: space.stack },

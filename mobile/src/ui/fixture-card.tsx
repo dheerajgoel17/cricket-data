@@ -13,7 +13,7 @@ import { Skeleton } from "@/ui/motion";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
 import { Tick } from "@/ui/tick";
-import { color, font, radius, space, type, fs } from "@/ui/tokens";
+import { color, font, radius, space, type, fs, surface } from "@/ui/tokens";
 
 /** One team's live total, right-aligned on the same row as the name. Empty means they have not batted. */
 export function LiveScore({ s, dim, pending, live }: { s: any | null; dim?: boolean; pending?: boolean; live?: boolean }) {
@@ -79,7 +79,7 @@ export function FixtureCard({ item, now, link = true }: { item: RailItem; now: n
 
 const styles = StyleSheet.create({
   // Its own height by default; in the Home rail the cell is held to the tallest card and the card grows to fill it (the site's `h-full`), the foot staying at the bottom.
-  card: { flexGrow: 1, backgroundColor: color.card, borderRadius: radius.card, padding: space.inset, gap: space.snug },
+  card: { flexGrow: 1, ...surface.card, padding: space.inset, gap: space.snug },
   pressed: { backgroundColor: color["surface-hover"] },
   meta: { flexDirection: "row", alignItems: "center", gap: space.tight },
   metaText: { ...type.footnote, color: color["muted-foreground"] },
@@ -90,12 +90,12 @@ const styles = StyleSheet.create({
   lost: { color: color["muted-foreground"] },
   score: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
   total: { fontFamily: font.data, fontSize: fs.title, color: color.foreground, letterSpacing: -0.36, fontVariant: ["tabular-nums"] },
-  overs: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  overs: { ...type.footnote, color: color["muted-foreground"], fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
   pendingScore: { width: 64, height: 16, borderRadius: 8 },
   yet: { ...type.callout, color: color["muted-foreground"] },
   when: { alignItems: "flex-end" },
   whenDay: { ...type.footnote, color: color["muted-foreground"] },
-  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.data, fontVariant: ["tabular-nums"] },
+  whenTime: { ...type.callout, color: color.foreground, fontFamily: font.dataLight, fontVariant: ["tabular-nums"] },
   foot: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingTop: space.tight, marginTop: "auto" },
   status: { flex: 1, minWidth: 0 },
   statusText: { ...type.footnote, color: color.foreground },

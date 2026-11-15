@@ -1,4 +1,4 @@
-import { color, tint } from "@/ui/tokens";
+import { color, tint, duration } from "@/ui/tokens";
 import type { ComponentRef, ReactNode, RefObject } from "react";
 import { View, type StyleProp, type ViewStyle } from "react-native";
 import {
@@ -64,8 +64,8 @@ export function useCollapseOnScroll(after = 80) {
     const offset = e.contentOffset.y, dy = offset - last.value;
     last.value = offset;
     y.value = offset;
-    if (offset < 24 || dy < -4) collapsed.value = withTiming(0, { duration: 220 });
-    else if (dy > 4 && offset > after) collapsed.value = withTiming(1, { duration: 220 });
+    if (offset < 24 || dy < -4) collapsed.value = withTiming(0, { duration: duration.base });
+    else if (dy > 4 && offset > after) collapsed.value = withTiming(1, { duration: duration.base });
   });
   return { collapsed, onScroll, y };
 }

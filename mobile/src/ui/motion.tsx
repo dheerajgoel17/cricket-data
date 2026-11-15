@@ -1,7 +1,7 @@
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { useState } from "react";
 import Animated, { FadeIn, FadeInDown, ReduceMotion, useReducedMotion } from "react-native-reanimated";
-import { color, space } from "@/ui/tokens";
+import { color, space, spring } from "@/ui/tokens";
 import { renderSkeleton, type SkeletonShape } from "@/ui/skeletons";
 
 export { CardSkeleton, RowsSkeleton, Skeleton, SkeletonGroup } from "@/ui/skeletons";
@@ -13,7 +13,7 @@ const entrances = new Map<number, ReturnType<typeof FadeInDown.delay>>();
 /** How a card or section comes in on first paint: a short rise that springs to rest. */
 export const enter = (i = 0) => {
   const k = Math.min(i, 6);
-  if (!entrances.has(k)) entrances.set(k, FadeInDown.delay(k * 45).springify(420).dampingRatio(0.9).reduceMotion(ReduceMotion.System));
+  if (!entrances.has(k)) entrances.set(k, FadeInDown.delay(k * 45).springify(spring.enter.duration).dampingRatio(spring.enter.dampingRatio).reduceMotion(ReduceMotion.System));
   return entrances.get(k)!;
 };
 

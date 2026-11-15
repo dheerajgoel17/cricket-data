@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ScrollRow } from "@/components/app/scroll-row";
 import { useCallback, useMemo, useState, type MouseEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AdjustmentsHorizontalIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
@@ -286,7 +287,7 @@ export function PropLineMeta({ r, soFar, out }: { r: Row; soFar: SoFar | null; o
     <span className="flex min-w-0 items-center gap-x-tight text-callout font-sans font-emphasis leading-snug text-foreground">
       <span className={cn("shrink-0", under ? "text-miss" : "text-primary")}>{under ? "U" : "O"}</span>
       <span className="shrink-0 tabular-nums">{r.line}</span>
-      <span className="min-w-0 truncate">{label}{scope ? ` · ${scope}` : ""}</span>
+      <span className="min-w-0 truncate font-label">{label}{scope ? ` · ${scope}` : ""}</span>
       {price > 1 ? <span className="shrink-0 font-condensed tabular-nums text-muted-foreground">{odds(price)}</span> : null}
       {stamp ? <ResultStamp kind={stamp} /> : null}
     </span>
@@ -553,10 +554,10 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
             </Button>
           </div>
           {active.length > 0 && (
-            <div className="flex items-center gap-snug overflow-x-auto px-gutter py-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <ScrollRow className="flex items-center gap-snug px-gutter py-snug" aria-label="Active filters">
               {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
               <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+            </ScrollRow>
           )}
         </StickyFilterBand>
       ) : (
@@ -570,10 +571,10 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
             </Button>
           </div>
           {active.length > 0 && (
-            <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <ScrollRow className="-mx-gutter flex items-center gap-snug px-gutter" aria-label="Active filters">
               {active.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => update(clearFilter(sc, f.key))} />)}
               <button type="button" onClick={() => update(clearFilter(sc, "all"))} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+            </ScrollRow>
           )}
         </div>
       )}

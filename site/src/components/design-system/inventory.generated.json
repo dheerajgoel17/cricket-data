@@ -65,6 +65,7 @@
     "route": true,
     "exports": [],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
@@ -242,7 +243,7 @@
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
       "mobile/src/ui/page-atmosphere.tsx",
-      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tournament-stats.tsx",
       "mobile/src/ui/tab-fade.tsx"
@@ -318,7 +319,7 @@
       "mobile/src/ui/grid-table.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
-      "mobile/src/ui/segmented.tsx",
+      "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/star.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/page-atmosphere.tsx",
@@ -455,6 +456,7 @@
       "CapsuleTabs"
     ],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -485,6 +487,7 @@
       "ChoiceRow"
     ],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -590,6 +593,7 @@
       "TrendList"
     ],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/round-button.tsx",
@@ -626,6 +630,15 @@
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/bleed.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/ui/h-scroll.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "HScroll"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/hot-home.tsx",
@@ -805,6 +818,7 @@
       "MatchChips"
     ],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/team-badge.tsx"
@@ -818,6 +832,7 @@
       "MatchFancy"
     ],
     "dependencies": [
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/round-button.tsx",
@@ -1434,6 +1449,7 @@
       "GridLineSheet"
     ],
     "dependencies": [
+      "site/src/components/app/scroll-row.tsx",
       "site/src/components/ui/button.tsx",
       "site/src/components/ui/sheet.tsx",
       "site/src/components/app/chip.tsx",
@@ -1547,6 +1563,7 @@
       "RateCell"
     ],
     "dependencies": [
+      "site/src/components/app/scroll-row.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/skeletons.tsx",
       "site/src/components/app/market-tape.tsx",
@@ -1675,6 +1692,7 @@
       "TEAM"
     ],
     "dependencies": [
+      "site/src/components/app/scroll-row.tsx",
       "site/src/components/ui/button.tsx",
       "site/src/components/ui/item.tsx",
       "site/src/components/ui/popover.tsx",
@@ -1919,6 +1937,15 @@
       "site/src/components/ui/switch.tsx",
       "site/src/components/app/chip.tsx"
     ]
+  },
+  {
+    "path": "site/src/components/app/scroll-row.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "ScrollRow"
+    ],
+    "dependencies": []
   },
   {
     "path": "site/src/components/app/sign-in-sheet.tsx",

@@ -4,7 +4,7 @@ import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, w
 import { scheduleOnRN } from "react-native-worklets";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "@/ui/text";
-import { color, fs } from "@/ui/tokens";
+import { color, fs, duration } from "@/ui/tokens";
 
 /** The mark's drawing units (the site's `BrandMark`: a 64-unit tile) and the size it is drawn at. */
 const SIZE = 112, U = SIZE / 64;
@@ -27,11 +27,11 @@ export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () =
 
   useEffect(() => {
     if (calm) return;
-    stem.value = withTiming(1, { duration: 320, easing: out });
-    top.value = withDelay(150, withTiming(1, { duration: 300, easing: out }));
-    mid.value = withDelay(270, withTiming(1, { duration: 240, easing: out }));
+    stem.value = withTiming(1, { duration: duration.moderate, easing: out });
+    top.value = withDelay(150, withTiming(1, { duration: duration.moderate, easing: out }));
+    mid.value = withDelay(270, withTiming(1, { duration: duration.base, easing: out }));
     ball.value = withDelay(430, withSpring(1, { damping: 9, stiffness: 240, mass: 0.7 }));
-    word.value = withDelay(620, withTiming(1, { duration: 360, easing: out })); // in the system font, so it never waits for the app's fonts
+    word.value = withDelay(620, withTiming(1, { duration: duration.moderate, easing: out })); // in the system font, so it never waits for the app's fonts
   }, [calm, stem, top, mid, ball, word]);
 
   // Everything above runs on the UI thread from the first frame, so it plays through even while the JS thread is busy mounting the app (the app mounts the moment its fonts are in). Only the

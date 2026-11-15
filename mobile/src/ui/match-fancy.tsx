@@ -1,5 +1,6 @@
 import { fancyMarketPath, push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { HScroll } from "@/ui/h-scroll";
 import { Sheet } from "@/ui/sheet";
 import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, Share, StyleSheet, View } from "react-native";
@@ -37,7 +38,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
-import { cap, color, control, font, num, numLg, radius, space, type, tint, fs } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, rhythm, duration } from "@/ui/tokens";
 
 
 const fancyLines = fancyFor as (doc: any, fixture: any, key: string, team?: string | null, inn?: number) => any[]; // the engine is plain JS: give its result the shape this view reads
@@ -204,11 +205,11 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
         </Press>
       </View>
       {activeN > 0 ? (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
+        <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
           {win !== 10 ? <ActiveChip label={`Window L${win}`} onClear={() => { setWin(10); setMl(undefined); }} /> : null}
           {here ? <ActiveChip label={`At ${venueName}`} onClear={() => { setHere(false); setMl(undefined); }} /> : null}
           <Press onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
-        </ScrollView>
+        </HScroll>
       ) : null}
       <Sheet visible={filtersOpen} onClose={() => setFiltersOpen(false)} label="Close filters">
           <View style={styles.sheetHead}>
@@ -362,7 +363,7 @@ function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
 /** A share as a bar that fills from the left on the UI thread. */
 function Meter({ value, tone }: { value: number; tone: string }) {
   const w = useSharedValue(0);
-  useEffect(() => { w.value = withTiming(value, { duration: 300 }); }, [value, w]);
+  useEffect(() => { w.value = withTiming(value, { duration: duration.moderate }); }, [value, w]);
   const fill = useAnimatedStyle(() => ({ transform: [{ scaleX: Math.max(w.value, 0.001) }] })); // scale, not width: no layout pass per frame
   return <View style={styles.meter}><Animated.View style={[styles.meterFill, { backgroundColor: tone, transformOrigin: "left" } as object, fill]} /></View>;
 }
@@ -398,7 +399,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
 }
 
 const styles = StyleSheet.create({
-  root: { gap: space.stack },
+  root: { gap: rhythm.between },
   filterRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   chipFlex: { flex: 1, minWidth: 0, marginHorizontal: -space.gutter },
   filterBtn: { height: control, flexDirection: "row", alignItems: "center", gap: space.tight, paddingHorizontal: space.snug, borderRadius: radius.chip, backgroundColor: color.card },
@@ -414,7 +415,7 @@ const styles = StyleSheet.create({
   sheetClearTxt: { ...type.body, color: color.foreground },
   sheetApply: { flex: 2, height: 48, borderRadius: 999, backgroundColor: color.primary, alignItems: "center", justifyContent: "center" },
   sheetApplyTxt: { ...type.body, fontFamily: font.medium, color: color.background },
-  h2: { ...type.title, color: color.foreground },
+  h2: { ...type.heading, color: color.foreground },
   h3: { ...type.body, fontFamily: font.medium, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
   bleed: { marginHorizontal: -space.gutter },

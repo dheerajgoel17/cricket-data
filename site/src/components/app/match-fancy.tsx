@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ScrollRow } from "@/components/app/scroll-row";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -282,10 +283,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
             </div>
           )}
           {activeFilters.length > 0 && (
-            <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <ScrollRow className="flex items-center gap-snug px-gutter pb-snug" aria-label="Active filters">
               {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
               <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+            </ScrollRow>
           )}
         </StickyFilterBand>
       ) : (
@@ -303,10 +304,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
             </Button>
           </div>
           {activeFilters.length > 0 && (
-            <div className="-mx-gutter flex items-center gap-snug overflow-x-auto px-gutter [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            <ScrollRow className="-mx-gutter flex items-center gap-snug px-gutter" aria-label="Active filters">
               {activeFilters.map((f) => <ActiveChip key={f.key} label={f.label} value={f.value} onRemove={() => set(f.key === "mw" ? { mw: "" } : { mv: "" })} />)}
               <button type="button" onClick={() => set({ mw: "", mv: "" })} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+            </ScrollRow>
           )}
         </div>
       )}
