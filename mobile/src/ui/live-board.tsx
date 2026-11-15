@@ -10,11 +10,9 @@ import { push } from "@/lib/nav";
 import { Accordion } from "@/ui/accordion";
 import { Bleed } from "@/ui/bleed";
 import { Press } from "@/ui/press";
-import { RecentForm, FormHeadline } from "@/ui/recent-form";
 import { Segmented } from "@/ui/segmented";
 import { Text } from "@/ui/text";
-import { cap, color, font, num, radius, space, type } from "@/ui/tokens";
-import { recentForms } from "@/lib/form";
+import { cap, color, font, num, radius, space, tint, type } from "@/ui/tokens";
 
 type Side = [string, number];
 
@@ -81,6 +79,7 @@ function Ball({ b }: { b: string }) {
 /**
  * Live strip under the scoreboard (site Hotstar-style): bowler O-R-W + ongoing over balls | batters with strike dot.
  * No faces, partnership, last wkt or CRR here — those stay off the strip.
+ * `flat`: fixture flush shell — full-bleed border-t + secondary wash + gutter (web `bg-secondary/40 px-gutter`).
  */
 export function LiveBoard({ match, teams, flat }: { match: any; teams?: Side[]; flat?: boolean }) {
   const board = liveBoard(match);
@@ -90,7 +89,7 @@ export function LiveBoard({ match, teams, flat }: { match: any; teams?: Side[]; 
   const batters = (board.batters || []).slice(0, 2);
   return (
     <View
-      style={flat ? styles.strip : [styles.strip, styles.stripCard]}
+      style={flat ? styles.stripFlat : [styles.strip, styles.stripCard]}
       accessibilityLabel="Live scoreboard"
     >
       <View style={[styles.stripCol, styles.stripLeft]}>
@@ -215,7 +214,7 @@ function ScorecardBody({ match, teams }: { match: any; teams?: Side[] }) {
   );
 }
 
-/** Header + Hotstar live strip + Full scorecard in place (site ScorecardCard). */
+/** Header + Hotstar live strip + Full scorecard in place (site ScorecardCard). Lives inside fixture `scoreShell`. */
 export function ScorecardCard({ match, teams, header }: { match: any; teams?: Side[]; header: ReactNode }) {
   const [open, setOpen] = useState(false);
   const full = cardInns(match).length > 0;
@@ -224,41 +223,35 @@ export function ScorecardCard({ match, teams, header }: { match: any; teams?: Si
   return (
     <View style={styles.cardBox} accessibilityLabel="Scorecard">
       {header}
-      {strip ? <><View style={styles.rule} /><LiveBoard match={match} teams={teams} flat /></> : null}
+      {strip ? <LiveBoard match={match} teams={teams} flat /> : null}
       {full ? (
         <>
-          <View style={styles.rule} />
           <Press scale={1} onPress={() => setOpen((o) => !o)} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.fullRow}>
             <Ionicons name="grid-outline" size={18} color={color["muted-foreground"]} />
             <Text style={styles.fullText}>{open ? "Hide scorecard" : "Full scorecard"}</Text>
             <Ionicons name={open ? "chevron-up" : "chevron-down"} size={16} color={color["muted-foreground"]} />
           </Press>
-          {open ? <ScorecardBody match={match} teams={teams} /> : null}
+          {open ? (
+            <View style={styles.fullBody}>
+              <ScorecardBody match={match} teams={teams} />
+            </View>
+          ) : null}
         </>
       ) : null}
     </View>
   );
 }
 
-/** Scorecard + recent form accordions under a finished / non-live match. */
-export function MatchAccordions({ match, teams, fmt, store, noCard }: { match?: any; teams: Side[]; fmt: string; store: any; noCard?: boolean }) {
+/** Scorecard accordion under a finished / non-live match (Form is a tab on web; not stacked here). */
+export function MatchAccordions({ match, teams, noCard }: { match?: any; teams: Side[]; noCard?: boolean }) {
   const card = match && !noCard ? cardInns(match) : [];
-  const form = useMemo(() => (store ? recentForms(store, teams, fmt) : []), [store, teams, fmt]);
-  const showForm = form.some((f) => f.games.length);
-  if (!card.length && !showForm) return null;
+  if (!card.length) return null;
   const last = card[card.length - 1];
   return (
     <View style={{ paddingHorizontal: space.gutter }}>
-      {card.length ? (
-        <Accordion title="Scorecard" right={<Text style={styles.sum} numberOfLines={1}>{last.team} {innScore(last)}</Text>}>
-          <ScorecardBody match={match} teams={teams} />
-        </Accordion>
-      ) : null}
-      {showForm ? (
-        <Accordion title="Recent form" right={<FormHeadline forms={recentForms(store, teams, fmt, 3)} />}>
-          <RecentForm forms={form} store={store} fmt={fmt} />
-        </Accordion>
-      ) : null}
+      <Accordion title="Scorecard" right={<Text style={styles.sum} numberOfLines={1}>{last.team} {innScore(last)}</Text>}>
+        <ScorecardBody match={match} teams={teams} />
+      </Accordion>
     </View>
   );
 }
@@ -268,15 +261,33 @@ const styles = StyleSheet.create({
   cap: { ...type.caption, ...cap, color: color["muted-foreground"] },
   muted: { ...type.footnote, color: color["muted-foreground"] },
   strongMuted: { fontFamily: font.medium, color: color.foreground },
-  cardBox: { gap: space.snug },
-  rule: { height: StyleSheet.hairlineWidth, backgroundColor: color.hairline, marginHorizontal: -space.gutter },
-  fullRow: { flexDirection: "row", alignItems: "center", gap: space.tight, minHeight: 44 },
+  cardBox: {},
+  fullRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.tight,
+    minHeight: 44,
+    paddingHorizontal: space.gutter,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: color.hairline,
+  },
+  fullBody: { paddingHorizontal: space.gutter, paddingBottom: space.snug },
   fullText: { ...type.callout, fontFamily: font.medium, color: color.foreground, flex: 1 },
   strip: {
     flexDirection: "row",
     gap: space.snug,
     paddingVertical: space.snug,
-    backgroundColor: "rgba(255,255,255,0.04)",
+    backgroundColor: tint.hex(color.secondary, 0.4),
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: color.hairline,
+  },
+  /** Fixture flush path — full width of scoreShell; content guttered (web twin). */
+  stripFlat: {
+    flexDirection: "row",
+    gap: space.snug,
+    paddingVertical: space.snug,
+    paddingHorizontal: space.gutter,
+    backgroundColor: tint.hex(color.secondary, 0.4),
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: color.hairline,
   },

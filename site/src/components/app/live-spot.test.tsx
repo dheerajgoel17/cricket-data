@@ -92,14 +92,26 @@ describe("LiveBadge, InPlayBadge and LiveOpened", () => {
 describe("live rows", () => {
   it("the tag, an over / under market with both prices and a pick with its outcomes", () => {
     render(<><InPlayBadge /><LiveMarketRow m={{ kind: "ou", market: "Runs at Fall of 3rd Wicket", line: 81.5, over: 1.9, under: 1.8, book: "BookK" }} /><LiveMarketRow m={{ kind: "pick", market: "To Score Most Runs", outcomes: [{ label: "A", price: 2.5 }, { label: "B", price: 3, sub: "Pakistan" }] }} /></>);
+    // CompactFancyItem + In Play Market; no book logo; scored rows fill Edge/L10 via scoreLiveOuRow at the Match Fancy call site
     expect(screen.getAllByText("In Play Market").length).toBe(3);
     expect(screen.getByText("Runs at Fall of 3rd Wicket")).toBeInTheDocument();
-    expect(screen.getByText("O/U 81.5")).toBeInTheDocument();
-    expect(document.querySelector('[data-book="BookK"]')).not.toBeNull(); // the row names its book
-    expect(screen.getByText("1.90")).toBeInTheDocument();
+    expect(screen.getByText("81.5")).toBeInTheDocument();
+    expect(screen.getAllByText("Edge")).toHaveLength(2);
+    expect(document.querySelector("[data-book]")).toBeNull();
     expect(screen.getByText("1.80")).toBeInTheDocument();
-    expect(screen.getByText("2.50")).toBeInTheDocument();
-    expect(screen.getByText("B (Pakistan)")).toBeInTheDocument();
+    expect(screen.getByText(/B \(Pakistan\)/)).toBeInTheDocument();
+  });
+
+  it("uses a scored row (Edge + L10) when Match Fancy passes scoreLiveOuRow", () => {
+    const scored = {
+      label: "BAN · 50 overs", live: true, line: 181.5, over: 1.83, under: 1.83, side: "over",
+      edge: 0.12, last: [{ v: 190, s: "hit" }, { v: 160, s: "miss" }],
+    };
+    render(<LiveMarketRow m={{ kind: "ou", market: "Runs in First 50 Overs", line: 181.5, over: 1.83, under: 1.83 }} scored={scored} />);
+    expect(screen.getByText("BAN · 50 overs")).toBeInTheDocument();
+    expect(screen.getByText("In Play Market")).toBeInTheDocument();
+    expect(screen.getByText("+12")).toBeInTheDocument();
+    expect(document.querySelector("[data-book]")).toBeNull();
   });
 });
 

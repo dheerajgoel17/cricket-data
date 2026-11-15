@@ -15,5 +15,6 @@ describe("tokens derived from tokens.json", () => {
     expect(tint.primary(0.2)).toBe("rgba(39,218,142,0.2)");
     expect(tint.miss(0.45)).toBe("rgba(255,0,0,0.45)");
     expect(tint.amber(0.25)).toBe("rgba(245,165,36,0.25)");
+    expect(tint.hex("#1B4F9C", 0.35)).toBe("rgba(27,79,156,0.35)");
   });
 });

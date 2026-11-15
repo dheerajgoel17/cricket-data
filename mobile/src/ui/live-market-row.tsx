@@ -1,43 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { StyleSheet, View } from "react-native";
-import { Text } from "@/ui/text";
-import { odds } from "@site/lib/format";
-import { BookBadge } from "@/ui/book-badge";
-import { InPlayBadge } from "@/ui/live-bits";
-import { color, font, num, numLg, space, type } from "@/ui/tokens";
+import { OverviewRow } from "@/ui/fancy-row";
 
-/** One live market of the Match Fancy list (`liveRows`): an over / under line with both prices, or a pick with its outcomes. Prices only, no history, as on the site. */
-export function LiveMarketRow({ m }: { m: any }) {
-  return (
-    <View style={styles.row}>
-      <View style={styles.title}>
-        <Text style={styles.name} numberOfLines={2}>{m.market}</Text>
-        <InPlayBadge />
-        {m.book ? <BookBadge source={m.book} /> : null}
-      </View>
-      {m.kind === "ou" ? (
-        <View style={styles.prices}>
-          <Text style={styles.hero}>O/U {m.line}</Text>
-          <Text style={styles.side}>O <Text style={styles.price}>{odds(m.over)}</Text></Text>
-          <Text style={styles.side}>U <Text style={styles.price}>{odds(m.under)}</Text></Text>
-        </View>
-      ) : (
-        <View style={styles.prices}>
-          {(m.outcomes || []).map((o: any) => (
-            <Text key={`${o.label}|${o.sub || ""}`} style={styles.side}>{o.label}{o.sub ? ` (${o.sub})` : ""} <Text style={styles.price}>{odds(o.price)}</Text></Text>
-          ))}
-        </View>
-      )}
-    </View>
-  );
+/** Lean the shorter decimal (nearer evens); Over when tied — unscored fallback only. */
+function leanSide(over: number, under: number) {
+  if (over > 1 && under > 1) return under < over ? "under" : "over";
+  return over > 1 ? "over" : "under";
 }
 
-const styles = StyleSheet.create({
-  row: { paddingHorizontal: space.gutter, paddingVertical: space.snug + 2, gap: 3 },
-  title: { flexDirection: "row", alignItems: "baseline", gap: space.tight },
-  name: { ...type.body, fontFamily: font.medium, color: color.foreground, flexShrink: 1 },
-  prices: { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", columnGap: space.snug, rowGap: 2 },
-  hero: { ...numLg, fontSize: 22, letterSpacing: -0.4, lineHeight: 24, color: color.foreground },
-  side: { ...type.callout, ...num, color: color["muted-foreground"] },
-  price: { ...type.callout, ...num, fontSize: 15, color: color.foreground },
-});
+/**
+ * Match Fancy `liveRows`: same OverviewRow as scored fancy — `live` → In Play Market.
+ * Prefer `scored` from `scoreLiveOuRow` (Edge + L10). No book logo.
+ */
+export function LiveMarketRow({ m, scored }: { m: any; scored?: any | null }) {
+  if (scored) return <OverviewRow r={scored} />;
+  if (m.kind === "ou") {
+    const side = leanSide(m.over, m.under);
+    return (
+      <OverviewRow
+        r={{
+          label: m.market,
+          live: true,
+          line: m.line,
+          over: m.over,
+          under: m.under,
+          side,
+          edge: null,
+          last: [],
+        }}
+      />
+    );
+  }
+  const first = m.outcomes?.[0];
+  return (
+    <OverviewRow
+      r={{
+        label: m.market,
+        live: true,
+        line: first?.price ?? 0,
+        over: first?.price ?? 0,
+        under: null,
+        side: "over",
+        edge: null,
+        last: [],
+      }}
+      sub={(m.outcomes || []).map((o: any) => `${o.label}${o.sub ? ` (${o.sub})` : ""} ${o.price}`).join(" · ")}
+    />
+  );
+}

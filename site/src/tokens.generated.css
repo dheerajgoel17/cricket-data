@@ -2,7 +2,7 @@
 
 :root {
   color-scheme: dark;
-  --background: #000000;
+  --background: #0C0C0E;
   --foreground: #ffffff;
   --card: #1c1c1e;
   --card-foreground: #ffffff;
@@ -20,7 +20,7 @@
   --border: #2c2c2e;
   --input: #1c1c1e;
   --ring: #27da8e;
-  --sidebar: #000000;
+  --sidebar: #0C0C0E;
   --sidebar-foreground: #ffffff;
   --sidebar-primary: #27da8e;
   --sidebar-primary-foreground: #0f0f0f;

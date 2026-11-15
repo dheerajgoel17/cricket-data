@@ -1,32 +1,49 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { odds } from "@/lib/format";
-import { BookBadge } from "./book-badge";
-import { InPlayBadge } from "./live-spot";
+import { CompactFancyItem } from "./fancy-lines";
 
-/** One live market of the Match Fancy list: an over / under line with both prices, or a pick with its outcomes. Same row chrome as the other rows of the list; prices only (no history for it). */
-export function LiveMarketRow({ m }: { m: any }) {
+/** Lean the shorter decimal (nearer evens); Over when tied — unscored fallback only. */
+function leanSide(over: number, under: number) {
+  if (over > 1 && under > 1) return under < over ? "under" : "over";
+  return over > 1 ? "over" : "under";
+}
+
+/**
+ * Match Fancy `liveRows`: CompactFancyItem with `live` (In Play Market).
+ * Prefer `scored` from `scoreLiveOuRow` (Edge + L10 from the overs tape). Unscored fallback has no book logo.
+ */
+export function LiveMarketRow({ m, scored }: { m: any; scored?: any | null }) {
+  if (scored) return <CompactFancyItem r={scored} />;
+  if (m.kind === "ou") {
+    const side = leanSide(m.over, m.under);
+    return (
+      <CompactFancyItem
+        r={{
+          label: m.market,
+          live: true,
+          line: m.line,
+          over: m.over,
+          under: m.under,
+          side,
+          edge: null,
+          last: [],
+        }}
+      />
+    );
+  }
+  const first = m.outcomes?.[0];
   return (
-    <div className="grid gap-hair px-gutter py-snug">
-      <span className="flex min-w-0 items-baseline gap-snug">
-        <span className="truncate text-body font-label leading-snug">{m.market}</span>
-        <InPlayBadge />
-        {m.book && <BookBadge source={m.book} />}
-      </span>
-      {m.kind === "ou" ? (
-        <span className="flex flex-wrap items-baseline gap-x-snug text-callout text-muted-foreground">
-          <span className="font-condensed text-metric font-emphasis leading-none tracking-tight tabular-nums text-foreground">O/U {m.line}</span>
-          <span className="font-condensed tabular-nums">O <b className="text-body text-foreground">{odds(m.over)}</b></span>
-          <span className="font-condensed tabular-nums">U <b className="text-body text-foreground">{odds(m.under)}</b></span>
-        </span>
-      ) : (
-        <span className="flex flex-wrap items-baseline gap-x-snug gap-y-hair text-callout text-muted-foreground">
-          {(m.outcomes || []).map((o: any) => (
-            <span key={`${o.label}|${o.sub || ""}`} className="inline-flex items-baseline gap-tight font-condensed tabular-nums">
-              {o.label}{o.sub ? ` (${o.sub})` : ""} <b className="text-body text-foreground">{odds(o.price)}</b>
-            </span>
-          ))}
-        </span>
-      )}
-    </div>
+    <CompactFancyItem
+      r={{
+        label: m.market,
+        live: true,
+        line: first?.price ?? 0,
+        over: first?.price ?? 0,
+        under: null,
+        side: "over",
+        edge: null,
+        last: [],
+      }}
+      sub={(m.outcomes || []).map((o: any) => `${o.label}${o.sub ? ` (${o.sub})` : ""} ${o.price}`).join(" · ")}
+    />
   );
 }

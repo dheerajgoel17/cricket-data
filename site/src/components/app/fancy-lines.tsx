@@ -85,13 +85,15 @@ export function FancyGround({ r }: { r: any }) {
   return <span className="truncate text-caption text-muted-foreground">Ground · {side} ({at.n})</span>;
 }
 
-/** Compact scan item (shared grid with PropLines compact). VOID replaces MiniBars (same as Not in XI on props). `inset`: nested in a padded card — drop row gutter so padding is not doubled. */
-export function CompactFancyItem({ r, onOpen, active, sub, standing, inset }: { r: any; onOpen: () => void; active?: boolean; sub?: string; standing?: Standing | null; inset?: boolean }) {
+/** Compact scan item (shared grid with PropLines compact). VOID replaces MiniBars (same as Not in XI on props). `inset`: nested in a padded card — drop row gutter so padding is not doubled. `onOpen` optional (in-play-only `liveRows` have nowhere to open). */
+export function CompactFancyItem({ r, onOpen, active, sub, standing, inset }: {
+  r: any; onOpen?: () => void; active?: boolean; sub?: string; standing?: Standing | null; inset?: boolean;
+}) {
   const mark = standing ?? r.standing;
   const voided = mark?.state === "void";
-  return (
-    <button type="button" onClick={onOpen} aria-label={`Open ${r.label}`}
-      className={cn(SCAN_ROW_GRID, inset && "px-0", "text-left transition-colors active:bg-card", active && "bg-card")}>
+  const className = cn(SCAN_ROW_GRID, inset && "px-0", "text-left", onOpen && "transition-colors active:bg-card", active && "bg-card");
+  const body = (
+    <>
       {r.team
         ? <TeamBadge name={r.team} size="md" className="size-control" />
         : <span className="grid size-control place-items-center rounded-full bg-secondary text-muted-foreground" aria-hidden><ChartBarIcon className="size-5" /></span>}
@@ -111,8 +113,12 @@ export function CompactFancyItem({ r, onOpen, active, sub, standing, inset }: { 
       ) : (
         <MiniBars last={r.last || []} line={r.line} max={r.max} />
       )}
-    </button>
+    </>
   );
+  if (onOpen) {
+    return <button type="button" onClick={onOpen} aria-label={`Open ${r.label}`} className={className}>{body}</button>;
+  }
+  return <div className={className}>{body}</div>;
 }
 
 function CompactFancyList({ rows, onOpen, standingOf, activeOf, subOf, afterRow, bleed = true, inset }: {

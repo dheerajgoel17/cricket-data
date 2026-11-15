@@ -20,6 +20,7 @@ import { PageHeader } from "@/ui/page-header";
 import { Segmented } from "@/ui/segmented";
 import { StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
+import { PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
 import { color, font, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
@@ -53,9 +54,10 @@ export default function Team() {
   const top = useQuery({ queryKey: ["team-plan", i, fmt, "top"], enabled: valid && tab === "top", queryFn: (): Promise<any> => (runPlan as any)(store, rz, { ...plan, kind: "top_batter", market: null }, { teamIdx: i }) });
   const grid = useQuery({ queryKey: ["team-grid", i, fmt, stat, games], enabled: valid, queryFn: () => collectGrid(store, i, fmt, stat, games) });
   const name = known ? store.teamName(i) : "Team";
+  const accent = useEntityAccent(known ? store.teams[i].n : null);
 
   return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>
+    <PageAtmosphere wash={known} accent={accent} style={{ paddingTop: inset.top }}>
       <PageHeader title={name} subtitle={known ? (store.teams[i].g ? "Women's cricket" : "Men's cricket") : undefined} right={known ? <StarButton idx={i} kind="team" /> : undefined} />
       {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store ? <Working label="Loading…" fill shape="grid" /> : !known ? <EmptyState title="Unknown team" body="This team is not in the stats data." /> : !matchesReady ? <Working label="Loading matches…" fill shape="grid" /> : (
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
@@ -112,12 +114,11 @@ export default function Team() {
         </ScrollView>
       )}
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
   body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
   hero: { flexDirection: "row", alignItems: "center", gap: space.stack },
   name: { ...type.display, color: color.foreground, flex: 1 },

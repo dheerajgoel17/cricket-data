@@ -10,10 +10,13 @@ export type BlurTarget = RefObject<ComponentRef<typeof View> | null>;
 /**
  * A translucent bar the content scrolls under (the site's `bg-background/80 backdrop-blur-xl` bars). iOS: the system blur. Android (and the browser preview): the same dark tint, nearly
  * opaque and with no blur, since blurring the scrolling content behind it every frame is too heavy there.
+ *
+ * Pass `accent` (any truthy) on atmosphere pages: chrome itself stays clear (no second gradient); the caller should fade in a solid scrim on scroll so content does not bleed through.
  */
-export function BlurBar({ children, style }: { children?: ReactNode; style?: StyleProp<ViewStyle>; blurTarget?: BlurTarget | null }) {
+export function BlurBar({ children, style, accent }: { children?: ReactNode; style?: StyleProp<ViewStyle>; blurTarget?: BlurTarget | null; accent?: string | null }) {
+  if (accent) return <View style={style}>{children}</View>;
   if (Platform.OS === "ios") return <BlurView tint="systemChromeMaterialDark" intensity={80} style={style}>{children}</BlurView>;
-  return <View style={[style, { backgroundColor: "rgba(8,8,10,0.97)" }]}>{children}</View>;
+  return <View style={[style, { backgroundColor: "rgba(12,12,14,0.97)" }]}>{children}</View>;
 }
 
 /**

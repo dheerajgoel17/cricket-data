@@ -33,6 +33,30 @@ const OVER_RANGE = /\b(?:first|1st|opening)\s+\d+\s+overs?\b|\bovers?\s+\d+\s*-\
 /** Does an over / under market over a stretch of overs belong on the site (the others are dropped)? */
 export const keepLiveOu = (market) => OVER_RANGE.test(String(market || "")) && !NOT_SETTLEABLE.test(String(market || ""));
 
+/**
+ * Map a live OU market name onto a session key we can score (`overs_N`, optional side + innings).
+ * `sides` are the fixture's two team names. Null when the name is not a stretch-of-overs market.
+ */
+export function parseLiveOu(market, sides = []) {
+  const s = String(market || "");
+  if (!keepLiveOu(s)) return null;
+  let n = 0, m;
+  if (/\bpowerplay\b/i.test(s)) n = 6;
+  else if ((m = /(?:first|1st|opening)\s+(\d+)\s+overs?/i.exec(s))) n = +m[1];
+  else if ((m = /overs?\s+(\d+)\s*-\s*(\d+)/i.exec(s))) n = +m[2];
+  else if ((m = /(\d+)\s*-\s*(\d+)\s+overs?/i.exec(s))) n = +m[2];
+  else if ((m = /\b(\d+)\s*-\s*(\d+)\s+over\s+runs\b/i.exec(s))) n = +m[2];
+  else if ((m = /\b(\d+)\s+overs?\s+(?:runs?|session)\b/i.exec(s))) n = +m[1];
+  else if ((m = /\b(\d+)\s+over\s+runs\b/i.exec(s))) n = +m[1];
+  if (!(n > 0 && n <= 100)) return null;
+  let inn = 0;
+  if (/\b2nd\s+inn/i.test(s) || /\binnings\s*[:\s#-]*2\b/i.test(s)) inn = 2;
+  else if (/\b1st\s+inn/i.test(s) || /\binnings\s*[:\s#-]*1\b/i.test(s)) inn = 1;
+  const lower = s.toLowerCase();
+  const team = (sides || []).find((t) => t && lower.includes(String(t).toLowerCase())) || null;
+  return { key: `overs_${n}`, n, team, inn };
+}
+
 const MILESTONE = /milestone|to score (?:a |an |at least )?(?:\d+|fifty|half[- ]?century|hundred|century)|\b\d+\+\s*runs?\b|\b(?:half[- ]?century|century|fifty|hundred)\b/i;
 const NOT_PLAYER_MILESTONE = /most runs|top (?:bat|bowl)|team|partnership|fastest|highest|first (?:wicket|innings)|total/i;
 const rungOf = (s) => {

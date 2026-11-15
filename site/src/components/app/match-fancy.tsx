@@ -21,7 +21,7 @@ import { LineStepper } from "./line-stepper";
 import { BookTable } from "./book-table";
 import { LadderRow, type LadderPriced } from "./line-ladder";
 import { DetailSplit, StickyFilterBand, StickyPanel, TABLE_HEAD } from "./page";
-import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
+import { FANCY_INNS, MATCH_KEYS as MATCH_KEY_LIST, TEAM_KEYS as TEAM_KEY_LIST, BAT_FIRST_TAG, batFirstBooked, buildOverview as buildOverviewRows, collectOverview as collectOverviewRows, fancyFm, fancySample as sampleMs, firstInnsMs as firstInns, innTag, parseFm as parseFmRaw, peerFancyFm as peerFm, scoreLiveOuRow, scoreMarket as score } from "@cricket/engine/fancy-edge.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useLiveMatch } from "@/hooks/useLive";
@@ -172,6 +172,17 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
     return [...rep.ladder, ...extra].sort((a: any, b: any) => a.line - b.line);
   }, [rep, book, store, scoredMs, key, scope]); // eslint-disable-line react-hooks/exhaustive-deps
   const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc.data, { a: fx.a, b: fx.b }) : []), [doc.data, fx.a, fx.b, mode]);
+  // same Edge + L10 as scored fancy: overs tape vs the live OU line (no book logo — CompactFancyItem with live)
+  const liveScored = useMemo(() => {
+    if (!liveList.length || !store) return [] as { m: any; r: any }[];
+    const ground = venueIdx.length ? hereMatches(10) : undefined;
+    return liveList.map((m: any) => ({
+      m,
+      r: (scoreLiveOuRow as any)({
+        store, m, sides: [fx.a, fx.b], teams, fmt: fmtIdx, gender, lastN: win, ground, test: fx.fmt === "Test",
+      }),
+    }));
+  }, [liveList, store, teams, fx.a, fx.b, fx.fmt, fmtIdx, gender, win, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
   /** Keep the meter on `at` when that line is still priced after a scope/market switch; else fall back to the bookie main. */
   const lineOn = (fmId: string, sc: number, at: number) => {
     const { key: k, inn: i } = parseFm(fmId);
@@ -316,9 +327,13 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                 standingOf={(r) => r.standing}
                 afterRow={(r) => <TeamSpot r={r} fx={fx} teams={teams} className="px-gutter pb-snug lg:px-0 lg:pb-0" />}
               />
-              {liveList.length ? (
+              {liveScored.length ? (
                 <ul className="-mx-gutter">
-                  {liveList.map((m, i) => <li key={`live-${i}-${m.market}`} className="border-t border-hairline first:border-t-0"><LiveMarketRow m={m} /></li>)}
+                  {liveScored.map(({ m, r }, i) => (
+                    <li key={`live-${i}-${m.market}`} className="border-t border-hairline first:border-t-0">
+                      <LiveMarketRow m={m} scored={r} />
+                    </li>
+                  ))}
                 </ul>
               ) : null}
             </section>)}

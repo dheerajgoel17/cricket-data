@@ -57,6 +57,7 @@ function SideBlock({
 
 /**
  * Fixture header (site MatchScoreboard): series · mirrored crest/score · centre StatusLabel · status / venue.
+ * `bare`: inside the fixture flush `scoreShell` — internal gutter (web MatchScoreboard `px-gutter`); Fancy detail keeps outer pad + non-bare.
  */
 export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem; onShare?: () => void; onGround?: () => void; bare?: boolean }) {
   const now = useNow(1000);
@@ -113,7 +114,7 @@ export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem;
 
 const styles = StyleSheet.create({
   box: { gap: space.snug },
-  bare: { gap: space.snug },
+  bare: { gap: space.snug, paddingHorizontal: space.gutter, paddingTop: space.snug, paddingBottom: space.snug },
   top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug },
   topRight: { flexDirection: "row", alignItems: "center", gap: space.snug, flexShrink: 0 },
   series: { ...type.footnote, fontFamily: font.medium, color: color.foreground, flex: 1 },

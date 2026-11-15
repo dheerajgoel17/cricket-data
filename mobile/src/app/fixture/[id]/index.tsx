@@ -115,11 +115,19 @@ export default function FixturePage() {
           ) : (
             <>
               {item.live?.status === "live" ? (
-                <View style={styles.pad}><ScorecardCard match={item.live} teams={known} header={<MatchHeader bare item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} />} /></View>
+                <View style={styles.scoreShell}>
+                  <ScorecardCard
+                    match={item.live}
+                    teams={known}
+                    header={<MatchHeader bare item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} />}
+                  />
+                </View>
               ) : (
-                <Animated.View entering={enter(0)} style={styles.pad}><MatchHeader item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} /></Animated.View>
+                <Animated.View entering={enter(0)} style={styles.scoreShell}>
+                  <MatchHeader bare item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} />
+                </Animated.View>
               )}
-              {!bodyReady ? <Working label="Loading…" rows={4} /> : f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} fmt={fmt} store={store} noCard={item.live?.status === "live"} /> : null}
+              {!bodyReady ? <Working label="Loading…" rows={4} /> : f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} noCard={item.live?.status === "live"} /> : null}
               {bodyReady && f.fmt !== "FC" ? <View style={styles.sections}><CapsuleTabs label="Sections" items={tabs} value={tab} onChange={setTab} /></View> : null}
               {!bodyReady ? null : f.fmt === "FC" ? (
                 <View style={styles.pad}><EmptyState title="No props for first-class" body="First-class cricket is not part of the stats here, so there are no player props for this match." /></View>
@@ -180,6 +188,12 @@ export default function FixturePage() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   bar: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },
+  /** Web twin: `-mx-gutter … bg-card border-b` — fill + bottom rule both full width. */
+  scoreShell: {
+    backgroundColor: color.card,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: color.hairline,
+  },
   pad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   bleed: { marginHorizontal: -space.gutter },
   // the page's sections as chips under the match (Props / Match Fancy / Grid / Custom line), then the stat chips of the open one

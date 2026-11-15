@@ -15,6 +15,36 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-15 — Fixture scoreboard edge-to-edge shell (app)
+- **Path:** mobile `app/fixture/[id]/index.tsx` (`scoreShell`); `ui/live-board.tsx` (`ScorecardCard` / `LiveBoard` `flat`); `ui/match-header.tsx` (`bare` internal gutter)
+- **Change:** App fixture scoreboard matches web flush card plane: full-bleed `color.card` + bottom hairline; live strip full-bleed `border-t` + secondary wash + gutter; full-scorecard trigger full-bleed `border-t` (no negative-margin-only hairline rules). Non-live header uses the same shell. Fancy detail keeps outer pad + non-bare header (no double pad).
+- **Callers:** Fixture live / non-live header; Fancy market page unchanged
+
+### 2026-11-15 — LineTabs clear wrap; blended atmosphere chrome
+- **Path:** mobile `ui/line-tabs.tsx`; `ui/blur-bar.tsx` (`accent`); `ui/page-atmosphere.tsx`; player sticky chrome `barH` + scroll scrim
+- **Change:** LineTabs wrap stays transparent. Atmosphere `BlurBar accent` is clear (no second header gradient) so one `PageAtmosphere` wash blends at rest. On scroll, player fades in a solid elevated scrim and fades the hero name with the sticky title so content does not bleed under the chrome.
+- **Callers:** Player sticky chrome; Home `PhaseBar`
+
+### 2026-11-15 — Elevated canvas + page atmosphere
+- **Path:** `site/packages/tokens/tokens.json` (`background` / `sidebar` → `#0C0C0E`); `engine/entity-accents.js`; mobile `ui/page-atmosphere.tsx`; web `components/app/hero-wash.tsx`; splash / `app.json` / `BlurBar` Android tint
+- **Change:** Shared canvas off true black. Optional partial top hero wash (fade to transparent) for player/team from curated side accents; unknown sides use soft brand wash. Tabs/lists stay solid elevated. No full-page gradients; no runtime jersey sampling. Player sticky chrome: `BlurBar accent=` (app) and `HeroWash` around StickyFilterBand + hero (web) so the wash covers the header band too.
+- **Callers:** All surfaces via token; Player / Team heroes (web + app); design-host atmosphere stage
+
+### 2026-11-15 — LiveMarketRow: score Edge + L10 from overs tape
+- **Path:** `engine/inplay-lines.js` (`parseLiveOu`); `engine/fancy-edge.js` (`scoreLiveOuRow`); `live-markets.tsx` / mobile `live-market-row`; Match Fancy (web + app)
+- **Change:** In-play-only stretch-of-overs markets reuse CompactFancyItem / OverviewRow with In Play Market. `scoreLiveOuRow` parses the feed name onto `overs_N` (+ side/innings) and scores Edge + L10 from the same overs tape as scored fancy — no empty Edge/bars when history exists. No book logo in the title.
+- **Callers:** Match Fancy Bookmaker lines; `inplay-lines` / `live-spot` tests
+
+### 2026-11-15 — LiveMarketRow → CompactFancyItem (In Play Market)
+- **Path:** `site/src/components/app/live-markets.tsx`; mobile `ui/live-market-row.tsx`
+- **Change:** In-play-only Fancy (`liveRows`) no longer uses a separate tall O/U + book-logo row. Adapter maps onto CompactFancyItem / OverviewRow with `live: true` (same In Play Market badge as scored in-play fancy). No book logo in the title. Superseded for Edge/L10 by `scoreLiveOuRow` above.
+- **Callers:** Match Fancy list (web + app); design-host row density; `live-spot.test.tsx`
+
+### 2026-11-15 — Spacing/type governance: close GOVERNED gaps
+- **Path:** `site/src/lib/design-tokens.test.ts`; `docs/DESIGN_SYSTEM.md` foundations row; `docs/DESIGN_SYSTEM_AUDIT.md`
+- **Change:** Audit of web + app spacing/type/layout confirmed the shared `tokens.json` contract is already the single foundation. Enrolled four already-compliant product modules (`fancy-lines`, `home-mix-table`, `result-stamp`, `AuthCallback`) into GOVERNED so the token lint covers every product page/app component. No visual redesign; mobile micro-gaps of 2 px documented as intentional.
+- **Callers:** CI `design-tokens.test.ts`; all product routes already on named roles
+
 ### 2026-11-15 — Tab pages: title in shell bar
 - **Path:** `lib/header-slot.tsx` (`TabTitle`); `layout/Header.tsx`; `Lists` / `Leagues` / `Saved` / `Contact`
 - **Change:** Shared `TabTitle` (app `AppHeader title=` twin) on every tab except Fixtures — phone swaps brand for the page name; `lg+` keeps brand + title. Top-level owned bars keep search/account. Fancy also gains day + match chips (`?day=` / `?match=`).

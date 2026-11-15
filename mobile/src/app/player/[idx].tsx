@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import Animated, { interpolate, useAnimatedStyle } from "react-native-reanimated";
+import Animated, { interpolate, interpolateColor, useAnimatedStyle } from "react-native-reanimated";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
@@ -45,6 +45,7 @@ import { pricedFromBooks, SideBook } from "@/ui/side-book";
 import { pushRecentPlayer } from "@/lib/saved";
 import { PropStar, StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
+import { PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
 import { color, control, font, radius, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 import { WindowPills } from "@/ui/window-pills";
@@ -84,10 +85,13 @@ export default function PlayerPage() {
   const sub = useAnimatedStyle(() => ({ height: subH ? subH * (1 - collapsed.value) : undefined, opacity: 1 - collapsed.value }));
   // the hero: the portrait rides slower than the page and fades as it goes, and swells when the page is pulled down past the top; the name follows more gently
   const portraitFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [0, 240], [1, 0.15], "clamp"), transform: [{ translateY: y.value * 0.35 }, { scale: 1 + Math.max(-y.value, 0) / 520 }] }));
-  const nameFx = useAnimatedStyle(() => ({ transform: [{ translateY: y.value * 0.12 }] }));
+  // fade hero identity with the sticky title so text does not sit under clear atmosphere chrome while scrolling
+  const nameFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [0, 90], [1, 0], "clamp"), transform: [{ translateY: y.value * 0.12 }] }));
   // sticky title fades in as the hero name scrolls away — avoids a doubled name at the top of the page
   const headerTitleFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [40, 120], [0, 1], "clamp") }));
-  const headerSubFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [40, 120], [0.35, 1], "clamp") }));
+  const headerSubFx = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [40, 120], [0, 1], "clamp") }));
+  // solid elevated scrim on scroll only — keeps PageAtmosphere wash at rest, blocks overflow under the sticky bar
+  const barScrim = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(y.value, [0, 72], ["rgba(12,12,14,0)", "rgba(12,12,14,0.96)"]) }));
 
   const res = s.res.data;
   // Hero paints first; plan body mounts as a transition once the index is known.
@@ -103,9 +107,10 @@ export default function PlayerPage() {
     void Share.share({ message: shareText({ entries, line, side: "over", fmt: s.fmt, price, ground: s.next?.ground, opp: s.next?.opp, url }) || url, title: s.name });
   };
   const game = (e: any, st: string, label: string, auxLabel?: string) => push({ pathname: "/info/[topic]", params: { topic: "game", d: e.date, o: e.opp, v: e.venueName ?? "", x: e.value == null ? ({ void: "VOID: in the XI, did not bat/bowl", na: "N/A: XI not recorded", dnp: "DNP: not in the XI" } as any)[st] ?? "–" : String(e.value), l: label, a: auxLabel && e.value != null ? `${auxLabel}: ${e.aux ?? "–"}` : "", p: e.pos ? `No. ${e.pos}` : "", n: s.name } });
+  const accent = useEntityAccent(s.side || params.team);
 
   return (
-    <View style={styles.root}>
+    <PageAtmosphere wash accent={accent}>
       <BlurTargetView ref={target} style={styles.root}>
         <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
           {s.storeError ? <View style={styles.pad}><EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /></View> : !s.loadingStore && !s.indexed ? <View style={styles.pad}><EmptyState title="Unknown player" body="This player is not in the stats data." /></View> : (
@@ -133,25 +138,27 @@ export default function PlayerPage() {
         </Animated.ScrollView>
       </BlurTargetView>
 
-      <View style={styles.bar} onLayout={(e) => setBarH((h) => Math.max(h, Math.round(e.nativeEvent.layout.height)))}>
-        <BlurBar blurTarget={target} style={{ paddingTop: inset.top }}>
+      <View style={styles.bar} onLayout={(e) => setBarH(Math.round(e.nativeEvent.layout.height))}>
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, barScrim]} />
+        <BlurBar accent={accent || color.primary} blurTarget={target} style={{ paddingTop: inset.top }}>
           <PageHeader title={s.name || "Player"} subtitle={s.side || undefined} titleStyle={headerTitleFx} subtitleStyle={headerSubFx} buttons={2} right={s.indexed ? (
             <>
               <StarButton idx={idx} />
               <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton>
             </>
           ) : undefined} />
+          {/* Format LineTabs must stay clear (no opaque canvas) so BlurBar accent wash continues through T20/ODI/Test. */}
           {s.fmts.length > 1 ? <LineTabs<string> label="Format" items={s.fmts.map(([i, f]) => [String(i), f] as [string, string])} value={String(s.fmtVal)} onChange={(v) => { setFmt(Number(v)); setLineQ(undefined); setScope(undefined); }} /> : null}
           <CapsuleTabs label="Stat" items={STAT_OPTIONS.map(([k, l]) => [k, l, !pricedSet.has(k)] as [string, string, boolean])} value={s.stat} onChange={(k) => { setStat(k); setLineQ(undefined); }} />
           <Animated.View style={[styles.sub2, sub]}>
-            <View onLayout={(e) => { const h = Math.round(e.nativeEvent.layout.height); if (h && h !== subH) setSubH(h); }} style={[styles.subInner, { position: "absolute", left: 0, right: 0, top: 0 }]}>
+            <View onLayout={(e) => { const h = Math.round(e.nativeEvent.layout.height); if (h !== subH) setSubH(h); }} style={[styles.subInner, { position: "absolute", left: 0, right: 0, top: 0 }]}>
               {s.testBat ? <Segmented<string> items={[0, 1, 2].map((n) => [String(n), (SCOPE_LABEL as any)[n]] as [string, string])} value={String(s.scope)} onChange={(v) => { setScope(Number(v)); setLineQ(undefined); }} label="Innings" /> : null}
             </View>
           </Animated.View>
         </BlurBar>
       </View>
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
@@ -424,7 +431,7 @@ function Unpriced({ label }: { label: string }) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
+  root: { flex: 1 },
   bar: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },
   sub2: { overflow: "hidden" },
   subInner: { gap: space.snug, paddingHorizontal: space.gutter, paddingBottom: space.snug },

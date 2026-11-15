@@ -11,7 +11,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Design tokens live in packages/tokens/tokens.json (true-black canvas, accent #27DA8E); html.dark stays on so shadcn dark: variants match. Role names (text-body, gap-stack, control, ...) are shared with future native apps. */
+/* Design tokens live in packages/tokens/tokens.json (elevated canvas #0C0C0E, accent #27DA8E); html.dark stays on so shadcn dark: variants match. Role names (text-body, gap-stack, control, ...) are shared with future native apps. */
 :root {
   --ion-background-color: var(--background);
   --ion-text-color: var(--foreground);

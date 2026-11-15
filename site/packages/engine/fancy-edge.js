@@ -1,9 +1,11 @@
 // The Match Fancy edge as plain functions of the data (no DOM, no clock of its own): one definition for the site (Match Fancy tab, /fancy cards) and for the server step that picks
 // the pre-match edges worth announcing (site/scripts/fancy-alerts.mjs). Every number is the history of the two sides over a line the books list, through `sideEdge` (stats.js).
 import { fancyByLine, fancyFor, fancyHeadline, fixtureBooks, lineProb } from "./lines.js";
-import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, oversN, selectMatches, teamOversReport, teamTotalReport, venueIndices } from "./markets.js";
+import { parseLiveOu } from "./inplay-lines.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, oversLabel, oversN, selectMatches, teamOversReport, teamTotalReport, venueIndices } from "./markets.js";
 import { shrunkProb, sideEdge } from "./stats.js";
 import { FORMATS } from "./util.js";
+import { teamKey } from "./live.js";
 
 /** [market key, short label] of the whole-match and team-total markets the Match Fancy tab shows, in its order (a key a book prices that is not here is not scored). */
 export const MATCH_KEYS = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["first_over", "1st over"], ["overs_5", "5 overs"], ["overs_6", "6 overs"], ["overs_10", "10 overs"], ["overs_15", "15 overs"],
@@ -63,6 +65,44 @@ export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, gro
   return { key: k, inn, scope, team: teamName, batFirst, line: b.line, overLine: lo?.line ?? null, underLine: lu?.line ?? null, over: lo?.over ?? null, under: lu?.under ?? null, books: shownBooks,
     overBook: src(lo, "over"), underBook: src(lu, "under"), live: shownBooks.some((x) => x.live), opened: shownBooks.find((x) => x.opened != null)?.opened ?? null, side, edge: side === "over" ? eo : eu, hits, played, chance: shrunkProb(hits, played, side === "over" ? po : pu),
     at, last: (rep.values || []).slice(-10).map((v) => ({ v, s: v > b.line ? "hit" : v < b.line ? "miss" : "push" })) };
+}
+
+/**
+ * Score one Match Fancy `liveRows` OU market against the sides' history (same `scoreMarket` / `sideEdge` as `marketRow`).
+ * Returns a CompactFancyItem-shaped row with Edge + L10 when the tape has enough games; null when the name cannot be parsed or there is no sample.
+ * `teams` is [[name, teamIndex], ...]; `sides` are the two fixture names for parsing.
+ */
+export function scoreLiveOuRow({ store, m, sides, teams, fmt, gender, lastN = WINDOW, ground = null, test = false }) {
+  if (!store || m?.kind !== "ou" || !(m.line > 0)) return null;
+  const parsed = parseLiveOu(m.market, sides);
+  if (!parsed) return null;
+  const teamEntry = parsed.team != null ? (teams || []).find(([name]) => name === parsed.team || teamKey(name) === teamKey(parsed.team)) : null;
+  const scope = teamEntry ? teamEntry[1] : -1;
+  if (parsed.team && !(scope >= 0)) return null;
+  const ms = fancySample(store, { fmt, gender, teams: teams || [], scope, lastN });
+  if (!ms.length) return null;
+  const k = parsed.key, inn = parsed.inn, line = m.line;
+  const books = [{ source: m.book || "live", over: m.over, under: m.under, live: true }];
+  const run = (ln) => scoreMarket(store, ms, scope, k, ln, inn);
+  const so = m.over > 1 ? run(line).summary : null, su = m.under > 1 ? run(line).summary : null, base = so ?? su;
+  if (!base || !base.n) return null;
+  const po = m.over > 1 ? lineProb(books) : null, pu = m.under > 1 && lineProb(books) != null ? 1 - lineProb(books) : null;
+  const eo = m.over > 1 && so ? sideEdge(so.over, so.over + so.under, po, m.over) : null;
+  const eu = m.under > 1 && su ? sideEdge(su.under, su.over + su.under, pu, m.under) : null;
+  const side = (eu ?? -9) > (eo ?? -9) ? "under" : "over";
+  const rep = run(line);
+  const gs = ground && ground.length >= GROUND_MIN ? scoreMarket(store, ground, scope, k, line, inn).summary : null;
+  const at = gs && gs.n >= GROUND_MIN ? { n: gs.n, over: gs.over, under: gs.under, side: gs.under > gs.over ? "under" : "over" } : null;
+  const mine = side === "over" ? so : su, hits = mine ? (side === "over" ? mine.over : mine.under) : 0, played = mine ? mine.over + mine.under : 0;
+  const teamName = teamEntry ? teamEntry[0] : parsed.team;
+  const r = {
+    key: k, inn, scope, team: teamName, batFirst: false, line, overLine: line, underLine: line,
+    over: m.over > 1 ? m.over : null, under: m.under > 1 ? m.under : null, books, overBook: m.book, underBook: m.book,
+    live: true, opened: null, side, edge: side === "over" ? eo : eu, hits, played,
+    chance: shrunkProb(hits, played, side === "over" ? po : pu),
+    at, last: (rep.values || []).slice(-10).map((v) => ({ v, s: v > line ? "hit" : v < line ? "miss" : "push" })),
+  };
+  return withLabel(r, () => oversLabel(parsed.n), !!teamName, test);
 }
 
 /** `marketRow` for each of `keys` (market keys; "top_batter" is a list, not a line), the best edge first. `inn` 1 or 2 is that side's own innings, scored only on that turn, never mixed into the match total. */

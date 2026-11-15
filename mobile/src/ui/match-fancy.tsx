@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { fancyByLine, fancyFor, fancyHeadline } from "@cricket/engine/lines.js";
-import { BAT_FIRST_TAG, FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, fancySample, firstInnsMs, innTag, parseFm, peerFancyFm, scoreMarket } from "@cricket/engine/fancy-edge.js";
+import { BAT_FIRST_TAG, FANCY_INNS, MATCH_KEYS, TEAM_KEYS, batFirstBooked, buildOverview, fancyFm, fancySample, firstInnsMs, innTag, parseFm, peerFancyFm, scoreLiveOuRow, scoreMarket } from "@cricket/engine/fancy-edge.js";
 import { fancyStanding } from "@cricket/engine/live.js";
 import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, topBatters, venueIndices } from "@cricket/engine/markets.js";
 import { fancyShareText } from "@cricket/engine/share-text.js";
@@ -100,8 +100,18 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc, ms, fxInfo, team, scope, hist, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // the other live markets (over / under lines and picks), from the in-play merge: prices only
   const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc, { a: fx.a, b: fx.b }) : []), [doc, fx.a, fx.b, mode]);
+  // same Edge + L10 as scored fancy: overs tape vs the live OU line
+  const liveScored = useMemo(() => {
+    if (!hist || !liveList.length) return [] as { m: any; r: any }[];
+    const ground = venueIdx.length ? hereMatches(10) : undefined;
+    return liveList.map((m: any) => ({
+      m,
+      r: (scoreLiveOuRow as any)({
+        store, m, sides: [fx.a, fx.b], teams, fmt: fmtIdx, gender, lastN: win, ground, test: fx.fmt === "Test",
+      }),
+    }));
+  }, [hist, liveList, store, teams, fx.a, fx.b, fx.fmt, fmtIdx, gender, win, venueIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const book = useMemo(() => (fancyByLine(bookedNow) as { line: number; over: number | null; under: number | null; books: { over: number | null; under: number | null; source: string }[] }[]), [bookedNow]);
   const base = useMemo(() => (!hist || !key || key === "top_batter" ? null : run(key)), [hist, store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -224,10 +234,10 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
-          {mode === "list" && overview.length === 0 && liveList.length === 0 ? (
+          {mode === "list" && overview.length === 0 && liveScored.length === 0 ? (
             <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />
           ) : null}
-          {mode === "list" && (overview.length > 0 || liveList.length > 0) ? (
+          {mode === "list" && (overview.length > 0 || liveScored.length > 0) ? (
             <View style={{ gap: space.snug }}>
               <Text style={styles.h2}>Bookmaker lines</Text>
               {liveMatch?.status === "live" ? <Text style={styles.note}>So far this match, delayed up to about 20 seconds. Not used for settlement.</Text> : null}
@@ -237,8 +247,10 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                     <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
                   </View>
                 ))}
-                {liveList.map((m, i) => (
-                  <View key={`live-${i}-${m.market}`} style={(overview.length > 0 || i > 0) && styles.sep}><LiveMarketRow m={m} /></View>
+                {liveScored.map(({ m, r }, i) => (
+                  <View key={`live-${i}-${m.market}`} style={(overview.length > 0 || i > 0) && styles.sep}>
+                    <LiveMarketRow m={m} scored={r} />
+                  </View>
                 ))}
               </View>
             </View>

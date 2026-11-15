@@ -14,8 +14,9 @@ const GOVERNED = [
   "pages/Markets.tsx", "pages/Simple.tsx", "pages/Tools.tsx", "pages/Legal.tsx",
   "components/app/ad-slot.tsx", "components/app/animated-height.tsx", "components/app/animated-number.tsx", "components/app/badges.tsx", "components/app/book-badge.tsx",
   "components/app/book-table.tsx", "components/app/empty-state.tsx", "components/app/error-boundary.tsx", "components/app/fancy-filters.tsx", "components/app/grid-filters.tsx",
-  "components/app/line-ladder.tsx", "components/app/player-picker.tsx", "components/app/portrait.tsx", "components/app/sign-in-sheet.tsx", "components/app/stats-ad.tsx",
-  "pages/AdminAds.tsx",
+  "components/app/fancy-lines.tsx", "components/app/home-mix-table.tsx", "components/app/line-ladder.tsx", "components/app/player-picker.tsx", "components/app/portrait.tsx",
+  "components/app/result-stamp.tsx", "components/app/sign-in-sheet.tsx", "components/app/stats-ad.tsx",
+  "pages/AdminAds.tsx", "pages/AuthCallback.tsx",
 ];
 const sources = import.meta.glob("../**/*.tsx", { query: "?raw", import: "default", eager: true }) as Record<string, string>;
 const src = (f: string) => sources[`../${f}`] ?? "";

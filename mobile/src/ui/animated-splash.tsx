@@ -67,7 +67,7 @@ export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () =
 }
 
 const styles = StyleSheet.create({
-  fill: { ...StyleSheet.absoluteFill, backgroundColor: "#000000", zIndex: 100 },
+  fill: { ...StyleSheet.absoluteFill, backgroundColor: color.background, zIndex: 100 },
   center: { flex: 1, alignItems: "center", justifyContent: "center", gap: 14 },
   word: { fontSize: 26, fontWeight: "700", letterSpacing: -0.5, color: color.foreground },
 });

@@ -117,7 +117,7 @@ test("the route serves the Supabase row while it is fresh, an empty list when it
 });
 
 // ---- folding the live lines into the lines data the tables read
-import { keepLiveOu, liveMerge, milestoneRows } from "@cricket/engine/inplay-lines.js";
+import { keepLiveOu, liveMerge, milestoneRows, parseLiveOu } from "@cricket/engine/inplay-lines.js";
 
 const prematch = () => ({
   generated_at_utc: "2026-11-09T05:00:00Z",
@@ -280,6 +280,16 @@ test("a live match no book priced takes its fixture from the site's list, a fini
 test("runs over a stretch of overs are kept; a single over or delivery, the fall of a wicket, wickets lost and dismissal are not", () => {
   for (const m of ["Runs in First 20 Overs", "Runs in First 6 Overs", "Overs 0-10 Over/Under 70.5 Runs", "Overs 1-45 Runs", "0-5 Over Runs", "6 Over Runs", "10 over runs", "Powerplay Runs"]) assert.ok(keepLiveOu(m), m);
   for (const m of ["Runs in over 3", "Over/Under 7.5 Runs In Over 12", "Runs Off Delivery 4", "Runs off 3rd ball", "Runs at Fall of 3rd Wicket", "Fall of Wicket 1 Runs", "Wickets Lost for 100 Runs", "Wicket in an over", "Runs In Over 5 odd or even", "Next Over Runs", "Method of Dismissal", "Other", ""]) assert.ok(!keepLiveOu(m), m);
+});
+
+test("parseLiveOu maps stretch-of-overs names onto overs_N (+ side / innings when named)", () => {
+  const sides = ["South Africa", "Bangladesh"];
+  assert.deepEqual(parseLiveOu("Runs in First 50 Overs", sides), { key: "overs_50", n: 50, team: null, inn: 0 });
+  assert.deepEqual(parseLiveOu("Total Runs - Bangladesh, Innings 1, Overs 1-50", sides), { key: "overs_50", n: 50, team: "Bangladesh", inn: 1 });
+  assert.deepEqual(parseLiveOu("Bangladesh Overs 0-50 Runs 1st innings", sides), { key: "overs_50", n: 50, team: "Bangladesh", inn: 1 });
+  assert.deepEqual(parseLiveOu("Bangladesh Overs 0-55 Runs 1st innings", sides), { key: "overs_55", n: 55, team: "Bangladesh", inn: 1 });
+  assert.deepEqual(parseLiveOu("Powerplay Runs", sides), { key: "overs_6", n: 6, team: null, inn: 0 });
+  assert.equal(parseLiveOu("Runs in over 3", sides), null);
 });
 
 test("a batter's milestone becomes rows of his own: a named market with Yes / No, a generic one with the batters as outcomes", () => {

@@ -20,6 +20,7 @@ import { BookTable } from "@/components/app/book-table";
 import { ActiveChip, Chip } from "@/components/app/chip";
 import { EmptyState } from "@/components/app/empty-state";
 import { Field, LiveForm, NativeSelect } from "@/components/app/forms";
+import { HeroWash, sideAccent } from "@/components/app/hero-wash";
 import { LadderRow, pricedFromBooks } from "@/components/app/line-ladder";
 import { MatchScoreboard } from "@/components/app/match-scoreboard";
 import { Note } from "@/components/app/note";
@@ -69,7 +70,7 @@ const GROUPS: readonly { title: string; sections: readonly (readonly [string, st
 
 const PAGE_BLURB: Record<string, string> = {
   type: "Satoshi for UI. Barlow Condensed for scoreboard figures.",
-  color: "Semantic colour tokens from tokens.json.",
+  color: "Elevated canvas (#0C0C0E), semantic tokens, and optional entity hero washes.",
   space: "Stack gaps and layout sizes used across web and app.",
   motion: "Curves, springs, and timings used in the product.",
   components: "Browse product components with live previews.",
@@ -86,7 +87,7 @@ const PAGE_BLURB: Record<string, string> = {
 
 const PAGE_WHEN: Record<string, string> = {
   type: "Pick Satoshi for names and UI copy; Barlow Condensed only for scores, odds, hit rates, and label-cap rails.",
-  color: "Use semantic tokens (primary, miss, amber, dnp) — never hard-code hex in product UI.",
+  color: "Use semantic tokens (primary, miss, amber, dnp). Canvas is elevated #0C0C0E — never true black. Entity hero washes via HeroWash / entityAccent only.",
   space: "Space siblings with parent gap tokens; do not add ad-hoc margins between blocks.",
   motion: "Reuse tokens.motion and the selection spring; honour prefers-reduced-motion.",
   buttons: "One primary action per region. Prefer h-control rounded-full for product CTAs. Match / row status marks use StatusLabel tones — never fork LIVE colours at the call site.",
@@ -302,10 +303,20 @@ export function DesignSystemPage() {
 
     color: (
       <>
-        <Muted>Prefer primary for positive / selected, miss for under, amber for push / caution.</Muted>
+        <Muted>Prefer primary for positive / selected, miss for under, amber for push / caution. Canvas is elevated dark — never true black.</Muted>
         <div className="grid grid-cols-2 gap-snug sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {colors.map(([name, value]) => <Swatch key={name} name={name} value={String(value)} />)}
         </div>
+        <PreviewFrame title="HeroWash" description="Partial top wash over the elevated canvas (app PageAtmosphere twin). Player / team heroes only; tabs stay solid. Unknown sides soft-brand." source="components/app/hero-wash.tsx · engine/entity-accents.js" canvasClassName="items-stretch bg-background p-0">
+          <div className="grid w-full gap-stack sm:grid-cols-2">
+            <HeroWash accent={sideAccent("India")} className="overflow-hidden rounded-[var(--card-radius)] border border-hairline">
+              <div className="px-inset py-group"><p className="text-title font-emphasis">India</p><p className="text-callout text-muted-foreground">Curated side accent</p></div>
+            </HeroWash>
+            <HeroWash accent={null} className="overflow-hidden rounded-[var(--card-radius)] border border-hairline">
+              <div className="px-inset py-group"><p className="text-title font-emphasis">Unknown XI</p><p className="text-callout text-muted-foreground">Brand primary wash</p></div>
+            </HeroWash>
+          </div>
+        </PreviewFrame>
       </>
     ),
 

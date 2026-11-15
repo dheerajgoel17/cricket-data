@@ -51,6 +51,8 @@ export const tint = {
   destructive: (a: number) => hexAlpha(color.destructive, a),
   white: (a: number) => `rgba(255,255,255,${a})`,
   black: (a: number) => `rgba(0,0,0,${a})`,
+  /** Arbitrary hex → rgba (page atmosphere washes, entity accents). */
+  hex: hexAlpha,
   /** Selected ladder / table row wash (matches web card-on). */
   row: "rgba(58,58,60,0.45)",
 } as const;

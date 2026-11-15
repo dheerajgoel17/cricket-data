@@ -4,6 +4,7 @@
  */
 import { ChartBarIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { MiniBars } from "@/components/app/mini-bars";
+import { LiveMarketRow } from "@/components/app/live-markets";
 import { InPlayBadge } from "@/components/app/live-spot";
 import { ResultStamp } from "@/components/app/result-stamp";
 import { TeamFlag } from "@/components/app/badges";
@@ -278,6 +279,35 @@ export function RowDensityDemos() {
               <ScanFancyRow stamp="Miss" />
             </PhoneShell>
           </div>
+        </div>
+      </PreviewFrame>
+      <PreviewFrame
+        title="In Play Market — liveRows"
+        description="Match Fancy in-play-only markets reuse CompactFancyItem with `live`. `scoreLiveOuRow` fills Edge + L10 from the overs tape (same as scored fancy). Demo shows a scored row."
+        canvasClassName="items-stretch justify-start bg-background"
+        source="live-markets.tsx · scoreLiveOuRow"
+      >
+        <div className="grid w-full justify-items-center gap-tight">
+          <PhoneShell>
+            <li className="border-t border-hairline first:border-t-0">
+              <LiveMarketRow
+                m={{ kind: "ou", market: "Runs in First 50 Overs", line: 181.5, over: 1.83, under: 1.83 }}
+                scored={{
+                  label: "50 overs", live: true, line: 181.5, over: 1.83, under: 1.83, side: "over",
+                  edge: 0.09, last: LAST.map((x) => ({ ...x, v: x.v == null ? null : Math.round((x.v / 24.5) * 180) })),
+                }}
+              />
+            </li>
+            <li className="border-t border-hairline">
+              <LiveMarketRow
+                m={{ kind: "ou", market: "Bangladesh Overs 0-50 Runs 1st innings", line: 178.5, over: 2.0, under: 1.8 }}
+                scored={{
+                  label: "BAN · 50 overs", live: true, line: 178.5, over: 2.0, under: 1.8, side: "under", innScope: "1st INN",
+                  edge: 0.05, last: LAST.map((x) => ({ ...x, v: x.v == null ? null : Math.round((x.v / 24.5) * 175) })),
+                }}
+              />
+            </li>
+          </PhoneShell>
         </div>
       </PreviewFrame>
     </>

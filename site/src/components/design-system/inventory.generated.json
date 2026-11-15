@@ -31,10 +31,14 @@
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/brand.tsx",
+      "mobile/src/ui/chips.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/fancy-row.tsx",
+      "mobile/src/ui/fixture-card.tsx",
       "mobile/src/ui/icons.tsx",
+      "mobile/src/ui/match-chip.tsx",
       "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
@@ -549,7 +553,8 @@
     "platform": "native",
     "route": false,
     "exports": [
-      "FixtureCard"
+      "FixtureCard",
+      "LiveScore"
     ],
     "dependencies": [
       "mobile/src/ui/press.tsx",
@@ -1308,6 +1313,10 @@
     "route": false,
     "exports": [
       "CompactFancyItem",
+      "FancyBooks",
+      "FancyGround",
+      "FancyHitRate",
+      "FancyLineMeta",
       "FancyLines",
       "OverviewRow"
     ],
@@ -1315,7 +1324,6 @@
       "site/src/components/app/book-badge.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/live-spot.tsx",
-      "site/src/components/ui/badge.tsx",
       "site/src/components/app/mini-bars.tsx",
       "site/src/components/app/result-stamp.tsx",
       "site/src/components/app/tick.tsx"
@@ -1426,6 +1434,23 @@
     ]
   },
   {
+    "path": "site/src/components/app/home-mix-table.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "HomeMixDenseTable"
+    ],
+    "dependencies": [
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/fancy-lines.tsx",
+      "site/src/components/app/hot-props.tsx",
+      "site/src/components/app/live-spot.tsx",
+      "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/portrait.tsx",
+      "site/src/components/app/tick.tsx"
+    ]
+  },
+  {
     "path": "site/src/components/app/home-phase-bar.tsx",
     "platform": "web",
     "route": false,
@@ -1450,6 +1475,7 @@
       "site/src/components/app/home-phase-bar.tsx",
       "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/fancy-lines.tsx",
+      "site/src/components/app/home-mix-table.tsx",
       "site/src/components/app/hot-props.tsx",
       "site/src/components/app/market-tape.tsx",
       "site/src/components/app/pill-group.tsx",
@@ -1463,9 +1489,14 @@
     "exports": [
       "BookQuotes",
       "HotProps",
+      "PropBarsSlot",
+      "PropLineIdentity",
+      "PropLineMeta",
       "PropLines",
+      "PropProgress",
       "PropRow",
-      "PropTable"
+      "PropTable",
+      "RateCell"
     ],
     "dependencies": [
       "site/src/components/app/animated-height.tsx",
@@ -1476,7 +1507,6 @@
       "site/src/components/app/page.tsx",
       "site/src/components/app/home-phase-bar.tsx",
       "site/src/components/ui/button.tsx",
-      "site/src/components/ui/badge.tsx",
       "site/src/components/app/book-badge.tsx",
       "site/src/components/app/book-table.tsx",
       "site/src/components/app/badges.tsx",
@@ -1551,7 +1581,8 @@
     ],
     "dependencies": [
       "site/src/components/app/book-badge.tsx",
-      "site/src/components/app/live-spot.tsx"
+      "site/src/components/app/live-spot.tsx",
+      "site/src/components/app/mini-bars.tsx"
     ]
   },
   {
@@ -2596,8 +2627,11 @@
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/hot-props.tsx",
       "site/src/components/app/ad-slot.tsx",
+      "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/match-fancy.tsx",
+      "site/src/components/app/pill-group.tsx",
       "site/src/components/app/badges.tsx",
+      "site/src/components/app/status-label.tsx",
       "site/src/components/app/skeletons.tsx",
       "site/src/components/app/page.tsx"
     ]

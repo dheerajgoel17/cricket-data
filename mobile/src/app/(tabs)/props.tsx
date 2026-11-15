@@ -39,7 +39,7 @@ function PlayerProps() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [pulling, setPulling] = useState(false);
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
-  const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, refetch } = useHotViewWithRefetch(Number(sc.day));
+  const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, matchOf, refetch } = useHotViewWithRefetch(Number(sc.day));
   const dayRows = useMemo(() => raw.map((r) => ({ ...r, live: r.quotes?.some((q: any) => q.live), out: outOf(r) })), [raw, outOf]);
   const matchChips = useMemo(() => {
     const m = new Map<string, { id: string; a: string; b: string; start: string; fmt: string }>();

@@ -2,7 +2,7 @@
 
 Fancy.cash has **two design systems** that share one contract: tokens, type roles, spacing roles, and component **jobs**. The web DS lives in `site/` (responsive). The app DS lives in `mobile/src/ui` (React Native). Reuse a web pattern on native only when it works; otherwise ship a **native-designed twin** with the same job and tokens.
 
-No rebrand. No paid UI kit. Dark only. Free MIT only. **Icons in product code (`components/app`, `pages`, `components/ui`, `mobile/src`): Heroicons / Ionicons — never Lucide.** `lucide-react` is not a dependency; after `npx shadcn add`, replace any Lucide imports with Heroicons before merge (CI bans Lucide under those trees).
+No rebrand. No paid UI kit. Dark only — elevated canvas `#0C0C0E` (never true black). Optional partial hero washes on entity pages from a curated side accent map (`engine/entity-accents.js`); tab/list surfaces stay solid elevated. Free MIT only. **Icons in product code (`components/app`, `pages`, `components/ui`, `mobile/src`): Heroicons / Ionicons — never Lucide.** `lucide-react` is not a dependency; after `npx shadcn add`, replace any Lucide imports with Heroicons before merge (CI bans Lucide under those trees).
 
 ## Foundations (shared)
 
@@ -11,7 +11,7 @@ No rebrand. No paid UI kit. Dark only. Free MIT only. **Icons in product code (`
 | Colours, space, type sizes, motion, breakpoints | `site/packages/tokens/tokens.json` | `npm run tokens` → `site/src/tokens.generated.css` + Tailwind roles | `mobile/src/ui/tokens.ts` derives px from the same JSON (`remPx`); `tint.*` for rgba washes |
 | Type pairing | Satoshi UI + Barlow Condensed figures / `label-cap` | `index.css` `@utility label-cap` / `num-cond` | `font`, `cap`, `num`, `numLg` |
 | Layout roles | gutter, control, row-min, header-h | CSS vars + utility classes | `space.gutter`, `control`, `HEADER_HEIGHT` |
-| Rules | Named roles only on migrated surfaces | `design-tokens.test.ts` GOVERNED list | Same role names; values from tokens |
+| Rules | Named roles only on migrated surfaces | `design-tokens.test.ts` GOVERNED list (all product `pages/*` + `components/app|layout/*` enrolled; catalogue/design-host excluded) | Same role names; values from `tokens.ts`. Micro-gaps of 2 px (icon+label) stay literal; 4/6 px prefer `space.hair` / `space.tight` |
 
 Use the shared weight roles from `tokens.json`: editorial (300), copy (400), label (500), emphasis (700), and brand (900). On web use `font-editorial`, `font-copy`, `font-label`, `font-emphasis`, and `font-display-heavy`. Native text styles resolve to the corresponding bundled Satoshi faces. Barlow Condensed uses the editorial weight for standard tabular figures and the label weight for caps.
 
@@ -36,6 +36,7 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | --- | --- | --- |
 | Page title / crumbs | `PageTitle`, `Crumbs` | Drill-in and desktop hierarchy |
 | Entity hero | `EntityHero` | Player / team / league / venue identity strip |
+| Page atmosphere / hero wash | `HeroWash` (+ `engine/entity-accents.js`) | Optional partial top wash on player/team; elevated canvas everywhere |
 | Page header (shell) | layout `Header` + `TabTitle` | Top chrome; tab pages (except Fixtures) put the title in the bar via `TabTitle` / `HeaderActions` — app twin is `AppHeader title=` |
 | Empty section | `EmptyState` | Any list / unknown / error that can be empty — **not** `EmptyNote` (deprecated alias only) |
 | 404 | `EmptyState` in `App.tsx` | Catch-all `*` route |
@@ -105,6 +106,7 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Long lists | FlashList | **Native-exclusive** |
 | Blur chrome | `BlurBar` / solid tint (no liquid glass) | **Native-exclusive** |
 | Page header | `PageHeader` | Native chrome |
+| Page atmosphere | `ui/page-atmosphere` | Elevated canvas + optional partial hero wash (web `HeroWash` twin) |
 | Accordion | `ui/accordion` | Twin of filters/splits |
 
 Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
@@ -128,6 +130,7 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 | Blur chrome | CSS / limited | **Native-exclusive** BlurBar / solid tint |
 | Sheets | Radix Sheet | Native form sheet / RN modal |
 | Entity hero / header | `EntityHero` / `PageTitle` | `PageHeader` |
+| Page atmosphere | `HeroWash` | `PageAtmosphere` — twin |
 | Forms | `LiveForm` / Field | Accordion + ChoiceChip / sheets |
 | Metric / StatTile | `Metric` / `StatTile` | `Metric` in `data-table` |
 | Contact | mailto Card | Contact tab |
