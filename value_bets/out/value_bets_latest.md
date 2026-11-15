@@ -1,17 +1,17 @@
-# Cricket value bets - 2026-11-15 14:00 IST
+# Cricket value bets - 2026-11-15 15:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1382 prices
-- **smarkets**: ok, 387 prices
+- **moviodds_bet365**: ok, 1246 prices
+- **smarkets**: ok, 419 prices
 - **feedg**: ok, 8 prices, 1 events
 - **feedk**: ok, 52 prices, 7 events
 - **feede**: ok, 130 prices, 9 events
-- **feedh**: ok, 583 prices, 18 events
-- **feedf**: ok, 186 prices, 18 events
+- **feedh**: ok, 559 prices, 16 events
+- **feedf**: ok, 138 prices, 16 events
 
-Matches starting in next 168h: **27**, markets priced: **272**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **23**, markets priced: **239**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -22,4 +22,4 @@ Matches starting in next 168h: **27**, markets priced: **272**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Border (W) (female), Diasqua Little Sai Wan Cricket Club (male), MID West Rhinos (male), Mountaineers (male), Nhlangano Legends (male), North West Dragons (W) (female), Pakistan Association of Hong Kong (male), Recon Tactical Free State (W) (female), Royal Champs (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tasmanian Tigers (male), Tuskers (W) (female)
 
-Runtime 499.9s. Snapshot: `odds_20261115T083027Z.jsonl.gz`
+Runtime 115.8s. Snapshot: `odds_20261115T093035Z.jsonl.gz`
