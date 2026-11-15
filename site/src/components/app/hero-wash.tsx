@@ -2,11 +2,11 @@ import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { entityAccent } from "@cricket/engine/entity-accents.js";
 
-const DEFAULT_H = 240;
+const DEFAULT_H = 220;
 
 /**
- * Partial top hero wash over the elevated canvas (app `PageAtmosphere` twin).
- * When `wash` and no accent, uses brand primary. Never a full-page fill.
+ * Entity tint behind a scroll hero (app `EntityHeroWash` twin). Lives in document flow so it scrolls away with identity —
+ * never a fixed screen wash. Unknown sides: brand primary. Never a full-page fill.
  */
 export function HeroWash({
   accent,

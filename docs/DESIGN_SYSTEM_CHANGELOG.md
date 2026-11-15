@@ -15,10 +15,30 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-15 — Universal page-header ↔ canvas merge
+- **Path:** mobile `ui/blur-bar.tsx` (`merge` + `useChromeScrim`); `app/player/[idx].tsx`; `app/fixture/[id]/index.tsx`; `app/team/[idx].tsx`; stack roots (`league`, fancy detail, `competitions`, `search`, `ground-page`, venue/ground loaders) via `PageAtmosphere`
+- **Change:** Sticky clear→solid scrim is shared (not player-only). Fixture uses `BlurBar merge` so Android no longer keeps a permanent solid slab at rest. Stack/detail pages wrap `PageAtmosphere` so `PageHeader` sits on the same elevated canvas. Team hero wash underlaps the clear header. Tabs keep transparent `AppHeader` + hairline.
+- **Callers:** All user-facing stack screens; Player / Fixture sticky bars; Team; docs MOBILE / DESIGN_SYSTEM
+
+### 2026-11-15 — Mobile: no liquid glass (solid BlurBar + JS Segmented)
+- **Path:** `mobile/src/ui/blur-bar.tsx`; deleted `segmented.ios.tsx`; `segmented.tsx`; dropped `expo-blur`
+- **Change:** Header chrome is solid elevated on every platform (no `BlurView` / system material). iOS uses the shared JS `Segmented` (no SwiftUI glass Picker). Merge/accent clear-at-rest + `useChromeScrim` unchanged. Tab bar already docked solid.
+- **Callers:** Fixture / Player sticky headers; every `Segmented` (Ground, Player, Market tape, League, Team, live board)
+
+### 2026-11-15 — Industry hero atmosphere (hero wash, not screen wash)
+- **Path:** mobile `ui/page-atmosphere.tsx` (`PageAtmosphere` canvas-only + `EntityHeroWash`); `app/player/[idx].tsx`; `app/team/[idx].tsx`; `ui/blur-bar.tsx` (`accent` clear); web `components/app/hero-wash.tsx`; `pages/Player.tsx`; design-host HeroWash stage
+- **Change:** Entity tint lives in the scrolling hero (`EntityHeroWash` / `HeroWash`), not a fixed screen wash. Sticky chrome is clear at rest over the hero band, then solid elevated once scroll past measured hero height — no bar gradient, no wash fade-out / slide hacks. Web player: solid `StickyFilterBand`; wash only around identity hero. Team page uses the same hero-bound wash.
+- **Callers:** Player / Team (web + app); `/design-system` HeroWash; docs MOBILE / DESIGN_SYSTEM
+
+### 2026-11-15 — Fixture scoreShell + native filter chrome (not blind web sticky)
+- **Path:** mobile `fixture/[id]/index.tsx` (`scoreShell` + accordion); `live-board.tsx` / `accordion.tsx` (`flush`); `match-fancy.tsx` / `ground-page.tsx` Top batter edge bands; Fancy detail keeps `MatchHeader`
+- **Change:** Keep web-aligned **scoreboard plane** (full-bleed card + accordion in shell). Do **not** copy web `StickyFilterBand` onto app: sticky under BlurBar hides content; pinning Props chip stack outside FlashList eats viewport; Fancy detail needs MatchHeader on the stack screen; Ground sticky stays the short section control only. Top batter lists use edge `border-y`.
+- **Callers:** Fixture hub / Fancy detail / Props / Ground; docs note native vs web sticky
+
 ### 2026-11-15 — Fixture scoreboard edge-to-edge shell (app)
 - **Path:** mobile `app/fixture/[id]/index.tsx` (`scoreShell`); `ui/live-board.tsx` (`ScorecardCard` / `LiveBoard` `flat`); `ui/match-header.tsx` (`bare` internal gutter)
-- **Change:** App fixture scoreboard matches web flush card plane: full-bleed `color.card` + bottom hairline; live strip full-bleed `border-t` + secondary wash + gutter; full-scorecard trigger full-bleed `border-t` (no negative-margin-only hairline rules). Non-live header uses the same shell. Fancy detail keeps outer pad + non-bare header (no double pad).
-- **Callers:** Fixture live / non-live header; Fancy market page unchanged
+- **Change:** App fixture scoreboard matches web flush card plane: full-bleed `color.card` + bottom hairline; live strip full-bleed `border-t` + secondary wash + gutter; full-scorecard trigger full-bleed `border-t` (no negative-margin-only hairline rules). Non-live header uses the same shell.
+- **Callers:** Fixture live / non-live header
 
 ### 2026-11-15 — LineTabs clear wrap; blended atmosphere chrome
 - **Path:** mobile `ui/line-tabs.tsx`; `ui/blur-bar.tsx` (`accent`); `ui/page-atmosphere.tsx`; player sticky chrome `barH` + scroll scrim

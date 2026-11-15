@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
+import Animated, { useSharedValue } from "react-native-reanimated";
 import { useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { FORMATS } from "@cricket/engine/util.js";
@@ -20,11 +21,13 @@ import { PageHeader } from "@/ui/page-header";
 import { Segmented } from "@/ui/segmented";
 import { StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
-import { PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
+import { EntityHeroWash, PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
+import { useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
 import { color, font, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const MARKETS: [string, string][] = [["", "All markets"], ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_runs", "Runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "Highest runs in an over"], ["max_conceded", "Most conceded"], ["top_score", "Top score"]];
+const HEADER_H = 56;
 
 /** A team: its players' last fixtures in a format against a line (the site's team page, Player grid tab). */
 export default function Team() {
@@ -55,13 +58,31 @@ export default function Team() {
   const grid = useQuery({ queryKey: ["team-grid", i, fmt, stat, games], enabled: valid, queryFn: () => collectGrid(store, i, fmt, stat, games) });
   const name = known ? store.teamName(i) : "Team";
   const accent = useEntityAccent(known ? store.teams[i].n : null);
+  const chromePad = inset.top + HEADER_H;
+  const { onScroll, y } = useCollapseOnScroll();
+  const scrimThreshold = useSharedValue(HEADER_H + 40);
+  const barScrim = useChromeScrim(y, scrimThreshold);
 
   return (
-    <PageAtmosphere wash={known} accent={accent} style={{ paddingTop: inset.top }}>
-      <PageHeader title={name} subtitle={known ? (store.teams[i].g ? "Women's cricket" : "Men's cricket") : undefined} right={known ? <StarButton idx={i} kind="team" /> : undefined} />
-      {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store ? <Working label="Loading…" fill shape="grid" /> : !known ? <EmptyState title="Unknown team" body="This team is not in the stats data." /> : !matchesReady ? <Working label="Loading matches…" fill shape="grid" /> : (
-        <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
-          <View style={styles.hero}><TeamBadge name={store.teams[i].n} size={56} /><Text style={styles.name}>{name}</Text></View>
+    <PageAtmosphere>
+      {stats.isError && !matchesReady ? (
+        <View style={{ paddingTop: chromePad }}><EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /></View>
+      ) : !store ? (
+        <View style={{ paddingTop: chromePad }}><Working label="Loading…" fill shape="grid" /></View>
+      ) : !known ? (
+        <View style={{ paddingTop: chromePad }}><EmptyState title="Unknown team" body="This team is not in the stats data." /></View>
+      ) : !matchesReady ? (
+        <View style={{ paddingTop: chromePad }}><Working label="Loading matches…" fill shape="grid" /></View>
+      ) : (
+        <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={[styles.body, { paddingTop: chromePad, paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
+          {/* Wash underlaps clear PageHeader at rest (player EntityHeroWash twin). */}
+          <EntityHeroWash
+            accent={accent}
+            style={[styles.heroBand, { marginTop: -chromePad, paddingTop: chromePad + space.stack }]}
+            onLayout={(e) => { scrimThreshold.value = Math.max(48, e.nativeEvent.layout.height - 40); }}
+          >
+            <View style={styles.hero}><TeamBadge name={store.teams[i].n} size={56} /><Text style={styles.name}>{name}</Text></View>
+          </EntityHeroWash>
           <Segmented<string> items={FORMATS.map((f: string) => [f, f] as [string, string])} value={fmt} onChange={setFmt} label="Format" />
           <Segmented<string> items={[["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]]} value={tab} onChange={setTab} label="Sections" />
           {tab === "grid" ? (
@@ -111,20 +132,25 @@ export default function Team() {
               </View>
             )
           )}
-        </ScrollView>
+        </Animated.ScrollView>
       )}
+      <View style={[styles.chrome, { paddingTop: inset.top }]}>
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, barScrim]} />
+        <PageHeader title={name} subtitle={known ? (store.teams[i].g ? "Women's cricket" : "Men's cricket") : undefined} right={known ? <StarButton idx={i} kind="team" /> : undefined} />
+      </View>
       <TabFade withTabBar={false} />
     </PageAtmosphere>
   );
 }
 
 const styles = StyleSheet.create({
-  body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
+  body: { gap: space.stack, paddingHorizontal: space.gutter },
+  heroBand: { marginHorizontal: -space.gutter, paddingHorizontal: space.gutter, paddingBottom: space.stack },
   hero: { flexDirection: "row", alignItems: "center", gap: space.stack },
   name: { ...type.display, color: color.foreground, flex: 1 },
   bleed: { marginHorizontal: -space.gutter },
   headline: { ...type.body, color: color.foreground },
   tableTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
-  empty: { ...type.callout, color: color["muted-foreground"], padding: space.gutter },
+  chrome: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },
 });

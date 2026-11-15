@@ -231,38 +231,38 @@ function PlayerScreen({ idx }: { idx: number }) {
       <div className="hidden pt-stack lg:block">
         <Crumbs items={[["Player props", "/props"], [name], [statLabel]]} />
       </div>
-      {/* Wash covers sticky filter chrome + identity hero (app BlurBar accent twin). Ad stays below so empty slots do not open a gap under the header. */}
-      <HeroWash accent={sideAccent(side)} height={360} className="-mx-gutter px-gutter">
-        <StickyFilterBand className="bg-transparent backdrop-blur-none">
-          {/* Format + Filters on the hairline. Filled rows: snug pad/gap (tight read as missing; stack on sub pills left a hole under the header that jumped on sticky). */}
-          <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
-            {fmts.length > 1 ? (
-              <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
-                className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
-            ) : <span className="min-w-0 flex-1" />}
-            <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
-              className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
-              <AdjustmentsHorizontalIcon className="size-4" />Filters
-              {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
-            </Button>
-          </div>
-          <div className="flex flex-col gap-snug px-gutter py-snug">
-            {testBat && (
-              <PillGroup layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
-                items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />
-            )}
-            <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => { track("player_stat", { stat: k, offered: pricedSet.has(k) ? 1 : 0 }); navigateWith({ stat: k, line: "", side: q.side }); }} items={statItems} />
-          </div>
-          {activeFilters.length > 0 && (
-            <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
-              {activeFilters.map(([k, v], i) => (
-                <ActiveChip key={i} label={k || "Filter"} value={String(v)}
-                  onRemove={() => navigateWith(CHIP_CLEAR[k] || Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl"].map((x) => [x, ""])))} />
-              ))}
-              <button type="button" onClick={clearFilters} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
-            </div>
+      {/* Sticky chrome stays solid elevated when stuck (shell flush). Wash is hero-bound only — scrolls away with identity (app EntityHeroWash twin). */}
+      <StickyFilterBand>
+        {/* Format + Filters on the hairline. Filled rows: snug pad/gap (tight read as missing; stack on sub pills left a hole under the header that jumped on sticky). */}
+        <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
+          {fmts.length > 1 ? (
+            <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
+              className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
+          ) : <span className="min-w-0 flex-1" />}
+          <Button type="button" variant="secondary" size="sm" aria-label={`Filters${activeFilters.length ? `, ${activeFilters.length} active` : ""}`} onClick={() => setFiltersOpen(true)}
+            className="relative h-control shrink-0 rounded-[var(--chip-radius)] bg-card px-snug text-callout shadow-none">
+            <AdjustmentsHorizontalIcon className="size-4" />Filters
+            {activeFilters.length > 0 && <span className="absolute -right-hair -top-hair grid min-w-4 place-items-center rounded-full bg-primary px-hair text-caption font-emphasis text-primary-foreground ring-2 ring-background">{activeFilters.length}</span>}
+          </Button>
+        </div>
+        <div className="flex flex-col gap-snug px-gutter py-snug">
+          {testBat && (
+            <PillGroup layoutId="pl-scope" label="Innings" value={String(scope)} onChange={(v) => navigateWith({ scope: v, line: "" })}
+              items={[0, 1, 2].map((n) => [String(n), SCOPE_LABEL[n]] as [string, string])} />
           )}
-        </StickyFilterBand>
+          <PillGroup layoutId="pl-stat" label="Prop" value={stat} onChange={(k) => { track("player_stat", { stat: k, offered: pricedSet.has(k) ? 1 : 0 }); navigateWith({ stat: k, line: "", side: q.side }); }} items={statItems} />
+        </div>
+        {activeFilters.length > 0 && (
+          <div className="flex items-center gap-snug overflow-x-auto px-gutter pb-snug [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Active filters">
+            {activeFilters.map(([k, v], i) => (
+              <ActiveChip key={i} label={k || "Filter"} value={String(v)}
+                onRemove={() => navigateWith(CHIP_CLEAR[k] || Object.fromEntries(["opp", "venue", "vt", "inn", "pos", "since", "until", "last", "comp", "lvl"].map((x) => [x, ""])))} />
+            ))}
+            <button type="button" onClick={clearFilters} className="h-control shrink-0 px-snug text-callout font-label text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring">Clear all</button>
+          </div>
+        )}
+      </StickyFilterBand>
+      <HeroWash accent={sideAccent(side)} height={220} className="-mx-gutter px-gutter">
         <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       </HeroWash>
       <AdSlot slotId="player_detail_top" />

@@ -14,6 +14,7 @@ import { EmptyState } from "@/ui/empty-state";
 import { ListRow } from "@/ui/list";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { LeagueBadge } from "@/ui/team-badge";
 import { color, font, space, type, tonal } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
@@ -29,7 +30,7 @@ export default function Competitions() {
   const t = text.trim().toLowerCase();
   const rows = all.filter(([e]) => !t || store.events[e].toLowerCase().includes(t)).slice(0, 80);
   return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>
       <PageHeader title="Competitions" />
       <View style={styles.field}>
         <Ionicons name="search" size={18} color={color["muted-foreground"]} />
@@ -46,12 +47,11 @@ export default function Competitions() {
         />
       )}
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
   field: { height: 40, marginHorizontal: space.gutter, marginVertical: space.snug, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: 12, backgroundColor: color.secondary },
   input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },
   list: { paddingHorizontal: space.gutter },

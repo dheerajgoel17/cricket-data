@@ -1,52 +1,52 @@
 import { useMemo, type ReactNode } from "react";
-import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import { StyleSheet, View, type LayoutChangeEvent, type StyleProp, type ViewStyle } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { entityAccent } from "@cricket/engine/entity-accents.js";
 import { color, tint } from "@/ui/tokens";
 
-/** Tall enough for status bar + sticky chrome (format + caps + innings) + hero — one wash, no second header gradient. */
-const DEFAULT_WASH_H = 420;
+/**
+ * Elevated page canvas only. Scrollable entity pages bind tint with `EntityHeroWash` inside the scroll hero
+ * (industry pattern) — do not pin a screen-level wash that fights scroll.
+ */
+export function PageAtmosphere({ children, style }: { children?: ReactNode; style?: StyleProp<ViewStyle> }) {
+  return <View style={[styles.root, style]}>{children}</View>;
+}
 
 /**
- * Elevated page canvas (`color.background`) with an optional partial top hero wash.
- * Wash fades to transparent — never a full-page gradient. When `wash` is on and `accent` is null, uses brand primary.
+ * Entity tint behind a scroll hero (Spotify / Apple Music style). Scrolls away with the hero.
+ * Unknown sides: pass null and brand primary is used.
  */
-export function PageAtmosphere({
-  children,
+export function EntityHeroWash({
   accent,
-  wash = false,
-  washHeight = DEFAULT_WASH_H,
   style,
+  children,
+  onLayout,
 }: {
-  children?: ReactNode;
   accent?: string | null;
-  wash?: boolean;
-  washHeight?: number;
   style?: StyleProp<ViewStyle>;
+  children?: ReactNode;
+  onLayout?: (e: LayoutChangeEvent) => void;
 }) {
-  const washHex = wash ? accent || color.primary : null;
+  const hex = accent || color.primary;
   return (
-    <View style={[styles.root, style]}>
-      {washHex ? (
-        <LinearGradient
-          pointerEvents="none"
-          // Soft top → clear: avoids a solid colour slab behind the sticky chrome.
-          colors={[tint.hex(washHex, 0.28), tint.hex(washHex, 0.14), tint.hex(washHex, 0.05), "transparent"]}
-          locations={[0, 0.35, 0.65, 1]}
-          style={[styles.wash, { height: washHeight }]}
-        />
-      ) : null}
+    <View style={[styles.heroWash, style]} onLayout={onLayout}>
+      <LinearGradient
+        pointerEvents="none"
+        colors={[tint.hex(hex, 0.34), tint.hex(hex, 0.14), tint.hex(hex, 0.04), "transparent"]}
+        locations={[0, 0.4, 0.75, 1]}
+        style={StyleSheet.absoluteFill}
+      />
       {children}
     </View>
   );
 }
 
-/** Curated side accent hex, or null when unmapped (PageAtmosphere brand-washes when wash is on). */
+/** Curated side accent hex, or null when unmapped. */
 export function useEntityAccent(side?: string | null) {
   return useMemo(() => (side ? entityAccent(side) : null), [side]);
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
-  wash: { position: "absolute", left: 0, right: 0, top: 0 },
+  heroWash: { overflow: "hidden" },
 });

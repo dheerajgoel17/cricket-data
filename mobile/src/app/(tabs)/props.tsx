@@ -81,6 +81,7 @@ function PlayerProps() {
     match: (id) => choices.matches.find((m) => m.id === id)?.label ?? id,
   }), [sc, pick, days, choices.matches]);
   const pull = () => { setPulling(true); void refetch().finally(() => setPulling(false)); };
+  // Filters scroll with the list (ListHeader) — pinning the full chip stack outside FlashList eats the phone viewport.
   const header = (
     <View>
       <Chips items={days} value={sc.day} onChange={(day) => setSc((s) => ({ ...s, day, match: "all" }))} />

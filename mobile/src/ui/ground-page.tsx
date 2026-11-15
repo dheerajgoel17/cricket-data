@@ -24,10 +24,12 @@ import { useScreenInsets } from "@/ui/insets";
 import { MiniBars } from "@/ui/mini-bars";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { Press } from "@/ui/press";
 import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
+import { Bleed } from "@/ui/bleed";
 import { cap, color, font, num, radius, space, type, tonal } from "@/ui/tokens";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
@@ -55,20 +57,20 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
   const wx = useQuery({ queryKey: ["venue-wx", name], queryFn: () => fetchVenueWx(name), staleTime: 10 * 60_000, enabled: !!venue });
   const head = <PageHeader title="Ground" />;
 
-  if (!venue) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="No venue" body="This fixture has no ground listed." /></View></View>;
+  if (!venue) return <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<View style={styles.pad}><EmptyState title="No venue" body="This fixture has no ground listed." /></View></PageAtmosphere>;
   if ((!g && stats.isError) || (fixtures.isError && !fixtures.data)) return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={[styles.pad, styles.stack]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<View style={[styles.pad, styles.stack]}>
       <EmptyState title="Could not load ground" body="Try again to see the matches and market history." />
       <Press accessibilityRole="button" onPress={() => { void stats.refetch(); void fixtures.refetch(); }} style={styles.more}><Text style={styles.moreText}>Try again</Text></Press>
-    </View></View>
+    </View></PageAtmosphere>
   );
-  if (!store || !matchesReady || !g || !filters || fixtures.isLoading) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<Working label="Loading…" shape="ground" /></View>;
-  if (!g.known) return <View style={[styles.root, { paddingTop: inset.top }]}>{head}<View style={styles.pad}><EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} /></View></View>;
+  if (!store || !matchesReady || !g || !filters || fixtures.isLoading) return <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<Working label="Loading…" shape="ground" /></PageAtmosphere>;
+  if (!g.known) return <PageAtmosphere style={{ paddingTop: inset.top }}>{head}<View style={styles.pad}><EmptyState title="Ground not in data" body={`We could not match “${venue}” to fixtures or stats.`} /></View></PageAtmosphere>;
 
   const { activeFmt, formats, list, both } = filters;
   const activeSection = g.primary < 0 ? "matches" : section;
   return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>
       {head}
       <ScrollView stickyHeaderIndices={g.primary >= 0 ? [1] : undefined} contentContainerStyle={{ paddingBottom: inset.bottom + space.section }} showsVerticalScrollIndicator={false}>
         <View style={[styles.pad, styles.stack, styles.intro]}>
@@ -86,6 +88,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
           {from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={g.atGround} /> : null}
         </View>
 
+        {/* Sticky only the short Matches/Markets control — pinning format+gender chips with it is too tall for phone. */}
         {g.primary >= 0 ? <View style={[styles.pad, styles.sectionBar]}>
           <Segmented<"matches" | "markets"> label="Ground sections" value={activeSection} onChange={setSection} height={44} items={[["matches", "Matches"], ["markets", "Markets"]]} />
         </View> : null}
@@ -104,7 +107,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
           ? <GroundMarkets store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} />
           : <GroundMatches key={`${activeFmt}|${gender}`} list={list} />}
       </ScrollView>
-    </View>
+    </PageAtmosphere>
   );
 }
 
@@ -255,8 +258,8 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
         {!ms.length ? (
           <EmptyState compact title="No matches" body={`Nothing in ${fmtName} at this ground for these filters.`} />
         ) : isTop && tops ? (
-          <View>
-            <Text style={styles.note}>Highest score in the match · last {tops.n} {fmtName}</Text>
+          <Bleed style={styles.topBleed}>
+            <Text style={[styles.note, styles.topNote]}>Highest score in the match · last {tops.n} {fmtName}</Text>
             {tops.rows.map((r: any) => (
               <Press key={r.player} accessibilityRole="link" onPress={() => openPlayer({ idx: r.player, stat: "runs", line: 0.5, fmt: fmtName })} style={({ pressed }) => [styles.topRow, pressed && { opacity: 0.6 }]}>
                 <View style={{ flex: 1 }}>
@@ -269,8 +272,8 @@ function GroundMarkets({ store, venueIndexes, fmt, gender }: { store: any; venue
                 </View>
               </Press>
             ))}
-            {!tops.rows.length ? <Text style={styles.note}>Not enough matches.</Text> : null}
-          </View>
+            {!tops.rows.length ? <Text style={[styles.note, styles.topNote]}>Not enough matches.</Text> : null}
+          </Bleed>
         ) : rep && s && active != null && at ? (
           <View style={{ gap: space.stack }}>
             <View style={styles.marketCard}>
@@ -324,7 +327,6 @@ function Stat({ k, v, big }: { k: string; v: string; big?: boolean }) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
   pad: { paddingHorizontal: space.gutter },
   stack: { gap: space.stack },
   intro: { paddingTop: space.tight, paddingBottom: space.stack },
@@ -370,7 +372,10 @@ const styles = StyleSheet.create({
   side: { flex: 1, gap: space.tight, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.snug },
   sideKey: { ...type.footnote, fontFamily: font.medium, color: color["muted-foreground"], textTransform: "capitalize" },
   big: { ...num, fontSize: 20, color: color.foreground },
-  topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 52, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  /** Web twin: `-mx-gutter border-y` Top batter edge band. */
+  topBleed: { marginTop: space.snug },
+  topNote: { paddingHorizontal: space.gutter, paddingVertical: space.snug },
+  topRow: { flexDirection: "row", alignItems: "center", gap: space.snug, minHeight: 52, paddingHorizontal: space.gutter, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   topName: { ...type.body, fontFamily: font.medium, color: color.foreground },
   lineNum: { ...num, fontSize: 17, color: color.foreground },
   cellNum: { ...num, fontSize: 15, color: color.foreground },

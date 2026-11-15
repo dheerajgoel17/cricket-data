@@ -13,6 +13,7 @@ import { useScreenInsets } from "@/ui/insets";
 import { ListRow } from "@/ui/list";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { Segmented } from "@/ui/segmented";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
@@ -34,7 +35,7 @@ export default function League() {
   const name = known ? store.events[e] : "Competition";
 
   return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>
       <PageHeader title={name} subtitle={data ? `${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}` : undefined} />
       {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store ? <Working label="Loading…" fill shape="league" /> : !matchesReady ? <Working label="Loading matches…" fill shape="league" /> : !known || !data ? <EmptyState title="Unknown competition" body="This competition is not in the stats data." /> : (
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
@@ -68,12 +69,11 @@ export default function League() {
         </ScrollView>
       )}
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
   body: { gap: space.stack, paddingHorizontal: space.gutter, paddingTop: space.snug },
   hero: { flexDirection: "row", alignItems: "center", gap: space.stack },
   name: { ...type.title, color: color.foreground },

@@ -87,7 +87,7 @@ const PAGE_BLURB: Record<string, string> = {
 
 const PAGE_WHEN: Record<string, string> = {
   type: "Pick Satoshi for names and UI copy; Barlow Condensed only for scores, odds, hit rates, and label-cap rails.",
-  color: "Use semantic tokens (primary, miss, amber, dnp). Canvas is elevated #0C0C0E — never true black. Entity hero washes via HeroWash / entityAccent only.",
+  color: "Use semantic tokens (primary, miss, amber, dnp). Canvas is elevated #0C0C0E — never true black. Headers sit on the same canvas (app PageAtmosphere / BlurBar merge). Entity tint is hero-bound (HeroWash / EntityHeroWash) — never a fixed screen wash.",
   space: "Space siblings with parent gap tokens; do not add ad-hoc margins between blocks.",
   motion: "Reuse tokens.motion and the selection spring; honour prefers-reduced-motion.",
   buttons: "One primary action per region. Prefer h-control rounded-full for product CTAs. Match / row status marks use StatusLabel tones — never fork LIVE colours at the call site.",
@@ -307,7 +307,7 @@ export function DesignSystemPage() {
         <div className="grid grid-cols-2 gap-snug sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {colors.map(([name, value]) => <Swatch key={name} name={name} value={String(value)} />)}
         </div>
-        <PreviewFrame title="HeroWash" description="Partial top wash over the elevated canvas (app PageAtmosphere twin). Player / team heroes only; tabs stay solid. Unknown sides soft-brand." source="components/app/hero-wash.tsx · engine/entity-accents.js" canvasClassName="items-stretch bg-background p-0">
+        <PreviewFrame title="HeroWash" description="Hero-bound wash in document flow (app EntityHeroWash twin). Scrolls away with identity — not a fixed screen wash. Player / team heroes only. Sticky app chrome: BlurBar merge clear at rest, useChromeScrim solid elevated after scroll (fixture + player). Unknown sides soft-brand." source="components/app/hero-wash.tsx · engine/entity-accents.js · mobile ui/blur-bar.tsx" canvasClassName="items-stretch bg-background p-0">
           <div className="grid w-full gap-stack sm:grid-cols-2">
             <HeroWash accent={sideAccent("India")} className="overflow-hidden rounded-[var(--card-radius)] border border-hairline">
               <div className="px-inset py-group"><p className="text-title font-emphasis">India</p><p className="text-callout text-muted-foreground">Curated side accent</p></div>

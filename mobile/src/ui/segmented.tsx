@@ -17,8 +17,8 @@ export interface SegmentedProps<T extends string> {
 }
 
 /**
- * A segmented control drawn like iOS's: a dark track, a raised thumb that slides to the chosen segment on the UI thread. iOS has the system's own (`segmented.ios.tsx`: a SwiftUI
- * `Picker`); Android and the browser preview use this one, so the two look the same.
+ * A segmented control drawn like iOS's: a dark track, a raised thumb that slides to the chosen segment on the UI thread.
+ * Same control on iOS, Android and the browser preview (no system glass Picker).
  */
 export function Segmented<T extends string>({ items, value, onChange, label, width, height = 36 }: SegmentedProps<T>) {
   const [w, setW] = useState(0);

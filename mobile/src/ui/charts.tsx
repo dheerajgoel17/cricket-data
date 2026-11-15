@@ -77,9 +77,9 @@ const COL = 30; // a bar's width when the chart scrolls sideways (more than 20 g
 const GAP = 4, TIP_W = 112;
 
 /**
- * Bar chart of a player's last games against a line (the site's `ChartBars`): the axis names the top and the floor, the line carries its own value, each bar its number, each column its
- * date and opponent. Bars are flat solids that grow up from the floor, one after another, on the UI thread; a game he did not play is a hatched stub and never counts. Drag a finger
- * across the bars to read each game (the others dim, a tip follows, a tick of haptics at every bar). More than 20 games scroll sideways with the newest in view. Tap a bar for that game.
+ * Bar chart of a player's last games against a line (the site's `ChartBars`): no left y-axis ticks (web dropped them —
+ * they stole width and sat on the oldest bar). The line carries its own value; each bar its number; each column its
+ * date and opponent. Bars grow from the floor on the UI thread; DNP is a hatched stub. Drag to scrub; >20 games scroll.
  */
 export function ChartBars({ entries, line, side, height = 240, onSelect }: { entries: any[]; line: number; side: string; height?: number; onSelect?: (e: any, state: string) => void }) {
   const vals = entries.filter((e) => e.value != null).map((e) => e.value as number);
@@ -115,16 +115,12 @@ export function ChartBars({ entries, line, side, height = 240, onSelect }: { ent
 
   return (
     <View style={styles.chart} accessibilityRole="image" accessibilityLabel={`Form chart, line ${line}`}>
-      <View style={[styles.axis, { height }]}>
-        <Text style={styles.tick}>{top}</Text>
-        <Text style={styles.tick}>{Math.round((top / 2) * 10) / 10}</Text>
-        <Text style={styles.tick}>0</Text>
-      </View>
       <ScrollView ref={scroller} horizontal={wide} scrollEnabled={wide} showsHorizontalScrollIndicator={false} style={{ flex: 1 }} contentContainerStyle={wide ? { minWidth: "100%" } : { flexGrow: 1 }}>
         <View style={{ flex: wide ? undefined : 1, width: wide ? entries.length * (COL + GAP) : undefined }}>
           <GestureDetector gesture={scrub}>
             <View style={{ height }} onLayout={(e) => setPlotW(Math.round(e.nativeEvent.layout.width))}>
-              <View pointerEvents="none" style={[styles.line, { bottom: `${(Math.min(line, top) / top) * 100}%` }]}><Text style={styles.lineLabel}>{line}</Text></View>
+              {/* Dashed O/U line only — no y-axis ticks and no floating line number (app; web keeps a right-side value). */}
+              <View pointerEvents="none" style={[styles.line, { bottom: `${(Math.min(line, top) / top) * 100}%` }]} />
               <View style={styles.bars}>
                 {entries.map((e, i) => {
                   const s = barState(e, line, side) as string;
@@ -179,11 +175,8 @@ function HatchStub({ i, active }: { i: number; active: SharedValue<number> }) {
 const styles = StyleSheet.create({
   gauge: { alignItems: "center", gap: space.hair },
   caption: { ...type.caption, color: color["muted-foreground"] },
-  chart: { flexDirection: "row", gap: 4 },
-  axis: { width: 28, justifyContent: "space-between", alignItems: "flex-end" },
-  tick: { fontSize: 15, lineHeight: 15, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"] },
-  line: { position: "absolute", left: 0, right: 0, zIndex: 2, borderTopWidth: 1, borderColor: "#fff" },
-  lineLabel: { position: "absolute", left: 0, top: -22, fontSize: 16, fontFamily: font.data, color: color.foreground, backgroundColor: "rgba(0,0,0,0.75)", paddingHorizontal: 4, borderRadius: 4, overflow: "hidden", fontVariant: ["tabular-nums"] },
+  chart: { width: "100%" },
+  line: { position: "absolute", left: 0, right: 0, zIndex: 2, borderTopWidth: StyleSheet.hairlineWidth, borderStyle: "dashed", borderColor: "rgba(255,255,255,0.35)" },
   bars: { ...StyleSheet.absoluteFill, flexDirection: "row", alignItems: "flex-end", gap: GAP },
   center: { ...StyleSheet.absoluteFill, alignItems: "center", justifyContent: "center" },
   centerText: { fontSize: 15, lineHeight: 18, fontFamily: font.data, color: color.foreground, fontVariant: ["tabular-nums"], textAlign: "center" },

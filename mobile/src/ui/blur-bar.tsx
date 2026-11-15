@@ -1,22 +1,54 @@
 import type { ComponentRef, ReactNode, RefObject } from "react";
-import { Platform, View, type StyleProp, type ViewStyle } from "react-native";
-import { BlurView } from "expo-blur";
-import { useAnimatedScrollHandler, useSharedValue, withTiming } from "react-native-reanimated";
+import { View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  interpolateColor,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+  type SharedValue,
+} from "react-native-reanimated";
 
-/** Kept so the screens that wrap their scrolling content in it need no change: a plain view. A live blur of scrolling content costs the GPU a full extra pass every frame on Android, which is what made it stutter. */
+/** Kept so the screens that wrap their scrolling content in it need no change: a plain view. */
 export const BlurTargetView = View;
 export type BlurTarget = RefObject<ComponentRef<typeof View> | null>;
 
+const SOLID = "rgba(12,12,14,0.97)";
+
 /**
- * A translucent bar the content scrolls under (the site's `bg-background/80 backdrop-blur-xl` bars). iOS: the system blur. Android (and the browser preview): the same dark tint, nearly
- * opaque and with no blur, since blurring the scrolling content behind it every frame is too heavy there.
- *
- * Pass `accent` (any truthy) on atmosphere pages: chrome itself stays clear (no second gradient); the caller should fade in a solid scrim on scroll so content does not bleed through.
+ * Sticky page chrome. With `merge` (or legacy `accent`): clear at rest so the elevated canvas / hero wash shows through —
+ * pair with `useChromeScrim` so the bar goes solid elevated once content scrolls under it. Without merge: solid elevated tint
+ * on every platform (no blur / liquid glass).
  */
-export function BlurBar({ children, style, accent }: { children?: ReactNode; style?: StyleProp<ViewStyle>; blurTarget?: BlurTarget | null; accent?: string | null }) {
-  if (accent) return <View style={style}>{children}</View>;
-  if (Platform.OS === "ios") return <BlurView tint="systemChromeMaterialDark" intensity={80} style={style}>{children}</BlurView>;
-  return <View style={[style, { backgroundColor: "rgba(12,12,14,0.97)" }]}>{children}</View>;
+export function BlurBar({
+  children,
+  style,
+  accent,
+  merge,
+}: {
+  children?: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  blurTarget?: BlurTarget | null;
+  /** @deprecated Prefer `merge` — any truthy value still clears the bar for entity pages. */
+  accent?: string | null;
+  /** Clear chrome at rest; caller fades in solid elevated via `useChromeScrim`. */
+  merge?: boolean;
+}) {
+  if (merge || accent) return <View style={style}>{children}</View>;
+  return <View style={[style, { backgroundColor: SOLID }]}>{children}</View>;
+}
+
+/**
+ * Solid elevated scrim for sticky merge chrome. Worklet-safe (`interpolateColor` — never call `tint.hex` here).
+ * `threshold` is usually measured hero height (player) or bar height (fixture); opaque once `y` reaches it.
+ */
+export function useChromeScrim(y: SharedValue<number>, threshold: SharedValue<number>) {
+  return useAnimatedStyle(() => {
+    const t = Math.max(48, threshold.value);
+    return {
+      backgroundColor: interpolateColor(y.value, [t * 0.35, t], ["rgba(12,12,14,0)", SOLID]),
+    };
+  });
 }
 
 /**

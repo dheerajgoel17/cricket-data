@@ -1,5 +1,5 @@
 /**
- * Curated side → accent hex for partial page hero washes (web HeroWash / app PageAtmosphere).
+ * Curated side → accent hex for hero-bound washes (web HeroWash / app EntityHeroWash).
  * Keys match `teamKey` folding (SAME_SIDE + women strip). Unknown sides return null; UI may fall back to brand primary.
  */
 import { SAME_SIDE } from "./util.js";

@@ -18,6 +18,7 @@ import { useScreenInsets } from "@/ui/insets";
 import { ListRow, Section } from "@/ui/list";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { color, font, space, type } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
@@ -55,7 +56,7 @@ export default function Search() {
   const team = (i: number) => store.teamName(store.P.tm[i]);
 
   return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>
       <View style={styles.bar}>
         <View style={styles.field}>
           <Ionicons name="search" size={18} color={color["muted-foreground"]} />
@@ -108,12 +109,11 @@ export default function Search() {
         )}
       </ScrollView>
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
   bar: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   field: { flex: 1, height: 40, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.snug + 2, borderRadius: 12, backgroundColor: color.secondary },
   input: { flex: 1, ...type.body, fontFamily: font.regular, color: color.foreground, paddingVertical: 0 },

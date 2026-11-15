@@ -15,7 +15,8 @@ import { MatchFancy } from "@/ui/match-fancy";
 import { MatchHeader } from "@/ui/match-header";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
-import { color, space } from "@/ui/tokens";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
+import { space } from "@/ui/tokens";
 
 /** One fancy market for a fixture: chart, over/under and ladder (the site's `/fixture/:id/fancy`). */
 const one = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
@@ -36,34 +37,34 @@ export default function FancyMarketPage() {
 
   if (isLoading || !stats.data?.store || !stats.matchesReady) {
     return (
-      <View style={[styles.root, { paddingTop: inset.top }]}>
+      <PageAtmosphere style={{ paddingTop: inset.top }}>
         <PageHeader title="Fancy" />
         {stats.isError ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : <Working label="Loading…" shape="market" />}
-      </View>
+      </PageAtmosphere>
     );
   }
   if (!f) {
     return (
-      <View style={[styles.root, { paddingTop: inset.top }]}>
+      <PageAtmosphere style={{ paddingTop: inset.top }}>
         <PageHeader title="Fancy" />
         <View style={styles.pad}>
           <EmptyState title="Fixture gone" body="That match is no longer in the schedule." />
         </View>
-      </View>
+      </PageAtmosphere>
     );
   }
+  // App: MatchHeader stays for context on this stack screen (web flush StickyFilterBand leads; native keeps the scoreboard).
   return (
-    <View style={[styles.root, { paddingTop: inset.top }]}>
+    <PageAtmosphere style={{ paddingTop: inset.top }}>
       <PageHeader title={`${f.a} v ${f.b}`} subtitle="Match Fancy" />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24, paddingHorizontal: space.gutter, gap: space.stack }} showsVerticalScrollIndicator={false}>
         {item ? <MatchHeader item={item} /> : null}
-        <MatchFancy fx={f} teams={known} fmt={fmt} doc={doc} mode="detail" start={start} />
+        <MatchFancy key={f.id} fx={f} teams={known} fmt={fmt} doc={doc} mode="detail" start={start} />
       </ScrollView>
-    </View>
+    </PageAtmosphere>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: color.background },
   pad: { paddingHorizontal: space.gutter, paddingTop: space.stack },
 });

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
 import { Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated, { useSharedValue } from "react-native-reanimated";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +27,8 @@ import { useHotView } from "@/lib/use-hot";
 import { useNow } from "@/lib/use-now";
 import { useLater } from "@/lib/use-later";
 import { useStore } from "@/lib/use-store";
-import { BlurBar, BlurTargetView, useCollapseOnScroll } from "@/ui/blur-bar";
+import { BlurBar, BlurTargetView, useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
+import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { CapsuleTabs } from "@/ui/capsule";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
@@ -36,7 +37,6 @@ import { GridFilters, GridTable, TrendList } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
 import { MatchAccordions, ScorecardCard } from "@/ui/live-board";
 import { MatchFancy } from "@/ui/match-fancy";
-import { Segmented } from "@/ui/segmented";
 import { TeamBadge } from "@/ui/team-badge";
 import { MatchHeader } from "@/ui/match-header";
 import { enter, Working } from "@/ui/motion";
@@ -89,6 +89,9 @@ export default function FixturePage() {
 
   const target = useRef<ComponentRef<typeof View>>(null);
   const [barH, setBarH] = useState(0);
+  const { onScroll, y } = useCollapseOnScroll();
+  const scrimThreshold = useSharedValue(56);
+  const barScrim = useChromeScrim(y, scrimThreshold);
   const share = () => {
     if (!f) return;
     const url = shareFixtureUrl(SITE_URL, f.id);
@@ -99,9 +102,9 @@ export default function FixturePage() {
   const bodyReady = useLater(!!f && !fxLoading);
 
   return (
-    <View style={styles.root}>
+    <PageAtmosphere>
       <BlurTargetView ref={target} style={styles.root}>
-        <Animated.ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
+        <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: barH, paddingBottom: inset.bottom + space.section }}>
           {fxLoading ? (
             <MatchHeaderSkeleton />
           ) : !f || !item ? (
@@ -125,10 +128,14 @@ export default function FixturePage() {
               ) : (
                 <Animated.View entering={enter(0)} style={styles.scoreShell}>
                   <MatchHeader bare item={item} onGround={store && fixtureHasGround(store, f?.venue) ? () => push(groundPath(f.id)) : undefined} />
+                  {bodyReady && f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} /> : null}
                 </Animated.View>
               )}
-              {!bodyReady ? <Working label="Loading…" rows={4} /> : f.fmt !== "FC" ? <MatchAccordions match={item.live} teams={known} noCard={item.live?.status === "live"} /> : null}
-              {bodyReady && f.fmt !== "FC" ? <View style={styles.sections}><CapsuleTabs label="Sections" items={tabs} value={tab} onChange={setTab} /></View> : null}
+              {!bodyReady ? <Working label="Loading…" rows={4} /> : null}
+              {/* CapsuleTabs scroll with content — sticky under BlurBar hides the band on native. */}
+              {bodyReady && f.fmt !== "FC" ? (
+                <View style={styles.sections}><CapsuleTabs label="Sections" items={tabs} value={tab} onChange={setTab} /></View>
+              ) : null}
               {!bodyReady ? null : f.fmt === "FC" ? (
                 <View style={styles.pad}><EmptyState title="No props for first-class" body="First-class cricket is not part of the stats here, so there are no player props for this match." /></View>
               ) : tab === "props" ? (
@@ -175,13 +182,21 @@ export default function FixturePage() {
         </Animated.ScrollView>
       </BlurTargetView>
 
-      <View style={styles.bar} onLayout={(e) => setBarH((h) => Math.max(h, Math.round(e.nativeEvent.layout.height)))}>
-        <BlurBar blurTarget={target} style={{ paddingTop: inset.top }}>
+      <View
+        style={styles.bar}
+        onLayout={(e) => {
+          const h = Math.round(e.nativeEvent.layout.height);
+          setBarH((prev) => Math.max(prev, h));
+          scrimThreshold.value = Math.max(48, h);
+        }}
+      >
+        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, barScrim]} />
+        <BlurBar merge blurTarget={target} style={{ paddingTop: inset.top }}>
           <PageHeader title={f ? `${f.a} v ${f.b}` : "Match"} subtitle={f ? seriesName(f) : undefined} right={f ? <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton> : undefined} />
         </BlurBar>
       </View>
       <TabFade withTabBar={false} />
-    </View>
+    </PageAtmosphere>
   );
 }
 
@@ -196,7 +211,6 @@ const styles = StyleSheet.create({
   },
   pad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   bleed: { marginHorizontal: -space.gutter },
-  // the page's sections as chips under the match (Props / Match Fancy / Grid / Custom line), then the stat chips of the open one
   sections: { paddingTop: space.stack },
   gridHead: { flexDirection: "row", alignItems: "center", gap: space.tight },
   gridTitle: { ...type.body, fontFamily: font.medium, color: color.foreground },

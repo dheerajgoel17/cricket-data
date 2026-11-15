@@ -242,17 +242,17 @@ export function ScorecardCard({ match, teams, header }: { match: any; teams?: Si
   );
 }
 
-/** Scorecard accordion under a finished / non-live match (Form is a tab on web; not stacked here). */
+/** Scorecard accordion for finished / non-live matches — lives inside fixture `scoreShell` (`flush`). Form stays a web-only tab. */
 export function MatchAccordions({ match, teams, noCard }: { match?: any; teams: Side[]; noCard?: boolean }) {
   const card = match && !noCard ? cardInns(match) : [];
   if (!card.length) return null;
   const last = card[card.length - 1];
   return (
-    <View style={{ paddingHorizontal: space.gutter }}>
-      <Accordion title="Scorecard" right={<Text style={styles.sum} numberOfLines={1}>{last.team} {innScore(last)}</Text>}>
+    <Accordion flush title="Scorecard" right={<Text style={styles.sum} numberOfLines={1}>{last.team} {innScore(last)}</Text>}>
+      <View style={styles.fullBody}>
         <ScorecardBody match={match} teams={teams} />
-      </Accordion>
-    </View>
+      </View>
+    </Accordion>
   );
 }
 

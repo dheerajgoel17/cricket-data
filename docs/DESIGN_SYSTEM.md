@@ -2,7 +2,7 @@
 
 Fancy.cash has **two design systems** that share one contract: tokens, type roles, spacing roles, and component **jobs**. The web DS lives in `site/` (responsive). The app DS lives in `mobile/src/ui` (React Native). Reuse a web pattern on native only when it works; otherwise ship a **native-designed twin** with the same job and tokens.
 
-No rebrand. No paid UI kit. Dark only — elevated canvas `#0C0C0E` (never true black). Optional partial hero washes on entity pages from a curated side accent map (`engine/entity-accents.js`); tab/list surfaces stay solid elevated. Free MIT only. **Icons in product code (`components/app`, `pages`, `components/ui`, `mobile/src`): Heroicons / Ionicons — never Lucide.** `lucide-react` is not a dependency; after `npx shadcn add`, replace any Lucide imports with Heroicons before merge (CI bans Lucide under those trees).
+No rebrand. No paid UI kit. Dark only — elevated canvas `#0C0C0E` (never true black). Entity pages bind a partial hero wash (scrolling with identity — never a fixed screen wash) from a curated side accent map (`engine/entity-accents.js`); sticky chrome goes solid elevated past the hero; tab/list surfaces stay solid elevated. Free MIT only. **Icons in product code (`components/app`, `pages`, `components/ui`, `mobile/src`): Heroicons / Ionicons — never Lucide.** `lucide-react` is not a dependency; after `npx shadcn add`, replace any Lucide imports with Heroicons before merge (CI bans Lucide under those trees).
 
 ## Foundations (shared)
 
@@ -36,13 +36,13 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | --- | --- | --- |
 | Page title / crumbs | `PageTitle`, `Crumbs` | Drill-in and desktop hierarchy |
 | Entity hero | `EntityHero` | Player / team / league / venue identity strip |
-| Page atmosphere / hero wash | `HeroWash` (+ `engine/entity-accents.js`) | Optional partial top wash on player/team; elevated canvas everywhere |
+| Page atmosphere / hero wash | `HeroWash` (+ `engine/entity-accents.js`) | Hero-bound wash on player/team (scrolls with identity); elevated canvas everywhere |
 | Page header (shell) | layout `Header` + `TabTitle` | Top chrome; tab pages (except Fixtures) put the title in the bar via `TabTitle` / `HeaderActions` — app twin is `AppHeader title=` |
 | Empty section | `EmptyState` | Any list / unknown / error that can be empty — **not** `EmptyNote` (deprecated alias only) |
 | 404 | `EmptyState` in `App.tsx` | Catch-all `*` route |
 | Forms | `LiveForm`, `Field`, `Segmented` (`forms.tsx`) | Pair tool, contact-ish inputs, live filters |
 | Metric / stat tile | `Metric`, `StatTile`, `StatGridCards` | Glance figures on Player / Odds / ResultView |
-| Sticky filter band | `StickyFilterBand` (+ `useHeaderFlush(true)` when flush) | Shared sticky chip/filter recipe. Flush header (`bg-card`) when the band leads the page (Player, Match Fancy detail, Fixture scorecard tabs). Without flush when a title/hero sits above (Ground full page; `/props` title is in the shell via `TabTitle`) |
+| Sticky filter band | `StickyFilterBand` (+ `useHeaderFlush(true)` when flush) | Web sticky chip recipe. **App does not mirror it 1:1** — Player uses BlurBar; Props filters scroll in FlashList header; Fixture CapsuleTabs scroll (sticky fights absolute BlurBar); Ground sticks only the short section control; Fancy detail keeps MatchHeader + scrolling filters |
 | Detail board | `DetailSplit`, `StickyPanel` | Player / Match Fancy / Ground chart + sticky Lines rail at `lg+` (game log stays in bottom tabs) |
 | Card directory | `CardGrid` | Fancy list — 1 → 2 (`md`) → 3 (`xl`) |
 | Chips / filters | `Chip`, `PillGroup`, `PillTabs`, `ScreenerFilters` | Format, scope, section tabs, screener; `PillTabs` = documented twin of `PillGroup` (taller control) |
@@ -101,12 +101,12 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Dense DataTable | `ui/data-table` (`bleed`, head = `type.footnote` + `cap`) | **Native twin** (flex rows, not HTML table) |
 | Game log list | `Bleed` + press rows | Twin of web list |
 | Skeletons | `ui/skeletons` + Reanimated | Twin |
-| Segmented control | `Segmented` | **Native-exclusive** (SwiftUI / Compose) |
+| Segmented control | `Segmented` (JS twin; no system glass Picker) | **Native-exclusive** |
 | Tab bar | Docked `TabBar` (`mobile/src/components/tab-bar.tsx`) | **Native-exclusive** (web preview uses the same docked bar) |
 | Long lists | FlashList | **Native-exclusive** |
-| Blur chrome | `BlurBar` / solid tint (no liquid glass) | **Native-exclusive** |
-| Page header | `PageHeader` | Native chrome |
-| Page atmosphere | `ui/page-atmosphere` | Elevated canvas + optional partial hero wash (web `HeroWash` twin) |
+| Sticky chrome | `BlurBar merge` + `useChromeScrim` (clear → solid elevated; no liquid glass) | **Native-exclusive** — universal, not player-only |
+| Page header | `PageHeader` | Native chrome (unfilled; sits on `PageAtmosphere`) |
+| Page atmosphere | `ui/page-atmosphere` | Elevated canvas on stack pages + `EntityHeroWash` in scroll hero (web `HeroWash` twin) |
 | Accordion | `ui/accordion` | Twin of filters/splits |
 
 Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
@@ -121,16 +121,18 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 | --- | --- | --- |
 | Empty state | `EmptyState` | `mobile/src/ui/empty-state` (compatible) |
 | Chips / filters | `Chip` / `PillGroup` / `PillTabs` | `Chips` / `ActiveChip` / `ChoiceChip` / Capsule |
+| Sticky filter band | `StickyFilterBand` (+ flush header) | **Native-designed** — `BlurBar merge` (Player + Fixture); list/header scroll (Props / Fancy); short sticky section only (Ground); no blind web sticky under BlurBar |
+| Fixture scoreboard shell | `-mx-gutter bg-card border-b` | `scoreShell` + flush accordion / live strip — **twin** |
 | Dense DataTable | `DataTable` (DOM) | Native `DataTable` flex rows — **twin** |
 | Game log | bleed list | bleed list — **twin** |
 | Skeletons | CSS shapes | Reanimated shapes — twin |
-| Segmented control | PillGroup / Tabs | **Native-exclusive** Segmented |
+| Segmented control | PillGroup / Tabs | **Native-exclusive** JS `Segmented` |
 | Tab bar | IosTabBar / sidebar | **Native-exclusive** docked `TabBar` |
 | Lists (long) | DOM scroll | **Native-exclusive** FlashList |
-| Blur chrome | CSS / limited | **Native-exclusive** BlurBar / solid tint |
+| Sticky chrome | CSS / limited | **Native-exclusive** `BlurBar merge` + `useChromeScrim` |
 | Sheets | Radix Sheet | Native form sheet / RN modal |
-| Entity hero / header | `EntityHero` / `PageTitle` | `PageHeader` |
-| Page atmosphere | `HeroWash` | `PageAtmosphere` — twin |
+| Entity hero / header | `EntityHero` / `PageTitle` | `PageHeader` on `PageAtmosphere` |
+| Page atmosphere | `HeroWash` | `PageAtmosphere` + `EntityHeroWash` — twin |
 | Forms | `LiveForm` / Field | Accordion + ChoiceChip / sheets |
 | Metric / StatTile | `Metric` / `StatTile` | `Metric` in `data-table` |
 | Contact | mailto Card | Contact tab |
