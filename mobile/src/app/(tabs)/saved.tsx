@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   sections: { gap: rhythm.between, paddingTop: rhythm.top },
   line: { color: color.primary, ...w.data },
   remove: { width: 36, height: 36, alignItems: "center", justifyContent: "center" },
-  gate: { paddingTop: space.section, gap: space.stack, paddingHorizontal: space.gutter },
+  gate: { flex: 1, justifyContent: "center", gap: rhythm.between, paddingHorizontal: rhythm.inline, paddingBottom: space.section * 2 },
   signBtn: { alignSelf: "center", minWidth: 160 },
 });
 

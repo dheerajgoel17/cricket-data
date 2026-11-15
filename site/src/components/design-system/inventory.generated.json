@@ -14,6 +14,7 @@
     "route": true,
     "exports": [],
     "dependencies": [
+      "mobile/src/ui/icon-badge.tsx",
       "mobile/src/ui/button.tsx",
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/press.tsx",
@@ -558,6 +559,7 @@
       "EmptyState"
     ],
     "dependencies": [
+      "mobile/src/ui/icon-badge.tsx",
       "mobile/src/ui/text.tsx"
     ]
   },
@@ -678,6 +680,15 @@
       "mobile/src/ui/skeletons.tsx",
       "mobile/src/ui/prop-row.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/ui/icon-badge.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "IconBadge"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/icons.tsx",
@@ -1121,6 +1132,7 @@
       "SignInSheet"
     ],
     "dependencies": [
+      "mobile/src/ui/button.tsx",
       "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/brand.tsx",
       "mobile/src/ui/press.tsx",
