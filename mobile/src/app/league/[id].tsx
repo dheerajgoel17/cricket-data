@@ -6,6 +6,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { pc } from "@site/lib/format";
 import { useStore } from "@/lib/use-store";
+import { useLater } from "@/lib/use-later";
 import { leagueData } from "@/lib/league";
 import { DataTable } from "@/ui/data-table";
 import { EmptyState } from "@/ui/empty-state";
@@ -31,13 +32,15 @@ export default function League() {
   const [tab, setTab] = useState("stats");
   const [season, setSeason] = useState("");
   const known = !!store && Number.isInteger(e) && e >= 0 && e < store.events.length;
-  const data = useMemo(() => (known && matchesReady ? leagueData(store, e) : null), [store, e, known, matchesReady]);
+  // the table work mounts after the first frame (header + skeleton paint first), as a transition so touches stay live
+  const bodyReady = useLater(known && matchesReady);
+  const data = useMemo(() => (known && matchesReady && bodyReady ? leagueData(store, e) : null), [store, e, known, matchesReady, bodyReady]);
   const name = known ? store.events[e] : "Competition";
 
   return (
     <PageAtmosphere style={{ paddingTop: inset.top }}>
       <PageHeader title={name} subtitle={data ? `${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}` : undefined} />
-      {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store ? <Working label="Loading…" fill shape="league" /> : !matchesReady ? <Working label="Loading matches…" fill shape="league" /> : !known || !data ? <EmptyState title="Unknown competition" body="This competition is not in the stats data." /> : (
+      {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store ? <Working label="Loading…" fill shape="league" /> : !matchesReady || (known && !bodyReady) ? <Working label="Loading matches…" fill shape="league" /> : !known || !data ? <EmptyState title="Unknown competition" body="This competition is not in the stats data." /> : (
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
           <View style={styles.hero}>
             <LeagueBadge name={name} size={56} />

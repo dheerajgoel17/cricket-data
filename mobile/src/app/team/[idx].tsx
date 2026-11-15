@@ -11,6 +11,7 @@ import { runPlan } from "@cricket/engine/plan.js";
 import { odds, pc } from "@site/lib/format";
 import { collectGrid } from "@site/lib/grid";
 import { useStore } from "@/lib/use-store";
+import { useLater } from "@/lib/use-later";
 import { DataTable, Pill } from "@/ui/data-table";
 import { Chips } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
@@ -38,7 +39,8 @@ export default function Team() {
   const store: any = stats.data?.store;
   const matchesReady = stats.matchesReady;
   const known = !!store && Number.isInteger(i) && i >= 0 && i < store.teams.length;
-  const valid = known && matchesReady;
+  const bodyReady = useLater(known && matchesReady); // header + skeleton paint first; the grid and format scan mount as a transition
+  const valid = known && matchesReady && bodyReady;
   // the format it has played most (needs matches.json)
   const main = useMemo(() => {
     if (!valid || !store.M) return "T20";
@@ -71,7 +73,7 @@ export default function Team() {
         <View style={{ paddingTop: chromePad }}><Working label="Loading…" fill shape="grid" /></View>
       ) : !known ? (
         <View style={{ paddingTop: chromePad }}><EmptyState title="Unknown team" body="This team is not in the stats data." /></View>
-      ) : !matchesReady ? (
+      ) : !matchesReady || !bodyReady ? (
         <View style={{ paddingTop: chromePad }}><Working label="Loading matches…" fill shape="grid" /></View>
       ) : (
         <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={[styles.body, { paddingTop: chromePad, paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
