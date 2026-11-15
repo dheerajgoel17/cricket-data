@@ -31,6 +31,8 @@ jobs:
       FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
       FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
       FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
+      FEEDG_RELAY_ALT: ${{ secrets.FEEDG_RELAY_ALT }}
+      FEEDG_RELAY_ALT_KEY: ${{ secrets.FEEDG_RELAY_ALT_KEY }}
       GITHUB_ACTIONS: "true"
     steps:
       - uses: actions/checkout@v4

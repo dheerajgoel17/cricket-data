@@ -26,3 +26,4 @@ site/node_modules/
 site/public/sitemap.xml
 site/public/robots.txt
 mobile/node_modules/
+relay/.env.local
