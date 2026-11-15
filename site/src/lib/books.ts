@@ -9,7 +9,7 @@ export { bookVariant };
 export const BOOK_LOGOS: Record<string, string> = Object.fromEntries(
   Object.keys(BOOK_STEMS).map((stem) => {
     // svg preferred where we ship one; png for the rest (matches public/books)
-    const ext = ["bet365", "ladbrokes", "polymarket"].includes(stem) ? "svg" : "png";
+    const ext = ["bet365", "ladbrokes", "polymarket", "1xbet"].includes(stem) ? "svg" : "png";
     return [stem, `/books/${stem}.${ext}`];
   }),
 );

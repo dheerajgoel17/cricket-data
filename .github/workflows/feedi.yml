@@ -1,0 +1,85 @@
+name: Feed I probe
+
+# Dispatch only: pull Feed I through the Mumbai Worker (same hop as Feed H / FairWin / ReddyBook).
+# Nothing committed. A pull request never runs this (the repository is public).
+# Set secrets FEEDI_URL, FEEDI_NAME (and optional FEEDI_PARTNER); reuse FEEDH_RELAY / FEEDH_RELAY_KEY.
+# Put Feed I's host on the Worker's RELAY_ALLOW_EXTRA first.
+on:
+  workflow_dispatch:
+    inputs:
+      also_live:
+        description: Also probe LiveFeed (in-play listing + one game when listed)
+        type: boolean
+        default: true
+
+concurrency:
+  group: feedi-probe
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FEEDI_URL: ${{ secrets.FEEDI_URL }}
+      FEEDI_NAME: ${{ secrets.FEEDI_NAME }}
+      FEEDI_PARTNER: ${{ secrets.FEEDI_PARTNER }}
+      FEEDH_RELAY: ${{ secrets.FEEDH_RELAY }}
+      FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
+      FEEDG_RELAY: ${{ secrets.FEEDG_RELAY }}
+      FEEDG_RELAY_KEY: ${{ secrets.FEEDG_RELAY_KEY }}
+      GITHUB_ACTIONS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Ping the relay
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import os, urllib.error, urllib.request
+          addr = (os.environ.get("FEEDH_RELAY") or os.environ.get("FEEDG_RELAY") or "").strip()
+          key = (os.environ.get("FEEDH_RELAY_KEY") or os.environ.get("FEEDG_RELAY_KEY") or "").strip()
+          if not addr.startswith("https://") or not key:
+              print("relay unset")
+              raise SystemExit(1)
+          req = urllib.request.Request(f"{addr}?health=1", headers={"x-relay-key": key})
+          try:
+              with urllib.request.urlopen(req, timeout=20) as r:
+                  print("health", r.status, r.read()[:200].decode())
+          except urllib.error.HTTPError as e:
+              print("health", e.code, e.read()[:200])
+          PY
+      - name: Feed I pre-match
+        run: |
+          python -m value_bets.adapters.feedi | tee "$GITHUB_STEP_SUMMARY"
+      - name: Feed I live sample
+        if: inputs.also_live
+        continue-on-error: true
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          from value_bets.adapters import feedi
+          from value_bets.util import iso, now_utc
+          s = feedi.settings()
+          if not s:
+              print("feedi live skipped: FEEDI_URL / FEEDI_NAME not set")
+              raise SystemExit(0)
+          got = feedi.live_matches(now_utc())
+          print(f"feedi live matches={len(got)}")
+          for m in got[:3]:
+              kinds = {}
+              for ln in m.get("lines") or []:
+                  kinds[ln.get("kind")] = kinds.get(ln.get("kind"), 0) + 1
+              print(f"  {m.get('home')} vs {m.get('away')} lines={len(m.get('lines') or [])} kinds={kinds}")
+              # market name samples only (never the host)
+              for ln in (m.get("lines") or [])[:8]:
+                  print("   ", ln.get("kind"), ln.get("market") or ln.get("player") or ln.get("team"), ln.get("line"))
+          PY

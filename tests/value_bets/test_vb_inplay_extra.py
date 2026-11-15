@@ -82,8 +82,9 @@ def test_feed_e_reads_team_innings_player_runs_other_over_unders_and_picks_and_l
 def test_all_matches_counts_each_source_and_a_failing_one_costs_only_itself(monkeypatch):
     monkeypatch.setattr(ix, "k_matches", lambda now, wanted=None: (_ for _ in ()).throw(RuntimeError("down")))
     monkeypatch.setattr(ix, "e_matches", lambda now, wanted=None: [{"home": "A", "away": "B", "league": "", "kickoff": None, "lines": [{"kind": "pick"}]}])
+    monkeypatch.setattr(ix, "i_matches", lambda now, wanted=None: [])
     matches, counts = ix.all_matches(NOW)
-    assert counts == {"feedk": 0, "feede": 1} and len(matches) == 1
+    assert counts == {"feedk": 0, "feede": 1, "feedi": 0} and len(matches) == 1
 
 
 def test_matches_live_on_our_fixture_list_are_read_first_whatever_level_the_book_leaves_off(tmp_path):
