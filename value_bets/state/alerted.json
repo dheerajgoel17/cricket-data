@@ -14,11 +14,6 @@
   "start_utc": "2026-11-15T08:00:00Z",
   "alerted_at": "2026-11-12T16:32:43.568004+00:00"
  },
- "female|Melbourne Renegades Women|Sydney Sixers Women|2026-11-15|batter_runs||Ellyse Perry under 29.5|29.5|under": {
-  "edge": 0.0566,
-  "start_utc": "2026-11-15T00:00:00Z",
-  "alerted_at": "2026-11-13T02:34:06.589274+00:00"
- },
  "female|Melbourne Stars Women|Sydney Thunder Women|2026-11-16|batter_runs||Amy Jones under 18.5|18.5|under": {
   "edge": 0.0648,
   "start_utc": "2026-11-16T08:13:00Z",
@@ -38,10 +33,5 @@
   "edge": 0.06,
   "start_utc": "2026-11-15T03:30:00Z",
   "alerted_at": "2026-11-13T12:39:31.841445+00:00"
- },
- "female|Melbourne Renegades Women|Sydney Sixers Women|2026-11-15|batter_runs||Ellyse Perry under 25.5|25.5|under": {
-  "edge": 0.0605,
-  "start_utc": "2026-11-15T00:00:00Z",
-  "alerted_at": "2026-11-14T23:40:14.002345+00:00"
  }
 }
