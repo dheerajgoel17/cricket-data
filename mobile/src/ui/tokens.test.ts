@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { control, fs, HEADER_HEIGHT, radius, rhythm, space, tint, type } from "./tokens";
+import { control, fs, HEADER_HEIGHT, icon, radius, rhythm, space, state, tint, type } from "./tokens";
 
 const src = join(__dirname, "..");
 const files = (dir: string): string[] => readdirSync(dir).flatMap((n) => { const p = join(dir, n); return statSync(p).isDirectory() ? files(p) : /\.tsx$/.test(n) && !/\.test\./.test(n) ? [p] : []; });
@@ -60,5 +60,20 @@ describe("tokens derived from tokens.json", () => {
     const hits = (re: RegExp, allow: RegExp) => files(src).filter((f) => !allow.test(f)).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (re.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
     expect(hits(/height: (36|44|48)\b[^}]*backgroundColor: color\.(primary|secondary)\b|backgroundColor: color\.(primary|secondary)\b[^}]*height: (36|44|48)\b/, /(ui\/button|ui\/line-stepper)\.tsx$/)).toEqual([]);
     expect(hits(/placeholderTextColor=\{color\["muted-foreground"\]\} style=\{styles\.input\} (accessibilityLabel|autoFocus)/, /ui\/search-field\.tsx$/)).toEqual([]);
+  });
+
+  it("takes shadows from the elevation tokens, never a screen's own", () => {
+    const bad = files(src).filter((f) => !/ui\/platform\.ts/.test(f)).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (/\bshadow(Color|Opacity|Radius|Offset)\b|\belevation: [0-9]/.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
+    expect(bad).toEqual([]);
+  });
+
+  it("takes icon sizes, pressed / dim opacities from tokens", () => {
+    const hits = (re: RegExp) => files(src).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (re.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
+    expect(hits(/<Ionicons[^>]*size=\{\d+\}/)).toEqual([]);
+    expect(hits(/pressed && \{ opacity: /)).toEqual([]);
+  });
+  it("derives icon sizes and states from the token file", () => {
+    expect(icon).toEqual({ xs: 12, sm: 16, md: 20, lg: 24 });
+    expect(state.pressed.opacity).toBe(0.7);
   });
 });

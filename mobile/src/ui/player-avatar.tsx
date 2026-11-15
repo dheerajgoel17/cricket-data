@@ -5,7 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { playerPhotos, teamJerseys } from "@cricket/engine/photos.js";
 import { abs } from "@/lib/config";
 import { photosQuery } from "@/lib/queries";
-import { color } from "@/ui/tokens";
+import { color, duration } from "@/ui/tokens";
+
+/** A picture that arrives after its circle fades in instead of popping (the circle is already there, so nothing shifts). */
+const AVATAR_FADE = { duration: duration.fast, effect: "cross-dissolve" as const };
 
 /** Face pictures are head and shoulders, nearly square (310 x 300); the shirt is the same width and rides up over the bottom third of the face (the site's `PlayerPortrait`). */
 const FACE = 300 / 310, SHIRT_TOP = 0.627, WITH_SHIRT = 1.03;
@@ -37,6 +40,7 @@ export function PlayerAvatar({ pid, team, test, size = 36 }: { pid: string; team
             contentPosition="bottom"
             recyclingKey={faces[face]}
             cachePolicy="memory-disk"
+            transition={AVATAR_FADE}
             onError={() => setFace((n) => n + 1)}
           />
         ) : null}
@@ -48,6 +52,7 @@ export function PlayerAvatar({ pid, team, test, size = 36 }: { pid: string; team
             contentPosition="top"
             recyclingKey={shirts[shirt]}
             cachePolicy="memory-disk"
+            transition={AVATAR_FADE}
             onError={() => setShirt((n) => n + 1)}
           />
         ) : null}
@@ -70,6 +75,7 @@ export function PlayerFace({ pid, size = 36 }: { pid: string; size?: number }) {
           contentPosition="top"
           recyclingKey={faces[face]}
           cachePolicy="memory-disk"
+            transition={AVATAR_FADE}
           onError={() => setFace((n) => n + 1)}
         />
       ) : null}
@@ -96,6 +102,7 @@ export function PlayerPortrait({ pid, team, test, width = 144 }: { pid: string; 
           contentPosition="bottom"
           recyclingKey={faces[face]}
           cachePolicy="memory-disk"
+            transition={AVATAR_FADE}
           onError={() => setFace((n) => n + 1)}
         />
       ) : null}
@@ -107,6 +114,7 @@ export function PlayerPortrait({ pid, team, test, width = 144 }: { pid: string; 
           contentPosition="top"
           recyclingKey={shirts[shirt]}
           cachePolicy="memory-disk"
+            transition={AVATAR_FADE}
           onError={() => setShirt((n) => n + 1)}
         />
       ) : null}

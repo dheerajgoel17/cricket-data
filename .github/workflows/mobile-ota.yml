@@ -1,0 +1,45 @@
+name: Mobile OTA update
+
+# Publishes the app's JavaScript to installed apps over the air (expo-updates), for changes that need no new APK (scripts/ota-check.mjs says which).
+# Needs the repository secret EXPO_TOKEN (a free EAS account) and the repository variable EXPO_UPDATES_URL used when the APK was built; see docs/OPERATIONS.md "App updates".
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: "What changed (shown in the update log)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EXPO_UPDATES_URL: ${{ vars.EXPO_UPDATES_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Is this change OTA-safe
+        run: node scripts/ota-check.mjs origin/main | tee ota.txt
+      - name: Refuse a native change
+        run: |
+          if grep -q "NEEDS A NEW BUILD" ota.txt; then echo "This change needs a new APK, not an update." >&2; exit 1; fi
+      - name: Install
+        working-directory: mobile
+        run: npm ci
+      - name: Publish the update
+        if: ${{ env.EXPO_TOKEN != '' && env.EXPO_UPDATES_URL != '' }}
+        working-directory: mobile
+        env:
+          UPDATE_MESSAGE: ${{ inputs.message }}
+        run: npx eas-cli@latest update --branch production --message "$UPDATE_MESSAGE" --non-interactive
+      - name: Nothing to publish to
+        if: ${{ env.EXPO_TOKEN == '' || env.EXPO_UPDATES_URL == '' }}
+        run: echo "EXPO_TOKEN or EXPO_UPDATES_URL is not set, so nothing was published." >&2

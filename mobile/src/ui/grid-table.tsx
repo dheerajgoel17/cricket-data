@@ -24,7 +24,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { MiniBars } from "@/ui/mini-bars";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, surface, t, d } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, surface, t, d, state, icon } from "@/ui/tokens";
 
 export const STAT_ITEMS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label as string]);
 export const GAMES = [5, 10, 15, 20, 30];
@@ -66,7 +66,7 @@ export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, o
       <Sheet visible={open} onClose={() => setOpen(false)} label="Close filters">
           <View style={styles.sheetHead}>
             <Text style={styles.sheetTitle}>Filters</Text>
-            <RoundButton label="Close" onPress={() => setOpen(false)}><Ionicons name="close" size={20} color={color.foreground} /></RoundButton>
+            <RoundButton label="Close" onPress={() => setOpen(false)}><Ionicons name="close" size={icon.md} color={color.foreground} /></RoundButton>
           </View>
           <Text style={styles.sheetSec}>Custom line</Text>
           <LineStepper value={draftLine} label="O" min={0} onStep={(d) => setDraftLine(Math.max(0, Math.round((draftLine + d) * 2) / 2))} />
@@ -105,7 +105,7 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
           const vals = g.fx.filter((m) => map.has(m)).map((m) => map.get(m)[g.def.key] as number);
           const k = vals.filter((v) => v > line).length;
           return (
-            <Press scale={1} key={p} onPress={() => push(`/player/${p}`)} accessibilityRole="button" accessibilityLabel={label(p)} style={({ pressed }) => [styles.cell, styles.rowStart, pressed && { opacity: 0.6 }]}>
+            <Press scale={1} key={p} onPress={() => push(`/player/${p}`)} accessibilityRole="button" accessibilityLabel={label(p)} style={({ pressed }) => [styles.cell, styles.rowStart, pressed && state.pressed]}>
               <View style={{ width: NAME_W, flexDirection: "row", alignItems: "center", gap: space.tight }}>
                 <PlayerAvatar pid={store.P.id[p]} team={store.teamName(teamIdx)} size={28} />
                 <Text style={styles.name} numberOfLines={1}>{label(p)}</Text>

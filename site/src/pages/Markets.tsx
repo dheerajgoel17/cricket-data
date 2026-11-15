@@ -148,7 +148,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
       <StatsAd />
       <Crumbs items={[["Home", "/"], [isTeam ? "Teams" : "Venues", `/teams?tab=${isTeam ? "teams" : "venues"}`], [label]]} />
       {isTeam ? (
-        <HeroWash accent={sideAccent(store.teams[idx].n)} className="-mx-gutter px-gutter">
+        <HeroWash page accent={sideAccent(store.teams[idx].n)} className="-mx-gutter px-gutter">
           <EntityHero badge={<TeamBadge name={store.teams[idx].n} size="xl" />} name={label} sub={store.teams[idx].g ? "Women's cricket" : "Men's cricket"}
             meta={[`${fmtName} markets`, "team markets use the side batting first"]} save={<StarButton kind="team" idx={idx} />} />
         </HeroWash>

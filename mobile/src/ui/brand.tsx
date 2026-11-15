@@ -8,7 +8,7 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Circle, Defs, G, LinearGradient, Rect, Stop } from "react-native-svg";
-import { color, HEADER_HEIGHT, space, type, fs } from "@/ui/tokens";
+import { color, HEADER_HEIGHT, space, type, fs, icon } from "@/ui/tokens";
 
 /** The Fancy.cash mark: a rounded dark tile with a green F whose top arm ends in a ball (same drawing as the site's `BrandMark`). */
 export function BrandMark({ size = 36 }: { size?: number }) {
@@ -43,7 +43,7 @@ export function AppHeader({ title, info, action }: { title?: string; info?: Reac
       )}
       {action}
       <RoundButton label="Search" onPress={() => push("/search")}>
-        <Ionicons name="search-outline" size={20} color={color.foreground} />
+        <Ionicons name="search-outline" size={icon.md} color={color.foreground} />
       </RoundButton>
     </View>
   );

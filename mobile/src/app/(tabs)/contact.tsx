@@ -9,7 +9,7 @@ import { Text } from "@/ui/text";
 import { AppHeader } from "@/ui/brand";
 import { useScreenInsets } from "@/ui/insets";
 import { TabFade } from "@/ui/tab-fade";
-import { color, font, numLg, radius, space, type, fs, surface, t, d } from "@/ui/tokens";
+import { color, font, numLg, radius, space, type, fs, surface, t, d, icon } from "@/ui/tokens";
 
 const INBOX = "tech@fancy.cash";
 
@@ -36,18 +36,18 @@ function ContactScreen() {
         <Text style={styles.lead}>Fancy.cash is a free cricket stats site. Write for business, tech, privacy, or anything else — one inbox.</Text>
 
         <View style={styles.hero}>
-          <IconBadge><Ionicons name="mail-outline" size={22} color={color.primary} /></IconBadge>
+          <IconBadge><Ionicons name="mail-outline" size={icon.lg} color={color.primary} /></IconBadge>
           <Text style={styles.cap}>EMAIL</Text>
           <Press accessibilityRole="link" accessibilityLabel={`Email ${INBOX}`} onPress={() => open(mailTo("Hello"))}>
             <Text style={styles.email}>{INBOX}</Text>
           </Press>
-          <Button label={`Email ${INBOX}`} icon={<Ionicons name="mail" size={16} color={color["primary-foreground"]} />} onPress={() => open(mailTo("Hello"))} style={styles.btn} />
+          <Button label={`Email ${INBOX}`} icon={<Ionicons name="mail" size={icon.sm} color={color["primary-foreground"]} />} onPress={() => open(mailTo("Hello"))} style={styles.btn} />
         </View>
 
         <Text style={styles.section}>What is it about?</Text>
         {TOPICS.map((t) => (
           <View key={t.id} style={styles.card}>
-            <IconBadge><Ionicons name={t.icon} size={20} color={color.foreground} /></IconBadge>
+            <IconBadge><Ionicons name={t.icon} size={icon.md} color={color.foreground} /></IconBadge>
             <Text style={styles.cardTitle}>{t.title}</Text>
             <Text style={styles.cardBlurb}>{t.blurb}</Text>
             <Button variant="secondary" size="sm" label="Write about this" onPress={() => open(mailTo(t.subject))} style={styles.secondary} />

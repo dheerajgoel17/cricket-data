@@ -1,4 +1,5 @@
 import { Profiler, useEffect, useState } from "react";
+import { checkForUpdate } from "@/lib/ota";
 import { Platform } from "react-native";
 import { DarkTheme, Stack, ThemeProvider } from "expo-router";
 import { useFonts } from "expo-font";
@@ -48,7 +49,8 @@ export default function RootLayout() {
     for (const q of [fixturesQuery, linesQuery, hotRowsQuery, photosQuery]) void client.prefetchQuery(q as never);
     const liveAt = Platform.OS === "android" ? 4_000 : 1200;
     const t = setTimeout(() => { void client.prefetchQuery(liveQuery as never); }, liveAt);
-    return () => clearTimeout(t);
+    const ota = setTimeout(() => { void checkForUpdate(); }, 12_000); // well after the first screen and the first data; never competes with startup
+    return () => { clearTimeout(t); clearTimeout(ota); };
   }, [ready]);
   // the system splash is plain black and is taken down by `AnimatedSplash` as it draws; the app is mounted behind it as soon as its fonts are in, so its data loads while the mark is on screen
   // (one parent for both, so the splash is never remounted, which would restart its drawing)

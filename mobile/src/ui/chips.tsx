@@ -7,7 +7,7 @@ import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTimin
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { AnimatedText, Text } from "@/ui/text";
-import { color, control, radius, space, type, font, tint, duration, t, d } from "@/ui/tokens";
+import { color, control, radius, space, type, font, tint, duration, t, d, state, icon } from "@/ui/tokens";
 
 /** The site's series chips: one row that scrolls sideways, the chosen one filled with the accent colour (the fill fades between chips); each carries how many matches it holds. */
 export function Chips({ items, value: valueProp, onChange: onChangeProp }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void }) {
@@ -29,7 +29,7 @@ function Chip({ label, count, on, muted, onPress }: { label: string; count?: num
   const countColor = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], color["primary-foreground"]]) }));
   return (
     <Press accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={onPress}>
-      <Animated.View style={[styles.chip, box, muted && !on && { opacity: 0.7 }]}>
+      <Animated.View style={[styles.chip, box, muted && !on && state.dim]}>
         <AnimatedText style={[styles.label, text]}>{label}</AnimatedText>
         {count != null ? <AnimatedText style={[styles.count, countColor]}>{count}</AnimatedText> : null}
       </Animated.View>
@@ -41,7 +41,7 @@ function Chip({ label, count, on, muted, onPress }: { label: string; count?: num
 export function FilterButton({ label = "Filters", count = 0, onPress, style }: { label?: string; count?: number; onPress: () => void; style?: StyleProp<ViewStyle> }) {
   return (
     <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={`Filters${count ? `, ${count} active` : ""}`} style={[styles.filterBtn, style]}>
-      <Ionicons name="options-outline" size={16} color={color.foreground} />
+      <Ionicons name="options-outline" size={icon.sm} color={color.foreground} />
       <Text style={styles.filterLbl}>{label}</Text>
       {count > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeTxt}>{count}</Text></View> : null}
     </Press>
@@ -53,7 +53,7 @@ export function ActiveChip({ label, onClear }: { label: string; onClear: () => v
   return (
     <Press scale={1} onPress={onClear} accessibilityRole="button" style={styles.active}>
       <Text style={styles.activeTxt}>{label}</Text>
-      <Ionicons name="close" size={12} color={color.primary} />
+      <Ionicons name="close" size={icon.xs} color={color.primary} />
     </Press>
   );
 }

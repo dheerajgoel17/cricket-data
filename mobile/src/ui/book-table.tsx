@@ -6,7 +6,7 @@ import * as Haptics from "expo-haptics";
 import { odds } from "@site/lib/format";
 import { BookBadge } from "@/ui/book-badge";
 import { ChevronDown } from "@/ui/icons";
-import { cap, color, font, space, type, t, d, w } from "@/ui/tokens";
+import { cap, color, font, space, type, t, d, w, state, icon } from "@/ui/tokens";
 
 type Priced = { source: string; over: number | null; under: number | null };
 
@@ -23,11 +23,11 @@ export function BookTable({ books, shown }: { books: Priced[]; shown: (string | 
         accessibilityState={{ expanded: open }}
         accessibilityLabel={open ? "Hide extra books" : `Show ${rest.length} more books`}
         onPress={() => { void Haptics.selectionAsync(); setOpen((v) => !v); }}
-        style={({ pressed }) => [styles.toggle, pressed && { opacity: 0.6 }]}
+        style={({ pressed }) => [styles.toggle, pressed && state.pressed]}
       >
         <Text style={styles.toggleText}>{open ? "Hide" : `+${rest.length} book${rest.length > 1 ? "s" : ""}`}</Text>
         <View style={{ transform: [{ rotate: open ? "180deg" : "0deg" }] }}>
-          <ChevronDown size={14} color={color["muted-foreground"]} />
+          <ChevronDown size={icon.sm} color={color["muted-foreground"]} />
         </View>
       </Press>
       {open ? (

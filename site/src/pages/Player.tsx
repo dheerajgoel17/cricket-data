@@ -259,7 +259,7 @@ function PlayerScreen({ idx }: { idx: number }) {
           </div>
         )}
       </StickyFilterBand>
-      <HeroWash accent={sideAccent(side)} height={220} className="-mx-gutter px-gutter">
+      <HeroWash page accent={sideAccent(side)} className="-mx-gutter px-gutter">
         <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       </HeroWash>
       <AdSlot slotId="player_detail_top" />

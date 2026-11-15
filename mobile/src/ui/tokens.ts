@@ -76,6 +76,16 @@ export const space = {
   gutter: remPx(Z.gutter),
 };
 
+/** Icon sizes in points (tokens.json `icon`): xs 12, sm 16 (inline with text), md 20 (buttons, headers, rows), lg 24 (back, hero). Never a literal `size={…}` on an icon. */
+export const icon = { xs: remPx(tokens.icon.xs), sm: remPx(tokens.icon.sm), md: remPx(tokens.icon.md), lg: remPx(tokens.icon.lg) } as const;
+
+/** Interaction states (tokens.json `state`): spread `state.pressed` onto a control under the finger, `state.disabled` onto one that cannot act, `state.dim` onto content that is out of play. */
+export const state = {
+  pressed: { opacity: tokens.state["pressed-opacity"] },
+  disabled: { opacity: tokens.state["disabled-opacity"] },
+  dim: { opacity: tokens.state["dim-opacity"] },
+} as const;
+
 /** The page rhythm, one set of gaps for every screen (tokens.json `rhythm`; web: gap-snug / gap-stack / gap-section). A screen picks a role here and never a raw `space.*` for page-level gaps. */
 export const rhythm = { within: space.snug, between: space.stack, section: space.section, top: space.stack, inline: space.gutter } as const;
 

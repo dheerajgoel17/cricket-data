@@ -13,12 +13,12 @@
   --secondary: #2c2c2e;
   --secondary-foreground: #ffffff;
   --muted: #1c1c1e;
-  --muted-foreground: #8e8e93;
+  --muted-foreground: #98989d;
   --accent: #3a3a3c;
   --accent-foreground: #ffffff;
   --destructive: #ff4444;
   --border: #2c2c2e;
-  --input: #1c1c1e;
+  --input: #6c6c70;
   --ring: #27da8e;
   --sidebar: #0C0C0E;
   --sidebar-foreground: #ffffff;
@@ -121,6 +121,10 @@
   --duration-moderate: 300ms;
   --duration-flash: 450ms;
   --duration-slow: 500ms;
+  --_doc: Interaction state opacities (CSS: --pressed-opacity ...; app: `state` in ui/tokens.ts): pressed = a control under the finger, disabled = a control that cannot act, dim = content that is out of play (a void line, a team that is out).;
+  --pressed-opacity: 0.7;
+  --disabled-opacity: 0.55;
+  --dim-opacity: 0.6;
 }
 
 :root {

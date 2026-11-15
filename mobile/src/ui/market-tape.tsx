@@ -11,7 +11,7 @@ import { InfoButton } from "@/ui/info-button";
 import { Segmented } from "@/ui/segmented";
 import { PlayerFace } from "@/ui/player-avatar";
 import { Tick } from "@/ui/tick";
-import { cap, color, control, font, numLg, radius, space, type, fs, tint, surface, w } from "@/ui/tokens";
+import { cap, color, control, font, numLg, radius, space, type, fs, tint, surface, w, state } from "@/ui/tokens";
 
 export type TapeRow = { idx: number; pid: string; name: string; stat: string; line: number; over: number; fmt: string; inn?: number; verdict: "cleared" | "missed" | "push" | null; v?: number };
 
@@ -68,7 +68,7 @@ export function MarketTape({ rows }: { rows: TapeRow[] }) {
               key={`${r.idx}${r.stat}${r.line}${r.fmt}`}
               onPress={() => openPlayer(r)}
               accessibilityRole="link"
-              style={({ pressed }) => [styles.ticketRow, k > 0 && styles.ticketSep, pressed && { opacity: 0.7 }]}
+              style={({ pressed }) => [styles.ticketRow, k > 0 && styles.ticketSep, pressed && state.pressed]}
             >
               <PlayerFace pid={r.pid} size={control} />
               <View style={styles.who}>
@@ -103,7 +103,7 @@ export function MarketTape({ rows }: { rows: TapeRow[] }) {
         </View>
       )}
       {list.slice(0, 4).map((r, k) => (
-        <Press scale={1} key={`${r.idx}${r.stat}${r.line}${r.fmt}`} onPress={() => openPlayer(r)} accessibilityRole="link" style={({ pressed }) => [styles.row, k > 0 && styles.sep, pressed && { opacity: 0.6 }]}>
+        <Press scale={1} key={`${r.idx}${r.stat}${r.line}${r.fmt}`} onPress={() => openPlayer(r)} accessibilityRole="link" style={({ pressed }) => [styles.row, k > 0 && styles.sep, pressed && state.pressed]}>
           <PlayerFace pid={r.pid} size={control} />
           <View style={styles.who}>
             <Text style={styles.name} numberOfLines={1}>{r.name}</Text>

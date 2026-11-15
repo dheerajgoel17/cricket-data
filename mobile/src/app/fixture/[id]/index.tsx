@@ -45,7 +45,7 @@ import { MatchHeaderSkeleton } from "@/ui/skeletons";
 import { PageHeader, RoundButton } from "@/ui/page-header";
 import { PropRow } from "@/ui/prop-row";
 import { abbr } from "@site/lib/format";
-import { color, font, radius, space, type, rhythm, t } from "@/ui/tokens";
+import { color, font, radius, space, type, rhythm, t, icon } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** A match, as on the site's phone page: the match flat on the page (state, sides, kick-off with a live countdown or the score, the pair at the crease, ball by ball, the scorecard), then the page's sections as chips (Props / Match Fancy / Grid / Custom line) with the open one's stat chips and rows under them. */
@@ -193,7 +193,7 @@ export default function FixturePage() {
       >
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, barScrim]} />
         <BlurBar merge blurTarget={target} style={{ paddingTop: inset.top }}>
-          <PageHeader title={f ? `${f.a} v ${f.b}` : "Match"} subtitle={f ? seriesName(f) : undefined} right={f ? <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton> : undefined} />
+          <PageHeader title={f ? `${f.a} v ${f.b}` : "Match"} subtitle={f ? seriesName(f) : undefined} right={f ? <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={icon.md} color={color.foreground} /></RoundButton> : undefined} />
         </BlurBar>
       </View>
       <TabFade withTabBar={false} />

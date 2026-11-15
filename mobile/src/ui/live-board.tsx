@@ -12,7 +12,7 @@ import { Bleed } from "@/ui/bleed";
 import { Press } from "@/ui/press";
 import { Segmented } from "@/ui/segmented";
 import { Text } from "@/ui/text";
-import { cap, color, font, num, radius, space, tint, type, fs, t, d, w } from "@/ui/tokens";
+import { cap, color, font, num, radius, space, tint, type, fs, t, d, w, icon } from "@/ui/tokens";
 
 type Side = [string, number];
 
@@ -227,9 +227,9 @@ export function ScorecardCard({ match, teams, header }: { match: any; teams?: Si
       {full ? (
         <>
           <Press scale={1} onPress={() => setOpen((o) => !o)} accessibilityRole="button" accessibilityState={{ expanded: open }} style={styles.fullRow}>
-            <Ionicons name="grid-outline" size={18} color={color["muted-foreground"]} />
+            <Ionicons name="grid-outline" size={icon.md} color={color["muted-foreground"]} />
             <Text style={styles.fullText}>{open ? "Hide scorecard" : "Full scorecard"}</Text>
-            <Ionicons name={open ? "chevron-up" : "chevron-down"} size={16} color={color["muted-foreground"]} />
+            <Ionicons name={open ? "chevron-up" : "chevron-down"} size={icon.sm} color={color["muted-foreground"]} />
           </Press>
           {open ? (
             <View style={styles.fullBody}>

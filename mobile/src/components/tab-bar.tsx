@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { TABS } from "@/lib/tabs";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, TAB_BAR_HEIGHT, type, t } from "@/ui/tokens";
+import { color, font, TAB_BAR_HEIGHT, type, t, icon } from "@/ui/tokens";
 
 type Props = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
 
@@ -37,7 +37,7 @@ export function TabBar({ state, emitter, navigateToTab, insets }: Props) {
               navigateToTab(route.key);
             }}
             style={styles.tab}>
-            <Ionicons name={on ? t.on : t.icon} size={22} color={tint} />
+            <Ionicons name={on ? t.on : t.icon} size={icon.lg} color={tint} />
             <Text style={[styles.label, { color: tint }]} numberOfLines={1}>{t.label}</Text>
           </Press>
         );

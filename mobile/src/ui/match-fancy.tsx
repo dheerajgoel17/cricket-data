@@ -40,7 +40,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
-import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, rhythm, duration, t, w } from "@/ui/tokens";
+import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, rhythm, duration, t, w, state, icon } from "@/ui/tokens";
 
 
 /** Width of the ladder's Line column: fits the longest line a Test total can have (1100.5) at the figure size. */
@@ -214,7 +214,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       <Sheet visible={filtersOpen} onClose={() => setFiltersOpen(false)} label="Close filters">
           <View style={styles.sheetHead}>
             <Text style={styles.h2}>Filters</Text>
-            <RoundButton label="Close" onPress={() => setFiltersOpen(false)}><Ionicons name="close" size={20} color={color.foreground} /></RoundButton>
+            <RoundButton label="Close" onPress={() => setFiltersOpen(false)}><Ionicons name="close" size={icon.md} color={color.foreground} /></RoundButton>
           </View>
           <Text style={styles.sheetSec}>Hit-rate window</Text>
           <ChoiceRow>{WINDOWS.map((n) => <ChoiceChip key={n} label={`L${n}`} on={draftWin === n} onPress={() => setDraftWin(n)} />)}</ChoiceRow>
@@ -266,7 +266,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                 <Text style={styles.h3}>{[innTag(inn, fx.fmt === "Test", key), batFirstNow ? BAT_FIRST_TAG : "", marketLabel(key)].filter(Boolean).join(" · ")}</Text>
                 <Text style={styles.note}>{useHere ? `Last ${rep.n} at ${venueName}` : `Last ${rep.n} matches`} · void excluded</Text>
               </View>
-              <RoundButton label="Share this line" onPress={shareLine}><Ionicons name="share-outline" size={20} color={color.foreground} /></RoundButton>
+              <RoundButton label="Share this line" onPress={shareLine}><Ionicons name="share-outline" size={icon.md} color={color.foreground} /></RoundButton>
             </View>
             {liveSoFar != null ? <Text style={styles.live}><StandingMark standing={liveSoFar} line={line} /></Text> : null}
             <View style={styles.stats}>
@@ -326,7 +326,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
                 const underB = priced?.under != null ? priced.books.find((x) => x.under === priced.under) : null;
                 const face = overB || underB;
                 return (
-                <Press scale={1} key={l.line} onPress={() => setMl(l.line)} accessibilityRole="button" style={({ pressed }) => [styles.ladderRow, l.line === line && styles.ladderOn, pressed && { opacity: 0.6 }]}>
+                <Press scale={1} key={l.line} onPress={() => setMl(l.line)} accessibilityRole="button" style={({ pressed }) => [styles.ladderRow, l.line === line && styles.ladderOn, pressed && state.pressed]}>
                   <Text style={[styles.ladderLine, { width: LINE_W }]}>{l.line}</Text>
                   <View style={[styles.lineCell, { flex: 1, flexDirection: "column", alignItems: "flex-start", gap: 2 }]}>
                     {priced && face ? (
@@ -381,7 +381,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
         <Text style={styles.note}>{scope < 0 ? `highest score in the match, last ${t.n} matches` : `${teamName} batting first, last ${t.n} matches`}</Text>
       </View>
       {t.rows.map((r) => (
-        <Press scale={1} key={r.player} onPress={() => push(`/player/${r.player}`)} accessibilityRole="button" style={({ pressed }) => [styles.topRow, pressed && { opacity: 0.6 }]}>
+        <Press scale={1} key={r.player} onPress={() => push(`/player/${r.player}`)} accessibilityRole="button" style={({ pressed }) => [styles.topRow, pressed && state.pressed]}>
           <View style={[styles.topFill, { width: `${(r.pSole / max) * 100}%` }]} />
           <PlayerAvatar pid={store.P.id[r.player]} team={store.teamName(store.P.tm[r.player])} size={36} />
           <View style={{ flex: 1, minWidth: 0 }}>

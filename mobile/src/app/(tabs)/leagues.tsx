@@ -21,7 +21,7 @@ import { ChevronRight } from "@/ui/icons";
 import { Working } from "@/ui/motion";
 import { LeagueBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
-import { cap, color, font, radius, space, type, fs, rhythm, t, w } from "@/ui/tokens";
+import { cap, color, font, radius, space, type, fs, rhythm, t, w, icon } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 /** Listed first, in this order, when they are live or due to start: Big Bash on top (the women's season live, the men's due). */
@@ -43,7 +43,7 @@ function Leagues() {
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <AppHeader title="Leagues" action={
         <Press onPress={() => push("/competitions")} accessibilityRole="button" hitSlop={8} style={styles.all}>
-          <Text style={styles.allText}>All competitions</Text><ChevronRight color={color["muted-foreground"]} size={14} />
+          <Text style={styles.allText}>All competitions</Text><ChevronRight color={color["muted-foreground"]} size={icon.sm} />
         </Press>
       } />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
@@ -66,7 +66,7 @@ function Leagues() {
                 <LeagueBadge name={store.events[e]} size={40} />
                 <Text style={styles.leagueName} numberOfLines={1}>{store.events[e]}</Text>
                 <Press onPress={() => push(`/league/${e}`)} accessibilityRole="button" hitSlop={8} style={styles.all}>
-                  <Text style={styles.allText}>More</Text><ChevronRight color={color["muted-foreground"]} size={14} />
+                  <Text style={styles.allText}>More</Text><ChevronRight color={color["muted-foreground"]} size={icon.sm} />
                 </Press>
               </View>
               <TournamentStats eventIdx={e} season={season} onSeason={setSeason} />

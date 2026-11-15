@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { BrandMark } from "@/ui/brand";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import { color, font, radius, space, type, fs, tint, t, w } from "@/ui/tokens";
+import { color, font, radius, space, type, fs, tint, t, w, icon } from "@/ui/tokens";
 
 /** Sign-in sheet — same hierarchy as the site: brand, Google, one email form, mode link. */
 export function SignInSheet() {
@@ -43,7 +43,7 @@ export function SignInSheet() {
           <View style={[styles.card, { paddingBottom: Math.max(insets.bottom, space.stack) }]} accessibilityViewIsModal>
             <Grabber style={styles.grabber} />
             <Press accessibilityRole="button" accessibilityLabel="Close" onPress={closeSignIn} style={styles.close} hitSlop={10}>
-              <Ionicons name="close" size={18} color={color["muted-foreground"]} />
+              <Ionicons name="close" size={icon.md} color={color["muted-foreground"]} />
             </Press>
 
             <View style={styles.hero}>
@@ -56,7 +56,7 @@ export function SignInSheet() {
               <Text style={styles.hint}>Sign-in is not configured. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in mobile/.env.local, then restart Expo.</Text>
             ) : (
               <View style={styles.body}>
-                <Button variant="secondary" disabled={busy} icon={<Ionicons name="logo-google" size={18} color={color.foreground} />} label="Continue with Google" onPress={google} />
+                <Button variant="secondary" disabled={busy} icon={<Ionicons name="logo-google" size={icon.md} color={color.foreground} />} label="Continue with Google" onPress={google} />
 
                 <View style={styles.orRow} accessibilityElementsHidden>
                   <View style={styles.rule} />

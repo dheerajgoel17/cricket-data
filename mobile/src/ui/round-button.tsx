@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Press } from "@/ui/press";
 import { hitSlopFor } from "@/ui/platform";
-import { color } from "@/ui/tokens";
+import { color, state } from "@/ui/tokens";
 
 /** Diameter of the round header / sheet buttons (the drawing; the touch target is topped up to the platform minimum by `hitSlopFor`). */
 export const ROUND = 40;
@@ -11,7 +11,7 @@ export const ROUND = 40;
 /** The app's one round icon button (back, search, account, share, close, save): a quiet filled circle with a hairline ring and its icon. Never restyle a `Press` into a circle by hand. */
 export function RoundButton({ label, onPress, children, active }: { label: string; onPress: () => void; children: ReactNode; active?: boolean }) {
   return (
-    <Press accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected: !!active }} hitSlop={hitSlopFor(ROUND)} onPress={() => { void Haptics.selectionAsync(); onPress(); }} style={({ pressed }) => [styles.round, pressed && { opacity: 0.6 }]}>
+    <Press accessibilityRole="button" accessibilityLabel={label} accessibilityState={{ selected: !!active }} hitSlop={hitSlopFor(ROUND)} onPress={() => { void Haptics.selectionAsync(); onPress(); }} style={({ pressed }) => [styles.round, pressed && state.pressed]}>
       {children}
     </Press>
   );

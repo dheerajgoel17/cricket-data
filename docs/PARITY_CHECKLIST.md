@@ -70,6 +70,7 @@ Working list for bringing the app (`mobile/`) and the web (`site/`) onto one des
 | B19 | Filters button | `FilterButton` | `FilterButton` | ok (Props filters seen) |
 | B20 | Primary / secondary button | `Button` (shadcn) | `Button` | ok (Contact, sheets, sign-in seen) |
 | B21 | Search box | header `SearchField` | `SearchField` | ok (Competitions seen) |
+| B23 | Entity wash through the chrome (header, tabs, sidebar) | `usePageWash` + `PageWashLayer` | `PageAtmosphere` + `EntityHeroWash` | ok (web seen at phone and desktop width; app seen on the phone) |
 | B22 | Icon on a circle | n/a | `IconBadge` | ok (Contact seen) |
 | C16 | List reflow (reorder, removal) | `ReflowGroup` / `ReflowItem` | `Reflow` | code (needs a hand on the phone) |
 | C17 | Instant choice highlight | n/a (DOM already instant) | `useChoice` | ok (chips, sheets measured) |

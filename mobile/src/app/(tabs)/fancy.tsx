@@ -24,7 +24,7 @@ import { MatchChips } from "@/ui/match-chip";
 import { Working } from "@/ui/motion";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, font, radius, space, type, surface, t, d } from "@/ui/tokens";
+import { color, font, radius, space, type, surface, t, d, icon } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
@@ -130,7 +130,7 @@ function MatchCard({ f, ms, rows, match }: Card) {
           <Text style={styles.statusText} numberOfLines={2}>{model.status}</Text>
           <Text style={styles.series} numberOfLines={1}>{seriesName(f)}{ms.length ? ` · last ${ms.length}` : ""}</Text>
         </View>
-        <View style={styles.linkRow}><Text style={styles.link}>{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}</Text><ChevronRight color={color.primary} size={14} /></View>
+        <View style={styles.linkRow}><Text style={styles.link}>{rows.length > SHOWN_ROWS ? `All ${rows.length} markets` : "Fancy"}</Text><ChevronRight color={color.primary} size={icon.sm} /></View>
       </Press>
     </View>
   );

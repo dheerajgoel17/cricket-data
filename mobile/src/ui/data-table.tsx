@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
 import { Ionicons } from "@expo/vector-icons";
-import { cap, color, font, space, type, tint, fs, radius, d, dStrong, w } from "@/ui/tokens";
+import { cap, color, font, space, type, tint, fs, radius, d, dStrong, w, icon } from "@/ui/tokens";
 
 /** Phone edge bleed for stats tables / game logs (mirrors web `TABLE_BLEED`). */
 export const TABLE_BLEED = {
@@ -45,7 +45,7 @@ export function Pill({ text, tone, width = 60 }: { text: string; tone: "up" | "d
 export function Note({ title, items }: { title: string; items: ReactNode[] }) {
   return (
     <View style={styles.note} accessibilityRole="summary" accessibilityLabel={title}>
-      <Ionicons name="information-circle-outline" size={16} color={color["muted-foreground"]} style={{ marginTop: 1 }} />
+      <Ionicons name="information-circle-outline" size={icon.sm} color={color["muted-foreground"]} style={{ marginTop: 1 }} />
       <View style={{ flex: 1, gap: space.tight }}>
         <Text style={styles.noteTitle}>{title}</Text>
         {items.map((t, i) => <Text key={i} style={styles.noteText}>{t}</Text>)}

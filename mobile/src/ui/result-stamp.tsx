@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { View } from "react-native";
-import { color } from "@/ui/tokens";
+import { color, icon } from "@/ui/tokens";
 
 /** Hit/Miss for the model side against the pre-match line (`cleared` = over the line). Push keeps Edge. */
 export function sideStamp(side: "over" | "under" | undefined, verdict: "cleared" | "missed" | "push" | null | undefined): "Hit" | "Miss" | null {
@@ -16,7 +16,7 @@ export function ResultStamp({ kind }: { kind: "Hit" | "Miss" }) {
     <View accessibilityRole="image" accessibilityLabel={kind}>
       <Ionicons
         name={kind === "Hit" ? "checkmark" : "close"}
-        size={16}
+        size={icon.sm}
         color={kind === "Hit" ? color.primary : color.miss}
       />
     </View>

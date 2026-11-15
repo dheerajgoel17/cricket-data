@@ -29,3 +29,13 @@ export const RIPPLE = isAndroid ? { color: tint.white(0.08), foreground: true } 
 
 /** The most the phone's font-size setting may enlarge text (iOS Dynamic Type / Android font scale): honoured, but capped so dense stat rows keep fitting. */
 export const FONT_SCALE_MAX = Number(isAndroid ? P["font-scale-max-android"] : isIOS ? P["font-scale-max-ios"] : P["font-scale-max-web"]);
+
+/**
+ * Elevation, one set for both idioms (tokens.json `elevation_native`; the web twins are the `--shadow-*` values): iOS draws a shadow, Android a Material elevation (its shadow props are ignored).
+ * Spread one onto a style: `{ ...elevation.raised }`. Never write `shadow*` or `elevation` in a screen (`tokens.test.ts`).
+ */
+const EL = tokens.elevation_native as unknown as Record<string, { opacity: number; radius: number; offsetY: number; elevation: number }>;
+const make = (k: string) => (isAndroid
+  ? { elevation: EL[k].elevation }
+  : { shadowColor: tint.black(1), shadowOpacity: EL[k].opacity, shadowRadius: EL[k].radius, shadowOffset: { width: 0, height: EL[k].offsetY } });
+export const elevation = { raised: make("raised"), sheet: make("sheet"), fab: make("fab"), thumb: make("thumb") } as const;

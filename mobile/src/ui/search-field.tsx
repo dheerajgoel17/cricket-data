@@ -1,13 +1,13 @@
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { TextInput } from "@/ui/text";
-import { color, radius, space, t } from "@/ui/tokens";
+import { color, radius, space, t, icon } from "@/ui/tokens";
 
 /** The app's one search box (Search, Competitions): search glyph, a text input, the clear button the platform draws. Web twin: `SearchField` in the header. */
 export function SearchField({ value, onChangeText, placeholder, label, autoFocus, style }: { value: string; onChangeText: (v: string) => void; placeholder: string; label?: string; autoFocus?: boolean; style?: StyleProp<ViewStyle> }) {
   return (
     <View style={[styles.field, style]}>
-      <Ionicons name="search" size={18} color={color["muted-foreground"]} />
+      <Ionicons name="search" size={icon.md} color={color["muted-foreground"]} />
       <TextInput value={value} onChangeText={onChangeText} autoFocus={autoFocus} autoCorrect={false} autoCapitalize="none" returnKeyType="search" clearButtonMode="while-editing"
         placeholder={placeholder} placeholderTextColor={color["muted-foreground"]} style={styles.input} accessibilityLabel={label ?? placeholder} />
     </View>

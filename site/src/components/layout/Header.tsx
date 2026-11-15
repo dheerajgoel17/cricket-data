@@ -8,7 +8,7 @@ import { isDesignHost, PRODUCT_ORIGIN } from "@/lib/design-host";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
 import { isTopLevel } from "./nav";
-import { useHeaderSlot } from "@/lib/header-slot";
+import { usePageWashColor, useHeaderSlot, useScrolled } from "@/lib/header-slot";
 import { cn } from "@/lib/utils";
 
 /** The Fancy.cash mark: a rounded dark tile with a green F whose top arm ends in a ball. Inline SVG, so it is crisp at any size and needs no file. */
@@ -90,11 +90,12 @@ export function Header() {
   const nav = useNavigate();
   const down = !isTopLevel(pathname); // one level down (a player, a team, a match): a back button on phones, where there is no sidebar
   const back = () => (history.state?.idx > 0 ? nav(-1) : nav("/"));
+  const wash = usePageWashColor(), scrolled = useScrolled();
   const slot = useHeaderSlot(), own = !!slot?.active; // a page that brings its own actions gets the slot; from lg the brand stays (phone still swaps title into the bar)
   // Top-level tabs (Fancy / Props) that own the bar keep search + account — only drill-ins (fixture, player) replace the whole phone chrome.
   const keepTools = !own || isTopLevel(pathname);
   return (
-    <header className={cn("sticky top-0 z-50 h-header text-foreground", slot?.flush ? "bg-card" : "bg-background ring-1 ring-hairline")}>
+    <header className={cn("sticky top-0 z-50 h-header text-foreground transition-colors duration-200", wash && !scrolled ? "bg-transparent ring-0" : slot?.flush ? "bg-card" : "bg-background ring-1 ring-hairline")}>
       <div className="mx-auto flex h-full items-center gap-snug px-gutter">
         <SidebarTrigger className="-ml-2 hidden text-foreground hover:bg-muted hover:text-foreground lg:inline-flex" aria-label="Toggle sidebar" />
         {down && <button type="button" aria-label="Back" onClick={back} className="-ml-2 grid size-(--touch) shrink-0 place-items-center rounded-full text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring active:bg-muted lg:hidden"><ChevronLeftIcon className="size-6" /></button>}
