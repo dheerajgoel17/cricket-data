@@ -59,6 +59,24 @@ Scrolling is solid everywhere. The cost is in **state changes that recompute a w
 - Tabs (phase, bottom bar), chips (day, season), section tabs, filters sheet open and Back: all respond and settle on the right state; no crash, no log errors.
 - Not checkable from here: spring feel, haptics, reduce-motion, gesture handoff, pull to refresh. Needs a hand on the phone.
 
+## Status after the second pass (same day, verified on the phone unless noted)
+
+| Finding | Status |
+| --- | --- |
+| X1 Home rail pinned | fixed: the rail scrolls with the page, header and phase tabs stay pinned |
+| X2 control consistency | fixed on Ground (line tabs + chips); `Segmented` stays where the web also uses a segmented track (market tape, player sections, stats groups) |
+| X3 hash ids as player names | open: data-builder bug, its own session / PR |
+| X4 fancy ladder wrap | fixed, seen on the phone |
+| X5 avatars load late | open |
+| X6 nav-bar padding | checked: last rows clear the bar |
+| X9 rhythm | applied to every page body; Contact and Saved too |
+| Saved empty state | fixed (centred), not yet seen on the phone |
+| Chip / tap latency | chips, tabs and segmented controls highlight in the tap frame (`useChoice`); Filters sheet jank 16% → 2%; Leagues season chip 17% → 14%; the Props day chip still has one 150 ms frame (data re-score) |
+| Sorting animation | added (`Reflow` / `ReflowGroup`) on Saved and the Fancy overview; not on virtualized lists |
+| Duplicated components | one `FilterButton`, `Button`, `SearchField`, `IconBadge`, `ActiveChip` / `ChoiceChip`, `Sheet`, `RoundButton` (guard tests) |
+| Text roles | 273 styles on named roles; no raw font family (guard test) |
+| Web | desktop Props and phone Competitions look coherent; the other web pages are not reviewed yet |
+
 ## Proposed fix order
 
 1. X1 Home layout, X2 control consistency, X6 nav-bar padding (structure).

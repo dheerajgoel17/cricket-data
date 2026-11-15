@@ -63,6 +63,17 @@ Working list for bringing the app (`mobile/`) and the web (`site/`) onto one des
 | C14 | Edge fade on scroll | mask | gradient | ok / code |
 | C15 | Haptics on select | n/a | `Haptics.selectionAsync` | code |
 
+## C2. Added in the second pass
+
+| # | Item | Web | App | Status |
+| --- | --- | --- | --- | --- |
+| B19 | Filters button | `FilterButton` | `FilterButton` | ok (Props filters seen) |
+| B20 | Primary / secondary button | `Button` (shadcn) | `Button` | ok (Contact, sheets, sign-in seen) |
+| B21 | Search box | header `SearchField` | `SearchField` | ok (Competitions seen) |
+| B22 | Icon on a circle | n/a | `IconBadge` | ok (Contact seen) |
+| C16 | List reflow (reorder, removal) | `ReflowGroup` / `ReflowItem` | `Reflow` | code (needs a hand on the phone) |
+| C17 | Instant choice highlight | n/a (DOM already instant) | `useChoice` | ok (chips, sheets measured) |
+
 ## D. Work order
 
 1. **Device pass** (cannot be done from here without taps; deep links and screenshots only): open each screen above marked "code", confirm it renders and the motion plays; flip the status.
