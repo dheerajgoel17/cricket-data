@@ -1,61 +1,61 @@
 {
- "generated_at_utc": "2026-11-16T18:30:43Z",
- "generated_at_ist": "2026-11-17 00:00 IST",
- "runtime_secs": 397.5,
+ "generated_at_utc": "2026-11-16T19:30:30Z",
+ "generated_at_ist": "2026-11-17 01:00 IST",
+ "runtime_secs": 257.1,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-16",
-  "commit": "ccf954f385"
+  "commit": "80054446be"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 401: Unauthorized",
-   "secs": 0.3
+   "secs": 0.2
   },
   "smarkets": {
    "status": "ok",
-   "rows": 263,
-   "secs": 2.4
+   "rows": 298,
+   "secs": 2.5
   },
   "feedk": {
    "status": "ok",
    "rows": 136,
-   "secs": 16.5,
+   "secs": 16.9,
    "events": 6
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 17.4,
+   "secs": 17.2,
    "events": 3
   },
   "feedf": {
    "status": "ok",
-   "rows": 74,
-   "secs": 25.0,
+   "rows": 90,
+   "secs": 26.3,
    "events": 4
   },
   "feede": {
    "status": "ok",
-   "rows": 384,
-   "secs": 59.1,
-   "events": 22
+   "rows": 400,
+   "secs": 63.9,
+   "events": 23
   },
   "feedh": {
    "status": "ok",
-   "rows": 888,
-   "secs": 82.4,
-   "events": 52
+   "rows": 939,
+   "secs": 80.1,
+   "events": 56
   },
   "feedi": {
    "status": "ok",
-   "rows": 1653,
-   "secs": 144.4,
-   "events": 58
+   "rows": 1664,
+   "secs": 146.3,
+   "events": 63
   }
  },
- "snapshot": "odds_20261116T183043Z.jsonl.gz",
+ "snapshot": "odds_20261116T193030Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -130,15 +130,15 @@
  },
  "stats": {
   "events_in_window": 45,
-  "rows_in_window": 3271,
-  "selections_with_model": 1596,
-  "selections_with_market_fair": 1982,
-  "markets_in_window": 361,
+  "rows_in_window": 3400,
+  "selections_with_model": 1597,
+  "selections_with_market_fair": 2044,
+  "markets_in_window": 366,
   "value_bets": 4,
   "dropped_by_filter": {
    "model_only_no_market": 77,
-   "model_market_gap": 941,
-   "odds_range": 19,
+   "model_market_gap": 939,
+   "odds_range": 20,
    "small_sample": 1,
    "policy_max_odds": 1,
    "model_disagrees": 2,
@@ -178,17 +178,17 @@
     "n_prices": 376,
     "mean_model_p": 0.021,
     "mean_market_p": 0.03,
-    "mean_logit_diff_model_minus_market": -0.185,
-    "mean_abs_logit_diff": 0.96,
-    "corr": 0.33
+    "mean_logit_diff_model_minus_market": -0.186,
+    "mean_abs_logit_diff": 0.964,
+    "corr": 0.333
    },
    "top_bowler_match": {
     "n_prices": 351,
-    "mean_model_p": 0.021,
-    "mean_market_p": 0.03,
-    "mean_logit_diff_model_minus_market": -0.109,
-    "mean_abs_logit_diff": 2.184,
-    "corr": 0.144
+    "mean_model_p": 0.02,
+    "mean_market_p": 0.029,
+    "mean_logit_diff_model_minus_market": -0.11,
+    "mean_abs_logit_diff": 2.14,
+    "corr": 0.188
    },
    "top_bowler_team": {
     "n_prices": 101,
@@ -387,6 +387,9 @@
    "format_source": "name",
    "teams_matched": null,
    "sources": [
+    "feede_lb",
+    "feedf_p",
+    "feedh_d",
     "smarkets"
    ]
   },
@@ -892,8 +895,14 @@
      "p_bat"
     ]
    },
-   "rain_risk": null,
-   "weather": null
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 68,
+    "cloud_pct": 9,
+    "source": "Open-Meteo forecast"
+   }
   },
   {
    "event_key": "male|Australia|England|2026-11-18",
@@ -942,8 +951,14 @@
      "p_bat"
     ]
    },
-   "rain_risk": null,
-   "weather": null
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 68,
+    "cloud_pct": 9,
+    "source": "Open-Meteo forecast"
+   }
   },
   {
    "event_key": "male|India|New Zealand|2026-11-18",
@@ -1084,13 +1099,17 @@
   "Speedworld Security Solutions (male)"
  ],
  "unmatched_players_in_window": [
+  "Aayan Khan",
   "Abhijeet Tomar",
   "Agha Salman",
   "Ahammed Suharaji Imran",
+  "Ali Naseer",
   "Ali Shabbir",
   "Alistair Frost",
   "Amith Sathvik V P",
   "Amith Sathvik Virumandi Prabhakaran",
+  "Andre Fletcher",
+  "Aneurin Donald",
   "Angus Alexander Patrick Atkinson",
   "Ankush Singh",
   "Annie O Neil",
@@ -1101,19 +1120,23 @@
   "Ayaka Kato Stafford",
   "Ayaka Kato-Stafford",
   "Ayush Jamwal",
+  "Azam Khan",
   "B Sachin",
   "Bonnie Berry",
   "Bradley Currie",
+  "Brandon King",
   "Brendon Senzere",
   "Callie Wilson",
   "Catherine White",
   "Chamari Athapaththu",
   "Charles Kunje",
   "Chipo Mugeri",
+  "Chris Jordan",
   "Claire Moore",
   "Dhruv Parashar",
   "Don Pasindu Sanjula Soriyabandara",
   "Dunith Wellalage",
+  "Dushmantha Chameera",
   "E De Broughe",
   "E de Broughe",
   "Eddie Jack",
@@ -1124,8 +1147,11 @@
   "Emma de Broughe",
   "Esha Rohit",
   "Eshaan Goyal",
+  "Eshan Malinga",
   "Grace Lyons",
   "Grace Parsons",
+  "Gulbadin Naib",
+  "Haider Ali",
   "Ikram Ali Khil",
   "Imran Tahir",
   "Ines Mackeon",
@@ -1133,13 +1159,18 @@
   "Israrullah",
   "James Coles",
   "James Matthew Coles",
+  "Janith Liyanage",
   "Jayant Lakhan",
   "Joylord Gumbie",
   "Kamil Pooran",
   "Kamindu Mendis",
   "Kartik Sharma",
   "Kate Pelle",
+  "Keemo Paul",
   "Kevin Kasuza",
+  "Khawaja Muhammad Nafay",
+  "Khushdil Shah",
+  "Kieron Pollard",
   "Kusal Mendis",
   "LR Chethan",
   "Lahiru Kumara",
@@ -1148,23 +1179,33 @@
   "Lauren Smith",
   "Linsey Smith",
   "Lucy Hamilton",
+  "Luke Wood",
   "Maddy Darke",
   "Maggie Clark",
   "Mandeep Singh",
   "Maramreddy Hemanth Reddy",
   "Marshall Takodza",
   "Masood Gurbaz",
+  "Max Bryant",
   "Mikayla Friday",
   "Milan Rathnayake",
+  "Mohammad Amir",
   "Mohammad Saleem",
   "Mohammad Suleman",
   "Mohammad Taha",
   "Mohammad Tayyab Arif",
+  "Mohammad Wasim Jr",
+  "Morawakage Maheesh Theekshana",
   "Muhammad Rohid",
   "Muhammad Suleman",
+  "Naseem Shah",
   "Naseer Khan Maroofkhil",
+  "Nicholas Pooran",
   "Nicola Hancock",
+  "Nuwan Thushara",
   "Obed McCoy",
+  "Obus Pienaar",
+  "Phil Salt",
   "Prithvi Pankaj Shaw",
   "Prithvi Shaw",
   "Pukhraj Mann",
@@ -1173,6 +1214,7 @@
   "Rodney Mupfudza",
   "Rohan Rajbar",
   "Rohan Rajbhar",
+  "Romario Shepherd",
   "Ronak Patel",
   "Ryan Kamwemba",
   "Ryan Takunda Kamwemba",
@@ -1183,11 +1225,16 @@
   "Sameer Minhas",
   "Sanjay Krishnamurthi",
   "Seeram Venkata Rahul",
+  "Shadab Khan",
+  "Sherfane Rutherford",
   "Shikhar Mohan",
   "Shikhar Suraj Mohan",
   "Shivang Kumar",
   "Siddhesh A Veer",
   "Siddhesh Veer",
+  "Sunil Narine",
+  "Tahir Zaman",
+  "Tajinder Singh",
   "Takudzwa Nyamugure",
   "Tayyab Arif",
   "Tinashe Kamunhukamwe",
@@ -1201,6 +1248,7 @@
   "Vihaan Malhotra",
   "Vriitya Aravind",
   "Wali Muhammad",
+  "Waseem Muhammad",
   "Yashvardhan Dalal"
  ],
  "model_backtest": {
@@ -1326,26 +1374,25 @@
   }
  },
  "log": [
-  "[00:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[00:00 IST] history: 24126 matches, last 2026-11-16, players 435075",
-  "[00:03 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.3}",
-  "[00:03 IST] source smarkets: {'status': 'ok', 'rows': 263, 'secs': 2.4}",
-  "[00:03 IST] source feedk: {'status': 'ok', 'rows': 136, 'secs': 16.5, 'events': 6}",
-  "[00:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 17.4, 'events': 3}",
-  "[00:03 IST] source feedf: {'status': 'ok', 'rows': 74, 'secs': 25.0, 'events': 4}",
-  "[00:03 IST] source feede: {'status': 'ok', 'rows': 384, 'secs': 59.1, 'events': 22}",
-  "[00:03 IST] source feedh: {'status': 'ok', 'rows': 888, 'secs': 82.4, 'events': 52}",
-  "[00:03 IST] source feedi: {'status': 'ok', 'rows': 1653, 'secs': 144.4, 'events': 58}",
-  "[00:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[00:03 IST] 134 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[00:03 IST] 54 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[00:03 IST] name map: Republic of Ireland (Women) vs Scotland (Women) -> Ireland Women vs Scotland Women (2026-11-18T05:00:00Z)",
-  "[00:03 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[00:03 IST] book lines: 356 player lines from 7 source(s)",
-  "[00:03 IST] 128 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[00:06 IST] weather failed for male|Australia|England|2026-11-18: <urlopen error _ssl.c:994: The handshake operation timed out>",
-  "[00:07 IST] weather: forecasts for 9 events, 1 failed",
-  "[00:07 IST] prop model: 797 prop selections modelled, 20 milestone ladder prices anchored to O/U",
-  "[00:07 IST] ledger upsert model: {'upserted': 4, 'skipped_settled': 0}"
+  "[01:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[01:00 IST] history: 24126 matches, last 2026-11-16, players 435075",
+  "[01:03 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.2}",
+  "[01:03 IST] source smarkets: {'status': 'ok', 'rows': 298, 'secs': 2.5}",
+  "[01:03 IST] source feedk: {'status': 'ok', 'rows': 136, 'secs': 16.9, 'events': 6}",
+  "[01:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 17.2, 'events': 3}",
+  "[01:03 IST] source feedf: {'status': 'ok', 'rows': 90, 'secs': 26.3, 'events': 4}",
+  "[01:03 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 63.9, 'events': 23}",
+  "[01:03 IST] source feedh: {'status': 'ok', 'rows': 939, 'secs': 80.1, 'events': 56}",
+  "[01:03 IST] source feedi: {'status': 'ok', 'rows': 1664, 'secs': 146.3, 'events': 63}",
+  "[01:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[01:03 IST] 134 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[01:03 IST] 54 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[01:03 IST] name map: Republic of Ireland (Women) vs Scotland (Women) -> Ireland Women vs Scotland Women (2026-11-18T05:00:00Z)",
+  "[01:03 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[01:03 IST] book lines: 356 player lines from 7 source(s)",
+  "[01:03 IST] 128 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[01:04 IST] weather: forecasts for 10 events, 0 failed",
+  "[01:04 IST] prop model: 797 prop selections modelled, 20 milestone ladder prices anchored to O/U",
+  "[01:04 IST] ledger upsert model: {'upserted': 4, 'skipped_settled': 0}"
  ]
 }
