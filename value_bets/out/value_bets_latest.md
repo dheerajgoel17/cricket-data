@@ -1,18 +1,18 @@
-# Cricket value bets - 2026-11-16 15:00 IST
+# Cricket value bets - 2026-11-16 16:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **smarkets**: ok, 397 prices
-- **feedg**: ok, 16 prices, 2 events
+- **smarkets**: ok, 344 prices
 - **feedk**: ok, 124 prices, 5 events
-- **feede**: ok, 284 prices, 10 events
-- **feedf**: ok, 234 prices, 9 events
-- **feedi**: ok, 1118 prices, 34 events
-- **feedh**: ok, 806 prices, 31 events
+- **feedg**: ok, 16 prices, 2 events
+- **feede**: ok, 208 prices, 10 events
+- **feedf**: ok, 158 prices, 9 events
+- **feedi**: ok, 887 prices, 35 events
+- **feedh**: ok, 588 prices, 25 events
 
-Matches starting in next 168h: **17**, markets priced: **234**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **15**, markets priced: **195**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -30,4 +30,4 @@ Matches starting in next 168h: **17**, markets priced: **234**, value bets: **3*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Baroda (W) (female), Royal Champs (male)
 
-Runtime 101.8s. Snapshot: `odds_20261116T093037Z.jsonl.gz`
+Runtime 101.3s. Snapshot: `odds_20261116T103037Z.jsonl.gz`
