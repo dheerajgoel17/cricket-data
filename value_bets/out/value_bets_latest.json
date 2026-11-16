@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-16T21:30:35Z",
- "generated_at_ist": "2026-11-17 03:00 IST",
- "runtime_secs": 119.6,
+ "generated_at_utc": "2026-11-16T22:27:12Z",
+ "generated_at_ist": "2026-11-17 03:57 IST",
+ "runtime_secs": 110.1,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-16",
-  "commit": "fa21f2b851"
+  "commit": "372a28e287"
  },
  "sources": {
   "moviodds_bet365": {
@@ -15,46 +15,46 @@
   },
   "smarkets": {
    "status": "ok",
-   "rows": 287,
-   "secs": 1.8
+   "rows": 309,
+   "secs": 2.4
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 16.5,
+   "secs": 16.7,
    "events": 3
   },
   "feedk": {
    "status": "ok",
    "rows": 136,
-   "secs": 17.1,
+   "secs": 18.3,
    "events": 7
-  },
-  "feedf": {
-   "status": "ok",
-   "rows": 90,
-   "secs": 24.1,
-   "events": 4
   },
   "feedi": {
    "status": "error",
    "reason": "HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm",
-   "secs": 25.8
+   "secs": 23.1
+  },
+  "feedf": {
+   "status": "ok",
+   "rows": 90,
+   "secs": 25.8,
+   "events": 4
   },
   "feede": {
    "status": "ok",
    "rows": 400,
-   "secs": 59.0,
+   "secs": 61.9,
    "events": 23
   },
   "feedh": {
    "status": "ok",
    "rows": 939,
-   "secs": 84.9,
+   "secs": 77.2,
    "events": 56
   }
  },
- "snapshot": "odds_20261116T213035Z.jsonl.gz",
+ "snapshot": "odds_20261116T222712Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -650,13 +650,13 @@
    ]
   },
   {
-   "event": "male|Madhya Pradesh|Tripura|2026-11-18",
+   "event": "male|Karnataka|Mizoram|2026-11-18",
    "start_ist": "2026-11-18 16:30 IST",
    "format": "T20",
    "format_source": "fixtures",
    "teams_matched": [
-    "Madhya Pradesh",
-    "Tripura"
+    "Karnataka",
+    "Mizoram"
    ],
    "sources": [
     "feede_lb",
@@ -665,13 +665,13 @@
    ]
   },
   {
-   "event": "male|Karnataka|Mizoram|2026-11-18",
+   "event": "male|Madhya Pradesh|Tripura|2026-11-18",
    "start_ist": "2026-11-18 16:30 IST",
    "format": "T20",
    "format_source": "fixtures",
    "teams_matched": [
-    "Karnataka",
-    "Mizoram"
+    "Madhya Pradesh",
+    "Tripura"
    ],
    "sources": [
     "feede_lb",
@@ -1122,24 +1122,24 @@
   }
  },
  "log": [
-  "[03:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[03:00 IST] history: 24126 matches, last 2026-11-16, players 435075",
-  "[03:02 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.2}",
-  "[03:02 IST] source smarkets: {'status': 'ok', 'rows': 287, 'secs': 1.8}",
-  "[03:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 16.5, 'events': 3}",
-  "[03:02 IST] source feedk: {'status': 'ok', 'rows': 136, 'secs': 17.1, 'events': 7}",
-  "[03:02 IST] source feedf: {'status': 'ok', 'rows': 90, 'secs': 24.1, 'events': 4}",
-  "[03:02 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm', 'secs': 25.8}",
-  "[03:02 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 59.0, 'events': 23}",
-  "[03:02 IST] source feedh: {'status': 'ok', 'rows': 939, 'secs': 84.9, 'events': 56}",
-  "[03:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[03:02 IST] 20 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[03:02 IST] 32 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[03:02 IST] held back 2 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[03:02 IST] book lines: 198 player lines from 6 source(s)",
-  "[03:02 IST] 36 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[03:02 IST] weather: forecasts for 10 events, 0 failed",
-  "[03:02 IST] prop model: 429 prop selections modelled, 20 milestone ladder prices anchored to O/U",
-  "[03:02 IST] ledger upsert model: {'upserted': 2, 'skipped_settled': 0}"
+  "[03:57 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[03:57 IST] history: 24126 matches, last 2026-11-16, players 435075",
+  "[03:58 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.2}",
+  "[03:58 IST] source smarkets: {'status': 'ok', 'rows': 309, 'secs': 2.4}",
+  "[03:58 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 16.7, 'events': 3}",
+  "[03:58 IST] source feedk: {'status': 'ok', 'rows': 136, 'secs': 18.3, 'events': 7}",
+  "[03:58 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm', 'secs': 23.1}",
+  "[03:58 IST] source feedf: {'status': 'ok', 'rows': 90, 'secs': 25.8, 'events': 4}",
+  "[03:58 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 61.9, 'events': 23}",
+  "[03:58 IST] source feedh: {'status': 'ok', 'rows': 939, 'secs': 77.2, 'events': 56}",
+  "[03:58 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[03:58 IST] 20 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[03:58 IST] 32 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[03:58 IST] held back 2 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[03:58 IST] book lines: 198 player lines from 6 source(s)",
+  "[03:58 IST] 36 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[03:59 IST] weather: forecasts for 10 events, 0 failed",
+  "[03:59 IST] prop model: 429 prop selections modelled, 20 milestone ladder prices anchored to O/U",
+  "[03:59 IST] ledger upsert model: {'upserted': 2, 'skipped_settled': 0}"
  ]
 }
