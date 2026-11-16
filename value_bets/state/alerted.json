@@ -1,19 +1,4 @@
 {
- "female|Melbourne Stars Women|Sydney Thunder Women|2026-11-16|batter_runs||Amy Jones under 18.5|18.5|under": {
-  "edge": 0.0648,
-  "start_utc": "2026-11-16T08:13:00Z",
-  "alerted_at": "2026-11-13T03:33:45.620664+00:00"
- },
- "female|Melbourne Stars Women|Sydney Thunder Women|2026-11-16|batter_runs||Meg Lanning under 28.5|28.5|under": {
-  "edge": 0.0609,
-  "start_utc": "2026-11-16T08:10:00Z",
-  "alerted_at": "2026-11-15T03:00:06.961538+00:00"
- },
- "female|Melbourne Stars Women|Sydney Thunder Women|2026-11-16|batter_sixes||Phoebe Litchfield under 0.5|0.5|under": {
-  "edge": 0.098,
-  "start_utc": "2026-11-16T08:10:00Z",
-  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
- },
  "male|Australia|England|2026-11-18|bowler_wickets||Jofra Archer under 1.5|1.5|under": {
   "edge": 0.2261,
   "start_utc": "2026-11-18T03:30:00Z",
