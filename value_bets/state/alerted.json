@@ -38,5 +38,10 @@
   "edge": 0.0518,
   "start_utc": "2026-11-18T03:30:00Z",
   "alerted_at": "2026-11-15T21:33:35.425575+00:00"
+ },
+ "male|Australia|England|2026-11-18|batter_milestone||Ben Duckett 50+ yes|49.5|over": {
+  "edge": 0.0615,
+  "start_utc": "2026-11-18T03:30:00Z",
+  "alerted_at": "2026-11-16T01:39:06.251548+00:00"
  }
 }
