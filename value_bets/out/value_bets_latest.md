@@ -1,16 +1,16 @@
-# Cricket value bets - 2026-11-17 04:01 IST
+# Cricket value bets - 2026-11-17 05:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
 - **smarkets**: ok, 309 prices
-- **feedg**: ok, 16 prices, 3 events
 - **feedk**: ok, 136 prices, 7 events
+- **feedg**: ok, 16 prices, 3 events
 - **feedf**: ok, 90 prices, 4 events
 - **feede**: ok, 400 prices, 23 events
 - **feedh**: ok, 939 prices, 56 events
-- **feedi**: ok, 1632 prices, 63 events
+- **feedi**: ok, 1660 prices, 63 events
 
 Matches starting in next 168h: **45**, markets priced: **366**, value bets: **4** (new alerts: 0). Min edge 5%.
 
@@ -32,4 +32,4 @@ Matches starting in next 168h: **45**, markets priced: **366**, value bets: **4*
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Elite Cricket Academy (male), Lahore Region Whites (male), Mashonaland Eagles (male), Mountaineers (male), Pak Xi (male), Peshawar Blues (male), Royal Champs (male), Speedworld Security Solutions (male)
 
-Runtime 238.5s. Snapshot: `odds_20261116T223139Z.jsonl.gz`
+Runtime 196.8s. Snapshot: `odds_20261116T233036Z.jsonl.gz`

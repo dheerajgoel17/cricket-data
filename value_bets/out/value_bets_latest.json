@@ -1,61 +1,61 @@
 {
- "generated_at_utc": "2026-11-16T22:31:39Z",
- "generated_at_ist": "2026-11-17 04:01 IST",
- "runtime_secs": 238.5,
+ "generated_at_utc": "2026-11-16T23:30:36Z",
+ "generated_at_ist": "2026-11-17 05:00 IST",
+ "runtime_secs": 196.8,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-16",
-  "commit": "ad0d528a63"
+  "commit": "01de63850b"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 401: Unauthorized",
-   "secs": 0.1
+   "secs": 0.5
   },
   "smarkets": {
    "status": "ok",
    "rows": 309,
    "secs": 1.8
   },
-  "feedg": {
-   "status": "ok",
-   "rows": 16,
-   "secs": 17.5,
-   "events": 3
-  },
   "feedk": {
    "status": "ok",
    "rows": 136,
-   "secs": 18.4,
+   "secs": 18.7,
    "events": 7
+  },
+  "feedg": {
+   "status": "ok",
+   "rows": 16,
+   "secs": 18.8,
+   "events": 3
   },
   "feedf": {
    "status": "ok",
    "rows": 90,
-   "secs": 25.5,
+   "secs": 24.7,
    "events": 4
   },
   "feede": {
    "status": "ok",
    "rows": 400,
-   "secs": 59.6,
+   "secs": 59.7,
    "events": 23
   },
   "feedh": {
    "status": "ok",
    "rows": 939,
-   "secs": 74.1,
+   "secs": 73.9,
    "events": 56
   },
   "feedi": {
    "status": "ok",
-   "rows": 1632,
-   "secs": 117.6,
+   "rows": 1660,
+   "secs": 120.1,
    "events": 63
   }
  },
- "snapshot": "odds_20261116T223139Z.jsonl.gz",
+ "snapshot": "odds_20261116T233036Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -130,19 +130,19 @@
  },
  "stats": {
   "events_in_window": 45,
-  "rows_in_window": 3368,
-  "selections_with_model": 1596,
-  "selections_with_market_fair": 2042,
+  "rows_in_window": 3396,
+  "selections_with_model": 1598,
+  "selections_with_market_fair": 2040,
   "markets_in_window": 366,
   "value_bets": 4,
   "dropped_by_filter": {
    "model_only_no_market": 77,
-   "model_market_gap": 915,
-   "odds_range": 19,
-   "loose_name_match": 2,
+   "model_market_gap": 939,
+   "odds_range": 18,
    "small_sample": 1,
    "policy_max_odds": 1,
    "model_disagrees": 2,
+   "loose_name_match": 2,
    "market_disabled": 3,
    "policy_min_edge": 2,
    "suspect_edge": 1
@@ -158,37 +158,37 @@
     "mean_abs_logit_diff": 1.041,
     "corr": 0.52
    },
-   "batter_runs": {
-    "n_prices": 614,
-    "mean_model_p": 0.5,
-    "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.637,
-    "corr": 0.103
-   },
    "batter_milestone": {
     "n_prices": 422,
     "mean_model_p": 0.495,
     "mean_market_p": 0.498,
     "mean_logit_diff_model_minus_market": -0.015,
-    "mean_abs_logit_diff": 0.79,
+    "mean_abs_logit_diff": 0.791,
     "corr": 0.987
+   },
+   "batter_runs": {
+    "n_prices": 614,
+    "mean_model_p": 0.5,
+    "mean_market_p": 0.5,
+    "mean_logit_diff_model_minus_market": -0.0,
+    "mean_abs_logit_diff": 0.637,
+    "corr": 0.103
    },
    "top_batter_match": {
     "n_prices": 376,
     "mean_model_p": 0.021,
     "mean_market_p": 0.03,
     "mean_logit_diff_model_minus_market": -0.185,
-    "mean_abs_logit_diff": 0.979,
-    "corr": 0.32
+    "mean_abs_logit_diff": 0.963,
+    "corr": 0.327
    },
    "top_bowler_match": {
-    "n_prices": 321,
-    "mean_model_p": 0.027,
-    "mean_market_p": 0.032,
-    "mean_logit_diff_model_minus_market": 0.037,
-    "mean_abs_logit_diff": 2.086,
-    "corr": -0.027
+    "n_prices": 353,
+    "mean_model_p": 0.021,
+    "mean_market_p": 0.029,
+    "mean_logit_diff_model_minus_market": -0.107,
+    "mean_abs_logit_diff": 2.214,
+    "corr": 0.145
    },
    "top_bowler_team": {
     "n_prices": 101,
@@ -693,19 +693,6 @@
    ]
   },
   {
-   "event": "male|Netherlands|Zimbabwe|2026-11-18",
-   "start_ist": "2026-11-18 14:45 IST",
-   "format": "ODI",
-   "format_source": "last-meeting",
-   "teams_matched": [
-    "Netherlands",
-    "Zimbabwe"
-   ],
-   "sources": [
-    "feedh_d"
-   ]
-  },
-  {
    "event": "male|Bangladesh|Thailand|2026-11-18",
    "start_ist": "2026-11-18 14:45 IST",
    "format": null,
@@ -713,6 +700,19 @@
    "teams_matched": [
     "Bangladesh",
     "Thailand"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Netherlands|Zimbabwe|2026-11-18",
+   "start_ist": "2026-11-18 14:45 IST",
+   "format": "ODI",
+   "format_source": "last-meeting",
+   "teams_matched": [
+    "Netherlands",
+    "Zimbabwe"
    ],
    "sources": [
     "feedh_d"
@@ -1147,11 +1147,9 @@
   "Emma de Broughe",
   "Esha Rohit",
   "Eshaan Goyal",
-  "Eshan Malinga",
   "Grace Lyons",
   "Grace Parsons",
   "Gulbadin Naib",
-  "Haider Ali",
   "Ikram Ali Khil",
   "Imran Tahir",
   "Ines Mackeon",
@@ -1374,25 +1372,25 @@
   }
  },
  "log": [
-  "[04:01 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[04:01 IST] history: 24126 matches, last 2026-11-16, players 435075",
-  "[04:03 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.1}",
-  "[04:03 IST] source smarkets: {'status': 'ok', 'rows': 309, 'secs': 1.8}",
-  "[04:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 17.5, 'events': 3}",
-  "[04:03 IST] source feedk: {'status': 'ok', 'rows': 136, 'secs': 18.4, 'events': 7}",
-  "[04:03 IST] source feedf: {'status': 'ok', 'rows': 90, 'secs': 25.5, 'events': 4}",
-  "[04:03 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 59.6, 'events': 23}",
-  "[04:03 IST] source feedh: {'status': 'ok', 'rows': 939, 'secs': 74.1, 'events': 56}",
-  "[04:03 IST] source feedi: {'status': 'ok', 'rows': 1632, 'secs': 117.6, 'events': 63}",
-  "[04:04 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[04:04 IST] 134 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[04:04 IST] 54 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[04:04 IST] name map: Republic of Ireland (Women) vs Scotland (Women) -> Ireland Women vs Scotland Women (2026-11-18T05:00:00Z)",
-  "[04:04 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[04:04 IST] book lines: 356 player lines from 7 source(s)",
-  "[04:04 IST] 128 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[04:05 IST] weather: forecasts for 10 events, 0 failed",
-  "[04:05 IST] prop model: 797 prop selections modelled, 20 milestone ladder prices anchored to O/U",
-  "[04:05 IST] ledger upsert model: {'upserted': 4, 'skipped_settled': 0}"
+  "[05:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[05:00 IST] history: 24126 matches, last 2026-11-16, players 435075",
+  "[05:02 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.5}",
+  "[05:02 IST] source smarkets: {'status': 'ok', 'rows': 309, 'secs': 1.8}",
+  "[05:02 IST] source feedk: {'status': 'ok', 'rows': 136, 'secs': 18.7, 'events': 7}",
+  "[05:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 18.8, 'events': 3}",
+  "[05:02 IST] source feedf: {'status': 'ok', 'rows': 90, 'secs': 24.7, 'events': 4}",
+  "[05:02 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 59.7, 'events': 23}",
+  "[05:02 IST] source feedh: {'status': 'ok', 'rows': 939, 'secs': 73.9, 'events': 56}",
+  "[05:02 IST] source feedi: {'status': 'ok', 'rows': 1660, 'secs': 120.1, 'events': 63}",
+  "[05:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[05:03 IST] 134 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[05:03 IST] 54 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[05:03 IST] name map: Republic of Ireland (Women) vs Scotland (Women) -> Ireland Women vs Scotland Women (2026-11-18T05:00:00Z)",
+  "[05:03 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[05:03 IST] book lines: 356 player lines from 7 source(s)",
+  "[05:03 IST] 128 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[05:03 IST] weather: forecasts for 10 events, 0 failed",
+  "[05:03 IST] prop model: 797 prop selections modelled, 20 milestone ladder prices anchored to O/U",
+  "[05:03 IST] ledger upsert model: {'upserted': 4, 'skipped_settled': 0}"
  ]
 }
