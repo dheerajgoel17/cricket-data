@@ -1,7 +1,7 @@
 {
- "generated_at_utc": "2026-11-16T05:38:44Z",
- "n": 31,
- "pnl_u": 7.834,
+ "generated_at_utc": "2026-11-16T06:33:49Z",
+ "n": 33,
+ "pnl_u": 7.198,
  "by": {
   "model|?|batter_fours": {
    "n": 2,
@@ -20,20 +20,20 @@
    "pnl_u": 3.856
   },
   "model|?|batter_milestone": {
-   "n": 16,
-   "won": 12,
+   "n": 17,
+   "won": 13,
    "lost": 3,
    "push": 0,
    "void": 1,
-   "pnl_u": 2.528
+   "pnl_u": 2.892
   },
   "model|?|bowler_wickets": {
-   "n": 1,
+   "n": 2,
    "won": 1,
-   "lost": 0,
+   "lost": 1,
    "push": 0,
    "void": 0,
-   "pnl_u": 1.25
+   "pnl_u": 0.25
   }
  }
 }
