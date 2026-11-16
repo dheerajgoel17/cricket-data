@@ -1,18 +1,18 @@
-# Cricket value bets - 2026-11-16 14:00 IST
+# Cricket value bets - 2026-11-16 15:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **smarkets**: ok, 451 prices
+- **smarkets**: ok, 397 prices
 - **feedg**: ok, 16 prices, 2 events
 - **feedk**: ok, 124 prices, 5 events
 - **feede**: ok, 284 prices, 10 events
-- **feedf**: ok, 254 prices, 11 events
-- **feedi**: ok, 1147 prices, 36 events
-- **feedh**: ok, 816 prices, 33 events
+- **feedf**: ok, 234 prices, 9 events
+- **feedi**: ok, 1118 prices, 34 events
+- **feedh**: ok, 806 prices, 31 events
 
-Matches starting in next 168h: **20**, markets priced: **245**, value bets: **3** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **17**, markets priced: **234**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -28,6 +28,6 @@ Matches starting in next 168h: **20**, markets priced: **245**, value bets: **3*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-17 13:40 IST Adelaide Strikers (Women) vs Sydney Sixers (Women) / G9181 batter_sixes / Maia Bouchier over 0.5 @ 6.00 (feedi_d): edge 32.8%, model 0.2988, market 0.1579
 
-Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Andhra (Women) (female), Bangla Tigers (male), Baroda (W) (female), Nhlangano Legends (male), Royal Champs (male)
+Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Baroda (W) (female), Royal Champs (male)
 
-Runtime 109.1s. Snapshot: `odds_20261116T083040Z.jsonl.gz`
+Runtime 101.8s. Snapshot: `odds_20261116T093037Z.jsonl.gz`
