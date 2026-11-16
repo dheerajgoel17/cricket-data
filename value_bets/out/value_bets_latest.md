@@ -1,18 +1,18 @@
-# Cricket value bets - 2026-11-16 10:00 IST
+# Cricket value bets - 2026-11-16 11:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **smarkets**: ok, 702 prices
+- **smarkets**: ok, 542 prices
 - **feedg**: ok, 16 prices, 2 events
 - **feedk**: ok, 152 prices, 8 events
-- **feede**: ok, 536 prices, 19 events
-- **feedh**: ok, 1291 prices, 32 events
-- **feedi**: ok, 1532 prices, 38 events
-- **feedf**: ok, 546 prices, 21 events
+- **feede**: ok, 428 prices, 15 events
+- **feedh**: ok, 1075 prices, 31 events, stopped HTTP 502
+- **feedf**: ok, 438 prices, 17 events
+- **feedi**: ok, 1587 prices, 35 events
 
-Matches starting in next 168h: **40**, markets priced: **392**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **31**, markets priced: **355**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -32,4 +32,4 @@ Matches starting in next 168h: **40**, markets priced: **392**, value bets: **4*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Andhra (Women) (female), Bangla Tigers (male), Baroda (W) (female), Baroda (Women) (female), Karnataka (W) (female), Maharashtra (W) (female), Nhlangano Legends (male), Pondicherry (male), Railways (W) (female), Royal Champs (male), Vidarbha (W) (female)
 
-Runtime 485.7s. Snapshot: `odds_20261116T043037Z.jsonl.gz`
+Runtime 475.0s. Snapshot: `odds_20261116T053037Z.jsonl.gz`
