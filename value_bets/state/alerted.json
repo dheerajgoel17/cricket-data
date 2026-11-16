@@ -33,5 +33,10 @@
   "edge": 0.0506,
   "start_utc": "2026-11-18T22:00:00Z",
   "alerted_at": "2026-11-16T11:37:13.302801+00:00"
+ },
+ "male|Australia|England|2026-11-18|batter_fours||Josh Inglis under 2.5|2.5|under": {
+  "edge": 0.0518,
+  "start_utc": "2026-11-18T03:30:00Z",
+  "alerted_at": "2026-11-16T12:32:40.277199+00:00"
  }
 }
