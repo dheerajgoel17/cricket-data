@@ -1,18 +1,18 @@
-# Cricket value bets - 2026-11-16 08:00 IST
+# Cricket value bets - 2026-11-16 08:27 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **smarkets**: ok, 713 prices
-- **feedg**: ok, 16 prices, 2 events
 - **feedi**: error - HTTP 403: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm
+- **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
+- **smarkets**: ok, 694 prices
+- **feedg**: ok, 20 prices, 3 events
 - **feedk**: ok, 128 prices, 8 events
-- **feede**: ok, 630 prices, 24 events
-- **feedh**: ok, 1624 prices, 38 events
-- **feedf**: ok, 670 prices, 27 events
+- **feede**: ok, 630 prices, 23 events
+- **feedh**: ok, 1608 prices, 38 events
+- **feedf**: ok, 642 prices, 27 events
 
-Matches starting in next 168h: **44**, markets priced: **324**, value bets: **2** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **41**, markets priced: **314**, value bets: **2** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -25,4 +25,4 @@ Matches starting in next 168h: **44**, markets priced: **324**, value bets: **2*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Bangla Tigers (male), Baroda (W) (female), Karnataka (W) (female), Maharashtra (W) (female), Nhlangano Legends (male), Railways (W) (female), Royal Champs (male), Vidarbha (W) (female)
 
-Runtime 178.8s. Snapshot: `odds_20261116T023039Z.jsonl.gz`
+Runtime 222.6s. Snapshot: `odds_20261116T025725Z.jsonl.gz`

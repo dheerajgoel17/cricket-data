@@ -1,60 +1,60 @@
 {
- "generated_at_utc": "2026-11-16T02:30:39Z",
- "generated_at_ist": "2026-11-16 08:00 IST",
- "runtime_secs": 178.8,
+ "generated_at_utc": "2026-11-16T02:57:25Z",
+ "generated_at_ist": "2026-11-16 08:27 IST",
+ "runtime_secs": 222.6,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-15",
-  "commit": "3fcaa752e7"
+  "commit": "4291ff0bcf"
  },
  "sources": {
+  "feedi": {
+   "status": "error",
+   "reason": "HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm",
+   "secs": 0.5
+  },
   "moviodds_bet365": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 401: Unauthorized",
-   "secs": 0.1
+   "secs": 0.5
   },
   "smarkets": {
    "status": "ok",
-   "rows": 713,
+   "rows": 694,
    "secs": 2.0
   },
   "feedg": {
    "status": "ok",
-   "rows": 16,
-   "secs": 13.4,
-   "events": 2
-  },
-  "feedi": {
-   "status": "error",
-   "reason": "HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm",
-   "secs": 18.5
+   "rows": 20,
+   "secs": 16.2,
+   "events": 3
   },
   "feedk": {
    "status": "ok",
    "rows": 128,
-   "secs": 20.3,
+   "secs": 20.5,
    "events": 8
   },
   "feede": {
    "status": "ok",
    "rows": 630,
-   "secs": 62.3,
-   "events": 24
+   "secs": 60.1,
+   "events": 23
   },
   "feedh": {
    "status": "ok",
-   "rows": 1624,
-   "secs": 67.0,
+   "rows": 1608,
+   "secs": 64.9,
    "events": 38
   },
   "feedf": {
    "status": "ok",
-   "rows": 670,
-   "secs": 141.8,
+   "rows": 642,
+   "secs": 142.0,
    "events": 27
   }
  },
- "snapshot": "odds_20261116T023039Z.jsonl.gz",
+ "snapshot": "odds_20261116T025725Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -128,16 +128,16 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 44,
-  "rows_in_window": 3695,
-  "selections_with_model": 1408,
-  "selections_with_market_fair": 2022,
-  "markets_in_window": 324,
+  "events_in_window": 41,
+  "rows_in_window": 3595,
+  "selections_with_model": 1390,
+  "selections_with_market_fair": 1974,
+  "markets_in_window": 314,
   "value_bets": 2,
   "dropped_by_filter": {
    "model_only_no_market": 160,
    "odds_range": 1,
-   "model_market_gap": 861
+   "model_market_gap": 845
   },
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 24,
@@ -151,19 +151,19 @@
     "corr": 0.448
    },
    "batter_runs": {
-    "n_prices": 692,
+    "n_prices": 666,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.77,
-    "corr": 0.086
+    "mean_abs_logit_diff": 0.777,
+    "corr": 0.088
    },
    "batter_milestone": {
-    "n_prices": 414,
+    "n_prices": 406,
     "mean_model_p": 0.493,
-    "mean_market_p": 0.498,
+    "mean_market_p": 0.497,
     "mean_logit_diff_model_minus_market": -0.022,
-    "mean_abs_logit_diff": 1.114,
+    "mean_abs_logit_diff": 1.11,
     "corr": 0.983
    },
    "top_batter_match": {
@@ -193,49 +193,6 @@
   }
  },
  "events_in_window": [
-  {
-   "event": "male|Victoria|Western Australia|2026-11-16",
-   "start_ist": "2026-11-16 08:30 IST",
-   "format": "ODI",
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Victoria",
-    "Western Australia"
-   ],
-   "sources": [
-    "feedk_leoal",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Andhra|Himachal Pradesh|2026-11-16",
-   "start_ist": "2026-11-16 08:30 IST",
-   "format": "T20",
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Andhra",
-    "Himachal Pradesh"
-   ],
-   "sources": [
-    "feede_lb",
-    "feedf_p",
-    "feedh_d",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "male|Karnataka|Vidarbha|2026-11-16",
-   "start_ist": "2026-11-16 08:30 IST",
-   "format": "T20",
-   "format_source": "last-meeting",
-   "teams_matched": [
-    "Karnataka",
-    "Vidarbha"
-   ],
-   "sources": [
-    "feedh_d"
-   ]
-  },
   {
    "event": "male|Jharkhand|Rajasthan|2026-11-16",
    "start_ist": "2026-11-16 09:00 IST",
@@ -496,13 +453,13 @@
    ]
   },
   {
-   "event": "male|Haryana|Saurashtra|2026-11-16",
+   "event": "male|Baroda|Mizoram|2026-11-16",
    "start_ist": "2026-11-16 13:30 IST",
    "format": "T20",
    "format_source": "fixtures",
    "teams_matched": [
-    "Haryana",
-    "Saurashtra"
+    "Baroda",
+    "Mizoram"
    ],
    "sources": [
     "feede_lb",
@@ -512,13 +469,13 @@
    ]
   },
   {
-   "event": "male|Baroda|Mizoram|2026-11-16",
+   "event": "male|Haryana|Saurashtra|2026-11-16",
    "start_ist": "2026-11-16 13:30 IST",
    "format": "T20",
    "format_source": "fixtures",
    "teams_matched": [
-    "Baroda",
-    "Mizoram"
+    "Haryana",
+    "Saurashtra"
    ],
    "sources": [
     "feede_lb",
@@ -957,7 +914,6 @@
   "Aaradhya Yadav",
   "Aarush Bhandari",
   "Aayan Khan",
-  "Aayushi Thakre",
   "Abdul Ajij Kuraishi",
   "Abhijeet Tomar",
   "Abhilash Shetty",
@@ -991,7 +947,6 @@
   "Atal Bihari Vipin Rai",
   "Atoshi Banerjee",
   "Ayush Doseja",
-  "Ayush Jamwal",
   "Ayush Loharuka",
   "Ayushman Malakar",
   "B Sachin",
@@ -1018,7 +973,6 @@
   "Dhruv Parashar",
   "Digvesh Singh Rathi",
   "Dikshant Kundal",
-  "Disha Deepak Kasat",
   "Don Pasindu Sanjula Soriyabandara",
   "Dunith Nethmika Wellalage",
   "Dushmantha Chameera",
@@ -1052,7 +1006,6 @@
   "Humaira Yusufamir Kazi",
   "Indigo Noble",
   "Ines Mackeon",
-  "Innesh Mahajan",
   "James Matthew Coles",
   "Janith Liyanage",
   "Jannatul Ferdus Sumona",
@@ -1098,7 +1051,6 @@
   "Manender Singh",
   "Mangesh Yadav",
   "Manvanth Kumar L",
-  "Maramreddy Hemanth Reddy",
   "Marty Lalrinhlua",
   "Mayank Rajesh Kumar",
   "Md Jamshed Alam",
@@ -1123,7 +1075,6 @@
   "Nidhi Dhrmuniya",
   "Nikhil Kumar",
   "Nikhil Muraleedharan",
-  "Nikki Siribhagwan Prasad",
   "Noor Ahmad",
   "Noor ul Rahman",
   "Obus Pienaar",
@@ -1142,7 +1093,6 @@
   "Prithvi Shaw",
   "Priya Punia",
   "Pugazhendi Akash",
-  "Pukhraj Mann",
   "Quentin Sampson",
   "R Rajkumar",
   "Ragavan Ramamoorthy",
@@ -1153,7 +1103,14 @@
   "Ramakrishna Ghosh",
   "Raman Bishnoi",
   "Ramnivas Golada",
-  "Ranga Lakshmi"
+  "Ranga Lakshmi",
+  "Rasikh Salam",
+  "Ravi Singh",
+  "Razaullah",
+  "Rishabh Chaudhary",
+  "Rithesh Bhatkal",
+  "Rithik Easwaran",
+  "Ritik Tada"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1278,25 +1235,25 @@
   }
  },
  "log": [
-  "[08:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[08:00 IST] history: 24099 matches, last 2026-11-15, players 434476",
-  "[08:03 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.1}",
-  "[08:03 IST] source smarkets: {'status': 'ok', 'rows': 713, 'secs': 2.0}",
-  "[08:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 13.4, 'events': 2}",
-  "[08:03 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm', 'secs': 18.5}",
-  "[08:03 IST] source feedk: {'status': 'ok', 'rows': 128, 'secs': 20.3, 'events': 8}",
-  "[08:03 IST] source feede: {'status': 'ok', 'rows': 630, 'secs': 62.3, 'events': 24}",
-  "[08:03 IST] source feedh: {'status': 'ok', 'rows': 1624, 'secs': 67.0, 'events': 38}",
-  "[08:03 IST] source feedf: {'status': 'ok', 'rows': 670, 'secs': 141.8, 'events': 27}",
-  "[08:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[08:03 IST] 20 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[08:03 IST] 24 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[08:03 IST] name map: Jammu & Kashmir vs Tamil Nadu -> Jammu and Kashmir vs Tamil Nadu (2026-11-16T05:30:00Z)",
-  "[08:03 IST] held back 0 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[08:03 IST] book lines: 249 player lines from 6 source(s)",
-  "[08:03 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[08:03 IST] weather: forecasts for 14 events, 0 failed",
-  "[08:03 IST] prop model: 651 prop selections modelled, 20 milestone ladder prices anchored to O/U",
-  "[08:03 IST] ledger upsert model: {'upserted': 2, 'skipped_settled': 0}"
+  "[08:27 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[08:27 IST] history: 24099 matches, last 2026-11-15, players 434476",
+  "[08:30 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm', 'secs': 0.5}",
+  "[08:30 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.5}",
+  "[08:30 IST] source smarkets: {'status': 'ok', 'rows': 694, 'secs': 2.0}",
+  "[08:30 IST] source feedg: {'status': 'ok', 'rows': 20, 'secs': 16.2, 'events': 3}",
+  "[08:30 IST] source feedk: {'status': 'ok', 'rows': 128, 'secs': 20.5, 'events': 8}",
+  "[08:30 IST] source feede: {'status': 'ok', 'rows': 630, 'secs': 60.1, 'events': 23}",
+  "[08:30 IST] source feedh: {'status': 'ok', 'rows': 1608, 'secs': 64.9, 'events': 38}",
+  "[08:30 IST] source feedf: {'status': 'ok', 'rows': 642, 'secs': 142.0, 'events': 27}",
+  "[08:30 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[08:30 IST] 20 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[08:30 IST] 24 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[08:30 IST] name map: Jammu & Kashmir vs Tamil Nadu -> Jammu and Kashmir vs Tamil Nadu (2026-11-16T05:30:00Z)",
+  "[08:30 IST] held back 0 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[08:30 IST] book lines: 253 player lines from 6 source(s)",
+  "[08:30 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[08:31 IST] weather: forecasts for 13 events, 0 failed",
+  "[08:31 IST] prop model: 671 prop selections modelled, 20 milestone ladder prices anchored to O/U",
+  "[08:31 IST] ledger upsert model: {'upserted': 2, 'skipped_settled': 0}"
  ]
 }
