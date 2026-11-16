@@ -1,60 +1,60 @@
 {
- "generated_at_utc": "2026-11-16T20:30:39Z",
- "generated_at_ist": "2026-11-17 02:00 IST",
- "runtime_secs": 370.3,
+ "generated_at_utc": "2026-11-16T21:30:35Z",
+ "generated_at_ist": "2026-11-17 03:00 IST",
+ "runtime_secs": 119.6,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-16",
-  "commit": "a8b974764a"
+  "commit": "fa21f2b851"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 401: Unauthorized",
-   "secs": 0.7
-  },
-  "feedi": {
-   "status": "error",
-   "reason": "HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm",
-   "secs": 1.3
+   "secs": 0.2
   },
   "smarkets": {
    "status": "ok",
    "rows": 287,
-   "secs": 2.6
+   "secs": 1.8
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 17.0,
+   "secs": 16.5,
    "events": 3
   },
   "feedk": {
    "status": "ok",
    "rows": 136,
-   "secs": 19.6,
+   "secs": 17.1,
    "events": 7
   },
   "feedf": {
    "status": "ok",
    "rows": 90,
-   "secs": 25.1,
+   "secs": 24.1,
    "events": 4
+  },
+  "feedi": {
+   "status": "error",
+   "reason": "HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm",
+   "secs": 25.8
   },
   "feede": {
    "status": "ok",
    "rows": 400,
-   "secs": 62.2,
+   "secs": 59.0,
    "events": 23
   },
   "feedh": {
    "status": "ok",
    "rows": 939,
-   "secs": 82.4,
+   "secs": 84.9,
    "events": 56
   }
  },
- "snapshot": "odds_20261116T203039Z.jsonl.gz",
+ "snapshot": "odds_20261116T213035Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -156,7 +156,7 @@
     "n_prices": 394,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_logit_diff_model_minus_market": -0.0,
     "mean_abs_logit_diff": 0.676,
     "corr": 0.119
    },
@@ -611,19 +611,6 @@
    ]
   },
   {
-   "event": "male|Netherlands|Zimbabwe|2026-11-18",
-   "start_ist": "2026-11-18 14:45 IST",
-   "format": "ODI",
-   "format_source": "last-meeting",
-   "teams_matched": [
-    "Netherlands",
-    "Zimbabwe"
-   ],
-   "sources": [
-    "feedh_d"
-   ]
-  },
-  {
    "event": "male|Bangladesh|Thailand|2026-11-18",
    "start_ist": "2026-11-18 14:45 IST",
    "format": null,
@@ -631,6 +618,19 @@
    "teams_matched": [
     "Bangladesh",
     "Thailand"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Netherlands|Zimbabwe|2026-11-18",
+   "start_ist": "2026-11-18 14:45 IST",
+   "format": "ODI",
+   "format_source": "last-meeting",
+   "teams_matched": [
+    "Netherlands",
+    "Zimbabwe"
    ],
    "sources": [
     "feedh_d"
@@ -808,8 +808,14 @@
      "p_bat"
     ]
    },
-   "rain_risk": null,
-   "weather": null
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 68,
+    "cloud_pct": 7,
+    "source": "Open-Meteo forecast"
+   }
   },
   {
    "event_key": "male|India|New Zealand|2026-11-18",
@@ -1116,25 +1122,24 @@
   }
  },
  "log": [
-  "[02:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[02:00 IST] history: 24126 matches, last 2026-11-16, players 435075",
-  "[02:02 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.7}",
-  "[02:02 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm', 'secs': 1.3}",
-  "[02:02 IST] source smarkets: {'status': 'ok', 'rows': 287, 'secs': 2.6}",
-  "[02:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 17.0, 'events': 3}",
-  "[02:02 IST] source feedk: {'status': 'ok', 'rows': 136, 'secs': 19.6, 'events': 7}",
-  "[02:02 IST] source feedf: {'status': 'ok', 'rows': 90, 'secs': 25.1, 'events': 4}",
-  "[02:02 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 62.2, 'events': 23}",
-  "[02:02 IST] source feedh: {'status': 'ok', 'rows': 939, 'secs': 82.4, 'events': 56}",
-  "[02:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[02:02 IST] 20 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[02:02 IST] 32 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[02:02 IST] held back 2 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[02:02 IST] book lines: 198 player lines from 6 source(s)",
-  "[02:02 IST] 36 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[02:05 IST] weather failed for male|Australia|England|2026-11-18: <urlopen error _ssl.c:994: The handshake operation timed out>",
-  "[02:06 IST] weather: forecasts for 9 events, 1 failed",
-  "[02:06 IST] prop model: 429 prop selections modelled, 20 milestone ladder prices anchored to O/U",
-  "[02:06 IST] ledger upsert model: {'upserted': 2, 'skipped_settled': 0}"
+  "[03:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[03:00 IST] history: 24126 matches, last 2026-11-16, players 435075",
+  "[03:02 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.2}",
+  "[03:02 IST] source smarkets: {'status': 'ok', 'rows': 287, 'secs': 1.8}",
+  "[03:02 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 16.5, 'events': 3}",
+  "[03:02 IST] source feedk: {'status': 'ok', 'rows': 136, 'secs': 17.1, 'events': 7}",
+  "[03:02 IST] source feedf: {'status': 'ok', 'rows': 90, 'secs': 24.1, 'events': 4}",
+  "[03:02 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm', 'secs': 25.8}",
+  "[03:02 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 59.0, 'events': 23}",
+  "[03:02 IST] source feedh: {'status': 'ok', 'rows': 939, 'secs': 84.9, 'events': 56}",
+  "[03:02 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[03:02 IST] 20 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[03:02 IST] 32 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[03:02 IST] held back 2 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[03:02 IST] book lines: 198 player lines from 6 source(s)",
+  "[03:02 IST] 36 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[03:02 IST] weather: forecasts for 10 events, 0 failed",
+  "[03:02 IST] prop model: 429 prop selections modelled, 20 milestone ladder prices anchored to O/U",
+  "[03:02 IST] ledger upsert model: {'upserted': 2, 'skipped_settled': 0}"
  ]
 }
