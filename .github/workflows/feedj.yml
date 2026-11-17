@@ -1,0 +1,51 @@
+name: Feed J probe
+
+# Dispatch only: pull Feed J's listing from a runner and print what comes back (status, a header sample, with plain urllib and with Chrome TLS).
+# Nothing committed. A pull request never runs this (the repository is public).
+# Set secrets FEEDJ_API, FEEDJ_BRAND, FEEDJ_ORIGIN and FEEDJ_NAME.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: feedj-probe
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FEEDJ_API: ${{ secrets.FEEDJ_API }}
+      FEEDJ_BRAND: ${{ secrets.FEEDJ_BRAND }}
+      FEEDJ_ORIGIN: ${{ secrets.FEEDJ_ORIGIN }}
+      FEEDJ_NAME: ${{ secrets.FEEDJ_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Listing, plain and Chrome TLS
+        run: |
+          python - <<'PY' | tee "$GITHUB_STEP_SUMMARY"
+          import os, urllib.request, urllib.error
+          api, brand, origin = (os.environ[k] for k in ("FEEDJ_API", "FEEDJ_BRAND", "FEEDJ_ORIGIN"))
+          url = f"{api}/v4/prematch/brand/{brand}/en-IN/0"
+          h = {"User-Agent": "Mozilla/5.0 Chrome/131.0 Safari/537.36", "Origin": origin, "Referer": origin + "/"}
+          try:
+              r = urllib.request.urlopen(urllib.request.Request(url, headers=h), timeout=30)
+              print("urllib", r.status, len(r.read()))
+          except urllib.error.HTTPError as e:
+              print("urllib", e.code, [(k, v) for k, v in e.headers.items() if k.lower() in ("server", "via", "x-cache", "content-type")], e.read()[:160])
+          from curl_cffi import requests
+          s = requests.Session(impersonate="chrome131")
+          r = s.get(url, headers={"Origin": origin, "Referer": origin + "/"}, timeout=30)
+          print("curl_cffi", r.status_code, len(r.content), r.text[:120].replace(os.environ["FEEDJ_ORIGIN"], "<origin>") if r.status_code >= 400 else "")
+          PY
+      - name: Feed J run
+        run: python -m value_bets.adapters.feedj | tee -a "$GITHUB_STEP_SUMMARY"
