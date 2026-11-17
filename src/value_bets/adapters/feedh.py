@@ -30,7 +30,7 @@ from cricket_data.hosts import host
 
 from .. import config
 from ..util import decimal_ok, http_json, iso, parse_ts
-from .base import Pace, gender_hint, row
+from .base import Pace, gender_hint, multi_day, row
 from .feedf import person
 
 NAME = "feedh"
@@ -39,7 +39,6 @@ SOURCE = "feedh_d"
 CRIC = 215
 SKIP_PATH = re.compile(r"virtual|simulated|electronic|\bsrl\b|long term|futures", re.I)
 INTL_PATH = re.compile(r"\binternational\b|\bworld cup\b|\basia cup\b|\btri[- ]?series\b|\btests?\b series|\bodi series\b|\bt20 series\b", re.I)
-MULTI_DAY = re.compile(r"\btests?\b|ashes|shield|first.class|championship|ranji", re.I)
 TEST = re.compile(r"\btests?\b|ashes", re.I)
 WOMEN = re.compile(r"women|wbbl|\(w\)", re.I)
 VS = re.compile(r"\s+vs\.?\s+", re.I)
@@ -259,7 +258,7 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
         return [], [], [], Counter()
     start = iso(parse_ts(ev.get("eventDate")))
     female = "female" if WOMEN.search(f"{paths} {home} {away}") else gender_hint(home, away)
-    multi = bool(MULTI_DAY.search(paths + " " + (competition or "")))
+    multi = multi_day(paths, competition)
     fmt = _fmt(competition or "", home, away)
     common = dict(source=src, source_type="bookmaker", event_id=str(ev.get("id")), match=f"{home} vs {away}", team_a=home, team_b=away,
                   gender_hint=female, competition=competition, start_utc=start, in_play=False, fetched_at=fetched_at, fmt=fmt)

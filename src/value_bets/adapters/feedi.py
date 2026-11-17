@@ -26,7 +26,7 @@ from cricket_data.hosts import host
 
 from .. import config
 from ..util import decimal_ok, http_json, iso, parse_ts
-from .base import Pace, gender_hint, row
+from .base import Pace, gender_hint, multi_day, row
 from .feedf import person
 
 NAME = "feedi"
@@ -35,7 +35,6 @@ SOURCE = "feedi_d"
 CRIC_SPORT = 66  # cricket on this feed (not the family's older 85 id)
 SKIP_COMP = re.compile(r"virtual|simulated|electronic|\bsrl\b|long term|futures|esports|card cricket", re.I)
 WOMEN = re.compile(r"women|wbbl|\(w\)", re.I)
-MULTI_DAY = re.compile(r"\btests?\b|ashes|shield|first.class|championship|ranji", re.I)
 TEST = re.compile(r"\btests?\b|ashes", re.I)
 
 # Ungrouped LineFeed market groups (G) → our market_type / fancy key. Probed 2026-11-15 on cricket Stats.
@@ -269,7 +268,7 @@ def parse_game(value: dict, src: str, fetched_at: str, *, in_play: bool = False)
         return [], [], [], Counter()
     start = _start(value)
     female = "female" if WOMEN.search(f"{competition} {home} {away}") else gender_hint(home, away)
-    multi = bool(MULTI_DAY.search(competition))
+    multi = multi_day(competition)
     fmt = _fmt(competition, home, away)
     eid = str(value.get("I") or value.get("CI") or "")
     common = dict(

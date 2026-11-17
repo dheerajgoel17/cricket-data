@@ -28,7 +28,6 @@ import datetime as dt
 import gzip
 import json
 import os
-import re
 import time
 import urllib.error
 import urllib.parse
@@ -37,7 +36,7 @@ from collections import Counter
 
 from .. import config
 from ..util import decimal_ok, iso, parse_ts
-from .base import Pace, gender_hint, row
+from .base import Pace, gender_hint, multi_day, row
 from .feedi import SKIP_COMP, WOMEN, _fmt
 
 NAME = "feedj"
@@ -53,14 +52,6 @@ MILESTONE = "662"
 MATCH_FANCY = {"13613": "top_score", "697": "match_wickets", "654": "match_runouts", "655": "match_extras"}
 SIDE_OVERS = {"352": 0, "353": 1}  # "innings overs 0 to N - competitor 1 / 2 total"
 OVERS_KEYS = {5, 6, 10, 15, 20, 30}  # the n for which the site has an overs_N key
-
-
-# "ICC ODI Championship" is a limited-overs league, so "championship" alone does not mean multi-day
-MULTI = re.compile(r"\btests?\b|ashes|shield|first.class|ranji|county championship", re.I)
-
-
-def multi_day(competition: str | None) -> bool:
-    return bool(MULTI.search(competition or ""))
 
 
 class Skip(Exception):

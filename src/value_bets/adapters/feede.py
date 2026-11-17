@@ -21,7 +21,7 @@ from collections import Counter
 
 from .. import config
 from ..util import http_json, iso, parse_ts
-from .base import Pace, gender_hint, row
+from .base import Pace, gender_hint, multi_day, row
 
 NAME = "feede"
 AUTO = True  # on whenever FEEDE_BOOKS is set; no need to list it in CV_SOURCES
@@ -34,7 +34,6 @@ INNINGS_NO = {"1st": 1, "2nd": 2}
 TO_SCORE = re.compile(r"^(?P<p>.+?) To Score (?P<n>\d+)$")
 MATCH_TOTAL = re.compile(r"^Over/Under (?P<line>\d+(?:\.\d+)?) Match (?P<what>Sixes|Fours)$")
 FANCY_KEY = {"Sixes": "match_sixes", "Fours": "match_fours"}
-MULTI_DAY = re.compile(r"test|ashes|shield|first.class|championship|ranji", re.I)
 TEST = re.compile(r"\btests?\b|ashes", re.I)  # the one multi-day format the site charts
 WOMEN = re.compile(r"women|wbbl|\(w\)", re.I)
 
@@ -105,7 +104,7 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
     if not home or not away:
         return [], [], Counter()
     typ = ev.get("typeName") or ""
-    multi, test = bool(MULTI_DAY.search(typ)), bool(TEST.search(typ))
+    multi, test = multi_day(typ), bool(TEST.search(typ))
     female = "female" if WOMEN.search(f"{typ} {ev['name']}") else gender_hint(home, away)
     start = iso(parse_ts(ev["startTime"])) if ev.get("startTime") else None
     common = dict(source=src, source_type="bookmaker", event_id=str(ev["id"]), match=f"{home} vs {away}", team_a=home, team_b=away,

@@ -136,3 +136,18 @@ def test_wickets_over_is_higher_selection_id_and_live_agrees():
     live = feedi.live_game_lines(game(outcomes), "BookX")
     wk = [x for x in live if x["market"].startswith("bowler_wickets")]
     assert wk[0]["over"] == 5.0 and wk[0]["under"] == 1.167
+
+
+def test_an_odi_championship_is_limited_overs_not_multi_day():
+    from value_bets.adapters.base import multi_day
+
+    for comp in ("ICC ODI Championship", "ICC Men's T20 World Cup", "Syed Mushtaq Ali Trophy", "The Hundred"):
+        assert not multi_day(comp), comp
+    for comp in ("County Championship Division One", "Sheffield Shield", "Ranji Trophy", "Test Series", "The Ashes", "Quaid-e-Azam First-Class"):
+        assert multi_day(comp), comp
+    outcomes = [
+        {"T": 3012, "P": 25.5, "PL": {"N": "Mitchell Marsh"}, "C": 1.85, "G": 2506},
+        {"T": 3013, "P": 25.5, "PL": {"N": "Mitchell Marsh"}, "C": 1.85, "G": 2506},
+    ]
+    rows, *_ = feedi.parse_game(game(outcomes, home="Australia", away="England", league="ICC ODI Championship"), "feedi_d", STAMP)
+    assert [r["market_type"] for r in rows] == ["batter_runs", "batter_runs"]  # was dropped as a "multi-day" game

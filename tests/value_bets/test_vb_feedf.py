@@ -6,6 +6,7 @@ import pytest
 
 from value_bets import booklines, pipeline
 from value_bets.adapters import feedf
+from value_bets.adapters.base import multi_day
 
 FIX = Path(__file__).parent / "fixtures"
 STAMP = "2026-10-28T10:00:00Z"
@@ -154,8 +155,8 @@ def test_a_stray_comma_in_the_event_name_is_dropped_and_multi_day_matches_are_no
     stub = {"eventId": "1", "eventName": "South Australia v Western Australia,", "eventDateTime": "29/10/2026 05:30:00"}
     ev = feedf._event(stub, (1, "Sheffield Shield 2026-27"), STAMP)
     assert (ev["home"], ev["away"], ev["common"]["match"]) == ("South Australia", "Western Australia", "South Australia vs Western Australia")
-    assert all(feedf.MULTI_DAY.search(c) for c in ("Test Matches", "Sheffield Shield 2026-27", "Ranji Trophy Plate 2026-27", "Presidents Trophy"))
-    assert not any(feedf.MULTI_DAY.search(c) for c in ("One Day Internationals", "Ford Trophy", "Global T20 Canada", "International Twenty20 Matches", "WBBL"))
+    assert all(multi_day(c) for c in ("Test Matches", "Sheffield Shield 2026-27", "Ranji Trophy Plate 2026-27", "Presidents Trophy"))
+    assert not any(multi_day(c) for c in ("One Day Internationals", "Ford Trophy", "Global T20 Canada", "International Twenty20 Matches", "WBBL"))
     names = J("feedf_names.json")
     names["data"]["children"].append({**stub, "eventTypeId": "4"})
     menu = J("feedf_menu.json")

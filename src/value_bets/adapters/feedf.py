@@ -27,7 +27,7 @@ from collections import Counter
 
 from .. import config
 from ..util import http_json, iso, parse_ts
-from .base import Pace, gender_hint, row
+from .base import Pace, gender_hint, multi_day, row
 
 NAME = "feedf"
 AUTO = True  # on whenever the FEEDF_* variables are set; no need to list it in CV_SOURCES
@@ -51,7 +51,6 @@ FANCY_PLAYER = re.compile(r"^(?P<p>[A-Za-z][A-Za-z.' -]*?)\s+Run Adv$")
 NOT_A_PLAYER = re.compile(r"\b(over|wkt|pship|match|fall|total|top|boundaries)\b", re.I)
 FANCY_TEAM_RUNS = re.compile(r"^(?P<n>\d+) Over Run (?P<abbr>[A-Z]{2,4})\s+Adv$")
 
-MULTI_DAY = re.compile(r"\btests?\b|ashes|shield|first.class|championship|ranji|presidents? trophy", re.I)  # innings-scoped markets there: not the match totals the pipeline prices (a later job)
 
 RULES = {"premium": "void_below_80pct", "fancy_side": "void_any_ball", "fancy_player": "stands_once_decided", "fancy_total": "not_voided_by_lost_balls"}
 
@@ -312,7 +311,7 @@ def fetch(fetched_at: str):
         ev = _event(stub, menu[stub["eventId"]], fetched_at)
         if not ev:
             continue
-        if MULTI_DAY.search(ev["common"]["competition"] or ""):
+        if multi_day(ev["common"]["competition"]):
             info["left_out"]["multi-day match"] += 1
             continue
         try:

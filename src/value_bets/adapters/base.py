@@ -53,3 +53,17 @@ def split_teams(name):
 
 def gender_hint(*names):
     return "female" if any(n and WOMEN_RE.search(n) for n in names) else None
+
+
+_TEST_ASHES = re.compile(r"\btests?\b|ashes", re.I)
+_MULTI = re.compile(r"shield|first.class|championship|ranji|presidents? trophy", re.I)
+_LIMITED = re.compile(r"\bodi\b|one.day|\bt20i?\b|twenty20|\bt10\b|list a|\b(20|50)[ -]overs?\b|hundred", re.I)
+
+
+def multi_day(*texts) -> bool:
+    """Is this competition multi-day cricket? A Test or the Ashes always is; "shield", "first-class", "championship" and the like are, unless the same text says limited overs
+    ("ICC ODI Championship", "T20 Championship": limited-overs leagues that happen to be called a championship). One definition for every adapter."""
+    t = " ".join(str(x or "") for x in texts)
+    if _TEST_ASHES.search(t):
+        return True
+    return bool(_MULTI.search(t)) and not _LIMITED.search(t)
