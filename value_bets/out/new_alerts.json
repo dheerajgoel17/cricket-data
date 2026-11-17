@@ -1,5 +1,5 @@
 {
- "generated_at_ist": "2026-11-17 21:00 IST",
+ "generated_at_ist": "2026-11-17 22:00 IST",
  "alerts": [
   {
    "event_key": "female|Adelaide Strikers Women|Melbourne Renegades Women|2026-11-20",
@@ -26,18 +26,18 @@
    "back_liquidity": null,
    "overround": 0.0772,
    "implied_prob": 0.2,
-   "fair_odds": 4.693,
-   "fair_prob": 0.2131,
+   "fair_odds": 4.507,
+   "fair_prob": 0.2219,
    "model_prob": 0.2083,
-   "market_prob": 0.217,
+   "market_prob": 0.233,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0653,
-   "edge_pct": 6.53,
-   "kelly_quarter_stake_pct": 0.41,
-   "n_sources": 2,
+   "edge": 0.1093,
+   "edge_pct": 10.93,
+   "kelly_quarter_stake_pct": 0.68,
+   "n_sources": 3,
    "confidence": "medium",
-   "why": "Model 21% vs market 22% for 50+ runs; form 27.3 runs/inn recency-weighted T20 (n_eff 81.8; last 5: 3, 1, 49, 59, 7), bats in 99% of games played; vs Adelaide Strikers Women: 1 inns avg 49.0; context adj: team H2H context +8%",
-   "notes": "2 market source(s) for fair price; model 0.208 vs market 0.217; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "why": "Model 21% vs market 23% for 50+ runs; form 27.3 runs/inn recency-weighted T20 (n_eff 81.8; last 5: 3, 1, 49, 59, 7), bats in 99% of games played; vs Adelaide Strikers Women: 1 inns avg 49.0; context adj: team H2H context +8%",
+   "notes": "3 market source(s) for fair price; model 0.208 vs market 0.233; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
    "model_detail": {
     "n_eff": 81.8,
     "expected": 31.24,
@@ -57,11 +57,11 @@
     "cloud_pct": null,
     "source": "Open-Meteo forecast"
    },
-   "alert_id": "aa20a0ae0772f517",
+   "alert_id": "faebdc8b553edd68",
    "alert_key": "female|Adelaide Strikers Women|Melbourne Renegades Women|2026-11-20|batter_milestone||Hayley Matthews 50+ yes|49.5|over",
-   "alerted_at_ist": "2026-11-17 21:03 IST",
-   "realert": false,
-   "previous_edge": null
+   "alerted_at_ist": "2026-11-17 22:06 IST",
+   "realert": true,
+   "previous_edge": 0.0653
   }
  ]
 }
