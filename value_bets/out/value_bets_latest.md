@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-18 02:00 IST
+# Cricket value bets - 2026-11-18 03:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -7,13 +7,13 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **smarkets**: ok, 336 prices
 - **feedg**: ok, 8 prices, 2 events
 - **feedk**: ok, 156 prices, 7 events
-- **feedj**: ok, 622 prices, 13 events
 - **feede**: ok, 576 prices, 32 events
 - **feedh**: ok, 1192 prices, 64 events
+- **feedi**: ok, 1772 prices, 47 events
 - **feedf**: ok, 418 prices, 25 events
-- **feedi**: ok, 1940 prices, 57 events
+- **feedj**: ok, 824 prices, 18 events
 
-Matches starting in next 168h: **53**, markets priced: **400**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **54**, markets priced: **448**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -30,4 +30,4 @@ Matches starting in next 168h: **53**, markets priced: **400**, value bets: **4*
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Andhra (W) (female), Andhra (Women) (female), Baroda (W) (female), Baroda (Women) (female), Central (male), Karnataka (W) (female), Karnataka (Women) (female), Maharashtra (W) (female), Maharashtra (Women) (female), Omr Checker (male), Pak Xi (male), Railways (W) (female), Railways (Women) (female), Sunny 11 Pratishtan (male), Vidarbha (W) (female), Vidarbha (Women) (female)
 
-Runtime 220.4s. Snapshot: `odds_20261117T203036Z.jsonl.gz`
+Runtime 219.3s. Snapshot: `odds_20261117T213039Z.jsonl.gz`
