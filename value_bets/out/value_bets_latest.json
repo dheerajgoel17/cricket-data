@@ -1,61 +1,61 @@
 {
- "generated_at_utc": "2026-11-17T04:30:35Z",
- "generated_at_ist": "2026-11-17 10:00 IST",
- "runtime_secs": 385.3,
+ "generated_at_utc": "2026-11-17T04:43:17Z",
+ "generated_at_ist": "2026-11-17 10:13 IST",
+ "runtime_secs": 209.0,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-16",
-  "commit": "f04e9668f7"
+  "commit": "a876939776"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 401: Unauthorized",
-   "secs": 1.1
+   "secs": 0.2
   },
   "smarkets": {
    "status": "ok",
    "rows": 283,
-   "secs": 2.6
+   "secs": 1.8
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 11.2,
+   "secs": 11.9,
    "events": 2
   },
   "feedk": {
    "status": "ok",
    "rows": 100,
-   "secs": 16.1,
+   "secs": 16.0,
    "events": 6
   },
   "feede": {
    "status": "ok",
    "rows": 400,
-   "secs": 62.1,
+   "secs": 58.8,
    "events": 23
   },
   "feedh": {
    "status": "ok",
    "rows": 866,
-   "secs": 78.4,
+   "secs": 69.7,
    "events": 47
   },
   "feedi": {
    "status": "ok",
-   "rows": 1486,
-   "secs": 134.2,
+   "rows": 1498,
+   "secs": 105.4,
    "events": 53
   },
   "feedf": {
    "status": "ok",
    "rows": 410,
-   "secs": 135.4,
+   "secs": 126.4,
    "events": 24
   }
  },
- "snapshot": "odds_20261117T043035Z.jsonl.gz",
+ "snapshot": "odds_20261117T044317Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -130,10 +130,10 @@
  },
  "stats": {
   "events_in_window": 42,
-  "rows_in_window": 3525,
-  "selections_with_model": 1617,
-  "selections_with_market_fair": 1960,
-  "markets_in_window": 378,
+  "rows_in_window": 3537,
+  "selections_with_model": 1629,
+  "selections_with_market_fair": 1972,
+  "markets_in_window": 384,
   "value_bets": 5,
   "dropped_by_filter": {
    "model_only_no_market": 76,
@@ -144,7 +144,7 @@
    "policy_max_odds": 1,
    "model_disagrees": 1,
    "market_disabled": 4,
-   "policy_min_edge": 2,
+   "policy_min_edge": 4,
    "suspect_edge": 1
   },
   "suspect_edges": 1,
@@ -178,7 +178,7 @@
     "n_prices": 373,
     "mean_model_p": 0.022,
     "mean_market_p": 0.03,
-    "mean_logit_diff_model_minus_market": -0.187,
+    "mean_logit_diff_model_minus_market": -0.188,
     "mean_abs_logit_diff": 0.979,
     "corr": 0.328
    },
@@ -186,8 +186,8 @@
     "n_prices": 319,
     "mean_model_p": 0.028,
     "mean_market_p": 0.033,
-    "mean_logit_diff_model_minus_market": 0.034,
-    "mean_abs_logit_diff": 2.079,
+    "mean_logit_diff_model_minus_market": 0.032,
+    "mean_abs_logit_diff": 2.08,
     "corr": -0.027
    },
    "top_bowler_team": {
@@ -207,20 +207,20 @@
     "corr": -0.627
    },
    "batter_sixes": {
-    "n_prices": 74,
+    "n_prices": 82,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.458,
-    "corr": 0.834
+    "mean_abs_logit_diff": 0.455,
+    "corr": 0.826
    },
    "batter_fours": {
-    "n_prices": 98,
+    "n_prices": 102,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.796,
-    "corr": 0.004
+    "mean_abs_logit_diff": 0.785,
+    "corr": -0.016
    }
   }
  },
@@ -831,6 +831,64 @@
    "start_ist": "2026-11-18 09:00 IST",
    "format": "ODI",
    "gender": "male",
+   "market_type": "batter_sixes",
+   "market": "G9181 batter_sixes",
+   "team_scope": "",
+   "selection": "Mitchell Marsh under 0.5",
+   "player_matched_as": "Mitchell Marsh",
+   "player_id": "3d8feaf8",
+   "player_team": "Australia",
+   "stat": "sixes",
+   "inn": 0,
+   "line": 0.5,
+   "side": "under",
+   "best_odds": 2.625,
+   "best_source": "feedi_d",
+   "effective_odds_after_commission": 2.625,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0735,
+   "implied_prob": 0.381,
+   "fair_odds": 2.379,
+   "fair_prob": 0.4204,
+   "model_prob": 0.5004,
+   "market_prob": 0.3549,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.1034,
+   "edge_pct": 10.34,
+   "kelly_quarter_stake_pct": 1.59,
+   "n_sources": 1,
+   "confidence": "low",
+   "why": "Model 50% vs market 35% for under 0.5 sixes; form 2.0 sixes/inn recency-weighted ODI (n_eff 21.5; last 5: 0, 4, 2, 2, 5), bats in 97% of games played; at Bellerive Oval, Hobart: 1 inns avg 0.0; vs England: 16 inns avg 1.0; context adj: venue environment +4%",
+   "notes": "1 market source(s) for fair price; model 0.500 vs market 0.355; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 21.5,
+    "expected": 1.57,
+    "nb_alpha": 2.105,
+    "p_bats_or_bowls": 0.974,
+    "venue_matched": "bellerive oval",
+    "context_terms": [
+     "env_sixes",
+     "p_bat",
+     "intl"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 68,
+    "cloud_pct": 7,
+    "source": "Open-Meteo forecast"
+   }
+  },
+  {
+   "event_key": "male|Australia|England|2026-11-18",
+   "match": "Australia vs England",
+   "start_utc": "2026-11-18T03:30:00Z",
+   "start_ist": "2026-11-18 09:00 IST",
+   "format": "ODI",
+   "gender": "male",
    "market_type": "batter_milestone",
    "market": "To score a Half-Century",
    "team_scope": "",
@@ -871,8 +929,14 @@
      "p_bat"
     ]
    },
-   "rain_risk": null,
-   "weather": null
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 68,
+    "cloud_pct": 7,
+    "source": "Open-Meteo forecast"
+   }
   },
   {
    "event_key": "male|Australia|England|2026-11-18",
@@ -921,58 +985,14 @@
      "p_bat"
     ]
    },
-   "rain_risk": null,
-   "weather": null
-  },
-  {
-   "event_key": "male|Australia|England|2026-11-18",
-   "match": "Australia vs England",
-   "start_utc": "2026-11-18T03:30:00Z",
-   "start_ist": "2026-11-18 09:00 IST",
-   "format": "ODI",
-   "gender": "male",
-   "market_type": "batter_fours",
-   "market": "G9182 batter_fours",
-   "team_scope": "",
-   "selection": "Josh Inglis under 2.5",
-   "player_matched_as": "Josh Inglis",
-   "player_id": "989889ff",
-   "player_team": "Australia",
-   "stat": "fours",
-   "inn": 0,
-   "line": 2.5,
-   "side": "under",
-   "best_odds": 2.1,
-   "best_source": "feedi_d",
-   "effective_odds_after_commission": 2.1,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "overround": 0.0761,
-   "implied_prob": 0.4762,
-   "fair_odds": 1.997,
-   "fair_prob": 0.5009,
-   "model_prob": 0.5722,
-   "market_prob": 0.4425,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0518,
-   "edge_pct": 5.18,
-   "kelly_quarter_stake_pct": 1.18,
-   "n_sources": 1,
-   "confidence": "low",
-   "why": "Model 57% vs market 44% for under 2.5 fours; form 3.1 fours/inn recency-weighted ODI (n_eff 21.2; last 5: 0, 2, 0, 11, 2), bats in 92% of games played; at Bellerive Oval, Hobart: 1 inns avg 2.0; vs England: 6 inns avg 2.0",
-   "notes": "1 market source(s) for fair price; model 0.572 vs market 0.443; assumes bet void if player doesn't bat/bowl - check book rules",
-   "model_detail": {
-    "n_eff": 21.2,
-    "expected": 3.09,
-    "nb_alpha": 1.037,
-    "p_bats_or_bowls": 0.915,
-    "venue_matched": "bellerive oval",
-    "context_terms": [
-     "p_bat"
-    ]
-   },
-   "rain_risk": null,
-   "weather": null
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 68,
+    "cloud_pct": 7,
+    "source": "Open-Meteo forecast"
+   }
   },
   {
    "event_key": "male|India|New Zealand|2026-11-18",
@@ -1367,26 +1387,25 @@
   }
  },
  "log": [
-  "[10:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[10:00 IST] history: 24126 matches, last 2026-11-16, players 435075",
-  "[10:03 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 1.1}",
-  "[10:03 IST] source smarkets: {'status': 'ok', 'rows': 283, 'secs': 2.6}",
-  "[10:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.2, 'events': 2}",
-  "[10:03 IST] source feedk: {'status': 'ok', 'rows': 100, 'secs': 16.1, 'events': 6}",
-  "[10:03 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 62.1, 'events': 23}",
-  "[10:03 IST] source feedh: {'status': 'ok', 'rows': 866, 'secs': 78.4, 'events': 47}",
-  "[10:03 IST] source feedi: {'status': 'ok', 'rows': 1486, 'secs': 134.2, 'events': 53}",
-  "[10:03 IST] source feedf: {'status': 'ok', 'rows': 410, 'secs': 135.4, 'events': 24}",
-  "[10:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[10:03 IST] 50 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[10:03 IST] 30 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[10:03 IST] name map: Republic of Ireland (Women) vs Scotland (Women) -> Ireland Women vs Scotland Women (2026-11-18T05:00:00Z)",
-  "[10:03 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[10:03 IST] book lines: 346 player lines from 7 source(s)",
-  "[10:03 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[10:06 IST] weather failed for male|Australia|England|2026-11-18: <urlopen error _ssl.c:994: The handshake operation timed out>",
-  "[10:06 IST] weather: forecasts for 9 events, 1 failed",
-  "[10:06 IST] prop model: 835 prop selections modelled, 20 milestone ladder prices anchored to O/U",
-  "[10:07 IST] ledger upsert model: {'upserted': 5, 'skipped_settled': 0}"
+  "[10:13 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[10:13 IST] history: 24126 matches, last 2026-11-16, players 435075",
+  "[10:15 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.2}",
+  "[10:15 IST] source smarkets: {'status': 'ok', 'rows': 283, 'secs': 1.8}",
+  "[10:15 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.9, 'events': 2}",
+  "[10:15 IST] source feedk: {'status': 'ok', 'rows': 100, 'secs': 16.0, 'events': 6}",
+  "[10:15 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 58.8, 'events': 23}",
+  "[10:15 IST] source feedh: {'status': 'ok', 'rows': 866, 'secs': 69.7, 'events': 47}",
+  "[10:15 IST] source feedi: {'status': 'ok', 'rows': 1498, 'secs': 105.4, 'events': 53}",
+  "[10:15 IST] source feedf: {'status': 'ok', 'rows': 410, 'secs': 126.4, 'events': 24}",
+  "[10:15 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[10:15 IST] 50 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[10:15 IST] 30 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[10:15 IST] name map: Republic of Ireland (Women) vs Scotland (Women) -> Ireland Women vs Scotland Women (2026-11-18T05:00:00Z)",
+  "[10:15 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[10:15 IST] book lines: 352 player lines from 7 source(s)",
+  "[10:15 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[10:16 IST] weather: forecasts for 10 events, 0 failed",
+  "[10:16 IST] prop model: 847 prop selections modelled, 20 milestone ladder prices anchored to O/U",
+  "[10:16 IST] ledger upsert model: {'upserted': 5, 'skipped_settled': 0}"
  ]
 }

@@ -43,5 +43,10 @@
   "edge": 0.0541,
   "start_utc": "2026-11-18T22:00:00Z",
   "alerted_at": "2026-11-17T04:36:58.919281+00:00"
+ },
+ "male|Australia|England|2026-11-18|batter_sixes||Mitchell Marsh under 0.5|0.5|under": {
+  "edge": 0.1034,
+  "start_utc": "2026-11-18T03:30:00Z",
+  "alerted_at": "2026-11-17T04:46:45.443299+00:00"
  }
 }
