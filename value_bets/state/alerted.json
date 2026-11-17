@@ -49,11 +49,6 @@
   "start_utc": "2026-11-18T03:30:00Z",
   "alerted_at": "2026-11-17T04:46:45.443299+00:00"
  },
- "female|Adelaide Strikers Women|Sydney Sixers Women|2026-11-17|batter_fours||Ellyse Perry under 3.5|3.5|under": {
-  "edge": 0.0556,
-  "start_utc": "2026-11-17T08:10:00Z",
-  "alerted_at": "2026-11-17T05:34:09.413633+00:00"
- },
  "female|Brisbane Heat Women|Sydney Thunder Women|2026-11-19|batter_milestone||Grace Harris 50+ no|49.5|under": {
   "edge": 0.0503,
   "start_utc": "2026-11-19T08:10:00Z",

@@ -1,34 +1,34 @@
-# Cricket value bets - 2026-11-17 13:00 IST
+# Cricket value bets - 2026-11-17 14:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **smarkets**: ok, 249 prices
-- **feedg**: ok, 8 prices, 2 events
-- **feedk**: ok, 132 prices, 6 events
-- **feede**: ok, 368 prices, 22 events
+- **smarkets**: ok, 279 prices
+- **feedg**: ok, 8 prices, 1 events
+- **feedk**: ok, 88 prices, 4 events
+- **feede**: ok, 368 prices, 21 events
 - **feedh**: ok, 720 prices, 41 events
-- **feedi**: ok, 1257 prices, 42 events
-- **feedf**: ok, 372 prices, 24 events
+- **feedi**: ok, 1016 prices, 36 events
+- **feedf**: ok, 364 prices, 23 events
 
-Matches starting in next 168h: **38**, markets priced: **335**, value bets: **5** (new alerts: 1). Min edge 5%.
+Matches starting in next 168h: **35**, markets priced: **320**, value bets: **5** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
 | 11-18 09:00 IST | Australia vs England | G9181 batter_sixes | Mitchell Marsh under 0.5 | 2.62 @ feedi_d | 2.38 | 0.5004 | 10.3% | 1.59% | low |
 | 11-18 09:00 IST | Australia vs England | To score a Half-Century | Cooper Connolly 50+ no | 1.39 @ feedk_leoal | 1.31 | 0.8349 | 5.9% | 2.00% | medium |
-| 11-19 03:30 IST | New Zealand vs India | Batsman Runs - Nicholls, Henry | Henry Nicholls under 24.5 | 1.87 @ feedh_d | 1.77 | 0.6416 | 5.4% | 1.56% | medium |
+| 11-19 03:30 IST | New Zealand vs India | Batsman Runs - Nicholls, Henry | Henry Nicholls under 24.5 | 1.87 @ feedh_d | 1.77 | 0.6416 | 5.4% | 1.56% | low |
 | 11-19 10:10 IST | Hobart Hurricanes (Women) vs Perth Scorchers (Women) | G9182 batter_fours | Beth Mooney under 3.5 | 2.10 @ feedi_d | 1.98 | 0.5826 | 6.2% | 1.40% | low |
 | 11-19 13:40 IST | Brisbane Heat (Women) vs Sydney Thunder (Women) | To score 50 - Grace Harris | Grace Harris 50+ no | 1.25 @ feedi_d | 1.19 | 0.8719 | 5.0% | 2.00% | medium |
 
 ### Why / notes per bet
 - **Australia vs England / G9181 batter_sixes / Mitchell Marsh under 0.5** - why: Model 50% vs market 35% for under 0.5 sixes; form 2.0 sixes/inn recency-weighted ODI (n_eff 21.5; last 5: 0, 4, 2, 2, 5), bats in 97% of games played; at Bellerive Oval, Hobart: 1 inns avg 0.0; vs England: 16 inns avg 1.0; context adj: venue environment +4%. Notes: 1 market source(s) for fair price; model 0.500 vs market 0.355; assumes bet void if player doesn't bat/bowl - check book rules
 - **Australia vs England / To score a Half-Century / Cooper Connolly 50+ no** - why: Model 83% vs market 70% for 50+ runs; form 31.3 runs/inn recency-weighted ODI (n_eff 16.1; last 5: 0, 27, 23, 10, 38), bats in 87% of games played; vs England: 2 inns avg 13.5. Notes: 4 market source(s) for fair price; model 0.835 vs market 0.702; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
-- **New Zealand vs India / Batsman Runs - Nicholls, Henry / Henry Nicholls under 24.5** - why: Model 64% vs market 50% for under 24.5 runs; form 22.1 runs/inn recency-weighted ODI (n_eff 18.6; last 5: 11, 9, 10, 0, 24), bats in 92% of games played; venue unknown/unmatched (venue terms neutral); vs India: 20 inns avg 27.4. Notes: 2 market source(s) for fair price; model 0.642 vs market 0.500; format guessed (ODI via last-meeting); assumes bet void if player doesn't bat/bowl - check book rules
-- **Hobart Hurricanes (Women) vs Perth Scorchers (Women) / G9182 batter_fours / Beth Mooney under 3.5** - why: Model 58% vs market 44% for under 3.5 fours; form 4.1 fours/inn recency-weighted T20 (n_eff 80.7; last 5: 1, 4, 8, 1, 9), bats in 97% of games played; at Allan Border Field, Brisbane: 20 inns avg 3.4; context adj: venue environment +9%, at this venue -4%, team H2H context +1%; weather: cloud cover 97%. Notes: 1 market source(s) for fair price; model 0.583 vs market 0.443; assumes bet void if player doesn't bat/bowl - check book rules
-- **Brisbane Heat (Women) vs Sydney Thunder (Women) / To score 50 - Grace Harris / Grace Harris 50+ no** - why: Model 87% vs market 81% for 50+ runs; form 22.6 runs/inn recency-weighted T20 (n_eff 64.8; last 5: 52, 2, 24, 22, 58), bats in 91% of games played; at Allan Border Field, Brisbane: 23 inns avg 15.3; weather: high humidity 82%, cloud cover 88%. Notes: 2 market source(s) for fair price; model 0.872 vs market 0.814; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+- **New Zealand vs India / Batsman Runs - Nicholls, Henry / Henry Nicholls under 24.5** - why: Model 64% vs market 50% for under 24.5 runs; form 22.1 runs/inn recency-weighted ODI (n_eff 18.6; last 5: 11, 9, 10, 0, 24), bats in 92% of games played; venue unknown/unmatched (venue terms neutral); vs India: 20 inns avg 27.4. Notes: 1 market source(s) for fair price; model 0.642 vs market 0.500; format guessed (ODI via last-meeting); assumes bet void if player doesn't bat/bowl - check book rules
+- **Hobart Hurricanes (Women) vs Perth Scorchers (Women) / G9182 batter_fours / Beth Mooney under 3.5** - why: Model 58% vs market 44% for under 3.5 fours; form 4.1 fours/inn recency-weighted T20 (n_eff 80.7; last 5: 1, 4, 8, 1, 9), bats in 97% of games played; at Allan Border Field, Brisbane: 20 inns avg 3.4; context adj: venue environment +9%, at this venue -4%, team H2H context +1%; weather: cloud cover 95%. Notes: 1 market source(s) for fair price; model 0.583 vs market 0.443; assumes bet void if player doesn't bat/bowl - check book rules
+- **Brisbane Heat (Women) vs Sydney Thunder (Women) / To score 50 - Grace Harris / Grace Harris 50+ no** - why: Model 87% vs market 81% for 50+ runs; form 22.6 runs/inn recency-weighted T20 (n_eff 64.8; last 5: 52, 2, 24, 22, 58), bats in 91% of games played; at Allan Border Field, Brisbane: 23 inns avg 15.3; weather: high humidity 80%, cloud cover 95%. Notes: 2 market source(s) for fair price; model 0.872 vs market 0.814; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Mountaineers (male), Pak Xi (male), Royal Champs (male)
 
-Runtime 344.4s. Snapshot: `odds_20261117T073041Z.jsonl.gz`
+Runtime 203.6s. Snapshot: `odds_20261117T083038Z.jsonl.gz`
