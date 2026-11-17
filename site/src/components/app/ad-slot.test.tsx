@@ -56,7 +56,7 @@ test("a manual creative draws its strip only once the image has loaded (a broken
   const image = await findByAltText("Book X");
   expect(container.querySelector("aside")!.className).not.toMatch(/border-b/);
   fireEvent.load(image);
-  await waitFor(() => expect(container.querySelector("aside")!.className).toMatch(/border-b/));
+  await waitFor(() => expect(container.querySelector("aside")!.className).not.toMatch(/border-b/));
 });
 
 test("a manual creative whose image fails leaves nothing", async () => {
@@ -86,19 +86,23 @@ test("filled AdSense shows the strip chrome", async () => {
   const { container } = wrap("/leagues", "stats_top");
   await waitFor(() => expect(container.querySelector("ins.adsbygoogle")).toBeTruthy());
   const ins = container.querySelector("ins.adsbygoogle")!;
-  ins.appendChild(document.createElement("iframe"));
+  const frame = document.createElement("iframe");
+  frame.getBoundingClientRect = () => ({ height: 90 }) as DOMRect; // jsdom has no layout
+  ins.appendChild(frame);
   ins.setAttribute("data-ad-status", "filled");
   await waitFor(() => expect(container.querySelector("aside")?.getAttribute("data-ad-fill")).toBe("filled"));
   const aside = container.querySelector("aside")!;
-  expect(aside.className).toMatch(/border-b/);
+  expect(aside.className).not.toMatch(/border-b/);
   expect(aside.className).not.toMatch(/opacity-0/);
 });
 
-test("a fill with no creative inside draws no strip", async () => {
+test("a fill whose iframe has no size draws nothing (blank fill)", async () => {
   manual.fetch.mockResolvedValue(null);
   const { container } = wrap("/leagues", "stats_top");
   await waitFor(() => expect(container.querySelector("ins.adsbygoogle")).toBeTruthy());
-  container.querySelector("ins.adsbygoogle")!.setAttribute("data-ad-status", "filled");
+  const ins = container.querySelector("ins.adsbygoogle")!;
+  ins.appendChild(document.createElement("iframe")); // zero height, as AdSense leaves it on a blank fill
+  ins.setAttribute("data-ad-status", "filled");
   await new Promise((r) => setTimeout(r, 50));
   const aside = container.querySelector("aside")!;
   expect(aside.getAttribute("data-ad-fill")).toBe("pending");

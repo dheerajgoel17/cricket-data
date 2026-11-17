@@ -67,15 +67,15 @@ export function NextMatchCard({ next, line, side, book, statLabel, standing, out
   const upcoming = !next.phase || next.phase === "upcoming";
   const when = upcoming ? whenLabel(next.start) : "";
   const sideLetter = side === "over" ? "O" : "U";
-  return (
-    <View style={[styles.card, out && state.dim]} accessibilityLabel={upcoming ? "Next match" : "This match"}>
-      <Press scale={1} disabled={!next.id} onPress={() => next.id && push(fixturePath(next.id))} accessibilityRole={next.id ? "link" : undefined} accessibilityLabel={next.id ? `Open match: ${next.match}` : undefined} style={styles.teams}>
+  const body = (
+    <>
+      <View style={styles.teams}>
         {next.opp ? <TeamBadge name={next.opp} size={32} /> : null}
         <Text style={[styles.opp, { flex: 1 }]} numberOfLines={1}>{next.opp ? `vs ${abbr(next.opp)}` : next.match}{when ? <Text style={styles.statLabel}> on {when}</Text> : null}</Text>
         {out ? <Text style={styles.notIn}>Not in XI</Text> : null}
         {!upcoming ? <MatchStatus phase={next.phase!} /> : null}
         {next.id ? <Ionicons name="chevron-forward" size={icon.sm} color={color["muted-foreground"]} /> : null}
-      </Press>
+      </View>
       {book && standing != null ? (
         <View style={styles.lineRow}>
           <Text style={styles.lineText}>{sideLetter} {line}</Text>
@@ -83,7 +83,14 @@ export function NextMatchCard({ next, line, side, book, statLabel, standing, out
         </View>
       ) : null}
       {!book ? <Text style={styles.statLabel}>No book is offering {statLabel} on this match; the rates are from his history.</Text> : null}
-    </View>
+    </>
+  );
+  // the whole card is the link, not just its first row
+  if (!next.id) return <View style={[styles.card, out && state.dim]} accessibilityLabel={upcoming ? "Next match" : "This match"}>{body}</View>;
+  return (
+    <Press scale={1} onPress={() => push(fixturePath(next.id!))} accessibilityRole="link" accessibilityLabel={`Open match: ${next.match}`} style={({ pressed }) => [styles.card, out && state.dim, pressed && state.pressed]}>
+      {body}
+    </Press>
   );
 }
 

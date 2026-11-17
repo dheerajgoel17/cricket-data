@@ -86,19 +86,8 @@ export function NextMatch({ next, line, side, book, statLabel, standing, out }: 
   const heading = next.phase && next.phase !== "upcoming" ? "This match" : "Next match";
   const upcoming = !next.phase || next.phase === "upcoming";
   const when = upcoming ? whenLabel(next.start) : "";
-  return (
-    <section className={cn("grid gap-snug rounded-2xl border border-hairline bg-card px-inset py-snug", out && "opacity-60")} aria-label={heading}>
-      {next.id ? (
-        <Link to={`/fixture/${next.id}`} aria-label={`Open match: ${next.match}`} className="-mx-inset -my-snug rounded-2xl px-inset py-snug outline-none hover:bg-surface-raised focus-visible:ring-2 focus-visible:ring-ring">
-        <div className="flex min-w-0 items-center gap-snug">
-        {next.opp ? <TeamBadge name={next.opp} size="sm" eager /> : null}
-        <span className="min-w-0 flex-1 truncate text-body font-emphasis">{next.opp ? `vs ${abbr(next.opp)}` : next.match}{when ? <span className="font-normal text-muted-foreground"> on {when}</span> : null}</span>
-        {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge> : null}
-        {!upcoming ? <MatchStatus phase={next.phase!} className="shrink-0 text-footnote" /> : null}
-        {next.id ? <ChevronRightIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" /> : null}
-        </div>
-      </Link>
-      ) : (
+  const strip = (
+    <>
       <div className="flex min-w-0 items-center gap-snug">
         {next.opp ? <TeamBadge name={next.opp} size="sm" eager /> : null}
         <span className="min-w-0 flex-1 truncate text-body font-emphasis">{next.opp ? `vs ${abbr(next.opp)}` : next.match}{when ? <span className="font-normal text-muted-foreground"> on {when}</span> : null}</span>
@@ -106,7 +95,6 @@ export function NextMatch({ next, line, side, book, statLabel, standing, out }: 
         {!upcoming ? <MatchStatus phase={next.phase!} className="shrink-0 text-footnote" /> : null}
         {next.id ? <ChevronRightIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" /> : null}
       </div>
-      )}
       {book && standing != null && (
         <p className="text-callout text-primary">
           <span className="font-label tabular-nums">{side === "over" ? "O" : "U"} {line}</span>
@@ -120,8 +108,13 @@ export function NextMatch({ next, line, side, book, statLabel, standing, out }: 
           <span className="text-muted-foreground"> · no book is offering {statLabel} on this match</span>
         </p>
       )}
-    </section>
+    </>
   );
+  const box = cn("grid gap-snug rounded-2xl border border-hairline bg-card px-inset py-snug", out && "opacity-60");
+  // the whole strip is the link, not just its first row
+  return next.id
+    ? <Link to={`/fixture/${next.id}`} aria-label={`Open match: ${next.match}`} className={cn(box, "outline-none hover:bg-surface-raised focus-visible:ring-2 focus-visible:ring-ring")}>{strip}</Link>
+    : <section className={box} aria-label={heading}>{strip}</section>;
 }
 
 /**

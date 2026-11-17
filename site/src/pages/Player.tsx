@@ -122,7 +122,7 @@ function PlayerHeader({ idx, name, team, teamIx, test, fmts }: { idx: number; na
         <h1 className="text-display font-emphasis leading-tight tracking-tight"><PlayerName idx={idx} always fallback={name} /></h1>
         <p className="text-body leading-snug text-muted-foreground"><span className="block truncate">{team}</span>{profile && <span className="block">{profile}</span>}</p>
         <div className="flex items-center gap-snug py-stack">
-          <Link to={`/team/${teamIx}`} aria-label={`${team} page`} className="grid min-h-(--touch) place-items-center active:opacity-70"><TeamBadge name={team} size="xl" className="size-20" /></Link>
+          <Link to={`/team/${teamIx}`} aria-label={`${team} page`} className="grid min-h-(--touch) place-items-center active:opacity-70"><TeamBadge name={team} size="xl" /></Link>
           <StarButton kind="player" idx={idx} className="size-(--touch)" />
         </div>
       </div>

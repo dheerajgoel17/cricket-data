@@ -58,7 +58,7 @@ export function Metric({ k, children, sub, tone, text, cols = 3, compact }: { k:
   return (
     <View style={[styles.metric, cols === 2 && { width: "50%" }, compact && styles.metricSm]}>
       <Text style={styles.metricKey} numberOfLines={1}>{k}</Text>
-      <View style={[styles.metricValue, compact && { minHeight: 20 }]}>
+      <View style={[styles.metricValue, compact && { minHeight: 24 }]}>
         {typeof children === "string" || typeof children === "number"
           ? <Text style={[text ? (compact ? styles.metricTextSm : styles.metricText) : compact ? styles.metricNumSm : styles.metricNum, tone === "up" && { color: color.primary }, tone === "down" && { color: color.miss }]} numberOfLines={text ? 2 : 1}>{children}</Text>
           : children}
@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
   metricNum: { fontSize: fs.figure, lineHeight: 28, letterSpacing: -0.48, ...w.data, color: color.foreground, fontVariant: ["tabular-nums"] },
   metricText: { ...dStrong.body, fontSize: fs.title, color: color.foreground },
   metricSm: { gap: 2 },
-  metricNumSm: { fontSize: fs.body, lineHeight: 20, ...w.dataStrong, color: color.foreground, fontVariant: ["tabular-nums"] },
-  metricTextSm: { ...dStrong.callout, fontSize: fs.title, lineHeight: 20, color: color.foreground },
+  metricNumSm: { fontSize: fs.metric + 2, lineHeight: 24, letterSpacing: -0.44, ...w.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  metricTextSm: { ...w.data, fontSize: fs.metric + 2, lineHeight: 24, letterSpacing: -0.44, color: color.foreground },
 });

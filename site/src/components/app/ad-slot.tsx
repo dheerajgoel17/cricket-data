@@ -51,8 +51,8 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
     if (!el) return;
     const read = () => {
       const st = el.getAttribute("data-ad-status");
-      // "filled" with no creative inside (a blank or placeholder fill) must not draw the strip: chrome only around a real ad
-      if (st === "filled" && el.querySelector("iframe")) {
+      // AdSense reports "filled" for a blank fill too: an iframe of zero size (seen on a phone, `aswift_*`). Only a creative with a real size counts.
+      if (st === "filled" && [...el.querySelectorAll("iframe")].some((f) => f.getBoundingClientRect().height >= 24)) {
         clearAdEmpty(slotId, slot);
         setFill("filled");
       } else if (st === "unfilled") {
@@ -62,7 +62,7 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
     };
     read();
     const mo = new MutationObserver(read);
-    mo.observe(el, { attributes: true, attributeFilter: ["data-ad-status"], childList: true, subtree: true });
+    mo.observe(el, { attributes: true, childList: true, subtree: true });
     const t = window.setTimeout(() => {
       if (el.getAttribute("data-ad-status") !== "filled") {
         setFill((f) => {
@@ -82,7 +82,7 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
     return (
       <aside
         aria-label="Advertisement"
-        className={cn(img === "ok" ? "-mx-gutter border-b border-hairline" : "pointer-events-none absolute h-0 w-full overflow-hidden border-0 opacity-0", img === "ok" && className)}
+        className={cn(img === "ok" ? "-mx-gutter" : "pointer-events-none absolute h-0 w-full overflow-hidden border-0 opacity-0", img === "ok" && className)}
       >
         <a
           href={manual.href}
@@ -108,7 +108,7 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
       data-ad-fill={fill}
       className={cn(
         shown
-          ? cn("-mx-gutter border-b border-hairline", className)
+          ? cn("-mx-gutter", className)
           : "pointer-events-none absolute h-0 w-full overflow-hidden border-0 opacity-0",
       )}
     >
