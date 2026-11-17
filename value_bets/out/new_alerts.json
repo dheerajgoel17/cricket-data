@@ -1,4 +1,60 @@
 {
- "generated_at_ist": "2026-11-17 09:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-17 10:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|India|New Zealand|2026-11-18",
+   "match": "New Zealand vs India",
+   "start_utc": "2026-11-18T22:00:00Z",
+   "start_ist": "2026-11-19 03:30 IST",
+   "format": "ODI",
+   "gender": "male",
+   "market_type": "batter_runs",
+   "market": "Batsman Runs - Nicholls, Henry",
+   "team_scope": "",
+   "selection": "Henry Nicholls under 24.5",
+   "player_matched_as": "Henry Nicholls",
+   "player_id": "03521fd3",
+   "player_team": "New Zealand",
+   "stat": "runs",
+   "inn": 0,
+   "line": 24.5,
+   "side": "under",
+   "best_odds": 1.87,
+   "best_source": "feedh_d",
+   "effective_odds_after_commission": 1.87,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0695,
+   "implied_prob": 0.5348,
+   "fair_odds": 1.774,
+   "fair_prob": 0.5637,
+   "model_prob": 0.6416,
+   "market_prob": 0.5,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0541,
+   "edge_pct": 5.41,
+   "kelly_quarter_stake_pct": 1.56,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 64% vs market 50% for under 24.5 runs; form 22.1 runs/inn recency-weighted ODI (n_eff 18.6; last 5: 11, 9, 10, 0, 24), bats in 92% of games played; venue unknown/unmatched (venue terms neutral); vs India: 20 inns avg 27.4",
+   "notes": "2 market source(s) for fair price; model 0.642 vs market 0.500; format guessed (ODI via last-meeting); assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 18.6,
+    "expected": 25.22,
+    "nb_alpha": 1.313,
+    "p_bats_or_bowls": 0.919,
+    "venue_matched": null,
+    "context_terms": [
+     "p_bat"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null,
+   "alert_id": "311f825bf26e8080",
+   "alert_key": "male|India|New Zealand|2026-11-18|batter_runs||Henry Nicholls under 24.5|24.5|under",
+   "alerted_at_ist": "2026-11-17 10:06 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
