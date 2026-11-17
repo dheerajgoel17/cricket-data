@@ -58,5 +58,15 @@
   "edge": 0.1093,
   "start_utc": "2026-11-20T08:10:00Z",
   "alerted_at": "2026-11-17T16:36:32.072889+00:00"
+ },
+ "female|Hobart Hurricanes Women|Perth Scorchers Women|2026-11-19|batter_fours||Freya Kemp under 1.5|1.5|under": {
+  "edge": 0.071,
+  "start_utc": "2026-11-19T04:40:00Z",
+  "alerted_at": "2026-11-17T22:34:45.530658+00:00"
+ },
+ "female|Brisbane Heat Women|Sydney Thunder Women|2026-11-19|batter_sixes||Grace Harris under 0.5|0.5|under": {
+  "edge": 0.0914,
+  "start_utc": "2026-11-19T08:10:00Z",
+  "alerted_at": "2026-11-17T22:34:45.530658+00:00"
  }
 }
