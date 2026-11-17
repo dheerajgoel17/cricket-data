@@ -54,6 +54,10 @@ env:
   FEEDI_URL: ${{ secrets.FEEDI_URL }}
   FEEDI_NAME: ${{ secrets.FEEDI_NAME }}
   FEEDI_PARTNER: ${{ secrets.FEEDI_PARTNER }}
+  FEEDJ_API: ${{ secrets.FEEDJ_API }}
+  FEEDJ_BRAND: ${{ secrets.FEEDJ_BRAND }}
+  FEEDJ_ORIGIN: ${{ secrets.FEEDJ_ORIGIN }}
+  FEEDJ_NAME: ${{ secrets.FEEDJ_NAME }}
 
 permissions:
   contents: write

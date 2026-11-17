@@ -19,7 +19,7 @@ from cricket_site import testend
 from cricket_site.sides import alike, find_scheduled, same_pair, side_key
 
 from . import fancy as fancy_mod
-from .adapters import feede, feedf, feedg, feedh, feedi, feedk
+from .adapters import feede, feedf, feedg, feedh, feedi, feedj, feedk
 from .util import parse_ts
 
 STAT ={"batter_runs": "runs", "batter_sixes": "sixes", "batter_fours": "fours", "bowler_wickets": "wickets", "player_points": "points"}
@@ -30,7 +30,7 @@ MATCH_TOTAL_SOURCES = ("moviodds_bet365",)  # see pipeline.MATCH_TOTAL_SOURCES: 
 
 def public_names() -> dict[str, str]:
     """Source key -> published name: the fixed ones, and the books Feed K, Feed E, Feed F, Feed G and Feed H are configured with (named in the environment, not here)."""
-    return {**PUBLIC_SOURCE, **feedk.published(), **feede.published(), **feedf.published(), **feedg.published(), **feedh.published(), **feedi.published()}
+    return {**PUBLIC_SOURCE, **feedk.published(), **feede.published(), **feedf.published(), **feedg.published(), **feedh.published(), **feedi.published(), **feedj.published()}
 
 
 def public(doc: dict) -> dict:

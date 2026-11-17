@@ -79,6 +79,10 @@ DEFAULTS = {
     "FEEDI_MAX_EVENTS": 80,        # ... GetGameZip pages fetched per run
     "FEEDI_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
     "FEEDI_BUDGET_SECS": 180.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDJ_SPACING_SECS": 1.0,     # Feed J (adapters/feedj.py, on whenever FEEDJ_API, FEEDJ_BRAND, FEEDJ_ORIGIN and FEEDJ_NAME are set): seconds between its requests
+    "FEEDJ_MAX_EVENTS": 40,        # ... events read per run (an event call and a players call each)
+    "FEEDJ_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
+    "FEEDJ_BUDGET_SECS": 150.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
     "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off
