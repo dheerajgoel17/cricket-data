@@ -46,6 +46,7 @@ LINES_STALE_S = 3 * H  # two missed hourly runs
 GRACE_S = H  # the build runs hourly: a row inside its window at the last build may be a little past it now
 DUP_S = 12 * H
 VOID_WARN, VOID_MIN, VOID_WEEKS = 0.2, 10, 8
+SKEW_MIN, REVERSE_TOL, MATCH_RUNS_MIN = 0.6, 0.002, 60  # check b-sides
 SHOWN = 12  # findings listed per check in the summary
 BALLS = {0: 120, 1: 300, 3: 100, 4: 60, 5: 360}  # scheduled balls per innings by format index (T20, ODI, Hundred, T10, 60-over); a Test has none
 MULTI_DAY = ("Test", "FC")
@@ -145,6 +146,40 @@ def check_lines_fresh(lines: dict | None, now: float) -> Check:
         c.problems.append("the book lines carry no generated_at_utc")
     elif now - t > LINES_STALE_S:
         c.problems.append(f"the book lines were written {(now - t) / H:.0f} h ago ({lines['generated_at_utc'][:16]})")
+    return c
+
+
+def check_book_sides(lines: dict | None) -> Check:
+    """Two books never quote the exact reverse of each other on a clearly skewed line, and no match total is a handful of runs.
+
+    A source whose over and under came out swapped (the same two prices on the other sides; Over 1.5 wickets at 1.167) is the bug this catches: it
+    prices the under as the over, and every edge it shows is fake. A reversal needs a skew of 0.6 or more (1.8 / 1.91 either way is a coin flip) and
+    prices equal to 0.002, which two honest books do not produce by chance. ``match_runs`` below MATCH_RUNS_MIN is another market linked to the key.
+    """
+    c = Check("b-sides", "No source quotes over and under the wrong way round, and no match total is tiny", HARD)
+    rows = (lines or {}).get("lines") or []
+    fancy = (lines or {}).get("fancy") or []
+    groups: list[tuple[str, list[dict]]] = [(f"{x.get('match')} {x.get('player')} {x.get('stat')} {x.get('line')}", x.get("books") or []) for x in rows]
+    fx: dict[tuple, list[dict]] = defaultdict(list)
+    for x in fancy:
+        fx[(x.get("match"), x.get("start_utc"), x.get("key"), x.get("scope"), x.get("team"), x.get("line"))].append(x)
+        if x.get("key") == "match_runs" and isinstance(x.get("line"), (int, float)) and x["line"] < MATCH_RUNS_MIN:
+            c.checked += 1
+            c.problems.append(f"{x.get('match')}: {x.get('source')} match_runs line {x['line']} is not a match total")
+    groups += [(f"{k[0]} {k[2]} {k[5]}", v) for k, v in fx.items()]
+    seen: set[tuple] = set()
+    for label, books in groups:
+        bs = [b for b in books if isinstance(b.get("over"), (int, float)) and isinstance(b.get("under"), (int, float))]
+        c.checked += len(bs)
+        for i, a in enumerate(bs):
+            for b in bs[i + 1:]:
+                if a.get("source") == b.get("source") or abs(a["over"] - a["under"]) < SKEW_MIN:
+                    continue
+                if abs(a["over"] - b["under"]) <= REVERSE_TOL and abs(a["under"] - b["over"]) <= REVERSE_TOL:
+                    key = (label, *sorted((str(a.get("source")), str(b.get("source")))))
+                    if key not in seen:
+                        seen.add(key)
+                        c.problems.append(f"{label}: {a.get('source')} {a['over']}/{a['under']} is the reverse of {b.get('source')} {b['over']}/{b['under']}")
     return c
 
 
@@ -393,7 +428,7 @@ def run(site: Path, data: Path, live: dict | None = None, now: float | None = No
     if M is None:
         raise FileNotFoundError(f"{site / 'matches.json'} is missing or unreadable")
     meta = _read(site / "meta.json", {})
-    checks = [*check_live_evidence(fixtures, live), check_keep_window(fixtures, lines, now), check_lines_fresh(lines, now)]
+    checks = [*check_live_evidence(fixtures, live), check_keep_window(fixtures, lines, now), check_lines_fresh(lines, now), check_book_sides(lines)]
     checks.append(check_bat_first(M, engine_editions(site) if editions == "run" else editions))
     checks += [check_complete_not_void(M), check_void_share(M, today)]
     docs = [d for f in sorted((data / "provisional").glob("*.json")) if (d := _read(f))]

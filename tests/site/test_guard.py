@@ -103,6 +103,24 @@ def test_b_a_book_lines_file_nobody_has_written_for_hours_is_flagged():
     assert G.check_lines_fresh({}, NOW).problems == ["the book lines carry no generated_at_utc"]
 
 
+def test_b_sides_a_source_with_over_and_under_swapped_or_a_tiny_match_total_fails():
+    def book(src, o, u):
+        return {"source": src, "over": o, "under": u}
+
+    swapped = {"lines": [{"match": "A v B", "player": "P", "stat": "wickets", "line": 1.5, "books": [book("X", 1.167, 5.0), book("Y", 5.0, 1.167)]}], "fancy": []}
+    c = G.check_book_sides(swapped)
+    assert c.level == G.HARD and len(c.problems) == 1 and "X 1.167/5.0 is the reverse of Y 5.0/1.167" in c.problems[0]
+    coin = {"lines": [{"match": "A v B", "player": "P", "stat": "fours", "line": 2.5, "books": [book("X", 1.8, 1.909), book("Y", 1.909, 1.8)]}], "fancy": []}
+    assert G.check_book_sides(coin).problems == []   # a coin flip priced either way is not a swap
+    fine = {"lines": [{"match": "A v B", "player": "P", "stat": "wickets", "line": 1.5, "books": [book("X", 5.0, 1.167), book("Y", 5.0, 1.167)]}], "fancy": []}
+    assert G.check_book_sides(fine).problems == []
+    fancy = {"lines": [], "fancy": [
+        {"match": "A v B", "start_utc": "s", "key": "match_runs", "scope": "match", "team": None, "line": 0.5, "source": "X", "over": 1.87, "under": 1.83},
+        {"match": "A v B", "start_utc": "s", "key": "match_runs", "scope": "match", "team": None, "line": 554.5, "source": "Y", "over": 1.85, "under": 1.85}]}
+    assert [p.split(" is not")[0] for p in G.check_book_sides(fancy).problems] == ["A v B: X match_runs line 0.5"]
+    assert G.check_book_sides(None).problems == []
+
+
 # ------------------------------------------------------------------ c
 def wbbl():
     """Seven matches of one edition: bat first (fi) and winner (w). The batting-first side won 3 of 7 (m0, m2, m5); m6 was a chase that ended early, so it is void (q 0)."""
