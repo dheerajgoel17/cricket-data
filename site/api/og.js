@@ -11,7 +11,7 @@ import { createStore } from "@cricket/engine/store.js";
 import { Resolver } from "@cricket/engine/resolve.js";
 import { runPlan } from "@cricket/engine/plan.js";
 import { fmtIndex } from "@cricket/engine/util.js";
-import { bookLogoStem } from "@cricket/engine/books.js";
+import { bookLogoFile, bookLogoStem, setBookManifest } from "@cricket/engine/books.js";
 import { loadData, unwrapJson } from "./load-data.js";
 
 // Same as the site: Satoshi for names/body; Barlow Condensed for figures and the Fancy.cash wordmark.
@@ -89,10 +89,17 @@ function withTimeout(p, ms, fallback) {
   return Promise.race([p, new Promise((r) => setTimeout(() => r(fallback), ms))]);
 }
 
+let manifestRead = false;
 /** The book's mark from public/books (same files the site badges use). Resolves every stem in bookLogoStem. */
 function readBookMark(source) {
+  if (!manifestRead) { // the published book list (public/books/books.json) is the table: a new book needs no code change here
+    manifestRead = true;
+    try { setBookManifest(JSON.parse(readFileSync(join(process.cwd(), "public/books/books.json"), "utf8"))); } catch { /* the built-in table */ }
+  }
   const stem = bookLogoStem(source);
   if (!stem) return null;
+  const file = bookLogoFile(stem);
+  if (file) { try { return readFileSync(join(process.cwd(), "public/books", file)); } catch { /* the extensions below */ } }
   for (const ext of ["svg", "png", "jpg", "webp"]) {
     try { return readFileSync(join(process.cwd(), "public/books", `${stem}.${ext}`)); } catch { /* the next extension, or the name */ }
   }

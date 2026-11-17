@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
 import { Image } from "expo-image";
 import { bookName } from "@cricket/engine/lines.js";
+import { bookVersion, subscribeBooks } from "@cricket/engine/books.js";
 import { bookLogo, bookVariant } from "@site/lib/books";
 import { abs } from "@/lib/config";
 import { color, space, type } from "@/ui/tokens";
@@ -11,6 +12,7 @@ const broken = new Set<string>(); // logo files that failed to load: every other
 
 /** Where a price comes from: the book's own logo when we hold one, else a neutral chip with its name (the site's `BookBadge`). */
 export function BookBadge({ source }: { source: string }) {
+  useSyncExternalStore(subscribeBooks, bookVersion); // the published book list arrives after the first paint
   const name = bookName(source), src = bookLogo(source);
   const [failed, setFailed] = useState(() => !!src && broken.has(src));
   if (!src || failed) return <View style={styles.chip}><Text style={styles.chipText}>{name}</Text></View>;

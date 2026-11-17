@@ -16,6 +16,7 @@ import { reloadOnce } from "@/components/app/error-boundary";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import { reportError } from "@/lib/analytics";
+import { loadBookManifest } from "@/lib/books";
 
 const DesignSystem = lazy(() => import("@/pages/DesignSystem").then(({ DesignSystemPage }) => ({ default: DesignSystemPage })));
 const designHost = DESIGN_SYSTEM_HOST;
@@ -51,6 +52,8 @@ const designFallback = (
     <span className="sr-only">Loading design system…</span>
   </div>
 );
+
+void loadBookManifest(); // the books and their logos are published data (public/books/books.json): a new book needs no release
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
