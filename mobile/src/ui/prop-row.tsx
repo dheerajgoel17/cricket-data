@@ -43,7 +43,7 @@ function PropRowView({ r, i, soFar, out, bars = true }: { r: Row; i: number; soF
         <View style={styles.main}>
           <View style={styles.titleRow}>
             <Text style={styles.name} numberOfLines={1}>{r.name}</Text>
-            <TeamBadge name={r.team} size={18} bare />
+            <TeamBadge name={r.team} size={18} />
             {inPlay ? <InPlayBadge /> : null}
           </View>
           {!out ? (

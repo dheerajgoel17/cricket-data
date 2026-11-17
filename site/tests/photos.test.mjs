@@ -39,6 +39,9 @@ test("league logos are looked up by the event's folded name, the newest season's
 });
 
 test("team id: photos.t wins; TEAM_FILL covers holes older builds omitted; no AD placeholder jersey", () => {
+  assert.equal(teamId({ t: { "adelaide strikers": "4Q", "adelaide strikers women": "4R" } }, "Adelaide Strikers (W)"), "4R", "a women's side takes the source's women's team");
+  assert.equal(teamId({ t: { "adelaide strikers": "4Q", "adelaide strikers women": "4R" } }, "Adelaide Strikers Women"), "4R");
+  assert.equal(teamId({ t: { "adelaide strikers": "4Q" } }, "Adelaide Strikers (W)"), "4Q", "no women's team listed: the men's logo");
   assert.equal(teamId(photos, "India"), "O");
   assert.equal(teamId(photos, "Afghanistan"), "Y", "fill when t omits a Base side the source lists");
   assert.equal(teamId({ t: { afghanistan: "XX" } }, "Afghanistan"), "XX", "photos.t wins over fill");

@@ -4,9 +4,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { cardFields, cardQuery, propForm, renderCard } from "@cricket/engine/card.js";
+import { renderPoster } from "@cricket/engine/poster.js";
 import { dominantFormat } from "@cricket/engine/props.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { createStore } from "@cricket/engine/store.js";
+import { Resolver } from "@cricket/engine/resolve.js";
+import { runPlan } from "@cricket/engine/plan.js";
 import { fmtIndex } from "@cricket/engine/util.js";
 import { bookLogoStem } from "@cricket/engine/books.js";
 import { loadData, unwrapJson } from "./load-data.js";
@@ -19,7 +22,7 @@ const FONTS = {
   brand: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-900-normal.woff",
 };
 const PHOTO_MS = 1500; // face + kit; still short enough for X, long enough for the CDN
-const FORM_MS = 2500; // L5 from the player shard; skip it rather than miss X's crawl window
+const FORM_MS = 3500; // L5 from the player shard; skip it rather than miss X's crawl window
 const OG_UA = "fancy-cash-og/1.0";
 let storeCache = null;
 
@@ -58,13 +61,28 @@ async function attachForm(f) {
   if (!store) return f;
   const def = STATS[f.statKey];
   if (!def) return f;
+  const opts = { year: f.year || String(new Date().getUTCFullYear()), ground: f.ground, opp: f.opp };
+  // the same games the site's row reads: the plan's chart (one format, the stat's own rows), so the card and the row say the same numbers
+  try {
+    const r = await runPlan(store, new Resolver(store), { kind: "player_prop", stat: f.statKey, line: f.line, side: "over", filters: { format: f.fmt || null, team_innings: null, innings: null }, split_by: [] }, { playerIdx: f.idx });
+    const entries = r?.ok ? r.chart?.entries || [] : [];
+    if (entries.length) return { ...f, ...propForm(entries.map((e) => ({ value: e.value, date: e.date, opp: e.opp, venueName: e.venueName })), f.line, (n) => n, opts) };
+  } catch { /* fall back to the rows below */ }
   const all = await store.playerRows(f.idx);
   const side = def.side === "bowl" ? all.bowl : def.side === "all" ? store.pointsRows(all) : all.bat;
   let fmtIdx = fmtIndex(f.fmt);
   if (fmtIdx < 0) fmtIdx = dominantFormat(side);
   if (fmtIdx == null || fmtIdx < 0) return f;
-  const rows = side.filter((r) => r.fmt === fmtIdx && r[def.key] != null).map((r) => ({ value: r[def.key], date: r.date, opp: r.opp }));
-  return { ...f, ...propForm(rows, f.line, (i) => store.teamName(i, true)) };
+  const rows = side.filter((r) => r.fmt === fmtIdx && r[def.key] != null).map((r) => ({ value: r[def.key], date: r.date, opp: r.opp, venueName: store.venueName(r.v) }));
+  return { ...f, ...propForm(rows, f.line, (i) => store.teamName(i, true), opts) };
+}
+
+let namesCache = null;
+/** The source's full names (names.json by player id); {} when it cannot be read in time. */
+async function loadNames() {
+  if (namesCache) return namesCache;
+  try { namesCache = await fetchStoreJson("names.json"); } catch { return {}; }
+  return namesCache;
 }
 
 function withTimeout(p, ms, fallback) {
@@ -82,10 +100,6 @@ function readBookMark(source) {
 }
 
 export { bookLogoStem as bookStem };
-
-function readBrand() {
-  try { return readFileSync(join(process.cwd(), "public/icon-192.png")); } catch { return null; }
-}
 
 /** Absolute image URL: Source CDN paths are host-relative when VITE_IMG_CDN is unset in the function. */
 function absPhotoUrl(u) {
@@ -144,18 +158,32 @@ export default async function handler(req, res) {
     const q = req.query || {};
     let f = cardFields(q.path != null ? cardQuery(q.path) : q, loadData()); // /card/<path>.jpg (vercel.json) or the plain query
     if (!f) return sendJpeg(res, await plainJpeg());
+    const names = await withTimeout(loadNames(), 1500, {});
+    if (f.pid && names && names[f.pid]) f.name = names[f.pid]; // the full name the site shows ("Maia Bouchier"), not the scorecard's initials
     f = await withTimeout(attachForm(f), FORM_MS, f);
     const [photo, jersey, teamLogo, oppLogo] = await Promise.all([firstPhoto(f.photos), firstPhoto(f.kitPhotos), firstPhoto(f.teamPhotos), firstPhoto(f.oppPhotos)]);
+    const bookMarks = {}; // each listed book's own logo, by stem (the file the site's badges use)
+    for (const b of f.bookLines || []) if (b.stem && !bookMarks[b.stem]) { const m = readBookMark(b.stem); if (m) bookMarks[b.stem] = m; }
+    const fonts = {
+      bold: join(process.cwd(), FONTS.bold),
+      regular: join(process.cwd(), FONTS.regular),
+      num: join(process.cwd(), FONTS.num),
+      brand: join(process.cwd(), FONTS.brand),
+    };
+    if (q.poster && f.kind === "prop") { // the 4:5 shareable sheet (Share on the player page): same fields, drawn as a PNG
+      const png = await renderPoster(f, { photo, jersey, teamLogo, oppLogo, bookMarks, fonts });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
+      res.setHeader("Content-Length", String(png.length));
+      return res.end(png);
+    }
     const img = await renderCard(f, {
       photo, jersey, teamLogo, oppLogo,
       bookLogo: readBookMark(f.source),
-      brandLogo: readBrand(),
-      fonts: {
-        bold: join(process.cwd(), FONTS.bold),
-        regular: join(process.cwd(), FONTS.regular),
-        num: join(process.cwd(), FONTS.num),
-        brand: join(process.cwd(), FONTS.brand),
-      },
+      bookMarks,
+      fonts,
     });
     sendJpeg(res, img);
   } catch {

@@ -184,10 +184,15 @@ TEAM_ALIASES = {
 
 
 def match_teams(teams: list[dict], crex: list[tuple[str, str]]) -> dict[str, str]:
-    """teams: [{'name', 'g'}] (Base) -> {folded Base team name: Source A id}. Men's / unisex ids win; women-only slugs are ignored."""
+    """teams: [{'name', 'g'}] (Base) -> {folded Base team name: Source A id}. Men's / unisex ids win under the plain name; a women's side (`g` 1) whose
+    "<name> women" team the source also lists is stored under "<name> women" (the key the site looks up first for a women's side, with its own "W" logo)."""
     avail: dict[str, str] = {}
+    women: dict[str, str] = {}
     for name, cid in crex:
         f = fold(name)
+        m = re.fullmatch(r"(.+?) (?:women|w)", f)
+        if m and not re.search(r"\b(u19|u 19|under 19|ii|2nd xi|academy)$", m.group(1)):
+            women.setdefault(m.group(1), cid)
         if re.search(r"\b(women|w|u19|u 19|under 19|ii|2nd xi|academy)$", f):
             continue
         avail.setdefault(f, cid)
@@ -199,6 +204,11 @@ def match_teams(teams: list[dict], crex: list[tuple[str, str]]) -> dict[str, str
             if cand and cand in avail:
                 out[raw] = avail[cand]
                 break
+        if t.get("g"):
+            for cand in (raw, f, TEAM_ALIASES.get(raw), TEAM_ALIASES.get(f)):
+                if cand and cand in women:
+                    out[f"{raw} women"] = women[cand]
+                    break
     return out
 
 

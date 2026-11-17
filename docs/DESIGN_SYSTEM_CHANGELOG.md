@@ -395,3 +395,33 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Change:** `AppHeader` is back to the earlier one (brand on Fixtures, each other tab's own title in the bar, Search). Motion is native rather than copied from the site: entrances are springs (`enter`, `Rise`), the LIVE dot has a ring that spreads and fades (`LiveDot`), a number that moved rolls in on a spring over a fading wash (`Tick`), content fades in over its skeleton (`Appear`). New `LineTabs`: underline tabs with one underline that glides on a spring; `PhaseBar` and the player's format switch use it. The match block on a fixture page is flat (no card), and the page's sections are chips under it with the open one's stat chips below. League chips use the accent fill; season facts, the leader figure and the table's key column are Barlow Condensed Bold.
 - **Callers:** every tab (header), Home, fixture page, player page, Leagues, league page
 
+### 2026-11-17 — Team crests without a container (site, app, share images)
+- **Path:** `site/src/components/app/badges.tsx` (`TeamBadge`, `TeamAvatar`), `site/src/pages/Player.tsx`, `mobile/src/ui/team-badge.tsx`, `site/packages/engine/card.js`, `poster.js`, `brand-draw.js`
+- **Change:** a team crest is the logo alone: no round tile, border, background or padding, so the whole crest shows at the full size of its box (`object-contain`; initials when there is no image). The `bare` prop is gone (it is the only look); `TeamAvatar` (AvatarGroup) loses its circle and background too. The player header's team link loses its grey disc. The link card and the share poster draw crests the same way, cropped to the logo's visible pixels. Both images also draw the site's own brand (dark tile, green gradient F, "Fancy.cash" in Satoshi bold, as `Brand` in `Header.tsx`) and each listed book as its logo with no pill behind it, not its name. League badges keep their round tile.
+- **Callers:** every `TeamBadge` / `TeamAvatar` (fixture cards, rows, chips, headers, player and team pages, app fixture cards, next match, match header), card and poster
+
+
+### 2026-11-17 — Player page match card: one line, history in its own section (site + app)
+- **Path:** `site/src/components/app/next-match.tsx` (`NextMatch`, new `MatchupRates`, `whenLabel`), `mobile/src/ui/next-match.tsx` (`NextMatchCard`, `MatchupRates`, `whenLabel`), `site/src/pages/Player.tsx`, `mobile/src/app/player/[idx].tsx`
+- **Change:** the card is a bordered strip on the card background: the opponent's crest and "vs Opponent" (his own side is in the page header); on one line, "vs Opponent on 29 Oct · 3:00 pm" (Live / Completed in place of the date while it is on; the ground is in the history tile below). The line's standing (or "No listed odds") stays under that. No heading row, no repeated competition / format text, and the app's book table is gone (the lanes above already list the books, as on the site). How he has gone over / under the chart's line at this ground and against this side is now `MatchupRates`, a separate section under the card (history only, never prices).
+- **Callers:** player page on both the site and the app (data and empty states)
+
+### 2026-11-17 — `cn` keeps Barlow numbers (font weight names)
+- **Path:** `site/src/lib/utils.ts` (+ `utils.test.ts`), `site/src/pages/Player.tsx` (`Metric`)
+- **Change:** `cn` now knows `font-editorial / copy / label / emphasis / display-heavy` are weights. Before, `font-condensed font-label` was read as two font families and the first was dropped, so numbers written with the condensed face (player metrics, window pills, hit rates, odds) rendered in Satoshi. They now use Barlow Condensed as written. `Metric` values use `font-label` (medium) with it.
+- **Callers:** every `cn("font-condensed … font-label|font-emphasis")` on the site (player page metrics and window pills, hit rates, next-match rates, alt lines, hot props, mini bars); check number columns at phone width
+
+### 2026-11-17 — Ad slot: strip chrome only around a real creative
+- **Path:** `site/src/components/app/ad-slot.tsx` (+ test)
+- **Change:** an AdSense slot counts as filled (border strip, minimum height) only when `data-ad-status="filled"` **and** the `ins` holds an `iframe`. A blank or placeholder fill, the likely cause of an edge-to-edge line under the player hero on a real phone while no ad ran, now stays hidden. Manual creatives are unchanged.
+- **Callers:** every `AdSlot` / `StatsAd`
+
+### 2026-11-17 — Player page: match strip under the hero, metric values, manual ad strip
+- **Path:** `site/src/pages/Player.tsx`, `mobile/src/app/player/[idx].tsx`, `site/src/components/app/ad-slot.tsx`
+- **Change:** the match strip moves to the top of the stats block, right under the player image; the Opponent metric is gone (the strip names the opponent); metric values are Barlow Condensed at 22 px, medium weight, including Prop; header and metrics dividers removed (site and app). A manual ad creative draws its strip only after its image has loaded, and a broken image leaves nothing (a zero-height image used to leave a lone edge-to-edge line).
+- **Callers:** player page (site and app), every `AdSlot`
+
+### 2026-11-17 — Tables are boxed in the page margin (site + app)
+- **Path:** `site/src/components/app/page.tsx` (`TABLE_BLEED`, `DataTable`), `site/src/pages/Player.tsx` (game log), `mobile/src/ui/data-table.tsx` (`TABLE_BLEED`, via `Bleed`)
+- **Change:** `TABLE_BLEED` is now a hairline on all four sides inside the page margin (it was edge to edge with top and bottom lines only), so every table reads like the hit-rate box. Cells and the game log rows use the normal snug inset instead of the gutter. The name stays (`bleed` prop) so call sites are unchanged. Not touched: the bespoke full-width lists (Match Fancy, Hot props, home mix, top batter, ladder panel), which are not `TABLE_BLEED` tables.
+- **Callers:** every `DataTable bleed`, `Bleed`, `live-board` batting / bowling, splits, Ask results, player game log; check each at phone width

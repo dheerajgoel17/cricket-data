@@ -4,16 +4,14 @@ import { Text } from "@/ui/text";
 import { Ionicons } from "@expo/vector-icons";
 import { cap, color, font, space, type, tint, fs, radius, d, dStrong, w, icon } from "@/ui/tokens";
 
-/** Phone edge bleed for stats tables / game logs (mirrors web `TABLE_BLEED`). */
+/** Stats tables / game logs boxed in the page margin with a hairline on all four sides (mirrors web `TABLE_BLEED`). */
 export const TABLE_BLEED = {
-  marginHorizontal: -space.gutter,
-  borderTopWidth: StyleSheet.hairlineWidth,
-  borderBottomWidth: StyleSheet.hairlineWidth,
+  borderWidth: StyleSheet.hairlineWidth,
   borderColor: color.hairline,
-  paddingHorizontal: space.gutter,
+  paddingHorizontal: space.snug,
 } as const;
 
-/** A table that fits the width it is given: a header row of small caps, hairlines between rows, the first column left and the numbers right. `flex` weighs the columns (the first one wide by default). `bleed` applies the Player Props edge contract. */
+/** A table that fits the width it is given: a header row of small caps, hairlines between rows, the first column left and the numbers right. `flex` weighs the columns (the first one wide by default). `bleed` boxes it (`TABLE_BLEED`). */
 export function DataTable({ columns, rows, flex, highlight, bleed }: { columns: string[]; rows: ReactNode[][]; flex?: number[]; highlight?: number; bleed?: boolean }) {
   const f = (i: number) => flex?.[i] ?? (i === 0 ? 2 : 1);
   return (

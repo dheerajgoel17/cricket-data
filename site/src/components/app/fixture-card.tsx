@@ -122,7 +122,7 @@ export function MatchChip({ f }: { f: any }) {
   const sub = session || (timed ? localTime(when) : dayLabel(dayKey(f)));
   return (
     <span className="flex min-w-0 items-center gap-tight">
-      <AvatarGroup className="-space-x-1.5">
+      <AvatarGroup className="-space-x-1.5 *:data-[slot=avatar]:ring-0">
         <TeamAvatar name={f.a} size="xs" eager />
         <TeamAvatar name={f.b} size="xs" eager />
       </AvatarGroup>

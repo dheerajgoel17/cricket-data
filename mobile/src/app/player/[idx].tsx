@@ -36,7 +36,7 @@ import { useScreenInsets } from "@/ui/insets";
 import { LineStepper } from "@/ui/line-stepper";
 import { enter } from "@/ui/motion";
 import { PlayerSkeleton } from "@/ui/skeletons";
-import { MatchStatus, NextFilters, NextMatchCard } from "@/ui/next-match";
+import { MatchupRates, NextFilters, NextMatchCard } from "@/ui/next-match";
 import { LineTabs } from "@/ui/line-tabs";
 import { PageHeader, RoundButton } from "@/ui/page-header";
 import { PlayerPortrait } from "@/ui/player-avatar";
@@ -126,7 +126,7 @@ export default function PlayerPage() {
                   <Animated.View style={[styles.heroLeft, nameFx]}>
                     <Text style={styles.name} numberOfLines={2}>{s.name}</Text>
                     <View style={styles.teamLine}>
-                      <View style={styles.logoCrop}><TeamBadge name={s.side} size={56} bare /></View>
+                      <View style={styles.logoCrop}><TeamBadge name={s.side} size={88} /></View>
                       <Text style={styles.sub} numberOfLines={1}>{s.side}</Text>
                     </View>
                     {profile ? <Text style={styles.profile} numberOfLines={2}>{profile}</Text> : null}
@@ -232,7 +232,8 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
     return (
       <View style={[styles.pad, { gap: space.stack, paddingTop: space.snug }]}>
         {!book ? <Unpriced label={label} /> : null}
-        {next ? <NextMatchCard next={next} entries={entries} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} /> : null}
+        {next ? <NextMatchCard next={next} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} /> : null}
+        {next ? <MatchupRates next={next} entries={entries} line={line} side={side} /> : null}
         <EmptyState
           title={`No ${res.sample?.unit || "games"}`}
           body={active.length ? "No games match these filters. Relax a filter to see a sample." : "No games match this selection. Relax a filter to see a sample."}
@@ -244,13 +245,17 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
 
   return (
     <View style={{ gap: space.stack }}>
+      {next ? (
+        <View style={styles.pad}>
+          <NextMatchCard next={next} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} />
+        </View>
+      ) : null}
       <Animated.View entering={enter(0)} style={[styles.pad, styles.metricsBand]}>
         <View style={styles.metricGrid}>
           <Metric compact k={`${cur.label} avg`}><View style={styles.countRow}>{arrow(cur.mean == null ? null : cur.mean > line)}{cur.mean == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={cur.mean} digits={2} style={styles.metricNum} />}</View></Metric>
           <Metric compact k={book ? "Line" : "Research line"}>{`${sideLetter} ${line}`}</Metric>
           <Metric compact k="Hit rate"><View style={styles.countRow}>{arrow(cur.p == null ? null : cur.p >= 0.5)}{cur.p == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={Math.round(cur.p * 100)} suffix="%" style={styles.metricNum} />}</View></Metric>
           <Metric compact k="Fair price">{cur.p ? <CountUp value={1 / cur.p} digits={2} style={styles.metricNum} /> : "–"}</Metric>
-          <Metric compact k="Opponent">{next?.opp ? <View style={styles.oppRow}><Text style={styles.metricTextSm}>{abbr(next.opp)}</Text><MatchStatus phase={next.phase || "upcoming"} start={next.start} /></View> : <Text style={styles.metricTextSm}>–</Text>}</Metric>
           <Metric compact text k="Prop">{book ? label : <View style={{ gap: 2 }}><Text style={styles.metricTextSm}>{label}</Text><Text style={styles.notListed}>Not listed</Text></View>}</Metric>
         </View>
       </Animated.View>
@@ -316,9 +321,11 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
                       </View>
                     ))}
                   </View>
-                  <View style={styles.bookExtras}>
-                    <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
-                  </View>
+                  {pricedAt.books.some((b: any) => b.source !== overFace?.source && b.source !== underFace?.source) ? (
+                    <View style={styles.bookExtras}>
+                      <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
+                    </View>
+                  ) : null}
                 </>
               ) : (
                 <Press scale={1} onPress={() => { void Haptics.selectionAsync(); setLine(book!.main.line); }} accessibilityRole="button" style={styles.wrongLine}>
@@ -327,14 +334,10 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
               )}
             </View>
           ) : null}
+          {next ? <View style={styles.bookBand}><MatchupRates inline next={next} entries={entries} line={line} side={side} /></View> : null}
         </View>
       </View>
 
-      {next ? (
-        <View style={[styles.pad, { gap: space.snug }]}>
-          <NextMatchCard next={next} entries={entries} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} />
-        </View>
-      ) : null}
 
       <View style={styles.pad}>
         <Accordion title="Filters" badge={active.length || undefined} value={active.length ? `${active.length} on` : "All matches"} open={filtersOpen} onToggle={setFiltersOpen}>
@@ -444,7 +447,7 @@ const styles = StyleSheet.create({
   sub2: { overflow: "hidden" },
   subInner: { gap: space.snug, paddingHorizontal: space.gutter, paddingBottom: space.snug },
   pad: { paddingHorizontal: space.gutter },
-  hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  hero: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: space.snug, paddingTop: space.snug },
   heroLeft: { flex: 1, gap: space.tight, alignSelf: "flex-start" },
   name: { ...type.display, fontSize: fs.display, lineHeight: 32, letterSpacing: -0.42, color: color.foreground },
   profile: { ...d.callout, fontSize: fs.body, color: color.foreground },
@@ -452,16 +455,13 @@ const styles = StyleSheet.create({
   strong: { color: color.foreground, ...w.data, fontVariant: ["tabular-nums"] },
   link: { color: color.primary, ...w.label },
   teamLine: { alignItems: "flex-start", gap: 2 },
-  logoCrop: { width: 44, height: 44, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  logoCrop: { width: 72, height: 72, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   metricsBand: {
     gap: space.snug,
     paddingTop: space.snug,
     paddingBottom: space.snug,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: color.hairline,
   },
   metricGrid: { flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
-  oppRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: 6 },
   countRow: { flexDirection: "row", alignItems: "center" },
   metricNum: { fontSize: fs.body, lineHeight: 20, ...w.dataStrong, color: color.foreground, fontVariant: ["tabular-nums"] },
   metricTextSm: { ...dStrong.callout, fontSize: fs.title, lineHeight: 20, color: color.foreground },

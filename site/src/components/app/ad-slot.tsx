@@ -29,6 +29,8 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
   const wantAdsense = !manualQ.isLoading && !manual && !!slot && adsAllowed(pathname) && !skipAdsense;
   const [fill, setFill] = useState<Fill>(() => (skipAdsense ? "empty" : "pending"));
   const insRef = useRef<HTMLModElement | null>(null);
+  const [img, setImg] = useState<"loading" | "ok" | "error">("loading"); // a manual creative draws its strip only once its image is on screen
+  useEffect(() => { setImg("loading"); }, [manualUrl]);
 
   useEffect(() => {
     if (!wantAdsense) {
@@ -49,7 +51,8 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
     if (!el) return;
     const read = () => {
       const st = el.getAttribute("data-ad-status");
-      if (st === "filled") {
+      // "filled" with no creative inside (a blank or placeholder fill) must not draw the strip: chrome only around a real ad
+      if (st === "filled" && el.querySelector("iframe")) {
         clearAdEmpty(slotId, slot);
         setFill("filled");
       } else if (st === "unfilled") {
@@ -59,7 +62,7 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
     };
     read();
     const mo = new MutationObserver(read);
-    mo.observe(el, { attributes: true, attributeFilter: ["data-ad-status"] });
+    mo.observe(el, { attributes: true, attributeFilter: ["data-ad-status"], childList: true, subtree: true });
     const t = window.setTimeout(() => {
       if (el.getAttribute("data-ad-status") !== "filled") {
         setFill((f) => {
@@ -75,8 +78,12 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
   if (manualQ.isLoading) return null;
 
   if (manual && manualUrl) {
+    if (img === "error") return null;
     return (
-      <aside aria-label="Advertisement" className={cn("-mx-gutter border-b border-hairline", className)}>
+      <aside
+        aria-label="Advertisement"
+        className={cn(img === "ok" ? "-mx-gutter border-b border-hairline" : "pointer-events-none absolute h-0 w-full overflow-hidden border-0 opacity-0", img === "ok" && className)}
+      >
         <a
           href={manual.href}
           target="_blank"
@@ -84,7 +91,7 @@ export function AdSlot({ slotId, slot = AD_SLOT, className }: { slotId: AdSlotId
           className="block w-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onClick={() => track("ad_click", { slot: slotId, source: "manual" })}
         >
-          <img src={manualUrl} alt={manual.alt || manual.name} className="mx-auto max-h-[calc(var(--row-min)*2.5)] w-full object-contain" />
+          <img src={manualUrl} alt={manual.alt || manual.name} onLoad={() => setImg("ok")} onError={() => setImg("error")} className="mx-auto max-h-[calc(var(--row-min)*2.5)] w-full object-contain" />
         </a>
       </aside>
     );

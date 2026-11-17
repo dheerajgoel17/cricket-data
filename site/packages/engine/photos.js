@@ -40,7 +40,8 @@ export function teamId(photos, name) {
   const raw = fold(name);
   // Prefer the full fold first (keeps "pakistan u19 women"); then the men's/unisex key (India (W) → india).
   const stripped = fold(String(name ?? "").replace(/\(w\)/i, "").replace(/\bwomen\b/i, ""));
-  for (const key of [raw, stripped]) {
+  const women = raw.replace(/ w$/, " women"); // "Adelaide Strikers (W)" → the source's women's team (its own logo with the W badge)
+  for (const key of [raw, women, stripped]) {
     if (!key) continue;
     const id = photos?.t?.[key] || TEAM_FILL[key];
     if (id) return id;

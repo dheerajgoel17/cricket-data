@@ -41,6 +41,15 @@ def test_match_teams_prefers_mens_and_ignores_women_only_slugs():
     assert ca.match_teams(teams, crex) == {"india": "O", "mumbai indians": "F"}
 
 
+def test_match_teams_gives_a_women_side_its_own_women_team_key():
+    teams = [{"name": "Adelaide Strikers", "g": 0}, {"name": "Adelaide Strikers", "g": 1}, {"name": "India", "g": 1}, {"name": "Sydney Sixers", "g": 1}]
+    crex = [("adelaide strikers", "4Q"), ("adelaide strikers women", "4R"), ("india", "O"), ("sydney sixers", "4O"), ("sydney sixers academy", "14R"), ("sydney sixers women", "50")]
+    out = ca.match_teams(teams, crex)
+    assert out["adelaide strikers"] == "4Q" and out["adelaide strikers women"] == "4R"
+    assert out["sydney sixers"] == "4O" and out["sydney sixers women"] == "50"
+    assert "india women" not in out  # no women's team listed: the men's logo is the fallback, as before
+
+
 def test_display_name_makes_a_readable_full_name_from_the_slug():
     from cricket_site.crex_assets import display_name
 

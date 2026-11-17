@@ -10,8 +10,8 @@ import { initials } from "@/lib/format";
 import { photosQuery } from "@/lib/queries";
 import { color, font, w } from "@/ui/tokens";
 
-/** Round team badge (or, with `bare`, the logo alone with no circle): the source's logo when we know the team, else the national flag, else initials (the site's `TeamBadge`). */
-export function TeamBadge({ name, size = 40, bare }: { name: string; size?: number; bare?: boolean }) {
+/** Team crest, the logo alone with no circle or padding (the site's `TeamBadge`): the source's logo when we know the team, else the national flag, else initials. */
+export function TeamBadge({ name, size = 40 }: { name: string; size?: number }) {
   const { data: photos } = useQuery(photosQuery);
   const urls = useMemo(
     () => ([...teamLogos(photos, name), flagUrl(name, size > 40 ? 160 : 80)].filter(Boolean) as string[]).map(abs),
@@ -19,23 +19,17 @@ export function TeamBadge({ name, size = 40, bare }: { name: string; size?: numb
   );
   const [failed, setFailed] = useState(0);
   const uri = urls[failed];
-  const img = (w: number) => uri ? (
+  if (!uri) return <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}><Text style={[styles.initials, { fontSize: size * 0.5 }]}>{initials(name)}</Text></View>;
+  return (
     <Image
       source={{ uri }}
-      style={{ width: w, height: w }}
+      style={{ width: size, height: size }}
       contentFit="contain"
       recyclingKey={uri}
       cachePolicy="memory-disk"
       onError={() => setFailed((n) => n + 1)}
       accessibilityLabel={name}
     />
-  ) : null;
-  if (bare && uri) return img(size);
-  if (bare) return <Text style={[styles.initials, { fontSize: size * 0.5 }]}>{initials(name)}</Text>;
-  return (
-    <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
-      {uri ? img(size - 4) : <Text style={[styles.initials, { fontSize: size * 0.34 }]}>{initials(name)}</Text>}
-    </View>
   );
 }
 
