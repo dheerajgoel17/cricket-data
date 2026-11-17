@@ -63,6 +63,16 @@ jobs:
           try:
               j = feedj.request(f"{api}/v4/prematch/brand/{brand}/en-IN/0", origin)
               print("relay ok, versions:", len(j.get("rest_events_versions") or []))
+              import time
+              for v in list(j.get("top_events_versions") or []) + list(j.get("rest_events_versions") or []):
+                  time.sleep(1)
+                  try:
+                      part = feedj.request(f"{api}/v4/prematch/brand/{brand}/en-IN/{v}", origin)
+                      print("version", str(v)[-3:], "ok", len(part.get("events") or {}))
+                  except urllib.error.HTTPError as e2:
+                      print("version", str(v)[-3:], "HTTP", e2.code, e2.read()[:120].decode("utf-8", "replace").replace(origin, "<origin>"))
+                  except Exception as e2:
+                      print("version", str(v)[-3:], "error", type(e2).__name__, str(e2)[:120])
           except urllib.error.HTTPError as e:
               print("relay HTTP", e.code, e.headers.get("server"), e.headers.get("x-relay-colo"), e.read()[:160].decode("utf-8", "replace").replace(origin, "<origin>"))
           PY
