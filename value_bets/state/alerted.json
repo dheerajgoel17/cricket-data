@@ -53,5 +53,10 @@
   "edge": 0.0556,
   "start_utc": "2026-11-17T08:10:00Z",
   "alerted_at": "2026-11-17T05:34:09.413633+00:00"
+ },
+ "female|Brisbane Heat Women|Sydney Thunder Women|2026-11-19|batter_milestone||Grace Harris 50+ no|49.5|under": {
+  "edge": 0.0503,
+  "start_utc": "2026-11-19T08:10:00Z",
+  "alerted_at": "2026-11-17T07:36:23.882111+00:00"
  }
 }
