@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-17 08:00 IST
+# Cricket value bets - 2026-11-17 09:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -8,11 +8,11 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **feedg**: ok, 16 prices, 3 events
 - **feedk**: ok, 136 prices, 7 events
 - **feede**: ok, 400 prices, 23 events
-- **feedh**: ok, 939 prices, 61 events
+- **feedh**: ok, 805 prices, 47 events
 - **feedf**: ok, 410 prices, 23 events
-- **feedi**: ok, 1593 prices, 69 events
+- **feedi**: ok, 1489 prices, 55 events
 
-Matches starting in next 168h: **45**, markets priced: **366**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **43**, markets priced: **368**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -30,6 +30,6 @@ Matches starting in next 168h: **45**, markets priced: **366**, value bets: **4*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-17 13:40 IST Adelaide Strikers (Women) vs Sydney Sixers (Women) / G9181 batter_sixes / Maia Bouchier over 0.5 @ 6.00 (feedi_d): edge 32.8%, model 0.2988, market 0.1579
 
-Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Elite Cricket Academy (male), Lahore Region Whites (male), Mashonaland Eagles (male), Mountaineers (male), Pak Xi (male), Peshawar Blues (male), Royal Champs (male), Speedworld Security Solutions (male)
+Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Elite Cricket Academy (male), Mashonaland Eagles (male), Mountaineers (male), Pak Xi (male), Royal Champs (male), Speedworld Security Solutions (male)
 
-Runtime 200.0s. Snapshot: `odds_20261117T023035Z.jsonl.gz`
+Runtime 347.1s. Snapshot: `odds_20261117T033047Z.jsonl.gz`
