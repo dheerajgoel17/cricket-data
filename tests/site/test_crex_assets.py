@@ -103,3 +103,22 @@ def test_a_remembered_source_player_is_added_only_when_todays_list_lacks_his_id(
     assert merged == cur + [("jomel warrican", "HX")] and kept == 1
     assert ca.merge_remembered(cur, []) == (cur, 0), "no memory, no change"
     assert ca.merge_remembered(cur, [("harri brook", "1IG")])[0] == cur, "today's spelling wins for an id both have"
+
+
+def test_fill_team_ids_adds_a_womens_side_from_the_cached_index():
+    """The build re-matches Base sides against the index rows [id, name, folded] kept in the day's cache; the cached `t` may predate the women's keys."""
+    from cricket_site.build import fill_team_ids
+
+    cx = {"t": {"adelaide strikers": "4Q"}, "index": {"teams": [["4Q", "adelaide strikers", "adelaide strikers"], ["4R", "adelaide strikers women", "adelaide strikers women"], ["4O", "sydney sixers", "sydney sixers"]]}}
+    fill_team_ids(cx, [("Adelaide Strikers", 0), ("Adelaide Strikers", 1), ("Sydney Sixers", 0)])
+    assert cx["t"]["adelaide strikers women"] == "4R"
+    assert cx["t"]["adelaide strikers"] == "4Q"
+    assert cx["t"]["sydney sixers"] == "4O", "a side the cache predates is added too"
+
+
+def test_fill_team_ids_without_an_index_changes_nothing():
+    from cricket_site.build import fill_team_ids
+
+    cx = {"t": {"x": "1"}, "index": {"teams": []}}
+    fill_team_ids(cx, [("X", 0)])
+    assert cx["t"] == {"x": "1"}
