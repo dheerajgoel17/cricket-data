@@ -126,7 +126,7 @@ export default function PlayerPage() {
                   <Animated.View style={[styles.heroLeft, nameFx]}>
                     <Text style={styles.name} numberOfLines={2}>{s.name}</Text>
                     <View style={styles.teamLine}>
-                      <View style={styles.logoCrop}><TeamBadge name={s.side} size={88} /></View>
+                      <View style={styles.logoCrop}><TeamBadge name={s.side} size={72} /></View>
                       <Text style={styles.sub} numberOfLines={1}>{s.side}</Text>
                     </View>
                     {profile ? <Text style={styles.profile} numberOfLines={2}>{profile}</Text> : null}
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
   strong: { color: color.foreground, ...w.data, fontVariant: ["tabular-nums"] },
   link: { color: color.primary, ...w.label },
   teamLine: { alignItems: "flex-start", gap: 2 },
-  logoCrop: { width: 72, height: 72, overflow: "hidden", alignItems: "center", justifyContent: "center" },
+  logoCrop: { width: 58, height: 58, overflow: "hidden", alignItems: "center", justifyContent: "center" },
   metricsBand: {
     gap: space.snug,
     paddingTop: space.snug,
@@ -463,8 +463,8 @@ const styles = StyleSheet.create({
   },
   metricGrid: { flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
   countRow: { flexDirection: "row", alignItems: "center" },
-  metricNum: { fontSize: fs.body, lineHeight: 20, ...w.dataStrong, color: color.foreground, fontVariant: ["tabular-nums"] },
-  metricTextSm: { ...dStrong.callout, fontSize: fs.title, lineHeight: 20, color: color.foreground },
+  metricNum: { fontSize: fs.metric + 2, lineHeight: 24, letterSpacing: -0.44, ...w.data, color: color.foreground, fontVariant: ["tabular-nums"] },
+  metricTextSm: { ...w.data, fontSize: fs.metric + 2, lineHeight: 24, letterSpacing: -0.44, color: color.foreground },
   notListed: { ...t.captionLabel, color: color["muted-foreground"] },
   controls: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", justifyContent: "center", gap: space.snug },
   mainChip: { height: control, paddingHorizontal: space.snug + 2, borderRadius: radius.chip, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },

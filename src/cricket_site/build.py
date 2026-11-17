@@ -680,6 +680,18 @@ def crex_match(canonical: list[dict], names: dict[str, str], cricinfo: dict[str,
     return out
 
 
+def fill_team_ids(cx: dict, teams) -> None:
+    """Re-match every Base side (`teams`: [(name, g)]) against the source's team list kept in `cx["index"]` and add the ids the day's cached `t` lacks
+    (a side that appeared later, and a women's side's own "<name> women" team). The index rows are [id, name, folded]; `match_teams` takes (name, id)."""
+    from . import crex_assets as ca
+
+    listed = [(nm, cid) for cid, nm, _f in (cx.get("index") or {}).get("teams", [])]
+    if not listed:
+        return
+    for k, v in ca.match_teams([{"name": n, "g": g} for n, g in teams], listed).items():
+        cx.setdefault("t", {}).setdefault(k, v)
+
+
 def crex_cached(cache_dir: Path | None, canonical: list[dict], names: dict[str, str], cricinfo: dict[str, str],
                 extra: dict[str, dict] | None = None, remembered: list[tuple[str, str]] | None = None, placeholders: set[str] | None = None) -> dict:
     """crex_match() cached for the day in cache_dir/crex_match.json (an empty result is never cached)."""
@@ -1055,11 +1067,7 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
         keep = set(A["pids"])
         # The day's crex_match.json cache freezes `t`. Re-match every Base side in the assembled index so a kit
         # (e.g. Afghanistan → Y) is not omitted when the cache predates that side appearing in bat/bowl rows.
-        crex_teams = [(cid, nm) for cid, nm, _f in (cx.get("index") or {}).get("teams", [])]
-        if crex_teams:
-            from . import crex_assets as ca
-            for k, v in ca.match_teams([{"name": n, "g": g} for n, g in A["teams"]], crex_teams).items():
-                cx.setdefault("t", {}).setdefault(k, v)
+        fill_team_ids(cx, A["teams"])
         (out / "photos.json").write_text(json.dumps({"p": faces(cx, keep, stock), "t": cx["t"], "l": cx.get("l", {})}, separators=(",", ":")), encoding="utf-8")
         (out / "crex_index.json").write_text(json.dumps(cx["index"], separators=(",", ":")), encoding="utf-8")  # for assets_sync; not deployed
         # full names for wide layouts: our names are initials plus surname ("P Rathnayake"); the source lists the full name for every linked player
