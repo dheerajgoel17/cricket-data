@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-17T14:56:54Z",
+ "generated_at_utc": "2026-11-17T15:34:10Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -211,6 +211,29 @@
    "chance": 0.6412,
    "edge": 0.2184,
    "edge_pct": 21.8,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-20-adelaide-strikers-women-v-melbourne-renegades-women|overs_6|Melbourne Renegades Women|0|under",
+   "fixture_id": "2026-11-20-adelaide-strikers-women-v-melbourne-renegades-women",
+   "match": "Adelaide Strikers Women vs Melbourne Renegades Women",
+   "format": "T20",
+   "series": "WBBL 2026",
+   "start_utc": "2026-11-20T08:10:00Z",
+   "start_ist": "2026-11-20 13:40 IST",
+   "key": "overs_6",
+   "team": "Melbourne Renegades Women",
+   "inn": 0,
+   "side": "under",
+   "line": 38.5,
+   "best_odds": 2.6,
+   "best_source": "Dafabet",
+   "hits": 8,
+   "played": 15,
+   "window": 20,
+   "chance": 0.4613,
+   "edge": 0.1994,
+   "edge_pct": 19.9,
    "bat_first": false
   },
   {

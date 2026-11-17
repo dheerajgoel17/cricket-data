@@ -53,5 +53,10 @@
   "edge": 0.0503,
   "start_utc": "2026-11-19T08:10:00Z",
   "alerted_at": "2026-11-17T07:36:23.882111+00:00"
+ },
+ "female|Adelaide Strikers Women|Melbourne Renegades Women|2026-11-20|batter_milestone||Hayley Matthews 50+ yes|49.5|over": {
+  "edge": 0.0653,
+  "start_utc": "2026-11-20T08:10:00Z",
+  "alerted_at": "2026-11-17T15:33:18.339221+00:00"
  }
 }
