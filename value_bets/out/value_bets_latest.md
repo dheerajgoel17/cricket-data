@@ -1,18 +1,19 @@
-# Cricket value bets - 2026-11-17 18:00 IST
+# Cricket value bets - 2026-11-17 18:19 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
+- **feedj**: skipped - Feed J listing HTTP 503
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **smarkets**: ok, 245 prices
+- **smarkets**: ok, 249 prices
 - **feedg**: ok, 8 prices, 1 events
 - **feedk**: ok, 152 prices, 6 events
 - **feede**: ok, 464 prices, 28 events
 - **feedh**: ok, 932 prices, 45 events
-- **feedi**: ok, 1720 prices, 47 events
+- **feedi**: ok, 1695 prices, 47 events
 - **feedf**: ok, 364 prices, 23 events
 
-Matches starting in next 168h: **40**, markets priced: **346**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **41**, markets priced: **338**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -27,6 +28,6 @@ Matches starting in next 168h: **40**, markets priced: **346**, value bets: **4*
 - **Hobart Hurricanes (Women) vs Perth Scorchers (Women) / G9182 batter_fours / Beth Mooney under 3.5** - why: Model 58% vs market 44% for under 3.5 fours; form 4.1 fours/inn recency-weighted T20 (n_eff 80.7; last 5: 1, 4, 8, 1, 9), bats in 97% of games played; at Allan Border Field, Brisbane: 20 inns avg 3.4; context adj: venue environment +9%, at this venue -4%, team H2H context +1%; weather: cloud cover 85%. Notes: 1 market source(s) for fair price; model 0.583 vs market 0.443; assumes bet void if player doesn't bat/bowl - check book rules
 - **Brisbane Heat (Women) vs Sydney Thunder (Women) / To score 50 - Grace Harris / Grace Harris 50+ no** - why: Model 87% vs market 81% for 50+ runs; form 22.6 runs/inn recency-weighted T20 (n_eff 64.8; last 5: 52, 2, 24, 22, 58), bats in 91% of games played; at Allan Border Field, Brisbane: 23 inns avg 15.3; weather: high humidity 81%. Notes: 2 market source(s) for fair price; model 0.872 vs market 0.814; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 
-Unmatched team names (add to mappings/teams.csv): Central (male), Royal Champs (male)
+Unmatched team names (add to mappings/teams.csv): Bangla Tigers (male), Central (male), Nhlangano Legends (male), Royal Champs (male)
 
-Runtime 203.7s. Snapshot: `odds_20261117T123030Z.jsonl.gz`
+Runtime 201.5s. Snapshot: `odds_20261117T124909Z.jsonl.gz`
