@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-17T18:36:50Z",
+ "generated_at_utc": "2026-11-17T19:34:16Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -168,29 +168,6 @@
    "bat_first": false
   },
   {
-   "alert_id": "2026-11-19-brisbane-heat-women-v-sydney-thunder-women|match_runouts||0|under",
-   "fixture_id": "2026-11-19-brisbane-heat-women-v-sydney-thunder-women",
-   "match": "Brisbane Heat Women vs Sydney Thunder Women",
-   "format": "T20",
-   "series": "WBBL 2026",
-   "start_utc": "2026-11-19T08:10:00Z",
-   "start_ist": "2026-11-19 13:40 IST",
-   "key": "match_runouts",
-   "team": null,
-   "inn": 0,
-   "side": "under",
-   "line": 0.5,
-   "best_odds": 2.4,
-   "best_source": "bc.game",
-   "hits": 15,
-   "played": 27,
-   "window": 20,
-   "chance": 0.5133,
-   "edge": 0.2319,
-   "edge_pct": 23.2,
-   "bat_first": false
-  },
-  {
    "alert_id": "2026-11-19-hobart-hurricanes-women-v-perth-scorchers-women|team_total_fours|Perth Scorchers Women|0|under",
    "fixture_id": "2026-11-19-hobart-hurricanes-women-v-perth-scorchers-women",
    "match": "Hobart Hurricanes Women vs Perth Scorchers Women",
@@ -257,6 +234,29 @@
    "chance": 0.6333,
    "edge": 0.1717,
    "edge_pct": 17.2,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-19-brisbane-heat-women-v-sydney-thunder-women|match_runouts||0|under",
+   "fixture_id": "2026-11-19-brisbane-heat-women-v-sydney-thunder-women",
+   "match": "Brisbane Heat Women vs Sydney Thunder Women",
+   "format": "T20",
+   "series": "WBBL 2026",
+   "start_utc": "2026-11-19T08:10:00Z",
+   "start_ist": "2026-11-19 13:40 IST",
+   "key": "match_runouts",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 0.5,
+   "best_odds": 2.24,
+   "best_source": "Dafabet",
+   "hits": 15,
+   "played": 27,
+   "window": 20,
+   "chance": 0.5172,
+   "edge": 0.1585,
+   "edge_pct": 15.9,
    "bat_first": false
   }
  ]
