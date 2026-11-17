@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-17 17:00 IST
+# Cricket value bets - 2026-11-17 17:40 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -6,13 +6,13 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
 - **smarkets**: ok, 249 prices
 - **feedg**: ok, 8 prices, 1 events
-- **feedk**: ok, 88 prices, 4 events
+- **feedk**: ok, 152 prices, 6 events
 - **feede**: ok, 464 prices, 28 events
 - **feedh**: ok, 932 prices, 45 events
-- **feedi**: ok, 1530 prices, 46 events
+- **feedi**: ok, 1568 prices, 46 events
 - **feedf**: ok, 364 prices, 23 events
 
-Matches starting in next 168h: **40**, markets priced: **338**, value bets: **5** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **40**, markets priced: **346**, value bets: **5** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -31,4 +31,4 @@ Matches starting in next 168h: **40**, markets priced: **338**, value bets: **5*
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Central (male), Royal Champs (male)
 
-Runtime 202.9s. Snapshot: `odds_20261117T113035Z.jsonl.gz`
+Runtime 242.9s. Snapshot: `odds_20261117T121023Z.jsonl.gz`
