@@ -1,0 +1,38 @@
+{
+ "bet365": {
+  "name": "bet365",
+  "file": "bet365.svg"
+ },
+ "ladbrokes": {
+  "name": "Ladbrokes",
+  "file": "ladbrokes.svg"
+ },
+ "leovegas": {
+  "name": "LeoVegas",
+  "file": "leovegas.png"
+ },
+ "fairwin247": {
+  "name": "FairWin247",
+  "file": "fairwin247.png"
+ },
+ "reddybook": {
+  "name": "Reddybook",
+  "file": "reddybook.png"
+ },
+ "polymarket": {
+  "name": "Polymarket",
+  "file": "polymarket.svg"
+ },
+ "dafabet": {
+  "name": "Dafabet",
+  "file": "dafabet.png"
+ },
+ "1xbet": {
+  "name": "1xBet",
+  "file": "1xbet.svg"
+ },
+ "bcgame": {
+  "name": "bc.game",
+  "file": "bcgame.png"
+ }
+}

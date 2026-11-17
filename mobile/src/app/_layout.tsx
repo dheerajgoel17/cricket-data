@@ -10,6 +10,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "@/lib/auth";
+import { SITE_URL } from "@/lib/config";
+import { loadBookManifest } from "@site/lib/books";
 import { mark, onRender, PROFILE } from "@/lib/perf";
 import { fixturesQuery, hotRowsQuery, linesQuery, liveQuery, photosQuery, watchAppState } from "@/lib/queries";
 import { AnimatedSplash } from "@/ui/animated-splash";
@@ -46,6 +48,7 @@ export default function RootLayout() {
   // Prefetch after fonts so MMKV/network work does not fight font load. Android live waits for useLive({ defer }).
   useEffect(() => {
     if (!ready) return;
+    void loadBookManifest(SITE_URL); // new books and their logos are published data: an installed app learns them without an update
     for (const q of [fixturesQuery, linesQuery, hotRowsQuery, photosQuery]) void client.prefetchQuery(q as never);
     const liveAt = Platform.OS === "android" ? 4_000 : 1200;
     const t = setTimeout(() => { void client.prefetchQuery(liveQuery as never); }, liveAt);
