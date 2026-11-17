@@ -25,6 +25,7 @@ describe("book logos", () => {
     expect(bookLogo("FairWin247 Fancy")).toBe(BOOK_LOGOS.fairwin247);
     expect(bookLogo("moviodds_leovegas")).toBe(BOOK_LOGOS.leovegas);
     expect(bookLogo("feed_dafabet")).toBe(BOOK_LOGOS.dafabet);
+    expect(bookLogo("bc.game")).toBe("/books/bcgame.png");
   });
 });
 

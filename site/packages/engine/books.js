@@ -10,6 +10,7 @@ export const BOOK_STEMS = {
   polymarket: "Polymarket",
   dafabet: "Dafabet",
   "1xbet": "1xBet",
+  bcgame: "bc.game",
 };
 
 const VARIANT = /^(.*\S)\s+(Premium|Fancy)$/i;
