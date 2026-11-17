@@ -51,6 +51,21 @@ jobs:
           r = s.get(url, headers={"Origin": origin, "Referer": origin + "/"}, timeout=30)
           print("curl_cffi", r.status_code, len(r.content), r.text[:120].replace(os.environ["FEEDJ_ORIGIN"], "<origin>") if r.status_code >= 400 else "")
           PY
+      - name: Through the relay
+        env:
+          GITHUB_ACTIONS: "true"
+        run: |
+          python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import os, urllib.error
+          from value_bets.adapters import feedj
+          print("relay set:", feedj.relay() is not None)
+          api, brand, origin = (os.environ[k] for k in ("FEEDJ_API", "FEEDJ_BRAND", "FEEDJ_ORIGIN"))
+          try:
+              j = feedj.request(f"{api}/v4/prematch/brand/{brand}/en-IN/0", origin)
+              print("relay ok, versions:", len(j.get("rest_events_versions") or []))
+          except urllib.error.HTTPError as e:
+              print("relay HTTP", e.code, e.headers.get("server"), e.headers.get("x-relay-colo"), e.read()[:160].decode("utf-8", "replace").replace(origin, "<origin>"))
+          PY
       - name: Feed J run (relay when set)
         env:
           GITHUB_ACTIONS: "true"
