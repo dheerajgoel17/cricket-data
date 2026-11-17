@@ -41,8 +41,9 @@ def test_player_runs_sixes_wickets_milestones_from_G_ids():
     assert six[0]["player"] == "Meg Lanning" and six[0]["line"] == 0.5
     fours = [r for r in rows if r["market_type"] == "batter_fours"]
     assert fours[0]["player"] == "Heather Knight" and fours[0]["line"] == 2.5
-    wk = [r for r in rows if r["market_type"] == "bowler_wickets"]
-    assert wk[0]["player"] == "Sophie Day" and wk[0]["line"] == 1.5
+    wk = [(r["player"], r["side"], r["line"], r["back"]) for r in rows if r["market_type"] == "bowler_wickets"]
+    # G3555: the HIGHER selection id is the over (T 4958 = 2.5 over, T 4957 = 1.5 under)
+    assert sorted(wk) == [("Sophie Day", "over", 1.5, 2.5), ("Sophie Day", "under", 1.5, 1.5)]
     ms = [(r["player"], r["line"], r["side"]) for r in rows if r["market_type"] == "batter_milestone"]
     assert ("Meg Lanning", 49.5, "over") in ms and ("Meg Lanning", 49.5, "under") in ms
     top = [r for r in rows if r["market_type"] == "top_batter_match"]
@@ -51,7 +52,8 @@ def test_player_runs_sixes_wickets_milestones_from_G_ids():
         "batter_runs", "batter_sixes", "batter_fours", "bowler_wickets",
         "batter_milestone", "top_batter_match",
     } for r in rows)
-    assert any(x["key"] == "match_runs" and x["line"] == 145.5 for x in fx)
+    assert fx == []  # G2508 is not the match total: catalogue only, never a fancy row
+    assert any(c["name"] == "G2508 total 145.5" and c["mapped"] is None for c in cat)
     assert rows[0]["in_play"] is False and rows[0]["source"] == "feedi_d"
 
 
@@ -116,3 +118,21 @@ def test_live_game_lines_player_runs():
     ])
     lines = feedi.live_game_lines(value, "1xBet")
     assert any(x["kind"] == "player_runs" and x["player"] == "Meg Lanning" for x in lines)
+
+
+def test_wickets_over_is_higher_selection_id_and_live_agrees():
+    outcomes = [
+        {"T": 4957, "P": 1.5, "PL": {"N": "Ella Wilson"}, "C": 1.167, "G": 3555},
+        {"T": 4958, "P": 1.5, "PL": {"N": "Ella Wilson"}, "C": 5.0, "G": 3555},
+        {"T": 3016, "P": 0.5, "C": 2.1, "G": 2508},
+        {"T": 3017, "P": 0.5, "C": 1.667, "G": 2508},
+        {"T": 3020, "P": 199.5, "C": 1.8, "G": 10605},
+        {"T": 3021, "P": 199.5, "C": 2.25, "G": 10605},
+    ]
+    rows, fx, _cat, _left = feedi.parse_game(game(outcomes), "feedi_d", STAMP)
+    by = {r["side"]: r["back"] for r in rows if r["market_type"] == "bowler_wickets"}
+    assert by == {"over": 5.0, "under": 1.167}
+    assert fx == []
+    live = feedi.live_game_lines(game(outcomes), "BookX")
+    wk = [x for x in live if x["market"].startswith("bowler_wickets")]
+    assert wk[0]["over"] == 5.0 and wk[0]["under"] == 1.167

@@ -52,7 +52,12 @@ TOP_G = {
     2808: "top_batter_match",
     2520: "top_bowler_match",
 }
-# Match-level O/U without a player (Stats G=2508 etc.): keep as fancy / catalogue by line heuristic
+# Groups whose over is the HIGHER selection id (the rest: lower T = over). Checked 2026-11-17 against a second book on 31
+# bowler-wickets lines: 30 came out swapped with the default order (Over 1.5 wickets at 1.167 for a part-timer).
+OVER_HIGH_T_G = {3555}
+# Match-level O/U without a player (G 2508, 2502, 2504, 10605). They are NOT the match total: they are mixed per-innings,
+# per-over and milestone ladders (0.5 / 8.5 / 14.5 / 49.5 / 100 / 199.5 ... in one group), so they stay in the catalogue
+# and never become a fancy row until each group is identified from the feed.
 FANCY_G = {2508, 2502, 2504, 10605}
 WINNER_G = {1}
 
@@ -221,7 +226,10 @@ def _ou_pairs(outcomes: list[dict]) -> list[tuple[str | None, float | None, floa
         rows = sorted(rows, key=lambda x: (x.get("T") is None, x.get("T") or 0))
         if len(rows) < 2:
             continue
-        ov, un = _coef(rows[0]), _coef(rows[1])
+        lo, hi = rows[0], rows[1]
+        if _g in OVER_HIGH_T_G:
+            lo, hi = hi, lo
+        ov, un = _coef(lo), _coef(hi)
         if ov is None or un is None or line is None:
             continue
         out.append((player, line, ov, un))
@@ -336,15 +344,7 @@ def parse_game(value: dict, src: str, fetched_at: str, *, in_play: bool = False)
             for player, line, ov, un in _ou_pairs(outs):
                 if line is None:
                     continue
-                key = "match_runs" if player is None else None
-                name = f"G{g} total {line}"
-                catalogue.append(_cat(common, name, player, None, line, ov, un, key))
-                if key and not in_play:
-                    fancy.append({
-                        "match": common["match"], "home": home, "away": away, "start_utc": start,
-                        "fmt": fmt, "competition": competition, "key": key, "scope": "match",
-                        "team": None, "line": line, "over": ov, "under": un, "source": src, "kind": "bookmaker",
-                    })
+                catalogue.append(_cat(common, f"G{g} total {line}", player, None, line, ov, un, None))
             continue
         # Unknown G: catalogue samples only
         for player, line, ov, un in _ou_pairs(outs)[:5]:
