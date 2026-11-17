@@ -160,3 +160,36 @@ def test_request_unzips_and_sends_the_page_origin(monkeypatch):
     monkeypatch.setattr(feedj.urllib.request, "urlopen", fake_open)
     assert feedj.request("https://feedj.invalid/x", ORIGIN) == {"a": 1}
     assert seen["Origin"] == ORIGIN and seen["Referer"] == ORIGIN + "/"
+
+
+def test_request_goes_through_the_relay_on_github_only(monkeypatch):
+    urls = []
+
+    class R:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return b'{"ok": 1}'
+
+    def fake_open(req, timeout=None):
+        urls.append((req.full_url, dict(req.headers)))
+        return R()
+
+    monkeypatch.setattr(feedj.urllib.request, "urlopen", fake_open)
+    for k in ("FEEDJ", "FEEDH", "FEEDG"):
+        monkeypatch.delenv(f"{k}_RELAY", raising=False)
+        monkeypatch.delenv(f"{k}_RELAY_KEY", raising=False)
+    monkeypatch.setenv("FEEDH_RELAY", "https://relay.invalid/r")
+    monkeypatch.setenv("FEEDH_RELAY_KEY", "k1")
+    monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+    feedj.request("https://feedj.invalid/api/x", ORIGIN)
+    assert urls[-1][0] == "https://feedj.invalid/api/x"  # a laptop is never routed anywhere new
+    monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    assert feedj.request("https://feedj.invalid/api/x", ORIGIN) == {"ok": 1}
+    u, h = urls[-1]
+    assert u == "https://relay.invalid/r?u=https%3A%2F%2Ffeedj.invalid%2Fapi%2Fx"
+    assert h["X-relay-key"] == "k1" and h["X-relay-origin"] == ORIGIN and h["X-relay-referer"] == ORIGIN + "/"

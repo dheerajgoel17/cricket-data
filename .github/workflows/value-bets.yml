@@ -58,6 +58,8 @@ env:
   FEEDJ_BRAND: ${{ secrets.FEEDJ_BRAND }}
   FEEDJ_ORIGIN: ${{ secrets.FEEDJ_ORIGIN }}
   FEEDJ_NAME: ${{ secrets.FEEDJ_NAME }}
+  FEEDJ_RELAY: ${{ secrets.FEEDJ_RELAY }}
+  FEEDJ_RELAY_KEY: ${{ secrets.FEEDJ_RELAY_KEY }}
 
 permissions:
   contents: write

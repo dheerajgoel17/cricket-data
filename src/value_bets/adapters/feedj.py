@@ -31,6 +31,7 @@ import os
 import re
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections import Counter
 
@@ -76,13 +77,24 @@ def published() -> dict[str, str]:
     return {SOURCE: s["NAME"]} if s else {}
 
 
+def relay() -> tuple[str, str] | None:
+    """(relay address, key): FEEDJ_RELAY / FEEDJ_RELAY_KEY, else Feed H's or Feed G's pair. GitHub's US servers get "access blocked" from the feed; the Mumbai Worker hop does not."""
+    for p in ("FEEDJ", "FEEDH", "FEEDG"):
+        addr, key = os.environ.get(f"{p}_RELAY", "").strip(), os.environ.get(f"{p}_RELAY_KEY", "").strip()
+        if addr.startswith("https://") and key:
+            return addr, key
+    return None
+
+
 def request(url: str, origin: str):
-    """GET JSON (gzip or not). The feed answers 403 unless the sportsbook page's Origin / Referer is sent."""
-    req = urllib.request.Request(url, headers={
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36",
-        "Accept": "application/json, text/plain, */*", "Origin": origin, "Referer": origin + "/",
-    })
-    with urllib.request.urlopen(req, timeout=config.get("HTTP_TIMEOUT")) as r:
+    """GET JSON (gzip or not). The feed answers 403 unless the sportsbook page's Origin / Referer is sent. On GitHub it goes through the relay when one is set."""
+    ua = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36"
+    headers = {"User-Agent": ua, "Accept": "application/json, text/plain, */*", "Origin": origin, "Referer": origin + "/"}
+    rl = relay() if os.environ.get("GITHUB_ACTIONS") == "true" else None
+    if rl:
+        headers = {**headers, "x-relay-key": rl[1], "x-relay-origin": origin, "x-relay-referer": origin + "/"}
+        url = f"{rl[0]}?u={urllib.parse.quote(url, safe='')}"
+    with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=config.get("HTTP_TIMEOUT")) as r:
         body = r.read()
     if body[:2] == b"\x1f\x8b":
         body = gzip.decompress(body)
