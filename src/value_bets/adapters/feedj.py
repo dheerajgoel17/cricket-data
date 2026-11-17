@@ -49,9 +49,12 @@ OVER, UNDER, YES, NO = "12", "13", "74", "76"
 PLAYER_OU = {"13700": "batter_runs", "13710": "batter_fours", "13711": "batter_sixes"}
 MILESTONE = "662"
 # match-level two-way totals -> fancy key (lines checked against another book's same line on 2026-11-17)
-MATCH_FANCY = {"13613": "top_score", "697": "match_wickets", "654": "match_runouts", "655": "match_extras"}
+MATCH_FANCY = {"13613": "top_score", "697": "match_wickets", "654": "match_runouts", "655": "match_extras", "50110": "match_runs"}
+# "innings over N - competitor total" (runs in over N; over 1 is the site's overs_1, the same market another book calls "total runs for over 1 in 1st innings - team")
+SIDE_OVER = {"356": 0, "357": 1}
+# top batter / top bowler of one side: the outcomes are player ids, the market names the side
+TOP_SIDE = {"13701": ("top_batter_team", 0), "13702": ("top_batter_team", 1), "13703": ("top_bowler_team", 0), "13704": ("top_bowler_team", 1)}
 SIDE_OVERS = {"352": 0, "353": 1}  # "innings overs 0 to N - competitor 1 / 2 total"
-OVERS_KEYS = {5, 6, 10, 15, 20, 30}  # the n for which the site has an overs_N key
 
 
 class Skip(Exception):
@@ -143,8 +146,9 @@ def _fancy(common: dict, key: str, team: str | None, line: float, over, under, *
     return f
 
 
-def parse_event(markets: dict, players: dict[str, str], common: dict) -> tuple[list[dict], list[dict], list[dict], Counter]:
-    """(player rows, fancy lines, catalogue, left_out) of one event's markets; ``players`` maps a player id to his name."""
+def parse_event(markets: dict, players: dict[str, str], common: dict, side_of: dict[str, int] | None = None) -> tuple[list[dict], list[dict], list[dict], Counter]:
+    """(player rows, fancy lines, catalogue, left_out) of one event's markets; ``players`` maps a player id to his name and ``side_of`` to 0 / 1, the side (first or
+    second team listed) he plays for: a top-batter / top-bowler market is read only when every one of its players is on the side the market names."""
     rows, fancy, cat, left = [], [], [], Counter()
     src, eid = common["source"], common["event_id"]
     multi = multi_day(common.get("competition"))
@@ -159,6 +163,18 @@ def parse_event(markets: dict, players: dict[str, str], common: dict) -> tuple[l
                             back=price, **({"ms_scope": "match"} if milestone else {})))
 
     for mid, by_spec in (markets or {}).items():
+        if mid in TOP_SIDE:
+            mt, i = TOP_SIDE[mid]
+            named = [(players.get(pid), _price(o), pid) for pid, o in ((by_spec or {}).get("") or {}).items()]
+            if not named or any(n is None or p is None or (side_of or {}).get(pid) != i for n, p, pid in named) or len(named) < 3:
+                left[f"M{mid}"] += 1
+                continue
+            gk = f"{src}:{eid}:{mt}:{teams[i]}"
+            for n, p, _pid in named:
+                cat.append(_cat(common, f"M{mid} {mt}", n, teams[i], None, p, None, mt))
+                if not multi:
+                    rows.append(row(**base, market_type=mt, market_raw=f"M{mid} {mt}", group_key=gk, selection=n, player=n, team=teams[i], back=p))
+            continue
         for sp, outs in (by_spec or {}).items():
             s = spec(sp)
             inn = s.get("inningnr")
@@ -187,9 +203,9 @@ def parse_event(markets: dict, players: dict[str, str], common: dict) -> tuple[l
                 key = MATCH_FANCY[mid]
                 cat.append(_cat(common, f"M{mid} {key}", None, None, line, ov, un, key))
                 fancy.append(_fancy(common, key, None, line, ov, un))
-            elif mid in SIDE_OVERS and not multi and inn == "1" and line is not None and ov is not None and un is not None \
-                    and _num(s.get("overnr")) in OVERS_KEYS:
-                n, team = int(_num(s["overnr"])), teams[SIDE_OVERS[mid]]
+            elif (mid in SIDE_OVERS or (mid in SIDE_OVER and _num(s.get("overnr")) == 1)) and not multi and inn == "1" and line is not None \
+                    and ov is not None and un is not None and _num(s.get("overnr")) in range(1, 51):
+                n, team = int(_num(s["overnr"])), teams[SIDE_OVERS.get(mid, SIDE_OVER.get(mid))]
                 cat.append(_cat(common, f"M{mid} overs 0-{n}", None, team, line, ov, un, f"overs_{n}"))
                 fancy.append(_fancy(common, f"overs_{n}", team, line, ov, un, bat_first=True))
             elif line is not None and ov is not None and un is not None:
@@ -262,16 +278,19 @@ def fetch(fetched_at: str):
             full = get(pace, f"{api}/v4/prematch/brand/{brand}/event/{LANG}/{eid}")
             markets = ((full.get("events") or {}).get(eid) or {}).get("markets") or {}
             players: dict[str, str] = {}
+            side_of: dict[str, int] = {}
             if (ev.get("desc") or {}).get("player_props"):
                 desc = get(pace, f"{api}/v3/descriptions/brand/{brand}/event/{eid}/{LANG}")
                 players = {p["id"]: str(p.get("name") or "").strip() for p in desc.get("players") or [] if p.get("id")}
+                ids = [str(c.get("id")) for c in (ev.get("desc") or {}).get("competitors") or []]
+                side_of = {p["id"]: ids.index(str(p.get("competitor_id"))) for p in desc.get("players") or [] if str(p.get("competitor_id")) in ids}
         except urllib.error.HTTPError as e:
             if e.code == 429:
                 info["stopped"] = "HTTP 429"
                 break
             continue
         common = ev_common(eid, ev, tournaments, SOURCE, fetched_at)
-        r, fx, cat, left = parse_event(markets, players, common)
+        r, fx, cat, left = parse_event(markets, players, common, side_of)
         if not (r or fx or cat):
             continue
         rows += r
