@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-17T00:35:18Z",
+ "generated_at_utc": "2026-11-17T01:35:37Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -42,14 +42,14 @@
    "inn": 0,
    "side": "over",
    "line": 0.5,
-   "best_odds": 1.58,
+   "best_odds": 1.571,
    "best_source": "1xBet",
    "hits": 36,
    "played": 36,
    "window": 20,
-   "chance": 0.9101,
-   "edge": 0.4379,
-   "edge_pct": 43.8,
+   "chance": 0.9106,
+   "edge": 0.4306,
+   "edge_pct": 43.1,
    "bat_first": false
   },
   {
