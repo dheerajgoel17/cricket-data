@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-17T04:43:17Z",
- "generated_at_ist": "2026-11-17 10:13 IST",
- "runtime_secs": 209.0,
+ "generated_at_utc": "2026-11-17T05:30:36Z",
+ "generated_at_ist": "2026-11-17 11:00 IST",
+ "runtime_secs": 214.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-16",
-  "commit": "a876939776"
+  "commit": "e0d6e684e2"
  },
  "sources": {
   "moviodds_bet365": {
@@ -16,46 +16,46 @@
   "smarkets": {
    "status": "ok",
    "rows": 283,
-   "secs": 1.8
+   "secs": 2.2
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 11.9,
+   "secs": 11.1,
    "events": 2
   },
   "feedk": {
    "status": "ok",
    "rows": 100,
-   "secs": 16.0,
+   "secs": 15.7,
    "events": 6
   },
   "feede": {
    "status": "ok",
    "rows": 400,
-   "secs": 58.8,
+   "secs": 59.0,
    "events": 23
   },
   "feedh": {
    "status": "ok",
    "rows": 866,
-   "secs": 69.7,
+   "secs": 82.6,
    "events": 47
   },
   "feedi": {
    "status": "ok",
-   "rows": 1498,
-   "secs": 105.4,
+   "rows": 1401,
+   "secs": 107.1,
    "events": 53
   },
   "feedf": {
    "status": "ok",
    "rows": 410,
-   "secs": 126.4,
+   "secs": 130.1,
    "events": 24
   }
  },
- "snapshot": "odds_20261117T044317Z.jsonl.gz",
+ "snapshot": "odds_20261117T053036Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -129,26 +129,26 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 42,
-  "rows_in_window": 3537,
-  "selections_with_model": 1629,
-  "selections_with_market_fair": 1972,
-  "markets_in_window": 384,
+  "events_in_window": 41,
+  "rows_in_window": 3452,
+  "selections_with_model": 1539,
+  "selections_with_market_fair": 1869,
+  "markets_in_window": 336,
   "value_bets": 5,
   "dropped_by_filter": {
    "model_only_no_market": 76,
-   "model_market_gap": 964,
-   "odds_range": 20,
+   "model_market_gap": 953,
+   "odds_range": 18,
    "loose_name_match": 1,
    "small_sample": 1,
    "policy_max_odds": 1,
-   "model_disagrees": 1,
-   "market_disabled": 4,
+   "model_disagrees": 2,
+   "market_disabled": 3,
    "policy_min_edge": 4,
    "suspect_edge": 1
   },
   "suspect_edges": 1,
-  "innings_milestones_unmodelled": 30,
+  "innings_milestones_unmodelled": 22,
   "model_vs_market": {
    "top_batter_team": {
     "n_prices": 183,
@@ -167,28 +167,28 @@
     "corr": 0.098
    },
    "batter_milestone": {
-    "n_prices": 524,
+    "n_prices": 522,
     "mean_model_p": 0.496,
     "mean_market_p": 0.498,
     "mean_logit_diff_model_minus_market": -0.012,
-    "mean_abs_logit_diff": 0.792,
-    "corr": 0.987
+    "mean_abs_logit_diff": 0.794,
+    "corr": 0.988
    },
    "top_batter_match": {
-    "n_prices": 373,
-    "mean_model_p": 0.022,
+    "n_prices": 369,
+    "mean_model_p": 0.021,
     "mean_market_p": 0.03,
-    "mean_logit_diff_model_minus_market": -0.188,
-    "mean_abs_logit_diff": 0.979,
-    "corr": 0.328
+    "mean_logit_diff_model_minus_market": -0.169,
+    "mean_abs_logit_diff": 0.951,
+    "corr": 0.36
    },
    "top_bowler_match": {
-    "n_prices": 319,
-    "mean_model_p": 0.028,
-    "mean_market_p": 0.033,
-    "mean_logit_diff_model_minus_market": 0.032,
-    "mean_abs_logit_diff": 2.08,
-    "corr": -0.027
+    "n_prices": 351,
+    "mean_model_p": 0.021,
+    "mean_market_p": 0.03,
+    "mean_logit_diff_model_minus_market": -0.107,
+    "mean_abs_logit_diff": 2.195,
+    "corr": 0.147
    },
    "top_bowler_team": {
     "n_prices": 90,
@@ -199,45 +199,32 @@
     "corr": 0.593
    },
    "bowler_wickets": {
-    "n_prices": 72,
+    "n_prices": 46,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 1.888,
-    "corr": -0.627
+    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_abs_logit_diff": 2.019,
+    "corr": -0.507
    },
    "batter_sixes": {
-    "n_prices": 82,
+    "n_prices": 50,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.455,
-    "corr": 0.826
+    "mean_abs_logit_diff": 0.526,
+    "corr": 0.678
    },
    "batter_fours": {
-    "n_prices": 102,
+    "n_prices": 70,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.785,
-    "corr": -0.016
+    "mean_abs_logit_diff": 1.012,
+    "corr": -0.038
    }
   }
  },
  "events_in_window": [
-  {
-   "event": "male|Afghanistan|Zimbabwe|2026-11-17",
-   "start_ist": "2026-11-17 11:30 IST",
-   "format": "MULTI",
-   "format_source": "last-meeting",
-   "teams_matched": [
-    "Afghanistan",
-    "Zimbabwe"
-   ],
-   "sources": [
-    "feedi_d"
-   ]
-  },
   {
    "event": "male|al barkat|pak|2026-11-17",
    "start_ist": "2026-11-17 12:30 IST",
@@ -667,19 +654,6 @@
    ]
   },
   {
-   "event": "male|Bangladesh|Thailand|2026-11-18",
-   "start_ist": "2026-11-18 14:45 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": [
-    "Bangladesh",
-    "Thailand"
-   ],
-   "sources": [
-    "feedh_d"
-   ]
-  },
-  {
    "event": "male|Netherlands|Zimbabwe|2026-11-18",
    "start_ist": "2026-11-18 14:45 IST",
    "format": "ODI",
@@ -687,6 +661,19 @@
    "teams_matched": [
     "Netherlands",
     "Zimbabwe"
+   ],
+   "sources": [
+    "feedh_d"
+   ]
+  },
+  {
+   "event": "male|Bangladesh|Thailand|2026-11-18",
+   "start_ist": "2026-11-18 14:45 IST",
+   "format": null,
+   "format_source": "unknown",
+   "teams_matched": [
+    "Bangladesh",
+    "Thailand"
    ],
    "sources": [
     "feedh_d"
@@ -824,6 +811,59 @@
   }
  ],
  "value_bets": [
+  {
+   "event_key": "female|Adelaide Strikers Women|Sydney Sixers Women|2026-11-17",
+   "match": "Adelaide Strikers (Women) vs Sydney Sixers (Women)",
+   "start_utc": "2026-11-17T08:10:00Z",
+   "start_ist": "2026-11-17 13:40 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_fours",
+   "market": "G9182 batter_fours",
+   "team_scope": "",
+   "selection": "Ellyse Perry under 3.5",
+   "player_matched_as": "Ellyse Perry",
+   "player_id": "be150fc8",
+   "player_team": "Sydney Sixers Women",
+   "stat": "fours",
+   "inn": 0,
+   "line": 3.5,
+   "side": "under",
+   "best_odds": 2.0,
+   "best_source": "feedi_d",
+   "effective_odds_after_commission": 2.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.079,
+   "implied_prob": 0.5,
+   "fair_odds": 1.895,
+   "fair_prob": 0.5278,
+   "model_prob": 0.6065,
+   "market_prob": 0.4634,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0556,
+   "edge_pct": 5.56,
+   "kelly_quarter_stake_pct": 1.39,
+   "n_sources": 1,
+   "confidence": "low",
+   "why": "Model 61% vs market 46% for under 3.5 fours; form 3.9 fours/inn recency-weighted T20 (n_eff 76.0; last 5: 0, 2, 11, 13, 0), bats in 95% of games played; at Karen Rolton Oval, Adelaide, South Australia: 3 inns avg 1.7; context adj: venue environment +16%, at this venue -6%, team H2H context -3%",
+   "notes": "1 market source(s) for fair price; model 0.607 vs market 0.463; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 76.0,
+    "expected": 3.77,
+    "nb_alpha": 0.958,
+    "p_bats_or_bowls": 0.954,
+    "venue_matched": "karen rolton oval",
+    "context_terms": [
+     "p_bat",
+     "env_fours",
+     "ven_fours",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null
+  },
   {
    "event_key": "male|Australia|England|2026-11-18",
    "match": "Australia vs England",
@@ -1043,65 +1083,6 @@
    },
    "rain_risk": null,
    "weather": null
-  },
-  {
-   "event_key": "female|Hobart Hurricanes Women|Perth Scorchers Women|2026-11-19",
-   "match": "Hobart Hurricanes (Women) vs Perth Scorchers (Women)",
-   "start_utc": "2026-11-19T04:40:00Z",
-   "start_ist": "2026-11-19 10:10 IST",
-   "format": "T20",
-   "gender": "female",
-   "market_type": "batter_fours",
-   "market": "G9182 batter_fours",
-   "team_scope": "",
-   "selection": "Beth Mooney under 3.5",
-   "player_matched_as": "Beth Mooney",
-   "player_id": "52d1dbc8",
-   "player_team": "Perth Scorchers Women",
-   "stat": "fours",
-   "inn": 0,
-   "line": 3.5,
-   "side": "under",
-   "best_odds": 2.1,
-   "best_source": "feedi_d",
-   "effective_odds_after_commission": 2.1,
-   "lay_odds": null,
-   "back_liquidity": null,
-   "overround": 0.0761,
-   "implied_prob": 0.4762,
-   "fair_odds": 1.978,
-   "fair_prob": 0.5056,
-   "model_prob": 0.5826,
-   "market_prob": 0.4425,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0617,
-   "edge_pct": 6.17,
-   "kelly_quarter_stake_pct": 1.4,
-   "n_sources": 1,
-   "confidence": "low",
-   "why": "Model 58% vs market 44% for under 3.5 fours; form 4.1 fours/inn recency-weighted T20 (n_eff 80.7; last 5: 1, 4, 8, 1, 9), bats in 97% of games played; at Allan Border Field, Brisbane: 20 inns avg 3.4; context adj: venue environment +9%, at this venue -4%, team H2H context +1%; weather: cloud cover 97%",
-   "notes": "1 market source(s) for fair price; model 0.583 vs market 0.443; assumes bet void if player doesn't bat/bowl - check book rules",
-   "model_detail": {
-    "n_eff": 80.7,
-    "expected": 4.05,
-    "nb_alpha": 0.958,
-    "p_bats_or_bowls": 0.972,
-    "venue_matched": "allan border field",
-    "context_terms": [
-     "p_bat",
-     "env_fours",
-     "ven_fours",
-     "h2h_runs"
-    ]
-   },
-   "rain_risk": false,
-   "weather": {
-    "rain_prob_max_pct": 10,
-    "rain_mm_in_window": 0.1,
-    "humidity_pct": 66,
-    "cloud_pct": 97,
-    "source": "Open-Meteo forecast"
-   }
   }
  ],
  "suspect_not_alerted": [
@@ -1179,7 +1160,6 @@
   "Grace Lyons",
   "Grace Parsons",
   "Gulbadin Naib",
-  "Ikram Ali Khil",
   "Imran Tahir",
   "Ines Mackeon",
   "Ines Mckeon",
@@ -1211,12 +1191,10 @@
   "Max Bryant",
   "Mikayla Friday",
   "Mohammad Amir",
-  "Mohammad Saleem",
   "Mohammad Wasim Jr",
   "Morawakage Maheesh Theekshana",
   "Muhammad Rohid",
   "Naseem Shah",
-  "Naseer Khan Maroofkhil",
   "Nicholas Pooran",
   "Nicola Hancock",
   "Nuwan Thushara",
@@ -1387,25 +1365,25 @@
   }
  },
  "log": [
-  "[10:13 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[10:13 IST] history: 24126 matches, last 2026-11-16, players 435075",
-  "[10:15 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.2}",
-  "[10:15 IST] source smarkets: {'status': 'ok', 'rows': 283, 'secs': 1.8}",
-  "[10:15 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.9, 'events': 2}",
-  "[10:15 IST] source feedk: {'status': 'ok', 'rows': 100, 'secs': 16.0, 'events': 6}",
-  "[10:15 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 58.8, 'events': 23}",
-  "[10:15 IST] source feedh: {'status': 'ok', 'rows': 866, 'secs': 69.7, 'events': 47}",
-  "[10:15 IST] source feedi: {'status': 'ok', 'rows': 1498, 'secs': 105.4, 'events': 53}",
-  "[10:15 IST] source feedf: {'status': 'ok', 'rows': 410, 'secs': 126.4, 'events': 24}",
-  "[10:15 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[10:15 IST] 50 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[10:15 IST] 30 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[10:15 IST] name map: Republic of Ireland (Women) vs Scotland (Women) -> Ireland Women vs Scotland Women (2026-11-18T05:00:00Z)",
-  "[10:15 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[10:15 IST] book lines: 352 player lines from 7 source(s)",
-  "[10:15 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[10:16 IST] weather: forecasts for 10 events, 0 failed",
-  "[10:16 IST] prop model: 847 prop selections modelled, 20 milestone ladder prices anchored to O/U",
-  "[10:16 IST] ledger upsert model: {'upserted': 5, 'skipped_settled': 0}"
+  "[11:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[11:00 IST] history: 24126 matches, last 2026-11-16, players 435075",
+  "[11:03 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.2}",
+  "[11:03 IST] source smarkets: {'status': 'ok', 'rows': 283, 'secs': 2.2}",
+  "[11:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.1, 'events': 2}",
+  "[11:03 IST] source feedk: {'status': 'ok', 'rows': 100, 'secs': 15.7, 'events': 6}",
+  "[11:03 IST] source feede: {'status': 'ok', 'rows': 400, 'secs': 59.0, 'events': 23}",
+  "[11:03 IST] source feedh: {'status': 'ok', 'rows': 866, 'secs': 82.6, 'events': 47}",
+  "[11:03 IST] source feedi: {'status': 'ok', 'rows': 1401, 'secs': 107.1, 'events': 53}",
+  "[11:03 IST] source feedf: {'status': 'ok', 'rows': 410, 'secs': 130.1, 'events': 24}",
+  "[11:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[11:03 IST] 30 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[11:03 IST] 22 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[11:03 IST] name map: Republic of Ireland (Women) vs Scotland (Women) -> Ireland Women vs Scotland Women (2026-11-18T05:00:00Z)",
+  "[11:03 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[11:03 IST] book lines: 304 player lines from 7 source(s)",
+  "[11:03 IST] 20 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[11:04 IST] weather: forecasts for 10 events, 0 failed",
+  "[11:04 IST] prop model: 755 prop selections modelled, 20 milestone ladder prices anchored to O/U",
+  "[11:04 IST] ledger upsert model: {'upserted': 5, 'skipped_settled': 0}"
  ]
 }
