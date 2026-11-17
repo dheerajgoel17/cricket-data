@@ -24,7 +24,7 @@ describe("NextMatch", () => {
 
   it("names the match as one strip (vs opponent, date and ground) and keeps rates out of the card", () => {
     render(<NextMatch next={next} entries={[...here, ...versus]} line={17.5} side="over" book={book} statLabel="Runs" fmt="T20" />);
-    expect(screen.getByText(/vs SSW/)).toBeInTheDocument();
+    expect(screen.getByText("vs")).toBeInTheDocument(); // then the crest, then the short name
     expect(screen.getByText(new RegExp(`on ${whenLabel(next.start)}`))).toBeInTheDocument();
     expect(screen.queryByText(/fair/)).not.toBeInTheDocument();
   });

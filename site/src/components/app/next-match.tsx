@@ -89,8 +89,9 @@ export function NextMatch({ next, line, side, book, statLabel, standing, out }: 
   const strip = (
     <>
       <div className="flex min-w-0 items-center gap-snug">
+        {next.opp ? <span className="shrink-0 text-body font-emphasis">vs</span> : null}
         {next.opp ? <TeamBadge name={next.opp} size="sm" eager /> : null}
-        <span className="min-w-0 flex-1 truncate text-body font-emphasis">{next.opp ? `vs ${abbr(next.opp)}` : next.match}{when ? <span className="font-normal text-muted-foreground"> on {when}</span> : null}</span>
+        <span className="min-w-0 flex-1 truncate text-body font-emphasis">{next.opp ? abbr(next.opp) : next.match}{when ? <span className="font-normal text-muted-foreground"> on {when}</span> : null}</span>
         {out ? <Badge variant="outline" className="shrink-0 px-snug py-hair text-caption font-label text-muted-foreground">Not in XI</Badge> : null}
         {!upcoming ? <MatchStatus phase={next.phase!} className="shrink-0 text-footnote" /> : null}
         {next.id ? <ChevronRightIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" /> : null}

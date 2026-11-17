@@ -70,8 +70,9 @@ export function NextMatchCard({ next, line, side, book, statLabel, standing, out
   const body = (
     <>
       <View style={styles.teams}>
+        {next.opp ? <Text style={styles.opp}>vs</Text> : null}
         {next.opp ? <TeamBadge name={next.opp} size={32} /> : null}
-        <Text style={[styles.opp, { flex: 1 }]} numberOfLines={1}>{next.opp ? `vs ${abbr(next.opp)}` : next.match}{when ? <Text style={styles.statLabel}> on {when}</Text> : null}</Text>
+        <Text style={[styles.opp, { flex: 1 }]} numberOfLines={1}>{next.opp ? abbr(next.opp) : next.match}{when ? <Text style={styles.statLabel}> on {when}</Text> : null}</Text>
         {out ? <Text style={styles.notIn}>Not in XI</Text> : null}
         {!upcoming ? <MatchStatus phase={next.phase!} /> : null}
         {next.id ? <Ionicons name="chevron-forward" size={icon.sm} color={color["muted-foreground"]} /> : null}
