@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-17 20:09 IST
+# Cricket value bets - 2026-11-17 20:18 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -9,11 +9,11 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **feedk**: ok, 156 prices, 6 events
 - **feede**: ok, 464 prices, 27 events
 - **feedh**: ok, 932 prices, 49 events
-- **feedj**: ok, 650 prices, 17 events
+- **feedj**: ok, 728 prices, 18 events
 - **feedf**: ok, 364 prices, 22 events
 - **feedi**: ok, 1858 prices, 52 events
 
-Matches starting in next 168h: **46**, markets priced: **367**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **46**, markets priced: **369**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -30,4 +30,4 @@ Matches starting in next 168h: **46**, markets priced: **367**, value bets: **4*
 
 Unmatched team names (add to mappings/teams.csv): Andhra (W) (female), Baroda (W) (female), Central (male), Karnataka (W) (female), Maharashtra (W) (female), Railways (W) (female), Royal Champs (male), Vidarbha (W) (female)
 
-Runtime 362.7s. Snapshot: `odds_20261117T143944Z.jsonl.gz`
+Runtime 435.7s. Snapshot: `odds_20261117T144839Z.jsonl.gz`
