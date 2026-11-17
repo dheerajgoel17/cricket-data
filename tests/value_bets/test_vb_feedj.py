@@ -193,3 +193,30 @@ def test_request_goes_through_the_relay_on_github_only(monkeypatch):
     u, h = urls[-1]
     assert u == "https://relay.invalid/r?u=https%3A%2F%2Ffeedj.invalid%2Fapi%2Fx"
     assert h["X-relay-key"] == "k1" and h["X-relay-origin"] == ORIGIN and h["X-relay-referer"] == ORIGIN + "/"
+
+
+def test_a_blocked_call_is_tried_again_and_a_dead_version_file_loses_only_its_events(monkeypatch):
+    for k, v in (("API", API), ("BRAND", "77"), ("ORIGIN", ORIGIN), ("NAME", "bc.game")):
+        monkeypatch.setenv(f"FEEDJ_{k}", v)
+    monkeypatch.setenv("CV_FEEDJ_SPACING_SECS", "0")
+    seen = {}
+
+    def fake(url, origin):
+        seen[url] = seen.get(url, 0) + 1
+        b = f"{API}/v4/prematch/brand/77"
+        if url == f"{b}/en-IN/0":
+            if seen[url] == 1:
+                raise feedj.urllib.error.HTTPError(url, 503, "access blocked", {}, None)  # first try blocked, second fine
+            return {"top_events_versions": [5], "rest_events_versions": [6]}
+        if url == f"{b}/en-IN/5":
+            return {"tournaments": TOURNAMENTS, "events": {"e1": stub()}}
+        if url == f"{b}/en-IN/6":
+            raise feedj.urllib.error.HTTPError(url, 503, "access blocked", {}, None)  # stays blocked
+        if url == f"{b}/event/en-IN/e1":
+            return {"events": {"e1": {"markets": MARKETS}}}
+        return {"players": [{"id": k, "name": n} for k, n in PLAYERS.items()]}
+
+    monkeypatch.setattr(feedj, "request", fake)
+    rows, raw = feedj.fetch("2026-11-17T12:00:00Z")
+    assert len(rows) == 8 and raw["books"]["bc.game"]["events"] == 1
+    assert seen[f"{API}/v4/prematch/brand/77/en-IN/0"] == 2 and seen[f"{API}/v4/prematch/brand/77/en-IN/6"] == 2

@@ -209,12 +209,27 @@ def parse_event(markets: dict, players: dict[str, str], common: dict) -> tuple[l
     return rows, fancy, cat, left
 
 
+def get(pace: Pace, url: str, tries: int = 2):
+    """One call, tried again once on a 5xx: through the relay one request in a few meets a blocked egress address (HTTP 503 "access blocked") and the next one does not."""
+    for i in range(tries):
+        try:
+            return pace.get(url)
+        except urllib.error.HTTPError as e:
+            if e.code < 500 or i == tries - 1:
+                raise
+
+
 def list_events(api: str, brand: str, pace: Pace) -> tuple[dict[str, dict], dict]:
     """({event id: event stub}, tournaments) from the manifest and its version files."""
-    man = pace.get(f"{api}/v4/prematch/brand/{brand}/{LANG}/0")
+    man = get(pace, f"{api}/v4/prematch/brand/{brand}/{LANG}/0")
     events, tournaments = {}, {}
     for v in list(man.get("top_events_versions") or []) + list(man.get("rest_events_versions") or []):
-        part = pace.get(f"{api}/v4/prematch/brand/{brand}/{LANG}/{v}")
+        try:
+            part = get(pace, f"{api}/v4/prematch/brand/{brand}/{LANG}/{v}")
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                raise
+            continue  # a version file that stays blocked loses only its events; the others still list
         tournaments.update(part.get("tournaments") or {})
         for eid, ev in (part.get("events") or {}).items():
             if (ev.get("desc") or {}).get("sport") == CRICKET:
@@ -253,11 +268,11 @@ def fetch(fetched_at: str):
             info["stopped"] = "time budget"
             break
         try:
-            full = pace.get(f"{api}/v4/prematch/brand/{brand}/event/{LANG}/{eid}")
+            full = get(pace, f"{api}/v4/prematch/brand/{brand}/event/{LANG}/{eid}")
             markets = ((full.get("events") or {}).get(eid) or {}).get("markets") or {}
             players: dict[str, str] = {}
             if (ev.get("desc") or {}).get("player_props"):
-                desc = pace.get(f"{api}/v3/descriptions/brand/{brand}/event/{eid}/{LANG}")
+                desc = get(pace, f"{api}/v3/descriptions/brand/{brand}/event/{eid}/{LANG}")
                 players = {p["id"]: str(p.get("name") or "").strip() for p in desc.get("players") or [] if p.get("id")}
         except urllib.error.HTTPError as e:
             if e.code == 429:
