@@ -22,6 +22,10 @@ jobs:
       FEEDJ_BRAND: ${{ secrets.FEEDJ_BRAND }}
       FEEDJ_ORIGIN: ${{ secrets.FEEDJ_ORIGIN }}
       FEEDJ_NAME: ${{ secrets.FEEDJ_NAME }}
+      FEEDJ_RELAY: ${{ secrets.FEEDJ_RELAY }}
+      FEEDJ_RELAY_KEY: ${{ secrets.FEEDJ_RELAY_KEY }}
+      FEEDH_RELAY: ${{ secrets.FEEDH_RELAY }}
+      FEEDH_RELAY_KEY: ${{ secrets.FEEDH_RELAY_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,5 +51,7 @@ jobs:
           r = s.get(url, headers={"Origin": origin, "Referer": origin + "/"}, timeout=30)
           print("curl_cffi", r.status_code, len(r.content), r.text[:120].replace(os.environ["FEEDJ_ORIGIN"], "<origin>") if r.status_code >= 400 else "")
           PY
-      - name: Feed J run
+      - name: Feed J run (relay when set)
+        env:
+          GITHUB_ACTIONS: "true"
         run: python -m value_bets.adapters.feedj | tee -a "$GITHUB_STEP_SUMMARY"
