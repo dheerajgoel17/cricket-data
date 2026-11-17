@@ -38,9 +38,12 @@ export const TEAM_FILL = {
 /** Folded Base team name → Source A team id (`photos.t`, then TEAM_FILL for known holes). */
 export function teamId(photos, name) {
   const raw = fold(name);
-  // Prefer the full fold first (keeps "pakistan u19 women"); then the men's/unisex key (India (W) → india).
+  // Prefer the full fold first (keeps "pakistan u19 women"); then the men's/unisex key for a men's or unisex side only.
   const stripped = fold(String(name ?? "").replace(/\(w\)/i, "").replace(/\bwomen\b/i, ""));
-  for (const key of [raw, stripped]) {
+  const women = raw.replace(/ w$/, " women"); // "Adelaide Strikers (W)" → the source's women's team (its own logo with the W badge)
+  // A women's side shows only its own logo: never the men's crest of the same name (no women's team listed → the flag or initials)
+  const own = /\(w\)|\bwomen\b|\bw$/i.test(String(name ?? ""));
+  for (const key of own ? [raw, women] : [raw, women, stripped]) {
     if (!key) continue;
     const id = photos?.t?.[key] || TEAM_FILL[key];
     if (id) return id;

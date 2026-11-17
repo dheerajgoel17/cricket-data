@@ -4,7 +4,10 @@ import { createCn } from "cn/config";
 // It knows our named scales from src/index.css, so `text-body` replaces a component's own `text-sm` and `mt-stack` replaces `mt-2`, instead of both staying.
 export const cn = createCn({
   extend: {
-    classGroups: { "font-size": [{ text: ["display", "title", "body", "callout", "footnote", "caption", "metric", "stat"] }] },
+    classGroups: {
+      "font-size": [{ text: ["display", "title", "body", "callout", "footnote", "caption", "metric", "stat"] }],
+      "font-weight": [{ font: ["editorial", "copy", "label", "emphasis", "display-heavy"] }], // else `font-condensed font-label` reads as two font families and the first is dropped
+    },
     theme: { spacing: ["hair", "tight", "snug", "stack", "group", "section", "inset", "gutter", "control", "header", "tabbar", "row"] },
   },
 });

@@ -108,7 +108,7 @@ export function nextMatchOf({ store, doc, pid, idx, fmt, team, lastGame, fixture
   const listed = (t: string) => [row?.a, row?.b].find((x) => x && teamKey(x) === teamKey(t)) || t;
   const ground = String(row?.venue || "");
   const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
-  return { match, start, competition, team: listed(mineRaw), opp: listed(oppRaw), ground, known, priced: !!priced, phase };
+  return { match, start, competition, team: listed(mineRaw), opp: listed(oppRaw), ground, known, priced: !!priced, phase, id: row?.id ? String(row.id) : undefined };
 }
 
 /** Every number the chart block shows for a line, a side and a look-back window: the windows, the one on show, the tally of every game, and the headline over the whole sample. */

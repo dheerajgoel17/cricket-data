@@ -12,9 +12,8 @@ describe("DataTable (stats tables)", () => {
   it("exports the shared header and bleed recipes", () => {
     expect(TABLE_HEAD).toContain("label-cap");
     expect(TABLE_HEAD).toContain("text-footnote");
-    expect(TABLE_BLEED).toContain("-mx-gutter");
     expect(TABLE_BLEED).toContain("border-hairline");
-    expect(TABLE_BLEED).toContain("lg:mx-0");
+    expect(TABLE_BLEED).not.toContain("-mx-gutter");
   });
 
   it("keeps BOARD_HEAD as the denser league-board variant", () => {
@@ -30,12 +29,11 @@ describe("DataTable (stats tables)", () => {
     expect(screen.getByText("60%")).toBeInTheDocument();
   });
 
-  it("wraps with the phone bleed contract when bleed is set", () => {
+  it("boxes the table in the page margin with a hairline on all four sides when bleed is set", () => {
     const { container } = render(<DataTable bleed columns={["A"]} rows={[["1"]]} />);
     const wrap = container.firstElementChild as HTMLElement;
-    expect(wrap.className).toContain("-mx-gutter");
-    expect(wrap.className).toContain("border-y");
-    expect(wrap.className).toContain("lg:mx-0");
+    expect(wrap.className).not.toContain("-mx-gutter");
+    expect(wrap.className).toMatch(/(^| )border( |$)/);
   });
 
   it("Match Fancy ladder and Ask ResultView use the shared recipes", () => {

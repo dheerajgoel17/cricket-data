@@ -935,15 +935,14 @@
     "route": false,
     "exports": [
       "MatchStatus",
+      "MatchupRates",
       "NextFilters",
       "NextMatchCard"
     ],
     "dependencies": [
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
-      "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/chips.tsx",
-      "mobile/src/ui/data-table.tsx",
       "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/tick.tsx",
       "mobile/src/ui/team-badge.tsx"
@@ -1829,6 +1828,7 @@
     "platform": "web",
     "route": false,
     "exports": [
+      "MatchupRates",
       "NextFilters",
       "NextMatch",
       "UnpricedNote"
@@ -2840,7 +2840,6 @@
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/star.tsx",
-      "site/src/components/app/match-status.tsx",
       "site/src/components/app/player-name.tsx",
       "site/src/components/app/portrait.tsx",
       "site/src/components/app/ad-slot.tsx",

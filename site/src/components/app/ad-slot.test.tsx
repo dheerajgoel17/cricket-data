@@ -1,4 +1,4 @@
-import { render, waitFor } from "@testing-library/react";
+import { fireEvent, render, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
@@ -46,6 +46,30 @@ test("manual creative overrides AdSense (image link, no ins)", async () => {
   expect((window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle).toBeUndefined();
 });
 
+test("a manual creative draws its strip only once the image has loaded (a broken image leaves no line)", async () => {
+  manual.fetch.mockResolvedValue({
+    id: "1", slot_id: "fancy_detail_top", name: "Book X", href: "https://example.com/x",
+    image_path: "fancy_detail_top/a.gif", alt: "Book X", enabled: true, priority: 1, starts_at: null, ends_at: null,
+  });
+  manual.url.mockReturnValue("https://cdn.example/a.gif");
+  const { container, findByAltText } = wrap("/fixture/2026-11-11-a-v-b/fancy");
+  const image = await findByAltText("Book X");
+  expect(container.querySelector("aside")!.className).not.toMatch(/border-b/);
+  fireEvent.load(image);
+  await waitFor(() => expect(container.querySelector("aside")!.className).toMatch(/border-b/));
+});
+
+test("a manual creative whose image fails leaves nothing", async () => {
+  manual.fetch.mockResolvedValue({
+    id: "1", slot_id: "fancy_detail_top", name: "Book X", href: "https://example.com/x",
+    image_path: "fancy_detail_top/a.gif", alt: "Book X", enabled: true, priority: 1, starts_at: null, ends_at: null,
+  });
+  manual.url.mockReturnValue("https://cdn.example/a.gif");
+  const { container, findByAltText } = wrap("/fixture/2026-11-11-a-v-b/fancy");
+  fireEvent.error(await findByAltText("Book X"));
+  await waitFor(() => expect(container.querySelector("aside")).toBeNull());
+});
+
 test("pending AdSense takes no layout chrome (no border strip)", async () => {
   manual.fetch.mockResolvedValue(null);
   const { container } = wrap("/fixture/2026-11-11-a-v-b/fancy");
@@ -62,11 +86,23 @@ test("filled AdSense shows the strip chrome", async () => {
   const { container } = wrap("/leagues", "stats_top");
   await waitFor(() => expect(container.querySelector("ins.adsbygoogle")).toBeTruthy());
   const ins = container.querySelector("ins.adsbygoogle")!;
+  ins.appendChild(document.createElement("iframe"));
   ins.setAttribute("data-ad-status", "filled");
   await waitFor(() => expect(container.querySelector("aside")?.getAttribute("data-ad-fill")).toBe("filled"));
   const aside = container.querySelector("aside")!;
   expect(aside.className).toMatch(/border-b/);
   expect(aside.className).not.toMatch(/opacity-0/);
+});
+
+test("a fill with no creative inside draws no strip", async () => {
+  manual.fetch.mockResolvedValue(null);
+  const { container } = wrap("/leagues", "stats_top");
+  await waitFor(() => expect(container.querySelector("ins.adsbygoogle")).toBeTruthy());
+  container.querySelector("ins.adsbygoogle")!.setAttribute("data-ad-status", "filled");
+  await new Promise((r) => setTimeout(r, 50));
+  const aside = container.querySelector("aside")!;
+  expect(aside.getAttribute("data-ad-fill")).toBe("pending");
+  expect(aside.className).not.toMatch(/border-b/);
 });
 
 test("unfilled AdSense collapses to nothing", async () => {

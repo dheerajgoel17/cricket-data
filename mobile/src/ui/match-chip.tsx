@@ -20,8 +20,8 @@ const CREST = 20;
 function Crests({ a, b }: { a: string; b: string }) {
   return (
     <View style={styles.group}>
-      <View style={[styles.ring, { zIndex: 1 }]}><TeamBadge name={a} size={CREST} bare /></View>
-      <View style={[styles.ring, styles.overlap, { zIndex: 0 }]}><TeamBadge name={b} size={CREST} bare /></View>
+      <View style={[styles.ring, { zIndex: 1 }]}><TeamBadge name={a} size={CREST} /></View>
+      <View style={[styles.ring, styles.overlap, { zIndex: 0 }]}><TeamBadge name={b} size={CREST} /></View>
     </View>
   );
 }

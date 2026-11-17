@@ -37,21 +37,16 @@ const Circle = ({ size, className, children, title }: { size: BadgeSize; classNa
 );
 
 /**
- * Team crest: Source A logo when we know the team, else a flag, else initials.
- * `bare`: the logo alone (no circle) so the full crest shows — use in MatchChip / AvatarGroup.
- * Default is the round badge used on fixture cards and rows.
+ * Team crest: Source A logo when we know the team, else a flag, else initials. Always the logo alone — no circle, tile or padding — so the whole crest shows at the full size of its box.
  */
-export function TeamBadge({ name, size = "sm", className, eager, bare }: { name: string; size?: BadgeSize; className?: string; eager?: boolean; bare?: boolean }) {
+export function TeamBadge({ name, size = "sm", className, eager }: { name: string; size?: BadgeSize; className?: string; eager?: boolean }) {
   const { photos } = useData();
   const urls = [...teamLogos(photos, name), flagUrl(name, size === "xl" || size === "lg" ? 160 : 40)].filter(Boolean) as string[];
-  if (bare) {
-    return (
-      <span title={name} className={cn("relative inline-grid shrink-0 place-items-center", SIZES[size], className)}>
-        <Img eager={eager} urls={urls} alt={name} className="size-full object-contain" fallback={<span className="text-[length:inherit] font-emphasis text-muted-foreground">{initials(name)}</span>} />
-      </span>
-    );
-  }
-  return <Circle size={size} className={cn("border-0 bg-secondary", className)} title={name}><Img eager={eager} urls={urls} alt={name} className="size-full object-contain p-0.5" fallback={initials(name)} /></Circle>;
+  return (
+    <span title={name} className={cn("relative inline-grid shrink-0 place-items-center", SIZES[size], className)}>
+      <Img eager={eager} urls={urls} alt={name} className="size-full object-contain" fallback={<span className="text-[length:inherit] font-emphasis text-muted-foreground">{initials(name)}</span>} />
+    </span>
+  );
 }
 
 const AVATAR_SIZE = { xs: "sm", sm: "sm", md: "default", lg: "lg", xl: "lg" } as const;
@@ -63,9 +58,9 @@ export function TeamAvatar({ name, size = "sm", eager }: { name: string; size?: 
   const [i, setI] = useState(0);
   const url = urls[i];
   return (
-    <Avatar size={AVATAR_SIZE[size]} title={name} className={cn("bg-secondary", size === "xs" && "size-5")}>
-      {url ? <AvatarImage src={url} alt={name} loading={eager ? "eager" : "lazy"} className="size-full object-contain p-0.5" onError={() => setI((n) => n + 1)} /> : null}
-      <AvatarFallback className="bg-secondary text-caption font-emphasis">{initials(name)}</AvatarFallback>
+    <Avatar size={AVATAR_SIZE[size]} title={name} className={cn("rounded-none bg-transparent after:hidden", size === "xs" && "size-5")}>
+      {url ? <AvatarImage src={url} alt={name} loading={eager ? "eager" : "lazy"} className="size-full rounded-none object-contain" onError={() => setI((n) => n + 1)} /> : null}
+      <AvatarFallback className="rounded-none bg-transparent text-caption font-emphasis">{initials(name)}</AvatarFallback>
     </Avatar>
   );
 }

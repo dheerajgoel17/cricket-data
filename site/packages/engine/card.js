@@ -2,8 +2,12 @@
 // Used by api/og.js (the image) and api/share.js (the page a link preview reads). Plain ESM; the drawing library is loaded only when a card is drawn.
 import { STATS } from "./rules.js";
 import { bookFormatFor, bookLinesFor, bookName, keepMsFor, overProb, teamKey } from "./lines.js";
+import { bookLogoStem, bookVariant } from "./books.js";
+import { brandWidth, drawBrand as drawBrandGroup, visibleBounds } from "./brand-draw.js";
 import { playerPhotos, teamJerseys, teamLogos } from "./photos.js";
 import { windowRate } from "./windows.js";
+import { atGround } from "./next-match.js";
+import { fairOdds } from "./stats.js";
 export { CARD_V, cardPath, cardQuery } from "./card-path.js";
 
 const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
@@ -32,24 +36,50 @@ const dateShort = (d) => {
 const fmtAvg = (n) => (Math.abs(n - Math.round(n)) < 0.05 ? String(Math.round(n)) : n.toFixed(1));
 
 /**
- * Last five played innings vs the line (L5 mean, hit rate, last innings). `rows` are oldest → newest
- * `{ value, date, opp }`; DNP / VOID (`value == null`) never count. Numbers come from the rows, never invented.
+ * Form of one prop: last five played innings vs the line (L5 mean, hit rate, last innings), the calendar-year hit rate,
+ * fair odds (1 / hit rate of the biggest sample) and his games at the match's ground. `rows` are oldest → newest
+ * `{ value, date, opp, venueName }`; DNP / VOID (`value == null`) never count. Numbers come from the rows, never invented.
+ * `opts`: `year` (calendar year of the match), `ground` (its venue name), `opp` (the other side: his record against it).
  */
-export function propForm(rows, line, teamName) {
-  const entries = (rows || []).filter((r) => r && r.value != null && Number.isFinite(Number(r.value))).map((r) => ({
-    value: Number(r.value),
+export function propForm(rows, line, teamName, opts = {}) {
+  // every game, DNP / VOID included (value null): the windows count them the way the site's row does (the last 5 games, of which those he played)
+  const entries = (rows || []).filter(Boolean).map((r) => ({
+    value: r.value != null && Number.isFinite(Number(r.value)) ? Number(r.value) : null,
     date: r.date,
     opp: typeof teamName === "function" ? teamName(r.opp) : (r.vs || r.opp || ""),
+    venueName: r.venueName || "",
   }));
-  if (!entries.length || !Number.isFinite(Number(line))) return {};
-  const l5 = windowRate(entries, 5, Number(line));
-  const last = entries[entries.length - 1];
-  return {
+  const playedOnly = entries.filter((e) => e.value != null);
+  if (!playedOnly.length || !Number.isFinite(Number(line))) return {};
+  const ln = Number(line);
+  const l5 = windowRate(entries, 5, ln);
+  const last = playedOnly[playedOnly.length - 1];
+  const out = {
     l5,
     hit: l5.p != null ? { p: l5.p, n: l5.played } : undefined,
     last: last ? { value: last.value, date: dateShort(last.date), vs: last.opp } : undefined,
-    last5: entries.slice(-5).map((e) => ({ value: e.value, date: dateShort(e.date), vs: e.opp })),
+    last5: entries.slice(-5).filter((e) => e.value != null).map((e) => ({ value: e.value, date: dateShort(e.date), vs: e.opp })),
   };
+  const year = String(opts.year || "");
+  if (year) {
+    const sr = windowRate(entries.filter((e) => String(e.date || "").startsWith(year)), 0, ln);
+    if (sr.played) out.season = { year, p: sr.p, played: sr.played, hits: sr.hits, mean: sr.mean };
+  }
+  out.recent = playedOnly.slice(-8).map((e) => ({ value: e.value, date: dateShort(e.date), vs: e.opp })); // the poster's big chart
+  const l10 = windowRate(entries, 10, ln);
+  if (l10.played) out.l10 = { p: l10.p, played: l10.played, hits: l10.hits };
+  if (opts.opp) {
+    const want = teamKey(opts.opp), h = windowRate(entries.filter((e) => teamKey(e.opp) === want), 0, ln);
+    if (h.played) out.h2h = { name: opts.opp, p: h.p, played: h.played, hits: h.hits };
+  }
+  const basis = out.season && out.season.played >= 5 ? { p: out.season.p, label: year } : l5.played >= 3 ? { p: l5.p, label: "L5" } : null;
+  if (basis && basis.p > 0) out.fair = { odds: fairOdds(basis.p), label: basis.label };
+  const here = atGround(playedOnly, opts.ground);
+  if (here.length) {
+    const r = windowRate(here, 0, ln);
+    out.atGround = { name: String(opts.ground).split(",")[0].trim(), bars: here.slice(-5).map((e) => ({ value: e.value, vs: e.opp })), played: r.played, hits: r.hits, p: r.p };
+  }
+  return out;
 }
 
 /** The line the books hang for this player (soonest match, runs first) so a /share/player/<idx> URL is not an empty name card. */
@@ -82,7 +112,7 @@ export function cardFields(q, data) {
       const listed = listedLine(pid, data.lines); // a player URL with no line still shows his booked prop, not an empty name card
       if (listed) { stat = listed.stat; line = listed.line; }
     }
-    const f = { kind: stat && line != null ? "prop" : "player", name, team: indexTeam, initials: initials(name), photos: biggerPhoto(playerPhotos(data.photos, pid)), idx };
+    const f = { kind: stat && line != null ? "prop" : "player", name, team: indexTeam, initials: initials(name), photos: biggerPhoto(playerPhotos(data.photos, pid)), idx, pid };
     f.kitPhotos = teamJerseys(data.photos, indexTeam, false); // a prop card below swaps in the format's kit
     if (f.kind === "prop") {
       f.statKey = stat; f.stat = STATS[stat].label; f.line = line; f.role = ROLE[STATS[stat].side] || "";
@@ -94,15 +124,36 @@ export function cardFields(q, data) {
         f.fmt = row.fmt || "";
         f.opp = otherSide(row.match, f.team);
       }
-      const prices = hits.flatMap((l) => (l.books || []).filter((b) => b.over > 1).map((b) => ({ over: b.over, under: b.under, book: bookName(b.source), source: b.source })));
+      const prices = hits.flatMap((l) => (l.books || []).filter((b) => b.over > 1 && !/^fancy$/i.test(bookVariant(b.source) || "")).map((b) => ({ over: b.over, under: b.under, book: bookName(b.source), source: b.source })));
       const best = prices.sort((x, y) => y.over - x.over)[0];
       if (best) {
         f.price = best.over; f.book = best.book; f.source = best.source; f.books = prices.length;
         if (best.under > 1) { f.under = best.under; f.market = overProb(best.over, best.under); }
       }
-      f.teamPhotos = teamLogos(data.photos, f.team);
+      const start = Date.parse(row?.start_utc || "");
+      if (Number.isFinite(start)) f.year = String(new Date(start).getUTCFullYear());
+      const fx = Number.isFinite(start) ? (Array.isArray(data.fixtures) ? data.fixtures : []).find((x) => Math.abs(Date.parse(x.start) - start) < 90 * 60e3 && x.venue && (teamKey(x.a) === teamKey(f.team) || teamKey(x.b) === teamKey(f.team))) : null;
+      if (fx) f.ground = fx.venue;
+      // every line the books list for this stat in this match, best over price at each: differing book lines side by side. `bookLinesFor` is what the page's ladder reads (a fixture the books spell several ways is one match)
+      const lf = f.fmt || bookFormatFor(data.lines, pid, stat, undefined, keepMsFor("Test")) || "";
+      const bk = lf ? bookLinesFor(data.lines, pid, stat, lf, Number.isFinite(start) ? start - 3600e3 : Date.now(), keepMsFor(lf), 0, { start: row?.start_utc, line, stat }) : null;
+      // Premium / exchange prices only: a book's Fancy market is a different bet from the line, so it is not set beside it
+      const comparable = (l) => (l.books || []).filter((b) => b.over > 1 && !/^fancy$/i.test(bookVariant(b.source) || ""));
+      const byLine = (bk?.lines || []).map((l) => {
+        const top = comparable(l).sort((x, y) => y.over - x.over)[0];
+        return top ? { line: l.line, price: top.over, book: bookName(top.source), stem: bookLogoStem(top.source), best: Math.abs(l.line - line) < 0.01 } : null;
+      }).filter(Boolean).sort((x, y) => Math.abs(x.line - line) - Math.abs(y.line - line)).slice(0, 4).sort((x, y) => x.line - y.line);
+      const here = (bk?.lines || []).find((l) => Math.abs(l.line - line) < 0.01);
+      const atLine = here ? comparable(here).sort((x, y) => y.over - x.over).slice(0, 4).map((b, i) => ({ line: here.line, price: b.over, book: bookName(b.source), stem: bookLogoStem(b.source), best: i === 0 })) : [];
+      // several lines: each line's best price; one line: each book's price at it (never two rows from one book's other market)
+      if (byLine.length > 1) { f.bookLines = byLine; f.bookTitle = "BOOK LINES"; }
+      else if (atLine.length > 1) { f.bookLines = atLine; f.bookTitle = `BOOKS AT ${line}`; }
+      else f.bookLines = [];
+      f.female = fx?.gender === "female"; // a women's fixture: the women's sides' own logos (the "<name> women" team), not the men's
+      const side = (n) => (f.female && !/\bwomen\b|\(w\)/i.test(n) ? `${n} Women` : n);
+      f.teamPhotos = teamLogos(data.photos, side(f.team));
       f.kitPhotos = teamJerseys(data.photos, f.team, f.fmt === "Test");
-      f.oppPhotos = f.opp ? teamLogos(data.photos, f.opp) : [];
+      f.oppPhotos = f.opp ? teamLogos(data.photos, side(f.opp)) : [];
       if (data.form?.[pid]) Object.assign(f, data.form[pid]); // last / hit, only when the caller already computed them from the data
     }
     return f;
@@ -142,8 +193,9 @@ async function asImage(loadImage, buf) {
  * Fonts match the site: Satoshi for names/body (`bold` / `regular`), Barlow Condensed for figures (`num`) and the Fancy.cash wordmark (`brand`).
  * `photo` / `jersey` / `teamLogo` / `oppLogo` / `bookLogo` / `brandLogo` are image bytes or null.
  */
-export async function renderCard(f, { photo = null, jersey = null, teamLogo = null, oppLogo = null, bookLogo = null, brandLogo = null, fonts = {} } = {}) {
+export async function renderCard(f, { photo = null, jersey = null, teamLogo = null, oppLogo = null, bookLogo = null, bookMarks = {}, brandLogo = null, fonts = {} } = {}) {
   const { createCanvas, GlobalFonts, loadImage } = await import("@napi-rs/canvas");
+  mk = createCanvas;
   if (fonts.bold) GlobalFonts.registerFromPath(fonts.bold, "CardBold");
   if (fonts.regular) GlobalFonts.registerFromPath(fonts.regular, "CardRegular");
   if (fonts.num) GlobalFonts.registerFromPath(fonts.num, "CardNum");
@@ -164,12 +216,12 @@ export async function renderCard(f, { photo = null, jersey = null, teamLogo = nu
   const teamImg = await asImage(loadImage, teamLogo);
   const oppImg = await asImage(loadImage, oppLogo);
   const bookImg = await asImage(loadImage, bookLogo);
-  const brandImg = await asImage(loadImage, brandLogo);
+  const marks = Object.fromEntries(await Promise.all(Object.entries(bookMarks || {}).map(async ([k, v]) => [k, await asImage(loadImage, v)])));
 
-  if (f.kind === "prop") drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, text, bold, reg, num });
+  if (f.kind === "prop") drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, marks, text, bold, reg, num });
   else if (f.kind === "fixture" || f.kind === "venue") drawPlain(g, f, { text, bold, reg });
   else drawPlayer(g, f, { img, kit, text, bold, reg });
-  drawBrand(g, text, brand, brandImg);
+  drawBrand(g, text, bold);
   return jpegUnder(c);
 }
 
@@ -210,46 +262,75 @@ function drawPlayer(g, f, { img, kit, text, bold, reg }) {
   text("Free, with every price in decimal", 72, 468, 26, MUTED, reg, "left", 580);
 }
 
-function drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, text, bold, reg, num }) {
-  // Cricket-stats share card: name (Satoshi) → hero line + decimal price (condensed) → crests → L5 chart → metric pills. Portrait right.
+function drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, marks = {}, text, bold, reg, num }) {
+  // Share card on a 64 px margin grid: left column x 64..624 (three equal tiles per row, 13 px gutters), portrait right. Baselines: name 98, meta 128, stat 178, hero 240,
+  // tile rows 272 / 340 (56 px tall), chart labels 430, chart tracks 462..514 (figures above, opponents 536), book strip 552..600. A block with no data is skipped, never left as an empty label.
   drawKitPortrait(g, f, img, kit, text, bold);
-  const left = 64, col = 560;
+  const L = 64, COL = 560, GAP = 13, TW = Math.floor((COL - 2 * GAP) / 3);
 
-  // Soft left rail so the type column reads as one composition against the portrait.
-  g.fillStyle = "rgba(39,218,142,0.55)";
-  g.fillRect(40, 96, 4, 430);
-
-  text(f.name, left, 112, 52, "#ffffff", bold, "left", col);
+  text(f.name, L, 98, 54, "#ffffff", bold, "left", COL);
   const meta = [f.fmt, f.role, f.team].filter(Boolean).join("  ·  ");
-  if (meta) text(meta.toUpperCase(), left, 142, 18, MUTED, num, "left", col);
+  if (meta) text(meta.toUpperCase(), L, 128, 18, MUTED, num, "left", COL);
 
-  // Hero: STAT + OVER line (condensed) beside the book chip and a big decimal price.
-  text(String(f.stat || "").toUpperCase(), left, 188, 20, GREEN, num, "left", 220);
-  const lineLabel = `OVER ${f.line}`;
-  text(lineLabel, left, 248, 64, "#ffffff", num, "left", 320);
-  if (f.price) {
-    const priceX = left + 340;
-    if (bookImg || f.book) {
-      bookChip(g, { img: bookImg, name: f.book }, priceX, 198, bookImg ? 100 : Math.min(120, 20 + String(f.book || "").length * 10), 38, text, bold);
-    }
-    text(f.price.toFixed(2), priceX, 268, 56, GREEN, num, "left", 160);
+  text(String(f.stat || "").toUpperCase(), L, 178, 20, GREEN, num, "left", 260);
+  const hero = text(`OVER ${f.line}`, L, 240, 64, "#ffffff", num, "left", 330);
+  if (f.opp) { // matchup: the two crests at full size, no container, centred on the hero line
+    const bw = 84, bh = 60, x0 = L + Math.max(hero, 190) + 30, cy = 216;
+    crest(g, teamImg, abbr(f.team), x0 + bw / 2, cy, bw, text, bold, bh);
+    text("v", x0 + bw + 14, cy + 7, 20, MUTED, bold, "center", 24);
+    crest(g, oppImg, abbr(f.opp), x0 + bw + 28 + bw / 2, cy, bw, text, bold, bh);
   }
 
-  drawMatchup(g, f, teamImg, oppImg, text, bold, left, 292);
-  const vs = f.team && f.opp ? `${abbr(f.team)} v ${abbr(f.opp)}` : (f.opp ? `vs ${abbr(f.opp)}` : "");
-  if (vs) text(vs, left + 128, 326, 22, MUTED, reg, "left", 360);
-
+  // Tiles: one grid, filled in reading order (fair, listed, hit rates, records); a missing figure leaves no hole
   const avg = f.l5 && Number.isFinite(Number(f.l5.mean)) ? Number(f.l5.mean) : null;
-  const last = f.last && Number.isFinite(Number(f.last.value)) ? Number(f.last.value) : null;
-  const hit = f.l5 && Number.isFinite(Number(f.l5.p)) ? Number(f.l5.p) : (f.hit && Number.isFinite(Number(f.hit.p)) ? Number(f.hit.p) : null);
+  const l5p = f.l5 && Number.isFinite(Number(f.l5.p)) ? Number(f.l5.p) : (f.hit && Number.isFinite(Number(f.hit.p)) ? Number(f.hit.p) : null);
+  const tone = (p) => (p >= 0.6 ? GREEN : p < 0.4 ? RED : "#f5a524");
+  const rate = (r) => `${Math.round(r.p * 100)}% · ${r.hits}/${r.played}`;
+  const tiles = [];
+  if (f.fair?.odds) tiles.push({ k: `FAIR · ${f.fair.label}`, v: f.fair.odds.toFixed(2) });
+  if (f.price) tiles.push({ k: "LISTED", v: f.price.toFixed(2), tone: GREEN, logo: true });
+  if (l5p != null) tiles.push({ k: "L5 HIT", v: `${Math.round(l5p * 100)}%`, tone: tone(l5p) });
+  if (f.season?.p != null) tiles.push({ k: `${f.season.year} HIT`, v: rate(f.season), tone: tone(f.season.p) });
+  if (f.h2h?.p != null) tiles.push({ k: `VS ${abbr(f.h2h.name)}`, v: rate(f.h2h), tone: tone(f.h2h.p) });
+  if (f.atGround?.p != null) tiles.push({ k: `AT ${String(f.atGround.name).toUpperCase()}`, v: rate(f.atGround), tone: tone(f.atGround.p) });
+  else if (avg != null) tiles.push({ k: "L5 AVG", v: fmtAvg(avg) });
+  tiles.slice(0, 6).forEach((t, i) => {
+    const x = L + (i % 3) * (TW + GAP), y = 272 + Math.floor(i / 3) * 68;
+    g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x, y, TW, 56, 12); g.fill();
+    text(t.k, x + 16, y + 22, 13, MUTED, num, "left", TW - 32);
+    const vw = text(t.v, x + 16, y + 47, 28, t.tone || "#ffffff", num, "left", TW - 32);
+    if (t.logo && (bookImg || f.book)) {
+      const room = TW - 32 - vw - 10;
+      if (room > 40) bookChip(g, { img: bookImg, name: f.book }, x + TW - 16 - Math.min(room, 84), y + 26, Math.min(room, 84), 22, text, bold);
+    }
+  });
 
-  text("LAST 5", left, 368, 16, MUTED, num, "left", 120);
-  if ((f.last5 && f.last5.length) || last != null) drawLast5(g, f, last, text, bold, reg, num, left, 380, 520, 128);
+  // Charts: his last five, and his games at this ground
+  const bars = f.last5 && f.last5.length ? f.last5 : (f.last && Number.isFinite(Number(f.last.value)) ? [{ value: f.last.value }] : []);
+  if (bars.length) {
+    text("LAST 5", L, 430, 16, MUTED, num, "left", 120);
+    drawLast5(g, { line: f.line, last5: bars }, null, text, bold, reg, num, L, 462, 232, 52);
+  }
+  if (f.atGround?.bars?.length) {
+    const gx = L + 296, a = f.atGround;
+    text(`AT ${String(a.name || "GROUND").toUpperCase()}${a.played ? `  ·  ${a.hits}/${a.played} HIT` : ""}`, gx, 430, 16, MUTED, num, "left", 250);
+    drawLast5(g, { line: f.line, last5: a.bars }, null, text, bold, reg, num, gx, 462, 232, 52);
+  }
 
-  // Metric pills — condensed figures, cricket scoreboard feel.
-  let px = left;
-  if (avg != null) px = metricPill(g, text, num, px, 580, "L5 AVG", fmtAvg(avg)) + 14;
-  if (hit != null) metricPill(g, text, num, px, 580, "HIT", `${Math.round(hit * 100)}%`, hit >= 0.6 ? GREEN : hit < 0.4 ? RED : "#f5a524");
+  // Book strip: each listed line with its best over price (or each book's price at the line), the best outlined
+  const bl = f.bookLines || [];
+  if (bl.length > 1) {
+    const w = Math.floor((COL - GAP * (bl.length - 1)) / bl.length);
+    bl.forEach((b, i) => {
+      const x = L + i * (w + GAP), on = !!b.best;
+      g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x, 552, w, 48, 12); g.fill();
+      if (on) { g.strokeStyle = GREEN; g.lineWidth = 2; g.beginPath(); g.roundRect(x, 552, w, 48, 12); g.stroke(); }
+      const mk = marks[b.stem];
+      if (mk) bookChipMark(g, mk, x + 14, 559, w - 28, 15); else text(String(b.book || "").toUpperCase(), x + 14, 572, 12, MUTED, num, "left", w - 28);
+      text(String(b.line), x + 14, 593, 24, "#ffffff", num, "left", w * 0.5);
+      text(b.price.toFixed(2), x + w - 14, 593, 22, on ? GREEN : MUTED, num, "right", w * 0.5);
+    });
+  }
 }
 
 /** Compact label + condensed value in a tonal pill (share-card metrics only). */
@@ -283,11 +364,10 @@ function drawMetric(g, { k, v, tone, img, chip }, x, y, text, bold, reg, max = 1
   }
 }
 
-/** The bookmaker's mark on a white pill (logos are drawn for dark or light grounds, a white pill reads for all); its name when there is no logo file. */
+/** The bookmaker's logo alone, no container, fitted in w x h; its name when there is no logo file. */
 function bookChip(g, { img, name }, x, y, w, h, text, bold) {
-  g.fillStyle = "#ffffff"; g.beginPath(); g.roundRect(x, y, w, h, h / 2); g.fill();
-  if (img) mark(g, img, x + 10, y + 6, w - 20, h - 12);
-  else if (name) text(name, x + w / 2, y + h / 2 + 7, 18, BG, bold, "center", w - 14);
+  if (img) mark(g, img, x, y, w, h);
+  else if (name) text(name, x, y + h / 2 + 7, 20, "#ffffff", bold, "left", w);
 }
 
 function drawGauge(g, f, hit, text, bold, cx, cy) {
@@ -302,25 +382,19 @@ function drawGauge(g, f, hit, text, bold, cx, cy) {
   else if (hit != null) text(`${Math.round(hit * 100)}%`, cx, cy + 8, 28, "#ffffff", bold, "center", 100);
 }
 
-function drawMatchup(g, f, teamImg, oppImg, text, bold, x, y) {
-  const r = 26;
-  logo(g, teamImg, abbr(f.team), x + r, y + r, r, text, bold);
-  text("vs", x + r * 2 + 28, y + r + 8, 20, MUTED, bold, "center", 40);
-  if (f.opp) logo(g, oppImg, abbr(f.opp), x + r * 2 + 56 + r, y + r, r, text, bold);
+let mk = null; // createCanvas, set when a picture is drawn (the logo-trimming scratch canvas)
+/** A team crest at full size in a `box` x `boxH` area: the logo alone (no circle, tile or padding), contained; the team's letters when there is no image. */
+function crest(g, img, letters, cx, cy, box, text, bold, boxH = box) {
+  if (img) {
+    const v = img.__vis || (img.__vis = visibleBounds(mk, img)), k = Math.min(box / v.sw, boxH / v.sh), w = v.sw * k, h = v.sh * k;
+    g.drawImage(img, v.sx, v.sy, v.sw, v.sh, cx - w / 2, cy - h / 2, w, h);
+  } else text(letters, cx, cy + boxH * 0.17, boxH * 0.5, MUTED, bold, "center", box);
 }
 
-function logo(g, img, letters, cx, cy, r, text, bold) {
-  g.save();
-  g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.closePath();
-  g.fillStyle = "#ffffff"; g.fill();
-  g.clip();
-  if (img) {
-    const pad = r * 0.18, box = (r - pad) * 2;
-    const s = Math.min(box / img.width, box / img.height), w = img.width * s, h = img.height * s;
-    g.drawImage(img, cx - w / 2, cy - r + pad, w, h); // sit at the tip of the circle so a crest is not cropped
-  } else text(letters, cx, cy + 8, 18, GREEN, bold, "center", r * 2 - 8);
-  g.restore();
-  g.strokeStyle = HAIR; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, r, 0, Math.PI * 2); g.stroke();
+/** A bookmaker's logo alone (no pill), fitted in maxW x h. */
+function bookChipMark(g, img, x, y, maxW, h) {
+  const k = Math.min(maxW / img.width, h / img.height);
+  g.drawImage(img, x, y, img.width * k, img.height * k);
 }
 
 /** The book's own mark, top-right, inside the ~64 px inset X's 2:1 crop leaves. */
@@ -388,9 +462,7 @@ function drawLast5(g, f, last, text, bold, reg, num, x, y, chartW = 200, chartH 
     const tone = v === f.line ? "#f5a524" : v > f.line ? GREEN : RED;
     g.fillStyle = tone;
     g.beginPath(); g.roundRect(bx, y + h - fill, w, fill, 8); g.fill();
-    // Value sits above the fill when there is room; otherwise inside the bar in white.
-    const above = fill < h - 28;
-    text(String(v), bx + w / 2, above ? y + h - fill - 8 : y + h - fill + 22, above ? 22 : 20, above ? "#ffffff" : BG, num, "center", w + 8);
+    text(String(v), bx + w / 2, y - 7, 20, tone, num, "center", w + 8); // the figure rides above the track, clear of the dashed line
     if (b.vs) text(abbr(b.vs), bx + w / 2, y + h + 22, 15, MUTED, reg, "center", w + 12);
   });
   g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 2; g.setLineDash([5, 5]);
@@ -398,23 +470,8 @@ function drawLast5(g, f, last, text, bold, reg, num, x, y, chartW = 200, chartH 
   text(String(f.line), x + total + 12, lineY + 6, 18, MUTED, num);
 }
 
-/** Fancy.cash mark first, then the wordmark (Barlow Condensed Black) — top-right, inside the ~64 px inset X's 2:1 crop leaves. */
-function drawBrand(g, text, brand, brandImg) {
-  const size = 48, right = 1136, y = 36, sizeT = 28, gap = 14;
-  g.font = `${sizeT}px ${brand}`;
-  const fw = g.measureText("Fancy").width, dw = 8, cw = g.measureText("cash").width;
-  const x0 = right - (size + gap + fw + dw + cw); // F mark leads the group
-  if (brandImg) mark(g, brandImg, x0, y, size, size);
-  else {
-    g.save(); g.translate(x0, y); g.scale(size / 64, size / 64);
-    const markFill = g.createLinearGradient(0, 0, 64, 64); markFill.addColorStop(0, "#3cf0a6"); markFill.addColorStop(1, "#1fb877");
-    g.fillStyle = markFill; g.beginPath(); g.roundRect(0, 0, 64, 64, 15); g.fill();
-    g.fillStyle = "#0f0f0f";
-    for (const [bx, by, w, h] of [[17, 14, 10, 37], [17, 14, 25, 10], [17, 29.5, 18, 10]]) { g.beginPath(); g.roundRect(bx, by, w, h, 5); g.fill(); }
-    g.beginPath(); g.arc(48.5, 19, 6, 0, Math.PI * 2); g.fill(); g.restore();
-  }
-  const tx = x0 + size + gap, ty = y + 34;
-  text("Fancy", tx, ty, sizeT, "#ffffff", brand);
-  text(".", tx + fw, ty, sizeT, GREEN, brand);
-  text("cash", tx + fw + dw, ty, sizeT, "#ffffff", brand);
+/** The site's own brand (`engine/brand-draw.js`), top-right inside the ~64 px inset X's 2:1 crop leaves. */
+function drawBrand(g, text, bold) {
+  const size = 48, right = 1136;
+  drawBrandGroup(g, right - brandWidth(g, size, bold), 36, size, bold);
 }

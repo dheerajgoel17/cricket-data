@@ -119,7 +119,7 @@ export const TABLE_HEAD =
   "h-auto px-snug py-tight text-left label-cap text-footnote font-label text-muted-foreground";
 
 /** Phone edge bleed for stats tables / game logs: full-bleed hairlines, inset again from `lg`. */
-export const TABLE_BLEED = "-mx-gutter border-y border-hairline lg:mx-0";
+export const TABLE_BLEED = "border border-hairline";
 
 /** Simple data table on shadcn's Table: columns are labels, rows are arrays of cells. `bleed` applies the Player Props edge contract. */
 export function DataTable({
@@ -132,17 +132,17 @@ export function DataTable({
   columns: ReactNode[];
   rows: ReactNode[][];
   className?: string;
-  /** Full-bleed on phone (`-mx-gutter` + hairlines); flush from `lg`. */
+  /** Boxed in the page margin with a hairline on all four sides (`TABLE_BLEED`). */
   bleed?: boolean;
   /** When set, rows are clickable (e.g. Player game log → sheet). */
   onRowClick?: (index: number) => void;
 }) {
   const table = (
-    <Table className={className}>
+    <Table className={cn(bleed && "[&_td]:px-tight [&_th]:px-tight", className)}>
       <TableHeader>
         <TableRow className="hover:bg-transparent">
           {columns.map((c, i) => (
-            <TableHead key={i} className={cn(TABLE_HEAD, i > 0 && "text-right", bleed && i === 0 && "pl-gutter", bleed && i === columns.length - 1 && "pr-gutter")}>
+            <TableHead key={i} className={cn(TABLE_HEAD, i > 0 && "text-right",)}>
               {c}
             </TableHead>
           ))}
@@ -156,7 +156,7 @@ export function DataTable({
             onClick={onRowClick ? () => onRowClick(i) : undefined}
           >
             {r.map((c, j) => (
-              <TableCell key={j} className={cn("whitespace-nowrap tabular-nums", j > 0 && "text-right", bleed && j === 0 && "pl-gutter", bleed && j === r.length - 1 && "pr-gutter")}>
+              <TableCell key={j} className={cn("whitespace-nowrap tabular-nums", j > 0 && "text-right",)}>
                 {c ?? "–"}
               </TableCell>
             ))}

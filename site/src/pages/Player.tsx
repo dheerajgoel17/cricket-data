@@ -13,7 +13,6 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components
 import { SCOPE_LABEL, TEST_KEEP_MS, bookFormatFor, bookLinesFor, bookScopesFor, bookStatsFor, keepMsFor, sameFixture, scopeTag, teamKey } from "@cricket/engine/lines.js";
 import { BookTable } from "@/components/app/book-table";
 import { LadderRow, SideBook, pricedFromBooks } from "@/components/app/line-ladder";
-import { fancySplitNote } from "@/lib/fancy-split";
 import { SPLITS } from "@cricket/engine/props.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { sideEdge } from "@cricket/engine/stats.js";
@@ -40,7 +39,8 @@ import { useLiveDoc } from "@/hooks/useLive";
 import { liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { venueStem } from "@cricket/engine/markets.js";
 import { matchPhase, matchSide, pickPricedMatch, teamIndexByName } from "@cricket/engine/next-match.js";
-import { NextFilters, NextMatch, UnpricedNote } from "@/components/app/next-match";
+import { bookVariant } from "@/lib/books";
+import { MatchupRates, NextFilters, NextMatch, UnpricedNote } from "@/components/app/next-match";
 import { Field, HOME_AWAY, LiveForm, NativeSelect } from "@/components/app/forms";
 import { TeamBadge } from "@/components/app/badges";
 import { ChartBars } from "@/components/app/chart";
@@ -48,10 +48,9 @@ import { HeroWash, sideAccent } from "@/components/app/hero-wash";
 import { AnimatedHeight } from "@/components/app/animated-height";
 import { PillGroup } from "@/components/app/pill-group";
 import { PropStar, StarButton } from "@/components/app/star";
-import { MatchStatus } from "@/components/app/match-status";
 import { PlayerName, isHexPlayerId, resolvePlayerLabel } from "@/components/app/player-name";
 import { PlayerPortrait } from "@/components/app/portrait";
-import { sendShare, sharePlayerUrl } from "@/lib/share";
+import { sendShare, sendShareImage, sharePlayerUrl } from "@/lib/share";
 import { shareText } from "@cricket/engine/share-text.js";
 import { AdSlot } from "@/components/app/ad-slot";
 import { Crumbs, DataTable, DetailSplit, StickyFilterBand, StickyPanel, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
@@ -78,7 +77,7 @@ function Metric({ k, v, tone, className, text }: { k: string; v: ReactNode; tone
   return (
     <div className={cn("grid min-w-0 gap-hair", className)}>
       <span className="label-cap text-callout leading-tight text-muted-foreground">{k}</span>
-      <b className={cn(text ? "line-clamp-2 break-words text-body font-label leading-snug" : "break-words font-condensed text-metric font-label leading-none tabular-nums", tone === "up" && "text-primary", tone === "down" && "text-miss")}>{v}</b>
+      <b className={cn(text ? "line-clamp-2 break-words font-condensed text-[1.375rem] font-label leading-tight" : "break-words font-condensed text-[1.375rem] font-label leading-none tabular-nums", tone === "up" && "text-primary", tone === "down" && "text-miss")}>{v}</b>
     </div>
   );
 }
@@ -112,18 +111,18 @@ export function PlayerPage() {
   return <PlayerScreen key={idx} idx={idx} />;
 }
 
-/** Compact identity hero: photo, name, match-side team and formats, star. Share lives in HeaderActions; desktop nav is Crumbs. `team` is the side for this match (kit + crest + label); `teamIx` is that side's team page. */
+/** Compact identity hero: photo, name, match-side team, profile, star. Share lives in HeaderActions; desktop nav is Crumbs. `team` is the side for this match (kit + crest + label); `teamIx` is that side's team page. */
 function PlayerHeader({ idx, name, team, teamIx, test, fmts }: { idx: number; name: string; team: string; teamIx: number; test?: boolean; fmts: [number, string][] }) {
   const { store } = useData();
   const profiles = useQuery({ queryKey: ["profiles"], queryFn: () => loadJson("/data/profiles.json"), staleTime: 60 * 60_000 });
   const profile = profileParts(profiles.data, store.P.id[idx]).join(" · ");
   return (
-    <section className="flex items-end justify-between gap-snug border-b border-hairline">
+    <section className="flex items-end justify-between gap-snug">
       <div className="grid min-w-0 flex-1 content-start gap-tight pt-stack">
         <h1 className="text-display font-emphasis leading-tight tracking-tight"><PlayerName idx={idx} always fallback={name} /></h1>
-        <p className="text-body leading-snug text-muted-foreground"><span className="block truncate">{team}</span><span className="block">{fmts.map(([, f]) => f).join(" · ")}</span>{profile && <span className="block">{profile}</span>}</p>
+        <p className="text-body leading-snug text-muted-foreground"><span className="block truncate">{team}</span>{profile && <span className="block">{profile}</span>}</p>
         <div className="flex items-center gap-snug py-stack">
-          <Link to={`/team/${teamIx}`} aria-label={`${team} page`} className="grid size-(--touch) place-items-center rounded-full bg-secondary active:opacity-70"><TeamBadge name={team} size="sm" /></Link>
+          <Link to={`/team/${teamIx}`} aria-label={`${team} page`} className="grid min-h-(--touch) place-items-center active:opacity-70"><TeamBadge name={team} size="xl" className="size-20" /></Link>
           <StarButton kind="player" idx={idx} className="size-(--touch)" />
         </div>
       </div>
@@ -207,7 +206,17 @@ function PlayerScreen({ idx }: { idx: number }) {
     const u = sharePlayerUrl(location.origin, idx, stat, shareLine);
     // the card carries the pick; the words are the numbers behind it, then the link (one string, so every app keeps both)
     const text = shareText({ entries: res.data?.ok ? res.data.chart?.entries : [], line: shareLine, side: plan.side, fmt: FORMATS[fmtVal], price: sharePrice, ground: nextMatch?.ground, opp: nextMatch?.opp, url: u }) || u;
-    void sendShare(text, name, () => toast("Copied"));
+    if (shareLine == null || plan.side === "under") { void sendShare(text, name, () => toast("Copied")); return; }
+    // the shareable picture is the server's poster (same numbers as the card and the row), shared as a file where the browser can, else saved
+    void (async () => {
+      try {
+        const r = await fetch(`/api/og?p=${idx}&stat=${encodeURIComponent(stat)}&line=${shareLine}&poster=1`);
+        if (!r.ok || !/^image\//.test(r.headers.get("content-type") || "")) throw new Error("poster");
+        await sendShareImage({ file: await r.blob(), text, title: name, filename: `fancy-${idx}-${stat}-${shareLine}.png`, copied: () => toast("Copied"), saved: () => toast("Image saved") });
+      } catch {
+        void sendShare(text, name, () => toast("Copied"));
+      }
+    })();
   };
   const loading = lines.isLoading || res.isLoading || !res.data;
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -234,13 +243,13 @@ function PlayerScreen({ idx }: { idx: number }) {
       </div>
       {/* Sticky chrome stays solid elevated when stuck (shell flush). Wash is hero-bound only — scrolls away with identity (app EntityHeroWash twin). */}
       <StickyFilterBand>
-        {/* Format + Filters on the hairline. Filled rows: snug pad/gap (tight read as missing; stack on sub pills left a hole under the header that jumped on sticky). */}
-        <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
+        {/* Format + Filters on the hairline (the selected format's underline sits on the line: no bottom padding on the row). Filled rows: snug pad/gap (tight read as missing; stack on sub pills left a hole under the header that jumped on sticky). */}
+        <div className="flex min-w-0 items-end gap-snug border-b border-hairline px-gutter pt-snug">
           {fmts.length > 1 ? (
             <PillGroup sub layoutId="pl-fmt" label="Format" value={String(fmtVal)} onChange={(v) => navigateWith({ fmt: v, line: "", scope: "", start: "" })}
               className="min-w-0 flex-1" items={fmts.map(([i, f]) => [String(i), f])} />
           ) : <span className="min-w-0 flex-1" />}
-          <FilterButton count={activeFilters.length} onClick={() => setFiltersOpen(true)} />
+          <div className="pb-snug"><FilterButton count={activeFilters.length} onClick={() => setFiltersOpen(true)} /></div>
         </div>
         <div className="flex flex-col gap-snug px-gutter py-snug">
           {testBat && (
@@ -337,7 +346,7 @@ function useNextMatch(doc: any, pid: string, idx: number, fmt: string, team: str
     const mine = listed(mineRaw);
     const ground = String(row?.venue || "");
     const known = ground ? (store.venues as string[]).find((n) => venueStem(n) === venueStem(ground)) : undefined; // the data spells a ground several ways
-    return { match, start, competition, team: mine, opp, ground, known, priced: !!priced, phase };
+    return { match, start, competition, team: mine, opp, ground, known, priced: !!priced, phase, id: row?.id ? String(row.id) : undefined };
   }, [doc, pid, idx, fmt, team, lastGame, prefer, fixtures.data, live.data, state.data, store]);
 }
 
@@ -370,11 +379,13 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
   const ws = entries.length ? windowRates(entries, line, side) : [];
   const cur = ws.find((w: any) => w.n === win) || ws[ws.length - 1];
   const shown = cur ? (cur.n ? entries.slice(-cur.n) : entries) : [];
+  // the ladder is only worth a table when two or more lines are offered; a book's Fancy market is another bet, not another line
+  const ladderLines = book ? book.lines.filter((l: any) => l.books.some((b: any) => !/^fancy$/i.test(bookVariant(b.source) || ""))).length : 0;
+  const ladder = ladderLines > 1;
   const bookAt = book ? book.lines.find((l: any) => l.line === line) : null;
   const pricedAt = bookAt ? pricedFromBooks(bookAt.line, bookAt.books) : null;
   const overFace = pricedAt?.over != null ? pricedAt.books.find((b) => b.over === pricedAt.over) : null;
   const underFace = pricedAt?.under != null ? pricedAt.books.find((b) => b.under === pricedAt.under) : null;
-  const splitNote = fancySplitNote(line, line, overFace?.source, underFace?.source);
   const bestPrice = bookAt ? Math.max(0, ...bookAt.books.map((b: any) => b[side] || 0)) : 0;
   const prior = bookAt?.prob == null ? null : side === "over" ? bookAt.prob : 1 - bookAt.prob; // the market's no-vig chance of this side
   const edge = bookAt && cur ? sideEdge(cur.hits, cur.played, prior, bestPrice) : null;
@@ -411,7 +422,8 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           {!book ? <UnpricedNote statLabel={res.statLabel} /> : null}
           {next ? (
             <div className="flex flex-col gap-snug lg:max-w-xl">
-              <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} />
+              <NextMatch {...{ next, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} />
+              <MatchupRates {...{ next, entries, line, side }} />
             </div>
           ) : null}
           <div className="flex flex-col items-start gap-snug" role="status">
@@ -424,15 +436,15 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
           </div>
         </>
       ) : (
-      <DetailSplit className={!book ? "lg:grid-cols-1" : undefined}>
+      <DetailSplit className={!ladder ? "lg:grid-cols-1" : undefined}>
         <section className="flex min-w-0 flex-col gap-stack">
-          <div className={cn("flex items-center justify-between gap-stack border-b border-hairline pb-snug", CARD)}>
+          {next ? <NextMatch {...{ next, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} /> : null}
+          <div className={cn("flex items-center justify-between gap-stack pb-snug", CARD)}>
             <div className="grid min-w-0 flex-1 grid-cols-3 gap-x-snug gap-y-snug">
               <Metric k={`${cur.label} avg`} v={<Arrow up={cur.mean == null ? null : cur.mean > line}>{num(cur.mean == null ? null : Math.round(cur.mean * 100) / 100)}</Arrow>} />
               <Metric k={book ? "Line" : "Research line"} v={`${side === "over" ? "O" : "U"} ${line}`} />
               <Metric k="Hit rate" v={<Arrow up={cur.p == null ? null : cur.p >= 0.5}>{cur.p == null ? "–" : `${Math.round(cur.p * 100)}%`}</Arrow>} />
               <Metric k="Fair price" v={cur.p ? odds(1 / cur.p) : "–"} />
-              <Metric text k="Opponent" v={next?.opp ? <span className="grid gap-hair"><span>{abbr(next.opp)}</span><MatchStatus phase={next.phase || "upcoming"} start={next.start} className="text-callout text-muted-foreground" /></span> : "–"} />
               <Metric text k="Prop" v={book ? res.statLabel : <span className="grid gap-hair"><span>{res.statLabel}</span><span className="text-callout font-label text-muted-foreground">Not listed</span></span>} />
             </div>
             <div className="hidden shrink-0 rounded-2xl border border-hairline bg-card px-snug py-snug sm:block">
@@ -512,21 +524,22 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
                         </div>
                       ))}
                     </div>
-                    {splitNote && <p className="border-t border-hairline px-snug py-tight text-footnote text-muted-foreground">{splitNote}</p>}
-                    <div className="border-t border-hairline px-snug py-snug">
-                      <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
-                    </div>
+                    {pricedAt.books.some((b) => b.source !== overFace?.source && b.source !== underFace?.source) ? (
+                      <div className="border-t border-hairline px-snug py-snug">
+                        <BookTable books={pricedAt.books} shown={[overFace?.source, underFace?.source]} />
+                      </div>
+                    ) : null}
                   </>
                 ) : (
                   <p className="px-snug py-snug text-callout text-muted-foreground">The books price {book.main.line}, not {line}. <Button variant="link" className="h-auto p-0 text-callout" onClick={() => pickLine(book.main.line)}>Use {book.main.line}</Button></p>
                 )}
               </div>
             )}
+            {next ? <div className="border-t border-hairline"><MatchupRates inline {...{ next, entries, line, side }} /></div> : null}
           </div>
-          {next ? <NextMatch {...{ next, entries, line, side, book: next.priced ? book : null, statLabel: res.statLabel, fmt, standing, out }} /> : null}
         </section>
 
-        {book && (
+        {ladder && (
           <StickyPanel label="Line ladder">
             <div className="hidden items-baseline justify-between gap-snug border-b border-hairline px-gutter py-snug lg:flex">
               <h2 className="text-body font-emphasis">Lines{scopeTag(fmt, scope) ? ` · ${scopeTag(fmt, scope)}` : ""}</h2>
@@ -576,7 +589,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
                     const s = barState(e, line, side) as string;
                     return (
                       <li key={i} className="border-t border-hairline first:border-t-0">
-                        <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-gutter py-snug text-left transition-colors active:bg-accent lg:px-0">
+                        <button type="button" onClick={() => setGame({ e, s })} className="flex min-h-row w-full items-center gap-snug px-snug py-snug text-left transition-colors active:bg-accent">
                           <TeamBadge name={e.opp} size="sm" />
                           <span className="grid min-w-0 flex-1 gap-hair"><span className="truncate text-body font-label">{e.opp}</span><span className="truncate text-footnote text-muted-foreground">{e.date}{e.venueName ? ` · ${e.venueName}` : ""}</span></span>
                           <span className={cn("min-w-14 rounded-lg px-snug py-tight text-center text-callout font-emphasis tabular-nums", s === "hit" ? "bg-primary/20 text-primary" : s === "miss" ? "bg-miss/20 text-miss" : s === "push" ? "bg-amber/20 text-amber" : "bg-secondary")}>{e.value == null ? (s === "void" ? "VOID" : s === "na" ? "N/A" : "DNP") : e.value}</span>
