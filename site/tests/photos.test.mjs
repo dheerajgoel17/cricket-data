@@ -15,7 +15,7 @@ test("player photos: the source first, Commons fallback, none otherwise", () => 
 
 test("team logos resolve display names, including women's sides, flag-less teams and clubs", () => {
   assert.equal(teamLogo(photos, "West Indies"), "https://img.test/Teams/V.png");
-  assert.equal(teamLogo(photos, "India (W)"), "https://img.test/Teams/O.png");
+  assert.equal(teamLogo(photos, "India (W)"), null, "a women's side with no women's team of its own shows no men's crest");
   assert.equal(teamLogo(photos, "Mumbai Indians"), "https://img.test/Teams/F.png");
   assert.equal(teamLogo(photos, "Nowhere XI"), null);
   assert.equal(fold("Côte d'Ivoire"), "cote d ivoire");
@@ -41,13 +41,13 @@ test("league logos are looked up by the event's folded name, the newest season's
 test("team id: photos.t wins; TEAM_FILL covers holes older builds omitted; no AD placeholder jersey", () => {
   assert.equal(teamId({ t: { "adelaide strikers": "4Q", "adelaide strikers women": "4R" } }, "Adelaide Strikers (W)"), "4R", "a women's side takes the source's women's team");
   assert.equal(teamId({ t: { "adelaide strikers": "4Q", "adelaide strikers women": "4R" } }, "Adelaide Strikers Women"), "4R");
-  assert.equal(teamId({ t: { "adelaide strikers": "4Q" } }, "Adelaide Strikers (W)"), "4Q", "no women's team listed: the men's logo");
+  assert.equal(teamId({ t: { "adelaide strikers": "4Q" } }, "Adelaide Strikers (W)"), null, "no women's team listed: no logo, never the men's");
   assert.equal(teamId(photos, "India"), "O");
   assert.equal(teamId(photos, "Afghanistan"), "Y", "fill when t omits a Base side the source lists");
   assert.equal(teamId({ t: { afghanistan: "XX" } }, "Afghanistan"), "XX", "photos.t wins over fill");
   assert.equal(teamId(photos, "United States of America"), "CD", "Base spelling vs source united states");
   assert.equal(teamId(photos, "Pakistan U19-Women"), "NR", "full fold before stripping women");
-  assert.equal(teamId(photos, "India (W)"), "O", "women's side still uses the men's kit id");
+  assert.equal(teamId({ t: { india: "O", "india women": "OW" } }, "India (W)"), "OW", "a women's side uses its own team id");
   assert.equal(teamId(photos, "Nowhere XI"), null);
   assert.deepEqual(teamJerseys(photos, "Afghanistan"), ["https://img.test/jersey/limited/org/Y.png"]);
   assert.deepEqual(teamJerseys(photos, "Nowhere XI"), []);
