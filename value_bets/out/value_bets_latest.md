@@ -1,18 +1,18 @@
-# Cricket value bets - 2026-11-17 07:00 IST
+# Cricket value bets - 2026-11-17 08:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
 - **smarkets**: ok, 283 prices
-- **feedk**: ok, 136 prices, 7 events
 - **feedg**: ok, 16 prices, 3 events
+- **feedk**: ok, 136 prices, 7 events
 - **feede**: ok, 400 prices, 23 events
-- **feedh**: ok, 939 prices, 55 events
-- **feedi**: ok, 1655 prices, 63 events
+- **feedh**: ok, 939 prices, 61 events
 - **feedf**: ok, 410 prices, 23 events
+- **feedi**: ok, 1593 prices, 69 events
 
-Matches starting in next 168h: **45**, markets priced: **368**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **45**, markets priced: **366**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -32,4 +32,4 @@ Matches starting in next 168h: **45**, markets priced: **368**, value bets: **4*
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Elite Cricket Academy (male), Lahore Region Whites (male), Mashonaland Eagles (male), Mountaineers (male), Pak Xi (male), Peshawar Blues (male), Royal Champs (male), Speedworld Security Solutions (male)
 
-Runtime 220.9s. Snapshot: `odds_20261117T013042Z.jsonl.gz`
+Runtime 200.0s. Snapshot: `odds_20261117T023035Z.jsonl.gz`
