@@ -1,19 +1,19 @@
-# Cricket value bets - 2026-11-18 15:00 IST
+# Cricket value bets - 2026-11-18 16:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **smarkets**: ok, 292 prices
+- **smarkets**: ok, 311 prices
 - **feedg**: ok, 8 prices, 2 events
 - **feedk**: ok, 153 prices, 6 events
-- **feede**: ok, 234 prices, 14 events
-- **feedj**: ok, 450 prices, 7 events
-- **feedf**: ok, 184 prices, 11 events
-- **feedh**: ok, 860 prices, 59 events
-- **feedi**: ok, 1561 prices, 39 events
+- **feedj**: ok, 376 prices, 4 events
+- **feede**: ok, 220 prices, 16 events
+- **feedf**: ok, 154 prices, 9 events
+- **feedh**: ok, 1038 prices, 55 events
+- **feedi**: ok, 1556 prices, 36 events
 
-Matches starting in next 168h: **21**, markets priced: **282**, value bets: **5** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **21**, markets priced: **286**, value bets: **5** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -30,6 +30,6 @@ Matches starting in next 168h: **21**, markets priced: **282**, value bets: **5*
 - **Adelaide Strikers (Women) vs Melbourne Renegades (Women) / G9182 batter_fours / Laura Wolvaardt under 2.5** - why: Model 56% vs market 42% for under 2.5 fours; form 3.7 fours/inn recency-weighted T20 (n_eff 87.6; last 5: 4, 7, 2, 0, 9), bats in 98% of games played; at Adelaide Oval, Adelaide: 11 inns avg 1.5; vs Melbourne Renegades Women: 1 inns avg 0.0; context adj: venue environment +5%, at this venue -13%, team H2H context -2%; weather: high humidity 81%. Notes: 1 market source(s) for fair price; model 0.555 vs market 0.423; assumes bet void if player doesn't bat/bowl - check book rules
 - **Adelaide Strikers vs Melbourne Renegades / Hayley Matthews To Score 50 / Hayley Matthews 50+ yes** - why: Model 21% vs market 25% for 50+ runs; form 27.3 runs/inn recency-weighted T20 (n_eff 81.7; last 5: 3, 1, 49, 59, 7), bats in 99% of games played; vs Adelaide Strikers Women: 1 inns avg 49.0; context adj: team H2H context +8%; weather: high humidity 81%. Notes: 4 market source(s) for fair price; model 0.208 vs market 0.249; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 
-Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Baroda (W) (female), Baroda (Women) (female), Central (male), Maharashtra (W) (female), Nhlangano Legends (male), Omr Checker (male), Sunny 11 Pratishtan (male), Vidarbha (W) (female), Vidarbha (Women) (female)
+Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Baroda (W) (female), Central (male), Maharashtra (W) (female), Nhlangano Legends (male), Vidarbha (W) (female)
 
-Runtime 142.9s. Snapshot: `odds_20261118T093034Z.jsonl.gz`
+Runtime 200.3s. Snapshot: `odds_20261118T103039Z.jsonl.gz`
