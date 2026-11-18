@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-18T10:34:44Z",
+ "generated_at_utc": "2026-11-18T11:34:43Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -119,6 +119,29 @@
    "chance": 0.641,
    "edge": 0.2179,
    "edge_pct": 21.8,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-19-brisbane-heat-women-v-sydney-thunder-women|match_fours||0|under",
+   "fixture_id": "2026-11-19-brisbane-heat-women-v-sydney-thunder-women",
+   "match": "Brisbane Heat Women vs Sydney Thunder Women",
+   "format": "T20",
+   "series": "WBBL 2026",
+   "start_utc": "2026-11-19T08:10:00Z",
+   "start_ist": "2026-11-19 13:40 IST",
+   "key": "match_fours",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 33.5,
+   "best_odds": 2,
+   "best_source": "ReddyBook Fancy",
+   "hits": 23,
+   "played": 36,
+   "window": 20,
+   "chance": 0.6085,
+   "edge": 0.217,
+   "edge_pct": 21.7,
    "bat_first": false
   },
   {
