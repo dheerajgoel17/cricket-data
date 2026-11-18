@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-18T00:35:58Z",
+ "generated_at_utc": "2026-11-18T01:35:57Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -234,6 +234,29 @@
    "chance": 0.4613,
    "edge": 0.1994,
    "edge_pct": 19.9,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-18-bangladesh-women-v-thailand-women|top_score||0|under",
+   "fixture_id": "2026-11-18-bangladesh-women-v-thailand-women",
+   "match": "Bangladesh Women vs Thailand Women",
+   "format": "T20",
+   "series": "Women's Emerging Nations Trophy 2026",
+   "start_utc": "2026-11-18T09:15:00Z",
+   "start_ist": "2026-11-18 14:45 IST",
+   "key": "top_score",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 55.5,
+   "best_odds": 1.85,
+   "best_source": "Dafabet",
+   "hits": 27,
+   "played": 40,
+   "window": 20,
+   "chance": 0.64,
+   "edge": 0.184,
+   "edge_pct": 18.4,
    "bat_first": false
   },
   {
