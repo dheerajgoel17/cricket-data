@@ -1,27 +1,27 @@
-# Cricket value bets - 2026-11-19 00:00 IST
+# Cricket value bets - 2026-11-19 01:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
 - **feedi**: error - HTTP 403: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm
-- **smarkets**: ok, 472 prices
+- **smarkets**: ok, 512 prices
 - **feedg**: ok, 16 prices, 3 events
 - **feedk**: ok, 161 prices, 9 events
-- **feedf**: ok, 232 prices, 8 events
-- **feede**: ok, 340 prices, 21 events
+- **feedf**: ok, 244 prices, 8 events
+- **feede**: ok, 352 prices, 22 events
 - **feedj**: ok, 500 prices, 10 events
-- **feedh**: ok, 1774 prices, 80 events
+- **feedh**: ok, 1826 prices, 84 events
 
-Matches starting in next 168h: **41**, markets priced: **393**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **41**, markets priced: **401**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
 | 11-20 13:40 IST | Adelaide Strikers vs Melbourne Renegades | Hayley Matthews To Score 50 | Hayley Matthews 50+ yes | 5.00 @ feede_lb | 4.34 | 0.2082 | 15.1% | 0.94% | medium |
 
 ### Why / notes per bet
-- **Adelaide Strikers vs Melbourne Renegades / Hayley Matthews To Score 50 / Hayley Matthews 50+ yes** - why: Model 21% vs market 25% for 50+ runs; form 27.3 runs/inn recency-weighted T20 (n_eff 81.7; last 5: 3, 1, 49, 59, 7), bats in 99% of games played; vs Adelaide Strikers Women: 1 inns avg 49.0; context adj: team H2H context +8%; weather: high humidity 83%. Notes: 3 market source(s) for fair price; model 0.208 vs market 0.248; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+- **Adelaide Strikers vs Melbourne Renegades / Hayley Matthews To Score 50 / Hayley Matthews 50+ yes** - why: Model 21% vs market 25% for 50+ runs; form 27.3 runs/inn recency-weighted T20 (n_eff 81.7; last 5: 3, 1, 49, 59, 7), bats in 99% of games played; vs Adelaide Strikers Women: 1 inns avg 49.0; context adj: team H2H context +8%; weather: high humidity 78%. Notes: 3 market source(s) for fair price; model 0.208 vs market 0.248; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Central (male), Elite Cricket Academy (male), Karnataka (W) (female), Lokseva Academy (male), Nhlangano Legends (male), Omr Checker (male), Pak Xi (male), Railways (W) (female), Royal Champs (male), Sunny 11 Pratishtan (male)
 
-Runtime 194.6s. Snapshot: `odds_20261118T183037Z.jsonl.gz`
+Runtime 176.1s. Snapshot: `odds_20261118T193038Z.jsonl.gz`
