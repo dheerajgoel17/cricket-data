@@ -1,67 +1,67 @@
 {
- "generated_at_utc": "2026-11-18T04:30:37Z",
- "generated_at_ist": "2026-11-18 10:00 IST",
- "runtime_secs": 204.0,
+ "generated_at_utc": "2026-11-18T04:39:12Z",
+ "generated_at_ist": "2026-11-18 10:09 IST",
+ "runtime_secs": 359.9,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-17",
-  "commit": "f9bf64af30"
+  "commit": "a31f4ab85f"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 401: Unauthorized",
-   "secs": 0.1
+   "secs": 0.4
   },
   "smarkets": {
    "status": "ok",
    "rows": 336,
-   "secs": 2.1
+   "secs": 3.0
   },
   "feedg": {
    "status": "ok",
    "rows": 0,
-   "secs": 5.2,
+   "secs": 5.9,
    "events": 1
   },
   "feedk": {
    "status": "ok",
    "rows": 157,
-   "secs": 17.2,
+   "secs": 18.7,
    "events": 7
   },
   "feede": {
    "status": "ok",
-   "rows": 444,
-   "secs": 69.2,
+   "rows": 420,
+   "secs": 70.8,
    "events": 27
   },
   "feedh": {
    "status": "ok",
    "rows": 984,
-   "secs": 84.8,
-   "events": 61
+   "secs": 82.1,
+   "events": 60
   },
   "feedj": {
    "status": "ok",
-   "rows": 700,
-   "secs": 104.2,
+   "rows": 672,
+   "secs": 99.5,
    "events": 15
   },
   "feedf": {
    "status": "ok",
    "rows": 346,
-   "secs": 116.8,
+   "secs": 124.5,
    "events": 22
   },
   "feedi": {
    "status": "ok",
    "rows": 1695,
-   "secs": 124.2,
+   "secs": 153.9,
    "events": 57
   }
  },
- "snapshot": "odds_20261118T043037Z.jsonl.gz",
+ "snapshot": "odds_20261118T043912Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -140,13 +140,13 @@
  },
  "stats": {
   "events_in_window": 44,
-  "rows_in_window": 4391,
-  "selections_with_model": 1738,
-  "selections_with_market_fair": 2474,
-  "markets_in_window": 336,
+  "rows_in_window": 4339,
+  "selections_with_model": 1718,
+  "selections_with_market_fair": 2446,
+  "markets_in_window": 329,
   "value_bets": 3,
   "dropped_by_filter": {
-   "model_market_gap": 1126,
+   "model_market_gap": 1104,
    "odds_range": 7,
    "model_only_no_market": 4,
    "model_disagrees": 7,
@@ -168,19 +168,19 @@
     "corr": 0.645
    },
    "batter_runs": {
-    "n_prices": 708,
+    "n_prices": 688,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.597,
-    "corr": 0.101
+    "mean_abs_logit_diff": 0.596,
+    "corr": 0.103
    },
    "batter_milestone": {
-    "n_prices": 588,
-    "mean_model_p": 0.485,
+    "n_prices": 568,
+    "mean_model_p": 0.484,
     "mean_market_p": 0.492,
-    "mean_logit_diff_model_minus_market": -0.042,
-    "mean_abs_logit_diff": 0.985,
+    "mean_logit_diff_model_minus_market": -0.043,
+    "mean_abs_logit_diff": 0.965,
     "corr": 0.985
    },
    "top_bowler_team": {
@@ -257,7 +257,6 @@
     "United Arab Emirates"
    ],
    "sources": [
-    "feede_lb",
     "smarkets"
    ]
   },
@@ -359,7 +358,6 @@
    ],
    "sources": [
     "feedi_d",
-    "feedj_d",
     "smarkets"
    ]
   },
@@ -1132,7 +1130,6 @@
   "Ella Hayward",
   "Emma De Broughe",
   "Emma de Broughe",
-  "Esha Rohit",
   "Eshaan Goyal",
   "Eshan Malinga",
   "Ethan Holman",
@@ -1207,7 +1204,6 @@
   "Muhammad Abbas Afridi",
   "Muhammad Rohid",
   "Mujeeb Ur Rahman",
-  "Musheer Khan",
   "Myrthe van den Raad",
   "Nangeyalia Kharote",
   "Nicholas Frederick Kelly",
@@ -1278,7 +1274,9 @@
   "Uddish Suri",
   "Usama Mir",
   "Vanshika Lila",
-  "Vihaan Malhotra"
+  "Vihaan Malhotra",
+  "Vrinda Dinesh",
+  "Wali Muhammad"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1403,26 +1401,26 @@
   }
  },
  "log": [
-  "[10:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[10:00 IST] history: 24132 matches, last 2026-11-17, players 435209",
-  "[10:02 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.1}",
-  "[10:02 IST] source smarkets: {'status': 'ok', 'rows': 336, 'secs': 2.1}",
-  "[10:02 IST] source feedg: {'status': 'ok', 'rows': 0, 'secs': 5.2, 'events': 1}",
-  "[10:02 IST] source feedk: {'status': 'ok', 'rows': 157, 'secs': 17.2, 'events': 7}",
-  "[10:02 IST] source feede: {'status': 'ok', 'rows': 444, 'secs': 69.2, 'events': 27}",
-  "[10:02 IST] source feedh: {'status': 'ok', 'rows': 984, 'secs': 84.8, 'events': 61}",
-  "[10:02 IST] source feedj: {'status': 'ok', 'rows': 700, 'secs': 104.2, 'events': 15}",
-  "[10:02 IST] source feedf: {'status': 'ok', 'rows': 346, 'secs': 116.8, 'events': 22}",
-  "[10:02 IST] source feedi: {'status': 'ok', 'rows': 1695, 'secs': 124.2, 'events': 57}",
-  "[10:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[10:03 IST] 400 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[10:03 IST] 270 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[10:03 IST] name map: Jammu & Kashmir vs Saurashtra -> Jammu and Kashmir vs Saurashtra (2026-11-18T10:30:00Z)",
-  "[10:03 IST] held back 4 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[10:03 IST] book lines: 339 player lines from 6 source(s)",
-  "[10:03 IST] 216 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[10:03 IST] weather: forecasts for 12 events, 0 failed",
-  "[10:03 IST] prop model: 734 prop selections modelled, 60 milestone ladder prices anchored to O/U",
-  "[10:04 IST] ledger upsert model: {'upserted': 3, 'skipped_settled': 0}"
+  "[10:09 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[10:09 IST] history: 24132 matches, last 2026-11-17, players 435209",
+  "[10:12 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.4}",
+  "[10:12 IST] source smarkets: {'status': 'ok', 'rows': 336, 'secs': 3.0}",
+  "[10:12 IST] source feedg: {'status': 'ok', 'rows': 0, 'secs': 5.9, 'events': 1}",
+  "[10:12 IST] source feedk: {'status': 'ok', 'rows': 157, 'secs': 18.7, 'events': 7}",
+  "[10:12 IST] source feede: {'status': 'ok', 'rows': 420, 'secs': 70.8, 'events': 27}",
+  "[10:12 IST] source feedh: {'status': 'ok', 'rows': 984, 'secs': 82.1, 'events': 60}",
+  "[10:12 IST] source feedj: {'status': 'ok', 'rows': 672, 'secs': 99.5, 'events': 15}",
+  "[10:12 IST] source feedf: {'status': 'ok', 'rows': 346, 'secs': 124.5, 'events': 22}",
+  "[10:12 IST] source feedi: {'status': 'ok', 'rows': 1695, 'secs': 153.9, 'events': 57}",
+  "[10:12 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[10:12 IST] 400 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[10:12 IST] 270 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[10:12 IST] name map: Jammu & Kashmir vs Saurashtra -> Jammu and Kashmir vs Saurashtra (2026-11-18T10:30:00Z)",
+  "[10:12 IST] held back 4 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[10:12 IST] book lines: 334 player lines from 6 source(s)",
+  "[10:12 IST] 216 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[10:15 IST] weather: forecasts for 12 events, 0 failed",
+  "[10:15 IST] prop model: 714 prop selections modelled, 60 milestone ladder prices anchored to O/U",
+  "[10:15 IST] ledger upsert model: {'upserted': 3, 'skipped_settled': 0}"
  ]
 }
