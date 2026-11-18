@@ -1,53 +1,18 @@
 {
- "male|Australia|England|2026-11-18|bowler_wickets||Jofra Archer under 1.5|1.5|under": {
-  "edge": 0.2261,
-  "start_utc": "2026-11-18T03:30:00Z",
-  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
- },
- "male|Australia|England|2026-11-18|bowler_wickets||Adam Zampa under 1.5|1.5|under": {
-  "edge": 0.2205,
-  "start_utc": "2026-11-18T03:30:00Z",
-  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
- },
- "male|Australia|England|2026-11-18|bowler_wickets||Riley Meredith under 1.5|1.5|under": {
-  "edge": 0.1349,
-  "start_utc": "2026-11-18T03:30:00Z",
-  "alerted_at": "2026-11-15T17:10:44.829034+00:00"
- },
  "female|Hobart Hurricanes Women|Perth Scorchers Women|2026-11-19|batter_fours||Beth Mooney under 3.5|3.5|under": {
   "edge": 0.0616,
   "start_utc": "2026-11-19T04:40:00Z",
   "alerted_at": "2026-11-15T18:34:53.193494+00:00"
- },
- "male|Australia|England|2026-11-18|batter_milestone||Cooper Connolly 50+ no|49.5|under": {
-  "edge": 0.0518,
-  "start_utc": "2026-11-18T03:30:00Z",
-  "alerted_at": "2026-11-15T21:33:35.425575+00:00"
- },
- "male|Australia|England|2026-11-18|batter_milestone||Ben Duckett 50+ yes|49.5|over": {
-  "edge": 0.0615,
-  "start_utc": "2026-11-18T03:30:00Z",
-  "alerted_at": "2026-11-16T01:39:06.251548+00:00"
  },
  "male|India|New Zealand|2026-11-18|batter_runs||KL Rahul under 29.5|29.5|under": {
   "edge": 0.0506,
   "start_utc": "2026-11-18T22:00:00Z",
   "alerted_at": "2026-11-16T11:37:13.302801+00:00"
  },
- "male|Australia|England|2026-11-18|batter_fours||Josh Inglis under 2.5|2.5|under": {
-  "edge": 0.0518,
-  "start_utc": "2026-11-18T03:30:00Z",
-  "alerted_at": "2026-11-16T12:32:40.277199+00:00"
- },
  "male|India|New Zealand|2026-11-18|batter_runs||Henry Nicholls under 24.5|24.5|under": {
   "edge": 0.0541,
   "start_utc": "2026-11-18T22:00:00Z",
   "alerted_at": "2026-11-17T04:36:58.919281+00:00"
- },
- "male|Australia|England|2026-11-18|batter_sixes||Mitchell Marsh under 0.5|0.5|under": {
-  "edge": 0.1034,
-  "start_utc": "2026-11-18T03:30:00Z",
-  "alerted_at": "2026-11-17T04:46:45.443299+00:00"
  },
  "female|Brisbane Heat Women|Sydney Thunder Women|2026-11-19|batter_milestone||Grace Harris 50+ no|49.5|under": {
   "edge": 0.0503,
@@ -68,5 +33,10 @@
   "edge": 0.0914,
   "start_utc": "2026-11-19T08:10:00Z",
   "alerted_at": "2026-11-17T22:34:45.530658+00:00"
+ },
+ "female|Adelaide Strikers Women|Melbourne Renegades Women|2026-11-20|batter_fours||Laura Wolvaardt under 2.5|2.5|under": {
+  "edge": 0.0621,
+  "start_utc": "2026-11-20T08:10:00Z",
+  "alerted_at": "2026-11-18T03:34:37.728389+00:00"
  }
 }
