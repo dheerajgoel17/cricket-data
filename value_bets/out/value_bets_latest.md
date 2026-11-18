@@ -1,15 +1,15 @@
-# Cricket value bets - 2026-11-18 19:57 IST
+# Cricket value bets - 2026-11-18 20:07 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
 - **feedi**: error - HTTP 403: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm
-- **smarkets**: ok, 396 prices
+- **smarkets**: ok, 392 prices
 - **feedk**: ok, 153 prices, 6 events
 - **feedg**: ok, 16 prices, 3 events
-- **feedf**: ok, 220 prices, 5 events
 - **feedj**: ok, 303 prices, 3 events
+- **feedf**: ok, 220 prices, 6 events
 - **feede**: ok, 200 prices, 14 events
 - **feedh**: ok, 1600 prices, 67 events
 
@@ -24,4 +24,4 @@ Matches starting in next 168h: **25**, markets priced: **317**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Central (male), Elite Cricket Academy (male), Lokseva Academy (male), Omr Checker (male), Sunny 11 Pratishtan (male)
 
-Runtime 360.1s. Snapshot: `odds_20261118T142759Z.jsonl.gz`
+Runtime 125.5s. Snapshot: `odds_20261118T143737Z.jsonl.gz`
