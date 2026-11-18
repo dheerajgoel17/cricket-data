@@ -1,4 +1,67 @@
 {
- "generated_at_ist": "2026-11-18 13:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-18 14:00 IST",
+ "alerts": [
+  {
+   "event_key": "female|Adelaide Strikers Women|Melbourne Renegades Women|2026-11-20",
+   "match": "Adelaide Strikers vs Melbourne Renegades",
+   "start_utc": "2026-11-20T08:11:00Z",
+   "start_ist": "2026-11-20 13:41 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_milestone",
+   "market": "Hayley Matthews To Score 50",
+   "team_scope": "",
+   "selection": "Hayley Matthews 50+ yes",
+   "player_matched_as": "Hayley Kristen Matthews",
+   "player_id": "d32cf49a",
+   "player_team": "Melbourne Renegades Women",
+   "stat": "runs",
+   "inn": 0,
+   "line": 49.5,
+   "side": "over",
+   "best_odds": 5.0,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 5.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0772,
+   "implied_prob": 0.2,
+   "fair_odds": 4.338,
+   "fair_prob": 0.2305,
+   "model_prob": 0.2082,
+   "market_prob": 0.2488,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.1527,
+   "edge_pct": 15.27,
+   "kelly_quarter_stake_pct": 0.95,
+   "n_sources": 4,
+   "confidence": "medium",
+   "why": "Model 21% vs market 25% for 50+ runs; form 27.3 runs/inn recency-weighted T20 (n_eff 81.7; last 5: 3, 1, 49, 59, 7), bats in 99% of games played; vs Adelaide Strikers Women: 1 inns avg 49.0; context adj: team H2H context +8%; weather: high humidity 81%",
+   "notes": "4 market source(s) for fair price; model 0.208 vs market 0.249; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "model_detail": {
+    "n_eff": 81.7,
+    "expected": 31.24,
+    "nb_alpha": 1.213,
+    "p_bats_or_bowls": 0.992,
+    "venue_matched": "adelaide oval",
+    "context_terms": [
+     "p_bat",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 4,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 81,
+    "cloud_pct": 43,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "4841dd201e29e9f6",
+   "alert_key": "female|Adelaide Strikers Women|Melbourne Renegades Women|2026-11-20|batter_milestone||Hayley Matthews 50+ yes|49.5|over",
+   "alerted_at_ist": "2026-11-18 14:03 IST",
+   "realert": true,
+   "previous_edge": 0.1093
+  }
+ ]
 }
