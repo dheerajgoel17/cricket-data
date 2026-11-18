@@ -1,27 +1,22 @@
-# Cricket value bets - 2026-11-18 20:07 IST
+# Cricket value bets - 2026-11-18 21:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
 - **feedi**: error - HTTP 403: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm
-- **smarkets**: ok, 392 prices
-- **feedk**: ok, 153 prices, 6 events
+- **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
+- **smarkets**: ok, 335 prices
 - **feedg**: ok, 16 prices, 3 events
-- **feedj**: ok, 303 prices, 3 events
-- **feedf**: ok, 220 prices, 6 events
-- **feede**: ok, 200 prices, 14 events
-- **feedh**: ok, 1600 prices, 67 events
+- **feedj**: ok, 0 prices, 0 events
+- **feedk**: ok, 161 prices, 7 events
+- **feedf**: ok, 208 prices, 6 events
+- **feede**: ok, 212 prices, 15 events
+- **feedh**: ok, 1562 prices, 68 events
 
-Matches starting in next 168h: **25**, markets priced: **317**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **28**, markets priced: **284**, value bets: **0** (new alerts: 0). Min edge 5%.
 
-| Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
-|---|---|---|---|---|---|---|---|---|---|
-| 11-20 13:40 IST | Adelaide Strikers vs Melbourne Renegades | Hayley Matthews To Score 50 | Hayley Matthews 50+ yes | 5.00 @ feede_lb | 4.34 | 0.2082 | 15.1% | 0.94% | medium |
-
-### Why / notes per bet
-- **Adelaide Strikers vs Melbourne Renegades / Hayley Matthews To Score 50 / Hayley Matthews 50+ yes** - why: Model 21% vs market 25% for 50+ runs; form 27.3 runs/inn recency-weighted T20 (n_eff 81.7; last 5: 3, 1, 49, 59, 7), bats in 99% of games played; vs Adelaide Strikers Women: 1 inns avg 49.0; context adj: team H2H context +8%; weather: high humidity 83%. Notes: 3 market source(s) for fair price; model 0.208 vs market 0.248; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+_No value bets passed the filters this run._
 
 Unmatched team names (add to mappings/teams.csv): Central (male), Elite Cricket Academy (male), Lokseva Academy (male), Omr Checker (male), Sunny 11 Pratishtan (male)
 
-Runtime 125.5s. Snapshot: `odds_20261118T143737Z.jsonl.gz`
+Runtime 163.4s. Snapshot: `odds_20261118T153032Z.jsonl.gz`
