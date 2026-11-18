@@ -4,16 +4,6 @@
   "start_utc": "2026-11-19T04:40:00Z",
   "alerted_at": "2026-11-15T18:34:53.193494+00:00"
  },
- "male|India|New Zealand|2026-11-18|batter_runs||KL Rahul under 29.5|29.5|under": {
-  "edge": 0.0506,
-  "start_utc": "2026-11-18T22:00:00Z",
-  "alerted_at": "2026-11-16T11:37:13.302801+00:00"
- },
- "male|India|New Zealand|2026-11-18|batter_runs||Henry Nicholls under 24.5|24.5|under": {
-  "edge": 0.0541,
-  "start_utc": "2026-11-18T22:00:00Z",
-  "alerted_at": "2026-11-17T04:36:58.919281+00:00"
- },
  "female|Brisbane Heat Women|Sydney Thunder Women|2026-11-19|batter_milestone||Grace Harris 50+ no|49.5|under": {
   "edge": 0.0503,
   "start_utc": "2026-11-19T08:10:00Z",
