@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-20 03:52 IST
+# Cricket value bets - 2026-11-20 04:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -10,10 +10,10 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **feedg**: ok, 24 prices, 3 events
 - **feede**: ok, 926 prices, 34 events
 - **feedh**: ok, 1672 prices, 73 events
-- **feedj**: ok, 996 prices, 20 events
+- **feedj**: ok, 956 prices, 19 events
 - **feedf**: ok, 580 prices, 27 events
 
-Matches starting in next 168h: **50**, markets priced: **437**, value bets: **2** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **50**, markets priced: **434**, value bets: **2** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -29,4 +29,4 @@ Matches starting in next 168h: **50**, markets priced: **437**, value bets: **2*
 
 Unmatched team names (add to mappings/teams.csv): Elite Cricket Academy (male), Karnataka (W) (female), Larkana Region (male), Lokseva Academy (male), Milan Icons (male), Omr Checker (male), Peshawar Region (male), Railways (W) (female), Roma Gladiators (male), Speedworld Security Solutions (male)
 
-Runtime 293.5s. Snapshot: `odds_20261119T222213Z.jsonl.gz`
+Runtime 260.7s. Snapshot: `odds_20261119T223039Z.jsonl.gz`
