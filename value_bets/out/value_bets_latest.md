@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-19 06:00 IST
+# Cricket value bets - 2026-11-19 07:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -8,12 +8,12 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **smarkets**: ok, 512 prices
 - **feedg**: ok, 16 prices, 2 events
 - **feedk**: ok, 97 prices, 8 events
-- **feedf**: ok, 244 prices, 8 events
 - **feede**: ok, 376 prices, 19 events
-- **feedj**: ok, 553 prices, 9 events
-- **feedh**: ok, 1531 prices, 83 events
+- **feedj**: ok, 579 prices, 10 events
+- **feedh**: ok, 1531 prices, 81 events
+- **feedf**: ok, 392 prices, 28 events
 
-Matches starting in next 168h: **37**, markets priced: **379**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **37**, markets priced: **385**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -24,4 +24,4 @@ Matches starting in next 168h: **37**, markets priced: **379**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Elite Cricket Academy (male), Karnataka (W) (female), Lokseva Academy (male), Nhlangano Legends (male), Omr Checker (male), Pak Xi (male), Railways (W) (female), Royal Champs (male), Sunny 11 Pratishtan (male)
 
-Runtime 172.9s. Snapshot: `odds_20261119T003044Z.jsonl.gz`
+Runtime 224.0s. Snapshot: `odds_20261119T013039Z.jsonl.gz`
