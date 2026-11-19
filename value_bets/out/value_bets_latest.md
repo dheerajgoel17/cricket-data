@@ -1,19 +1,19 @@
-# Cricket value bets - 2026-11-19 09:00 IST
+# Cricket value bets - 2026-11-19 09:16 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **feedi**: error - HTTP 403: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm
 - **smarkets**: ok, 513 prices
-- **feedg**: ok, 16 prices, 2 events
+- **feedg**: ok, 8 prices, 1 events
 - **feedk**: ok, 97 prices, 8 events
 - **feede**: ok, 376 prices, 19 events
-- **feedj**: ok, 603 prices, 11 events
+- **feedj**: ok, 672 prices, 12 events
 - **feedh**: ok, 1531 prices, 66 events
-- **feedf**: ok, 492 prices, 27 events, stopped time budget
+- **feedi**: ok, 1042 prices, 50 events
+- **feedf**: ok, 476 prices, 28 events
 
-Matches starting in next 168h: **37**, markets priced: **379**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **40**, markets priced: **451**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -25,6 +25,6 @@ Matches starting in next 168h: **37**, markets priced: **379**, value bets: **1*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-21 20:00 IST Desert Vipers vs Mi Emirates / Top Batsman - Mi Emirates / Kieron Pollard @ 11.00 (feedh_d): edge 31.7%, model 0.1832, market 0.0856
 
-Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Elite Cricket Academy (male), Karnataka (W) (female), Lokseva Academy (male), Nhlangano Legends (male), Omr Checker (male), Pak Xi (male), Railways (W) (female), Royal Champs (male), Sunny 11 Pratishtan (male)
+Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Boland Rocks (male), Elite Cricket Academy (male), Karnataka (W) (female), Karnataka (Women) (female), Lokseva Academy (male), Nhlangano Legends (male), Omr Checker (male), Pak Xi (male), Railways (W) (female), Railways (Women) (female), Royal Champs (male), Sunny 11 Pratishtan (male)
 
-Runtime 234.4s. Snapshot: `odds_20261119T033039Z.jsonl.gz`
+Runtime 220.4s. Snapshot: `odds_20261119T034604Z.jsonl.gz`
