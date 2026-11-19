@@ -1,4 +1,66 @@
 {
- "generated_at_ist": "2026-11-19 15:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-19 16:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|Pakistan|United Arab Emirates|2026-11-20",
+   "match": "Pakistan A vs United Arab Emirates",
+   "start_utc": "2026-11-20T06:00:00Z",
+   "start_ist": "2026-11-20 11:30 IST",
+   "format": "ODI",
+   "gender": "male",
+   "market_type": "batter_milestone",
+   "market": "1st innings - Shahdad, Muhammad to score 50",
+   "team_scope": "",
+   "selection": "Muhammad Shahdad 50+ yes",
+   "player_matched_as": "Muhammad Shahdad",
+   "player_id": "a8ac334b",
+   "player_team": "United Arab Emirates",
+   "stat": "runs",
+   "inn": 0,
+   "line": 49.5,
+   "side": "over",
+   "best_odds": 4.35,
+   "best_source": "feedf_p",
+   "effective_odds_after_commission": 4.35,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0632,
+   "implied_prob": 0.2299,
+   "fair_odds": 3.933,
+   "fair_prob": 0.2543,
+   "model_prob": 0.2419,
+   "market_prob": 0.2644,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.1062,
+   "edge_pct": 10.62,
+   "kelly_quarter_stake_pct": 0.79,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 24% vs market 26% for 50+ runs; form 37.6 runs/inn recency-weighted ODI (n_eff 14.4; last 5: 0, 14, 21, 0, 79), bats in 96% of games played; venue unknown/unmatched (venue terms neutral)",
+   "notes": "2 market source(s) for fair price; model 0.242 vs market 0.264; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "model_detail": {
+    "n_eff": 14.4,
+    "expected": 35.91,
+    "nb_alpha": 1.313,
+    "p_bats_or_bowls": 0.963,
+    "venue_matched": null,
+    "context_terms": [
+     "p_bat"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 16,
+    "cloud_pct": 58,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "833d6e42819a6490",
+   "alert_key": "male|Pakistan|United Arab Emirates|2026-11-20|batter_milestone||Muhammad Shahdad 50+ yes|49.5|over",
+   "alerted_at_ist": "2026-11-19 16:04 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
