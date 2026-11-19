@@ -28,5 +28,10 @@
   "edge": 0.0621,
   "start_utc": "2026-11-20T08:10:00Z",
   "alerted_at": "2026-11-18T03:34:37.728389+00:00"
+ },
+ "female|Hobart Hurricanes Women|Perth Scorchers Women|2026-11-19|batter_runs||Beth Mooney under 30.5|30.5|under": {
+  "edge": 0.0536,
+  "start_utc": "2026-11-19T04:40:00Z",
+  "alerted_at": "2026-11-19T04:34:18.494808+00:00"
  }
 }
