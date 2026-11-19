@@ -1,19 +1,19 @@
-# Cricket value bets - 2026-11-19 11:00 IST
+# Cricket value bets - 2026-11-19 12:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
 - **feedi**: error - HTTP 403: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm
-- **smarkets**: ok, 502 prices
+- **smarkets**: ok, 495 prices
 - **feedg**: ok, 8 prices, 1 events
-- **feedk**: ok, 65 prices, 6 events
+- **feedk**: ok, 65 prices, 7 events
 - **feede**: ok, 340 prices, 18 events
-- **feedj**: ok, 523 prices, 10 events
-- **feedh**: ok, 1338 prices, 60 events
-- **feedf**: ok, 412 prices, 27 events, stopped time budget
+- **feedj**: ok, 536 prices, 12 events
+- **feedh**: ok, 1266 prices, 58 events
+- **feedf**: ok, 454 prices, 27 events
 
-Matches starting in next 168h: **35**, markets priced: **330**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **35**, markets priced: **313**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -27,4 +27,4 @@ Matches starting in next 168h: **35**, markets priced: **330**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): AL Barkat (male), Bangla Tigers (male), Elite Cricket Academy (male), Karnataka (W) (female), Lokseva Academy (male), Nhlangano Legends (male), Omr Checker (male), Pak Xi (male), Railways (W) (female), Royal Champs (male), Sunny 11 Pratishtan (male)
 
-Runtime 231.5s. Snapshot: `odds_20261119T053037Z.jsonl.gz`
+Runtime 229.8s. Snapshot: `odds_20261119T063042Z.jsonl.gz`
