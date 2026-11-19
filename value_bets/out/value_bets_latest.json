@@ -1,11 +1,11 @@
 {
- "generated_at_utc": "2026-11-19T01:30:39Z",
- "generated_at_ist": "2026-11-19 07:00 IST",
- "runtime_secs": 224.0,
+ "generated_at_utc": "2026-11-19T02:30:46Z",
+ "generated_at_ist": "2026-11-19 08:00 IST",
+ "runtime_secs": 186.8,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-18",
-  "commit": "9696f3d525"
+  "commit": "ba15109e6c"
  },
  "sources": {
   "moviodds_bet365": {
@@ -16,17 +16,17 @@
   "feedi": {
    "status": "error",
    "reason": "HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm",
-   "secs": 0.8
+   "secs": 1.2
   },
   "smarkets": {
    "status": "ok",
-   "rows": 512,
-   "secs": 2.0
+   "rows": 513,
+   "secs": 2.6
   },
   "feedg": {
    "status": "ok",
    "rows": 16,
-   "secs": 10.9,
+   "secs": 11.9,
    "events": 2
   },
   "feedk": {
@@ -38,29 +38,29 @@
   "feede": {
    "status": "ok",
    "rows": 376,
-   "secs": 51.7,
+   "secs": 51.5,
    "events": 19
   },
   "feedj": {
    "status": "ok",
-   "rows": 579,
-   "secs": 73.0,
+   "rows": 491,
+   "secs": 69.3,
    "events": 10
   },
   "feedh": {
    "status": "ok",
    "rows": 1531,
-   "secs": 89.6,
+   "secs": 87.5,
    "events": 81
   },
   "feedf": {
    "status": "ok",
-   "rows": 392,
-   "secs": 141.7,
+   "rows": 440,
+   "secs": 150.4,
    "events": 28
   }
  },
- "snapshot": "odds_20261119T013039Z.jsonl.gz",
+ "snapshot": "odds_20261119T023046Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -139,73 +139,72 @@
  },
  "stats": {
   "events_in_window": 37,
-  "rows_in_window": 3499,
-  "selections_with_model": 1387,
-  "selections_with_market_fair": 2313,
-  "markets_in_window": 385,
+  "rows_in_window": 3460,
+  "selections_with_model": 1326,
+  "selections_with_market_fair": 2247,
+  "markets_in_window": 367,
   "value_bets": 1,
   "dropped_by_filter": {
-   "model_market_gap": 660,
-   "odds_range": 15,
-   "model_only_no_market": 15,
+   "model_market_gap": 659,
+   "odds_range": 14,
+   "model_only_no_market": 26,
    "rarely_selected": 2,
    "liquidity": 1,
-   "model_disagrees": 5,
+   "model_disagrees": 4,
    "small_sample": 6,
    "policy_max_odds": 1,
-   "market_disabled": 1,
    "loose_name_match": 1
   },
   "suspect_edges": 0,
   "innings_milestones_unmodelled": 4,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 489,
-    "mean_model_p": 0.078,
+    "n_prices": 437,
+    "mean_model_p": 0.077,
     "mean_market_p": 0.071,
-    "mean_logit_diff_model_minus_market": 0.522,
-    "mean_abs_logit_diff": 1.007,
-    "corr": 0.661
+    "mean_logit_diff_model_minus_market": 0.488,
+    "mean_abs_logit_diff": 1.001,
+    "corr": 0.645
    },
    "batter_runs": {
-    "n_prices": 578,
+    "n_prices": 586,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.683,
-    "corr": 0.106
+    "mean_abs_logit_diff": 0.681,
+    "corr": 0.102
    },
    "batter_milestone": {
-    "n_prices": 386,
-    "mean_model_p": 0.476,
+    "n_prices": 394,
+    "mean_model_p": 0.477,
     "mean_market_p": 0.488,
-    "mean_logit_diff_model_minus_market": -0.065,
-    "mean_abs_logit_diff": 0.987,
+    "mean_logit_diff_model_minus_market": -0.061,
+    "mean_abs_logit_diff": 0.988,
     "corr": 0.977
    },
    "top_bowler_team": {
-    "n_prices": 163,
-    "mean_model_p": 0.125,
-    "mean_market_p": 0.123,
+    "n_prices": 156,
+    "mean_model_p": 0.124,
+    "mean_market_p": 0.122,
     "mean_logit_diff_model_minus_market": 0.016,
-    "mean_abs_logit_diff": 0.382,
-    "corr": 0.552
+    "mean_abs_logit_diff": 0.373,
+    "corr": 0.566
    },
    "batter_sixes": {
-    "n_prices": 44,
+    "n_prices": 28,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.308,
-    "corr": 0.977
+    "mean_abs_logit_diff": 0.297,
+    "corr": 0.986
    },
    "batter_fours": {
-    "n_prices": 44,
+    "n_prices": 28,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.206,
-    "corr": 0.518
+    "mean_abs_logit_diff": 0.223,
+    "corr": 0.547
    },
    "top_batter_match": {
     "n_prices": 111,
@@ -310,19 +309,6 @@
    ]
   },
   {
-   "event": "male|Knights|Rocks|2026-11-19",
-   "start_ist": "2026-11-19 13:00 IST",
-   "format": null,
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Knights",
-    "Rocks"
-   ],
-   "sources": [
-    "feedh_d"
-   ]
-  },
-  {
    "event": "male|elite academy|lokseva academy|2026-11-19",
    "start_ist": "2026-11-19 13:30 IST",
    "format": "T20",
@@ -388,6 +374,20 @@
    ]
   },
   {
+   "event": "male|Knights|Rocks|2026-11-19",
+   "start_ist": "2026-11-19 13:30 IST",
+   "format": null,
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Knights",
+    "Rocks"
+   ],
+   "sources": [
+    "feedh_d",
+    "feedj_d"
+   ]
+  },
+  {
    "event": "female|Brisbane Heat Women|Sydney Thunder Women|2026-11-19",
    "start_ist": "2026-11-19 13:40 IST",
    "format": "T20",
@@ -399,7 +399,6 @@
    "sources": [
     "feede_lb",
     "feedg_f",
-    "feedj_d",
     "feedk_leoal",
     "smarkets"
    ]
@@ -502,6 +501,7 @@
    ],
    "sources": [
     "feede_lb",
+    "feedf_p",
     "smarkets"
    ]
   },
@@ -516,6 +516,7 @@
    ],
    "sources": [
     "feede_lb",
+    "feedf_p",
     "smarkets"
    ]
   },
@@ -838,7 +839,6 @@
   "Ayaan Misbah",
   "Ayabulela Gqamane",
   "Ayaka Kato Stafford",
-  "Ayaka Stafford",
   "Ayush Badoni",
   "Babar Azam",
   "Bashir Ahmed",
@@ -1016,7 +1016,8 @@
   "Sophie Reid",
   "Srikar Bharat",
   "Sufyan Moqim",
-  "Tajinder Singh"
+  "Tajinder Singh",
+  "Takudzwa Zivanai Chataira"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1141,27 +1142,27 @@
   }
  },
  "log": [
-  "[07:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[07:00 IST] history: 24156 matches, last 2026-11-18, players 435742",
-  "[07:03 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.3}",
-  "[07:03 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm', 'secs': 0.8}",
-  "[07:03 IST] source smarkets: {'status': 'ok', 'rows': 512, 'secs': 2.0}",
-  "[07:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 10.9, 'events': 2}",
-  "[07:03 IST] source feedk: {'status': 'ok', 'rows': 97, 'secs': 21.0, 'events': 8}",
-  "[07:03 IST] source feede: {'status': 'ok', 'rows': 376, 'secs': 51.7, 'events': 19}",
-  "[07:03 IST] source feedj: {'status': 'ok', 'rows': 579, 'secs': 73.0, 'events': 10}",
-  "[07:03 IST] source feedh: {'status': 'ok', 'rows': 1531, 'secs': 89.6, 'events': 81}",
-  "[07:03 IST] source feedf: {'status': 'ok', 'rows': 392, 'secs': 141.7, 'events': 28}",
-  "[07:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[07:03 IST] 4 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[07:03 IST] name map: Bangladesh A vs Hong Kong VI -> Bangladesh A vs Hong Kong (2026-11-19T06:00:00Z)",
-  "[07:03 IST] name map: Bangladesh A vs China Hong Kong -> Bangladesh A vs Hong Kong (2026-11-19T06:00:00Z)",
-  "[07:03 IST] name map: Zimbabwe XI vs Ireland A -> Zimbabwe A vs Ireland A (2026-11-20T07:30:00Z)",
-  "[07:03 IST] held back 2 player and 2 fancy lines first priced after their match started (not pre-match prices)",
-  "[07:03 IST] book lines: 310 player lines from 7 source(s)",
-  "[07:03 IST] 4 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[07:04 IST] weather: forecasts for 13 events, 0 failed",
-  "[07:04 IST] prop model: 756 prop selections modelled, 60 milestone ladder prices anchored to O/U",
-  "[07:04 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
+  "[08:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[08:00 IST] history: 24156 matches, last 2026-11-18, players 435742",
+  "[08:03 IST] source moviodds_bet365: {'status': 'error', 'reason': 'HTTPError: HTTP Error 401: Unauthorized', 'secs': 0.3}",
+  "[08:03 IST] source feedi: {'status': 'error', 'reason': 'HTTP 403: <!DOCTYPE html><html lang=\"en-US\"><head><title>Just a moment...</title><meta http-equiv=\"Content-Type\" content=\"text/htm', 'secs': 1.2}",
+  "[08:03 IST] source smarkets: {'status': 'ok', 'rows': 513, 'secs': 2.6}",
+  "[08:03 IST] source feedg: {'status': 'ok', 'rows': 16, 'secs': 11.9, 'events': 2}",
+  "[08:03 IST] source feedk: {'status': 'ok', 'rows': 97, 'secs': 21.0, 'events': 8}",
+  "[08:03 IST] source feede: {'status': 'ok', 'rows': 376, 'secs': 51.5, 'events': 19}",
+  "[08:03 IST] source feedj: {'status': 'ok', 'rows': 491, 'secs': 69.3, 'events': 10}",
+  "[08:03 IST] source feedh: {'status': 'ok', 'rows': 1531, 'secs': 87.5, 'events': 81}",
+  "[08:03 IST] source feedf: {'status': 'ok', 'rows': 440, 'secs': 150.4, 'events': 28}",
+  "[08:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[08:03 IST] 4 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[08:03 IST] name map: Bangladesh A vs Hong Kong VI -> Bangladesh A vs Hong Kong (2026-11-19T06:00:00Z)",
+  "[08:03 IST] name map: Bangladesh A vs China Hong Kong -> Bangladesh A vs Hong Kong (2026-11-19T06:00:00Z)",
+  "[08:03 IST] name map: Zimbabwe XI vs Ireland A -> Zimbabwe A vs Ireland A (2026-11-20T07:30:00Z)",
+  "[08:03 IST] held back 2 player and 2 fancy lines first priced after their match started (not pre-match prices)",
+  "[08:03 IST] book lines: 290 player lines from 7 source(s)",
+  "[08:03 IST] 4 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[08:03 IST] weather: forecasts for 13 events, 0 failed",
+  "[08:03 IST] prop model: 716 prop selections modelled, 60 milestone ladder prices anchored to O/U",
+  "[08:03 IST] ledger upsert model: {'upserted': 1, 'skipped_settled': 0}"
  ]
 }
