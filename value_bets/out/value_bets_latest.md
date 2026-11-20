@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-21 02:00 IST
+# Cricket value bets - 2026-11-21 03:12 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2134 prices
+- **moviodds_bet365**: ok, 2167 prices
 - **smarkets**: ok, 556 prices
 - **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
 - **feedk**: ok, 198 prices, 7 events
-- **feedg**: ok, 32 prices, 4 events
-- **feedl**: ok, 681 prices, 40 events
+- **feedl**: ok, 728 prices, 40 events
+- **feedg**: ok, 40 prices, 5 events
 - **feedf**: ok, 388 prices, 8 events
-- **feedj**: ok, 936 prices, 11 events
-- **feedh**: ok, 2125 prices, 131 events
+- **feedh**: ok, 2125 prices, 133 events
+- **feedj**: ok, 968 prices, 11 events
 - **feede**: ok, 918 prices, 40 events
 
-Matches starting in next 168h: **64**, markets priced: **641**, value bets: **9** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **64**, markets priced: **661**, value bets: **9** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -40,8 +40,8 @@ Matches starting in next 168h: **64**, markets priced: **641**, value bets: **9*
 - **South Africa vs Bangladesh / Bowler Total Match Wickets / Hasan Mahmud over 3.5** - why: Model 53% vs market 39% for over 3.5 wkts; form 4.0 wkts/spell recency-weighted MULTI (n_eff 15.3; last 5: 4, 6, 2, 6, 7), bowls in 94% of games, 27.5 overs/spell; vs South Africa: 3 spells avg 2.3; context adj: opposition strength -1%, venue environment +6%. Notes: 1 market source(s) for fair price; model 0.528 vs market 0.392; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
-- 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 35.5%, model 0.3168, market 0.2227
+- 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 35.3%, model 0.3155, market 0.2227
 
 Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Bahawalpur Region (male), Dm Jamali Region (male), Dolphins (W) (female), Dolphins (female), Elite Cricket Academy (male), Faisalabad Region (male), Fata Region (male), Garden Route Badgers (W) (female), Garden Route Badgers (female), Islamabad Region (male), Karachi Region Blues (male), Karachi Whites (male), Lahore Region Blues (male), Lahore Region Whites (male), Larkana Region (male), Lions (W) (female), Lions (female), Multan Region (male), Omr Checker (male), Peshawar Blues (male), Peshawar Region (male), Quetta Region (male), Rawalpindi Region (male), Sialkot Blues (male), South Western Districts (male), Venice Livewire (male), Western Province (W) (female), Western Province (female)
 
-Runtime 273.6s. Snapshot: `odds_20261120T203038Z.jsonl.gz`
+Runtime 262.1s. Snapshot: `odds_20261120T214235Z.jsonl.gz`
