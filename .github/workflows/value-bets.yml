@@ -33,6 +33,7 @@ env:
   VITE_IMG_CDN: ${{ secrets.IMG_CDN_BASE }}
   BASE_DATA_URL: ${{ secrets.BASE_DATA_URL }}
   PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
+  PRICE_FEED_KEY: ${{ secrets.PRICE_FEED_KEY }}
   EXCHANGE_API_URL: ${{ secrets.EXCHANGE_API_URL }}
   FEEDK_URL: ${{ secrets.FEEDK_URL }}
   FEEDK_BOOKS: ${{ secrets.FEEDK_BOOKS }}

@@ -9,13 +9,15 @@ from collections import Counter
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from cricket_data.hosts import host  # noqa: E402
+from value_bets.adapters import moviodds  # noqa: E402
 from value_bets.util import http_json  # noqa: E402
 
 KEYS = ("group_name", "label", "line", "n2", "side", "handicap", "odds_dec", "market_id")
 
 
 def main() -> int:
-    d = http_json(host("PRICE_FEED_URL"), timeout=45)[0]
+    # Same X-API-Key as the hourly pre-match pull when PRICE_FEED_KEY is set (never printed).
+    d = http_json(host("PRICE_FEED_URL"), timeout=45, headers=moviodds.api_headers())[0]
     ms = d.get("matches", [])
     live = [m for m in ms if m.get("in_play")]
     print(f"matches {len(ms)}, in play {len(live)}, top-level keys {sorted(d)}")
