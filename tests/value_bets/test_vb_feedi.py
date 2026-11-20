@@ -57,6 +57,20 @@ def test_player_runs_sixes_wickets_milestones_from_G_ids():
     assert rows[0]["in_play"] is False and rows[0]["source"] == "feedi_d"
 
 
+def test_cloudflare_challenge_html_is_detected():
+    assert feedi._is_challenge('<html><title>Just a moment...</title>', 403)
+    assert feedi._is_challenge("cf-browser-verification", 200)
+    assert not feedi._is_challenge('{"Success":true}', 200)
+    assert not feedi._is_challenge("<html><body>line</body></html>", 200)
+
+
+def test_impersonate_ladder_honours_env_pin(monkeypatch):
+    monkeypatch.setenv("FEEDI_IMPERSONATE", "chrome136")
+    assert feedi._impersonate_ladder() == ["chrome136"]
+    monkeypatch.delenv("FEEDI_IMPERSONATE", raising=False)
+    assert feedi._impersonate_ladder()[0] == "chrome"
+
+
 def test_published_and_skip_without_env(monkeypatch):
     monkeypatch.delenv("FEEDI_URL", raising=False)
     monkeypatch.delenv("FEEDI_NAME", raising=False)

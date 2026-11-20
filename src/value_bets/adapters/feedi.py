@@ -5,8 +5,9 @@ The book and its host are deployment configuration, never code (docs/OPERATIONS.
 ``fetch`` raises ``Skip`` unless ``GITHUB_ACTIONS`` is set (tests use ``*.invalid`` hosts only).
 
 Cloudflare's JS challenge blocks plain ``urllib`` and the Mumbai relay hops. Feed I talks to the book **directly** with
-Chrome TLS impersonation (``curl_cffi``), which clears that gate; a session is warmed on the site root first. Polite:
-``FEEDI_SPACING_SECS`` between pages, ``FEEDI_BUDGET_SECS`` / ``FEEDI_MAX_EVENTS`` caps.
+Chrome TLS impersonation (``curl_cffi``): a warmed session tries a ladder of browser profiles (override with
+``FEEDI_IMPERSONATE``) until the site root is not a challenge page. Polite: ``FEEDI_SPACING_SECS`` between pages,
+``FEEDI_BUDGET_SECS`` / ``FEEDI_MAX_EVENTS`` caps.
 
 Listing: ``GetSportsZip`` (cricket sport id) → ``GetChampZip`` per league. Markets: ``GetGameZip`` with
 ``GroupEvents=false`` so outcomes carry player names (``PL.N``). Market kinds are numeric ``G`` ids (mapped below).
@@ -69,6 +70,8 @@ MAX_LIVE_LINES = 120
 LIVE_BUDGET_SECS = 40.0
 
 _session = None  # curl_cffi Session, warmed once per process
+# Newest Chrome first; CF fingerprints go stale. Ops can pin with FEEDI_IMPERSONATE (one profile name).
+IMPERSONATE_LADDER = ("chrome", "chrome152", "chrome146", "chrome136", "chrome133a", "safari270", "firefox155", "chrome131")
 
 
 class Skip(Exception):
@@ -103,23 +106,59 @@ def _cffi():
     return cffi_requests
 
 
+def _is_challenge(text: str, status: int | None = None) -> bool:
+    """True when the body (or status) looks like Cloudflare's interstitial, not the book."""
+    t = (text or "")[:800].lower()
+    if status in (403, 503) and ("just a moment" in t or "cf-" in t or "cloudflare" in t or "<html" in t):
+        return True
+    return "just a moment" in t or "cf-browser-verification" in t or "cf-challenge" in t or "attention required" in t
+
+
+def _impersonate_ladder() -> list[str]:
+    pinned = os.environ.get("FEEDI_IMPERSONATE", "").strip()
+    if pinned:
+        return [pinned]
+    return list(IMPERSONATE_LADDER)
+
+
+def _warm(sess, base: str) -> bool:
+    """Hit the site root; True when the response is not a Cloudflare challenge page."""
+    try:
+        r = sess.get(f"{base}/en", timeout=30, headers={"Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8"})
+    except Exception:
+        return False
+    body = r.text or ""
+    if _is_challenge(body, r.status_code):
+        return False
+    return r.status_code < 400 and ("<!doctype html" in body[:200].lower() or "<html" in body[:200].lower() or len(body) > 200)
+
+
 def _session_for(base: str):
     """Warmed Chrome-impersonating session for ``base`` (clears Cloudflare; cookies kept)."""
     global _session
     cffi_requests = _cffi()
-    if _session is None or getattr(_session, "_feedi_base", None) != base:
-        sess = cffi_requests.Session(impersonate="chrome131")
+    if _session is not None and getattr(_session, "_feedi_base", None) == base:
+        return _session
+    last_err = None
+    for profile in _impersonate_ladder():
         try:
-            sess.get(f"{base}/en", timeout=30, headers={"Accept": "text/html"})
-        except Exception:
-            pass
+            sess = cffi_requests.Session(impersonate=profile)
+        except Exception as e:  # unknown profile name on this curl_cffi build
+            last_err = e
+            continue
+        if not _warm(sess, base):
+            last_err = Skip(f"Cloudflare challenge with impersonate={profile}")
+            continue
         sess._feedi_base = base  # type: ignore[attr-defined]
+        sess._feedi_impersonate = profile  # type: ignore[attr-defined]
         _session = sess
-    return _session
+        return _session
+    raise Skip(f"Feed I Cloudflare challenge (tried {_impersonate_ladder()}: {last_err})")
 
 
 def request(url: str):
     """GET JSON from the book with Chrome TLS impersonation. Lab hosts use plain http_json. No laptop → real book."""
+    global _session
     if lab(url):
         return http_json(url, retries=0)[0]
     if not on_runner():
@@ -132,8 +171,12 @@ def request(url: str):
         "Referer": f"{base}/en/line/cricket",
     }
     r = sess.get(url, headers=headers, timeout=45)
+    body = r.text or ""
+    if _is_challenge(body, r.status_code):
+        _session = None  # drop a poisoned session; next call re-warms the ladder
+        raise urllib.error.HTTPError(url, r.status_code or 403, f"Cloudflare challenge ({getattr(sess, '_feedi_impersonate', '?')}): {body[:180]}", r.headers, None)
     if r.status_code >= 400:
-        raise urllib.error.HTTPError(url, r.status_code, (r.text or "")[:240], r.headers, None)
+        raise urllib.error.HTTPError(url, r.status_code, body[:240], r.headers, None)
     try:
         return r.json()
     except Exception as e:
