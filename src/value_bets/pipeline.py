@@ -22,6 +22,7 @@ from .adapters import (
     feedi,
     feedj,
     feedk,
+    feedl,
     matchbook,
     moviodds,
     oddsapi,
@@ -34,7 +35,7 @@ from .pricing import devig, edge, effective_odds, exchange_mid, kelly_pct, logit
 from .props_live import PropEngine
 from .util import iso, ist, now_utc, parse_ts
 
-ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair, feedk, feede, feedf, feedg, feedh, feedi, feedj]
+ALL_ADAPTERS = [smarkets, moviodds, polymarket, matchbook, oddsapi, betfair, feedk, feede, feedf, feedg, feedh, feedi, feedj, feedl]
 
 
 def adapters():

@@ -29,6 +29,7 @@ test("bookLogoStem resolves every feed name we publish to its mark", () => {
     ["Reddybook", "reddybook"],
     ["1xBet", "1xbet"],
     ["polymarket", "polymarket"],
+    ["Swarm", "swarm"],
     ["nobody", ""],
   ];
   for (const [src, stem] of cases) assert.equal(bookLogoStem(src), stem, src);
