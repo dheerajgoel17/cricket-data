@@ -13,5 +13,25 @@
   "edge": 0.1062,
   "start_utc": "2026-11-20T06:00:00Z",
   "alerted_at": "2026-11-19T10:34:08.967858+00:00"
+ },
+ "male|Australia|England|2026-11-21|batter_sixes||Tom Banton under 0.5|0.5|under": {
+  "edge": 0.107,
+  "start_utc": "2026-11-21T08:15:00Z",
+  "alerted_at": "2026-11-20T01:34:58.639644+00:00"
+ },
+ "male|Australia|England|2026-11-21|batter_fours||Tim David under 1.5|1.5|under": {
+  "edge": 0.0789,
+  "start_utc": "2026-11-21T08:15:00Z",
+  "alerted_at": "2026-11-20T01:34:58.639644+00:00"
+ },
+ "male|Australia|England|2026-11-21|batter_fours||Philip Salt under 2.5|2.5|under": {
+  "edge": 0.0708,
+  "start_utc": "2026-11-21T08:15:00Z",
+  "alerted_at": "2026-11-20T01:34:58.639644+00:00"
+ },
+ "male|Australia|England|2026-11-21|batter_fours||Mitchell Marsh under 2.5|2.5|under": {
+  "edge": 0.0664,
+  "start_utc": "2026-11-21T08:15:00Z",
+  "alerted_at": "2026-11-20T01:34:58.639644+00:00"
  }
 }
