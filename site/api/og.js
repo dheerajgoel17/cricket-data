@@ -32,7 +32,8 @@ let storeCache = null;
 export function dataOrigin() {
   const base = (process.env.SHARE_DATA_BASE || "").trim();
   if (base) return base.replace(/\/$/, "");
-  const host = (process.env.VERCEL_URL || "").trim();
+  // the production domain first: the per-deployment address sits behind Vercel Authentication, answers with an HTML login page and leaves every card without its form
+  const host = (process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || "").trim();
   return host ? `https://${host}` : null;
 }
 
@@ -87,8 +88,8 @@ async function loadNames() {
   return namesCache;
 }
 
-function withTimeout(p, ms, fallback) {
-  return Promise.race([p, new Promise((r) => setTimeout(() => r(fallback), ms))]);
+function withTimeout(p, ms, fallback) { // a rejected `p` is the fallback too (never an unhandled rejection that takes the process down)
+  return Promise.race([Promise.resolve(p).catch(() => fallback), new Promise((r) => setTimeout(() => r(fallback), ms))]);
 }
 
 let manifestRead = false;
@@ -198,7 +199,7 @@ export default async function handler(req, res) {
       res.statusCode = 200;
       res.setHeader("Content-Type", "image/png");
       res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
+      res.setHeader("Cache-Control", f.season || f.l5 ? "public, max-age=300, s-maxage=600" : "public, max-age=0, s-maxage=30"); // a poster that came out without its form is not kept for ten minutes
       res.setHeader("Content-Length", String(png.length));
       return res.end(png);
     }
