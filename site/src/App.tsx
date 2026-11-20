@@ -37,6 +37,7 @@ const TeamPage = lazy(() => import("@/pages/Markets").then((m) => ({ default: ()
 const VenuePage = lazy(() => import("@/components/app/fixture-ground").then((m) => ({ default: m.VenueGroundPage })));
 const ContactPage = page(() => import("@/pages/Contact"), "ContactPage");
 const AdminAdsPage = page(() => import("@/pages/AdminAds"), "AdminAdsPage");
+const AdminCardPage = page(() => import("@/pages/AdminCard"), "AdminCardPage");
 
 /** Old links used hash routes (#/player/12?stat=runs): send them to the same path. */
 function LegacyHash() {
@@ -85,6 +86,7 @@ export function App() {
             <Route path="glossary" element={<GlossaryPage />} />
             <Route path="saved" element={<SavedPage />} />
             <Route path="admin/ads" element={<AdminAdsPage />} />
+            <Route path="admin/card" element={<AdminCardPage />} />
             <Route path="auth/callback" element={<AuthCallbackPage />} />
             <Route path="players" element={<PlayersPage />} />
             <Route path="player/:id" element={<Player />} />

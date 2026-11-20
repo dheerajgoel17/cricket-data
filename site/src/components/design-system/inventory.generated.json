@@ -2629,6 +2629,18 @@
     ]
   },
   {
+    "path": "site/src/pages/AdminCard.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "AdminCardPage"
+    ],
+    "dependencies": [
+      "site/src/components/ui/button.tsx",
+      "site/src/components/ui/input.tsx"
+    ]
+  },
+  {
     "path": "site/src/pages/AuthCallback.tsx",
     "platform": "web",
     "route": true,
