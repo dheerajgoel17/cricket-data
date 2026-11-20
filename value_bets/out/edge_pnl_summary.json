@@ -1,14 +1,14 @@
 {
- "generated_at_utc": "2026-11-20T05:04:02Z",
- "n": 52,
+ "generated_at_utc": "2026-11-20T05:35:48Z",
+ "n": 54,
  "pnl_u": 13.173,
  "by": {
   "model|?|batter_runs": {
-   "n": 15,
+   "n": 17,
    "won": 10,
    "lost": 3,
    "push": 0,
-   "void": 2,
+   "void": 4,
    "pnl_u": 5.516
   },
   "model|?|batter_milestone": {
