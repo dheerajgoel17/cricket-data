@@ -1,4 +1,69 @@
 {
- "generated_at_ist": "2026-11-20 23:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-21 00:00 IST",
+ "alerts": [
+  {
+   "event_key": "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21",
+   "match": "Sydney Sixers (Women) vs Perth Scorchers (Women)",
+   "start_utc": "2026-11-21T04:30:00Z",
+   "start_ist": "2026-11-21 10:00 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_fours",
+   "market": "G9182 batter_fours",
+   "team_scope": "",
+   "selection": "Ellyse Perry under 3.5",
+   "player_matched_as": "Ellyse Perry",
+   "player_id": "be150fc8",
+   "player_team": "Sydney Sixers Women",
+   "stat": "fours",
+   "inn": 0,
+   "line": 3.5,
+   "side": "under",
+   "best_odds": 2.05,
+   "best_source": "feedi_d",
+   "effective_odds_after_commission": 2.05,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.076,
+   "implied_prob": 0.4878,
+   "fair_odds": 1.936,
+   "fair_prob": 0.5164,
+   "model_prob": 0.5545,
+   "market_prob": 0.4853,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0587,
+   "edge_pct": 5.87,
+   "kelly_quarter_stake_pct": 1.4,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 55% vs market 49% for under 3.5 fours; form 3.9 fours/inn recency-weighted T20 (n_eff 76.7; last 5: 4, 0, 2, 11, 13), bats in 95% of games played; at North Sydney Oval: 39 inns avg 5.2; context adj: venue environment +14%, at this venue +8%; weather: rain chance up to 65%",
+   "notes": "2 market source(s) for fair price; model 0.554 vs market 0.485; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 65% rain chance, 0.4 mm forecast during the match - shortened match or void props possible",
+   "model_detail": {
+    "n_eff": 76.7,
+    "expected": 4.41,
+    "nb_alpha": 0.958,
+    "p_bats_or_bowls": 0.955,
+    "venue_matched": "north sydney oval",
+    "context_terms": [
+     "p_bat",
+     "env_fours",
+     "ven_fours",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": true,
+   "weather": {
+    "rain_prob_max_pct": 65,
+    "rain_mm_in_window": 0.4,
+    "humidity_pct": 67,
+    "cloud_pct": 19,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "676846ac75d636ad",
+   "alert_key": "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_fours||Ellyse Perry under 3.5|3.5|under",
+   "alerted_at_ist": "2026-11-21 00:06 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }

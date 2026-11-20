@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-20T17:37:50Z",
+ "generated_at_utc": "2026-11-20T18:37:08Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -73,29 +73,6 @@
    "chance": 0.5653,
    "edge": 0.3114,
    "edge_pct": 31.1,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-21-desert-vipers-v-mi-emirates|match_wickets||0|under",
-   "fixture_id": "2026-11-21-desert-vipers-v-mi-emirates",
-   "match": "Desert Vipers vs MI Emirates",
-   "format": "T20",
-   "series": "ILT20 2026",
-   "start_utc": "2026-11-21T14:30:00Z",
-   "start_ist": "2026-11-21 20:00 IST",
-   "key": "match_wickets",
-   "team": null,
-   "inn": 0,
-   "side": "under",
-   "line": 13.5,
-   "best_odds": 1.82,
-   "best_source": "bc.game",
-   "hits": 26,
-   "played": 35,
-   "window": 20,
-   "chance": 0.6889,
-   "edge": 0.2538,
-   "edge_pct": 25.4,
    "bat_first": false
   },
   {
@@ -346,9 +323,9 @@
    "hits": 18,
    "played": 22,
    "window": 20,
-   "chance": 0.7535,
-   "edge": 0.1838,
-   "edge_pct": 18.4,
+   "chance": 0.7529,
+   "edge": 0.1828,
+   "edge_pct": 18.3,
    "bat_first": false
   },
   {
@@ -369,8 +346,8 @@
    "hits": 11,
    "played": 20,
    "window": 20,
-   "chance": 0.4966,
-   "edge": 0.1819,
+   "chance": 0.4967,
+   "edge": 0.1823,
    "edge_pct": 18.2,
    "bat_first": false
   },
