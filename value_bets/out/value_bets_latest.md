@@ -1,23 +1,23 @@
-# Cricket value bets - 2026-11-20 10:00 IST
+# Cricket value bets - 2026-11-20 10:27 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
-- **smarkets**: ok, 576 prices
+- **smarkets**: ok, 572 prices
 - **feedk**: ok, 158 prices, 6 events
 - **feedg**: ok, 24 prices, 3 events
 - **feede**: ok, 766 prices, 32 events
-- **feedh**: ok, 1584 prices, 65 events
-- **feedj**: ok, 858 prices, 18 events
-- **feedf**: ok, 668 prices, 26 events, stopped time budget
-- **feedi**: ok, 2061 prices, 56 events
+- **feedh**: ok, 1568 prices, 65 events
+- **feedj**: ok, 886 prices, 18 events
+- **feedf**: ok, 758 prices, 26 events
+- **feedi**: ok, 2003 prices, 56 events
 
-Matches starting in next 168h: **47**, markets priced: **483**, value bets: **8** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **45**, markets priced: **481**, value bets: **8** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
-| 11-20 11:30 IST | Pakistan A vs United Arab Emirates | 1st innings - Shahdad, Muhammad to score 50 | Muhammad Shahdad 50+ yes | 4.35 @ feedf_p | 4.03 | 0.2419 | 8.0% | 0.60% | medium |
+| 11-20 11:30 IST | Pakistan A vs United Arab Emirates | 1st innings - Shahdad, Muhammad to score 50 | Muhammad Shahdad 50+ yes | 4.35 @ feedf_p | 4.08 | 0.2419 | 6.7% | 0.50% | medium |
 | 11-20 13:40 IST | Adelaide Strikers vs Melbourne Renegades | Hayley Matthews To Score 50 | Hayley Matthews 50+ yes | 5.00 @ feede_lb | 4.34 | 0.2082 | 15.3% | 0.95% | medium |
 | 11-20 13:40 IST | Adelaide Strikers (Women) vs Melbourne Renegades (Women) | G9182 batter_fours | Laura Wolvaardt under 2.5 | 2.20 @ feedi_d | 2.03 | 0.5555 | 8.4% | 1.76% | medium |
 | 11-21 10:00 IST | Sydney Sixers (Women) vs Perth Scorchers (Women) | G2506 batter_runs | Ellyse Perry under 29.5 | 1.85 @ feedi_d | 1.76 | 0.6314 | 5.3% | 1.55% | medium |
@@ -27,7 +27,7 @@ Matches starting in next 168h: **47**, markets priced: **483**, value bets: **8*
 | 11-21 13:45 IST | Australia vs England | G9182 batter_fours | Mitchell Marsh under 2.5 | 2.00 @ feedi_d | 1.88 | 0.6056 | 6.6% | 1.66% | medium |
 
 ### Why / notes per bet
-- **Pakistan A vs United Arab Emirates / 1st innings - Shahdad, Muhammad to score 50 / Muhammad Shahdad 50+ yes** - why: Model 24% vs market 25% for 50+ runs; form 37.6 runs/inn recency-weighted ODI (n_eff 14.4; last 5: 0, 14, 21, 0, 79), bats in 96% of games played. Notes: 4 market source(s) for fair price; model 0.242 vs market 0.254; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
+- **Pakistan A vs United Arab Emirates / 1st innings - Shahdad, Muhammad to score 50 / Muhammad Shahdad 50+ yes** - why: Model 24% vs market 25% for 50+ runs; form 37.6 runs/inn recency-weighted ODI (n_eff 14.4; last 5: 0, 14, 21, 0, 79), bats in 96% of games played. Notes: 3 market source(s) for fair price; model 0.242 vs market 0.248; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 - **Adelaide Strikers vs Melbourne Renegades / Hayley Matthews To Score 50 / Hayley Matthews 50+ yes** - why: Model 21% vs market 25% for 50+ runs; form 27.3 runs/inn recency-weighted T20 (n_eff 81.5; last 5: 3, 1, 49, 59, 7), bats in 99% of games played; vs Adelaide Strikers Women: 1 inns avg 49.0; context adj: team H2H context +8%; weather: high humidity 79%. Notes: 4 market source(s) for fair price; model 0.208 vs market 0.249; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)
 - **Adelaide Strikers (Women) vs Melbourne Renegades (Women) / G9182 batter_fours / Laura Wolvaardt under 2.5** - why: Model 56% vs market 44% for under 2.5 fours; form 3.7 fours/inn recency-weighted T20 (n_eff 87.4; last 5: 4, 7, 2, 0, 9), bats in 98% of games played; at Adelaide Oval, Adelaide: 11 inns avg 1.5; vs Melbourne Renegades Women: 1 inns avg 0.0; context adj: venue environment +5%, at this venue -13%, team H2H context -2%; weather: high humidity 79%. Notes: 2 market source(s) for fair price; model 0.555 vs market 0.442; assumes bet void if player doesn't bat/bowl - check book rules
 - **Sydney Sixers (Women) vs Perth Scorchers (Women) / G2506 batter_runs / Ellyse Perry under 29.5** - why: Model 63% vs market 52% for under 29.5 runs; form 31.5 runs/inn recency-weighted T20 (n_eff 76.7; last 5: 45, 3, 30, 59, 84), bats in 95% of games played; at North Sydney Oval: 39 inns avg 38.3; weather: rain chance up to 49%. Notes: 3 market source(s) for fair price; model 0.631 vs market 0.518; assumes bet void if player doesn't bat/bowl - check book rules
@@ -43,4 +43,4 @@ Matches starting in next 168h: **47**, markets priced: **483**, value bets: **8*
 
 Unmatched team names (add to mappings/teams.csv): Elite Cricket Academy (male), Karnataka (W) (female), Karnataka (Women) (female), Larkana Region (male), Lokseva Academy (male), Milan Icons (male), Omr Checker (male), Peshawar Region (male), Peshawar Whites (male), Pondicherry (male), Railways (W) (female), Railways (Women) (female), Roma Gladiators (male), Speedworld Security Solutions (male)
 
-Runtime 233.0s. Snapshot: `odds_20261120T043032Z.jsonl.gz`
+Runtime 280.4s. Snapshot: `odds_20261120T045716Z.jsonl.gz`
