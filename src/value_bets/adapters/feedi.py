@@ -71,7 +71,11 @@ LIVE_BUDGET_SECS = 40.0
 
 _session = None  # curl_cffi Session, warmed once per process
 # Newest Chrome first; CF fingerprints go stale. Ops can pin with FEEDI_IMPERSONATE (one profile name).
-IMPERSONATE_LADDER = ("chrome", "chrome152", "chrome146", "chrome136", "chrome133a", "safari270", "firefox155", "chrome131")
+# Android profiles sometimes clear a desktop-gated challenge from Actions' US IPs.
+IMPERSONATE_LADDER = (
+    "chrome", "chrome152", "chrome146", "chrome136", "chrome133a",
+    "chrome_android", "chrome131_android", "safari270", "firefox155", "chrome131",
+)
 
 
 class Skip(Exception):
@@ -121,26 +125,52 @@ def _impersonate_ladder() -> list[str]:
     return list(IMPERSONATE_LADDER)
 
 
+def _api_headers(base: str) -> dict[str, str]:
+    return {
+        "Accept": "application/json, text/plain, */*",
+        "Origin": base,
+        "Referer": f"{base}/en/line/cricket",
+    }
+
+
 def _warm(sess, base: str) -> bool:
-    """Hit the site root; True when the response is not a Cloudflare challenge page."""
+    """True when /en is not a challenge page AND LineFeed GetSportsZip returns JSON (the API is what CF gates)."""
     try:
         r = sess.get(f"{base}/en", timeout=30, headers={"Accept": "text/html,application/xhtml+xml;q=0.9,*/*;q=0.8"})
     except Exception:
         return False
     body = r.text or ""
-    if _is_challenge(body, r.status_code):
+    if _is_challenge(body, r.status_code) or r.status_code >= 400:
         return False
-    return r.status_code < 400 and ("<!doctype html" in body[:200].lower() or "<html" in body[:200].lower() or len(body) > 200)
+    try:
+        api = sess.get(linefeed(base, "GetSportsZip", gr="70"), headers=_api_headers(base), timeout=45)
+    except Exception:
+        return False
+    text = api.text or ""
+    if _is_challenge(text, api.status_code) or api.status_code >= 400:
+        return False
+    try:
+        data = api.json()
+    except Exception:
+        return False
+    return isinstance(data, dict) and (data.get("Success") is True or "Value" in data)
 
 
-def _session_for(base: str):
+def _session_for(base: str, *, skip: set[str] | None = None):
     """Warmed Chrome-impersonating session for ``base`` (clears Cloudflare; cookies kept)."""
     global _session
     cffi_requests = _cffi()
-    if _session is not None and getattr(_session, "_feedi_base", None) == base:
+    skip = skip or set()
+    if (
+        _session is not None
+        and getattr(_session, "_feedi_base", None) == base
+        and getattr(_session, "_feedi_impersonate", None) not in skip
+    ):
         return _session
     last_err = None
     for profile in _impersonate_ladder():
+        if profile in skip:
+            continue
         try:
             sess = cffi_requests.Session(impersonate=profile)
         except Exception as e:  # unknown profile name on this curl_cffi build
@@ -164,23 +194,30 @@ def request(url: str):
     if not on_runner():
         raise Skip("Feed I does not run on a local machine")
     base = f"{urllib.parse.urlparse(url).scheme}://{urllib.parse.urlparse(url).hostname}"
-    sess = _session_for(base)
-    headers = {
-        "Accept": "application/json, text/plain, */*",
-        "Origin": base,
-        "Referer": f"{base}/en/line/cricket",
-    }
-    r = sess.get(url, headers=headers, timeout=45)
-    body = r.text or ""
-    if _is_challenge(body, r.status_code):
-        _session = None  # drop a poisoned session; next call re-warms the ladder
-        raise urllib.error.HTTPError(url, r.status_code or 403, f"Cloudflare challenge ({getattr(sess, '_feedi_impersonate', '?')}): {body[:180]}", r.headers, None)
-    if r.status_code >= 400:
-        raise urllib.error.HTTPError(url, r.status_code, body[:240], r.headers, None)
-    try:
-        return r.json()
-    except Exception as e:
-        raise Skip(f"Feed I non-JSON response ({r.status_code})") from e
+    tried: set[str] = set()
+    last_challenge = None
+    while True:
+        sess = _session_for(base, skip=tried)
+        profile = getattr(sess, "_feedi_impersonate", "?")
+        r = sess.get(url, headers=_api_headers(base), timeout=45)
+        body = r.text or ""
+        if _is_challenge(body, r.status_code):
+            tried.add(profile)
+            _session = None
+            last_challenge = profile
+            if not (set(_impersonate_ladder()) - tried):
+                raise urllib.error.HTTPError(
+                    url, r.status_code or 403,
+                    f"Cloudflare challenge (tried {sorted(tried)}): {body[:160]}",
+                    r.headers, None,
+                )
+            continue  # re-warm with the next profile
+        if r.status_code >= 400:
+            raise urllib.error.HTTPError(url, r.status_code, body[:240], r.headers, None)
+        try:
+            return r.json()
+        except Exception as e:
+            raise Skip(f"Feed I non-JSON response ({r.status_code}; last_challenge={last_challenge})") from e
 
 
 def flip(name: str) -> str:
