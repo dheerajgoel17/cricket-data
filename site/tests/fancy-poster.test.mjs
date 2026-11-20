@@ -68,3 +68,12 @@ test("the bot route needs its key and a card link", async () => {
     assert.equal(keyOk("s3cret", "s3cret"), true);
   } finally { delete process.env.CARD_API_KEY; }
 });
+
+import { renderPoster } from "@cricket/engine/poster.js";
+test("the player poster draws a book box for a single listed book too", async () => {
+  const f = { kind: "prop", name: "Test Player", team: "Alpha", fmt: "Test", role: "Batter", stat: "Runs", line: 29.5, price: 1.87, book: "1xBet", year: "2026", initials: "TP", recent: [{ value: 40, date: "1 Jan", vs: "Beta" }, { value: 10, date: "2 Jan", vs: "Beta" }], season: { mean: 30, p: 0.5, hits: 1, played: 2 } };
+  const fonts = { bold: "fonts/satoshi/Satoshi-Bold.woff", regular: "fonts/satoshi/Satoshi-Medium.woff", num: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-700-normal.woff", brand: "node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-900-normal.woff" };
+  const none = await renderPoster({ ...f, bookLines: [] }, { fonts }), one = await renderPoster({ ...f, bookLines: [{ line: 29.5, price: 1.87, book: "1xBet", stem: null, best: true }], bookTitle: "BOOKS AT 29.5" }, { fonts, bookMarks: {} });
+  assert.notDeepEqual(none, one);
+  if (process.env.POSTER_OUT) writeFileSync(process.env.POSTER_OUT, one);
+});

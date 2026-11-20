@@ -186,6 +186,7 @@ export default async function handler(req, res) {
     if (f.pid && names && names[f.pid]) f.name = names[f.pid]; // the full name the site shows ("Maia Bouchier"), not the scorecard's initials
     f = await withTimeout(attachForm(f), FORM_MS, f);
     const [photo, jersey, teamLogo, oppLogo] = await Promise.all([firstPhoto(f.photos), firstPhoto(f.kitPhotos), firstPhoto(f.teamPhotos), firstPhoto(f.oppPhotos)]);
+    if (q.poster && f.kind === "prop" && !f.bookLines?.length && f.price) f.bookLines = [{ line: f.line, price: f.price, book: f.book, stem: bookLogoStem(f.source), best: true }], f.bookTitle = `BOOKS AT ${f.line}`; // one book is still a box on the right, so the sheet is not lopsided
     const bookMarks = {}; // each listed book's own logo, by stem (the file the site's badges use)
     for (const b of f.bookLines || []) if (b.stem && !bookMarks[b.stem]) { const m = readBookMark(b.stem); if (m) bookMarks[b.stem] = m; }
     const fonts = {

@@ -65,7 +65,7 @@ export async function renderPoster(f, { photo = null, jersey = null, teamLogo = 
 
   // book lines: every line the books list, best over price at each, the one on show outlined
   const bl = (f.bookLines || []).slice(0, 4);
-  if (bl.length > 1) {
+  if (bl.length) {
     const bx = 740, by = 470, bw = W - M - bx, bh = 64 + bl.length * 80 + 4;
     g.fillStyle = PANEL; g.beginPath(); g.roundRect(bx, by, bw, bh, 26); g.fill();
     g.strokeStyle = HAIR; g.lineWidth = 2; g.stroke();
