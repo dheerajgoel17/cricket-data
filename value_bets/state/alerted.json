@@ -28,5 +28,30 @@
   "edge": 0.0814,
   "start_utc": "2026-11-21T01:00:00Z",
   "alerted_at": "2026-11-20T03:35:39.111330+00:00"
+ },
+ "male|Australia|England|2026-11-21|batter_sixes||AHT Donald under 0.5|0.5|under": {
+  "edge": 0.1972,
+  "start_utc": "2026-11-21T08:15:00Z",
+  "alerted_at": "2026-11-20T12:32:37.516453+00:00"
+ },
+ "male|Australia|England|2026-11-21|batter_fours||Harry Brook under 2.5|2.5|under": {
+  "edge": 0.0792,
+  "start_utc": "2026-11-21T08:15:00Z",
+  "alerted_at": "2026-11-20T12:32:37.516453+00:00"
+ },
+ "male|Bangladesh|South Africa|2026-11-23|bowler_milestone||Hasan Mahmud 5+ yes|4.5|over": {
+  "edge": 0.2476,
+  "start_utc": "2026-11-23T08:00:00Z",
+  "alerted_at": "2026-11-20T12:32:37.516453+00:00"
+ },
+ "male|Bangladesh|South Africa|2026-11-23|bowler_milestone||Mehidy Hasan Miraz 5+ yes|4.5|over": {
+  "edge": 0.1525,
+  "start_utc": "2026-11-23T08:00:00Z",
+  "alerted_at": "2026-11-20T12:32:37.516453+00:00"
+ },
+ "male|Bangladesh|South Africa|2026-11-23|bowler_wickets||Hasan Mahmud over 3.5|3.5|over": {
+  "edge": 0.0766,
+  "start_utc": "2026-11-23T08:00:00Z",
+  "alerted_at": "2026-11-20T12:32:37.516453+00:00"
  }
 }
