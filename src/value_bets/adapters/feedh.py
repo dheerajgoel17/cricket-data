@@ -9,9 +9,11 @@ in-horizon game and competition page (internationals first), ``FEEDH_SPACING_SEC
 
 Rows are the player markets the other books already map: "Batsman Runs / Sixes / Fours - Last, First" and "Bowler Wickets - Last, First"
 over/unders, "Player Performance - Last, First" (fantasy points: 1 per run, 20 per wicket, 10 per catch, 25 per stumping; the book's
-own scoring is not in the payload), "To score N - Last, First" yes/nos, and Top Batsman / Top Bowler (match and per side). Match
-totals of runs / fours / sixes, first-innings runs, highest over, ducks, run-outs, first-N-overs session runs and a side's total runs / fours / sixes come back as ``fancy`` lines. A Test's unscoped player line is
-not the match total the pipeline prices and is left out of rows (it still goes in the catalogue). Head-to-head is never a row.
+own scoring is not in the payload), "To score N - Last, First" yes/nos, Top Batsman / Top Bowler (match and per side), and the named
+"{Team} Player Sixes / Fours" markets (UI often appends " - Match") whose outcomes are over-only "to Hit Over N Sixes/Fours" (one
+sided; no under). Match totals of runs / fours / sixes, first-innings runs, highest over, ducks, run-outs, first-N-overs session runs
+and a side's total runs / fours / sixes come back as ``fancy`` lines. A Test's unscoped player line is not the match total the pipeline
+prices and is left out of rows (it still goes in the catalogue). Head-to-head is never a row.
 
 Every open market of a fetched match is also returned as a compact ``catalogue`` row (name, player, line, both decimal prices, which
 existing mapping it used if any) so the archive can keep a historical record of odds, markets and lines the site does not yet chart.
@@ -91,6 +93,10 @@ DUCKS = re.compile(r"^Total Ducks$", re.I)
 RUNOUTS = re.compile(r"^Total run[- ]?outs$", re.I)
 AFTER_N = re.compile(r"^Total runs after (?P<n>\d+) overs(?:\s*- (?P<team>.+))?$", re.I)
 OVER_1 = re.compile(r"^Total runs for over 1 in 1st innings?(?:\s*- (?P<team>.+))?$", re.I)
+# "{Team} Player Sixes" / "Player Fours" (optional " - Match"); outcomes "M. Marsh to Hit Over 0.5 Sixes" — over-only, not two-way O/U
+TEAM_PLAYER_HIT = re.compile(r"^(?:(?P<team>.+?)\s+)?Player (?P<what>Sixes|Fours)(?:\s*-\s*Match)?$", re.I)
+HIT_OVER = re.compile(r"^(?P<p>.+?) to Hit Over (?P<line>\d+(?:\.\d+)?) (?P<what>Sixes|Fours)$", re.I)
+HIT_MT = {"sixes": "batter_sixes", "fours": "batter_fours"}
 OU = re.compile(r"^(Over|Under)\s+(\d+(?:\.\d+)?)$", re.I)
 TOP_MT = {"Batsman": ("top_batter_team", "top_batter_match"), "Bowler": ("top_bowler_team", "top_bowler_match")}
 
@@ -306,6 +312,30 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
                 player_ou = True
                 break
         if player_ou:
+            continue
+        if (mm := TEAM_PLAYER_HIT.match(name)):
+            mt, team = HIT_MT[mm["what"].lower()], (mm["team"] or "").strip() or None
+            named = _named(m)
+            if not named:
+                left[name] += 1
+                continue
+            got_any = False
+            for n, p in named:
+                hm = HIT_OVER.match(n.strip())
+                if not hm or hm["what"].lower() != mm["what"].lower() or COMBO.search(n):
+                    catalogue.append(_cat(common, name, n, team, None, round(p, 3), None, None))
+                    continue
+                player, line = flip(hm["p"]), float(hm["line"])
+                got_any = True
+                catalogue.append(_cat(common, name, player, team, line, round(p, 3), None, mt))
+                if multi:
+                    continue  # a Test's match-total "to hit" is not the innings line we price
+                gk = f"{src}:{ev.get('id')}:{m.get('id')}:{player}:{line}"
+                rows.append(row(**{k: v for k, v in common.items() if k != "fmt"}, market_type=mt, market_raw=name,
+                                group_key=gk, selection=f"{player} over {line}", player=player, team=team, line=line,
+                                side="over", back=round(p, 3), inn_hint=hint[0]))
+            if not got_any:
+                left[name] += 1
             continue
         if (mm := TO_SCORE.match(name)) and not COMBO.search(mm["p"]):
             player, line = flip(mm["p"]), int(mm["n"]) - 0.5

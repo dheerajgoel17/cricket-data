@@ -113,6 +113,50 @@ def test_virtual_and_one_sided_markets_are_not_rows():
     assert rows == [] and left["Batsman Runs - Conway, Devon"] == 1 and cat[0]["mapped"] is None
 
 
+def test_team_player_sixes_and_fours_are_over_only_rows():
+    # UI "Australia Player Sixes - Match"; API name often drops " - Match". Outcomes are over-only "to Hit Over N".
+    markets = [
+        named("Australia Player Sixes", [
+            ("M. Marsh to Hit Over 0.5 Sixes", 1.50),
+            ("Tim David to Hit Over 0.5 Sixes", 1.40),
+        ], 30),
+        named("England Player Sixes - Match", [
+            ("Banton to Hit Over 0.5 Sixes", 1.60),
+        ], 31),
+        named("Australia Player Fours", [
+            ("M. Marsh to Hit Over 2.5 Fours", 1.75),
+        ], 32),
+        named("Australia Player to Hit a Six & Over 2.5 Fours", [  # combo market: catalogue only
+            ("M. Marsh To Hit A Six & Over 2.5 Fours", 3.50),
+        ], 33),
+    ]
+    rows, _, cat, left = feedh.parse_event(event(markets), "feedh_d", STAMP)
+    six = [(r["player"], r["team"], r["line"], r["side"], r["back"]) for r in rows if r["market_type"] == "batter_sixes"]
+    assert six == [
+        ("M. Marsh", "Australia", 0.5, "over", 1.5),
+        ("Tim David", "Australia", 0.5, "over", 1.4),
+        ("Banton", "England", 0.5, "over", 1.6),
+    ]
+    fours = [(r["player"], r["team"], r["line"], r["side"], r["back"]) for r in rows if r["market_type"] == "batter_fours"]
+    assert fours == [("M. Marsh", "Australia", 2.5, "over", 1.75)]
+    aus_six = [x for x in cat if x["name"] == "Australia Player Sixes"]
+    assert {(x["player"], x["line"], x["mapped"], x["over"]) for x in aus_six} == {
+        ("M. Marsh", 0.5, "batter_sixes", 1.5), ("Tim David", 0.5, "batter_sixes", 1.4)}
+    assert next(x for x in cat if x["name"] == "England Player Sixes - Match")["mapped"] == "batter_sixes"
+    assert next(x for x in cat if x["name"] == "Australia Player Fours")["mapped"] == "batter_fours"
+    assert next(x for x in cat if x["name"] == "Australia Player to Hit a Six & Over 2.5 Fours")["mapped"] is None
+    assert "Australia Player to Hit a Six & Over 2.5 Fours" not in {r["market_raw"] for r in rows}
+    assert left == {}
+
+
+def test_team_player_hit_on_a_test_is_catalogue_only():
+    m = named("Australia Player Sixes", [("M. Marsh to Hit Over 0.5 Sixes", 1.50)], 40)
+    ev = event([m])
+    ev["eventPaths"][-1]["name"] = "Test Series Australia vs England"
+    rows, _, cat, _ = feedh.parse_event(ev, "feedh_d", STAMP)
+    assert rows == [] and cat[0]["mapped"] == "batter_sixes" and cat[0]["player"] == "M. Marsh" and cat[0]["line"] == 0.5
+
+
 def test_settings_and_published_names_come_from_the_environment(monkeypatch):
     monkeypatch.delenv("FEEDH_URL", raising=False)
     monkeypatch.delenv("FEEDH_NAME", raising=False)
