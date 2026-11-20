@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Swarm">
+  <rect width="64" height="64" rx="12" fill="#0f172a"/>
+  <circle cx="22" cy="28" r="6" fill="#38bdf8"/>
+  <circle cx="42" cy="24" r="5" fill="#7dd3fc"/>
+  <circle cx="34" cy="40" r="7" fill="#0ea5e9"/>
+  <path d="M22 28 L34 40 L42 24" stroke="#e0f2fe" stroke-width="2" fill="none"/>
+</svg>

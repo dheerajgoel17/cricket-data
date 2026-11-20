@@ -1,0 +1,39 @@
+name: Feed L probe
+
+# Dispatch only: guest Swarm parent session + cricket listing (FEEDL_WS / FEEDL_SITE / FEEDL_NAME secrets).
+# Nothing committed. Hosts stay in secrets; the script redacts the socket URL.
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: feedl-probe
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      FEEDL_WS: ${{ secrets.FEEDL_WS }}
+      FEEDL_SITE: ${{ secrets.FEEDL_SITE }}
+      FEEDL_NAME: ${{ secrets.FEEDL_NAME }}
+      FEEDL_SOURCE: ${{ secrets.FEEDL_SOURCE }}
+      GITHUB_ACTIONS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Feed L run
+        run: |
+          if [ -z "$FEEDL_WS" ] || [ -z "$FEEDL_SITE" ] || [ -z "$FEEDL_NAME" ]; then
+            echo "Set secrets FEEDL_WS, FEEDL_SITE, FEEDL_NAME"
+            exit 1
+          fi
+          python -m value_bets.adapters.feedl | tee "$GITHUB_STEP_SUMMARY"

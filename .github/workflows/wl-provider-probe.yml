@@ -1,0 +1,56 @@
+name: WL provider probe
+
+# Dispatch only: fingerprint + feasibility score for a candidate white-label origin (guest or demo).
+# Nothing committed. Hosts and demo creds are secrets / inputs — never logged raw (script redacts).
+# Set repository secrets or pass workflow inputs: WL_PROBE_ORIGIN (required unless HTML artifact),
+# optional WL_PROBE_API, WL_PROBE_DEMO_USER, WL_PROBE_DEMO_PASS, WL_PROBE_TRANSPORT.
+on:
+  workflow_dispatch:
+    inputs:
+      origin:
+        description: Sportsbook page origin (https://…)
+        required: false
+        type: string
+      api:
+        description: Optional feed/API root if already known
+        required: false
+        type: string
+      transport:
+        description: urllib | curl_cffi | skip
+        required: false
+        default: urllib
+        type: string
+
+concurrency:
+  group: wl-provider-probe
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      WL_PROBE_ORIGIN: ${{ inputs.origin || secrets.WL_PROBE_ORIGIN }}
+      WL_PROBE_API: ${{ inputs.api || secrets.WL_PROBE_API }}
+      WL_PROBE_TRANSPORT: ${{ inputs.transport || 'urllib' }}
+      WL_PROBE_DEMO_USER: ${{ secrets.WL_PROBE_DEMO_USER }}
+      WL_PROBE_DEMO_PASS: ${{ secrets.WL_PROBE_DEMO_PASS }}
+      GITHUB_ACTIONS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Fingerprint + score
+        run: |
+          if [ -z "$WL_PROBE_ORIGIN" ] && [ -z "$WL_PROBE_API" ]; then
+            echo "Set origin input or WL_PROBE_ORIGIN / WL_PROBE_API secret"
+            exit 1
+          fi
+          python scripts/probe_wl_provider.py | tee "$GITHUB_STEP_SUMMARY"

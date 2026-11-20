@@ -83,6 +83,10 @@ DEFAULTS = {
     "FEEDJ_MAX_EVENTS": 40,        # ... events read per run (an event call and a players call each)
     "FEEDJ_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
     "FEEDJ_BUDGET_SECS": 150.0,    # ... starts no request after this long (the whole source is cut at SOURCE_TIMEOUT)
+    "FEEDL_SPACING_SECS": 0.4,     # Feed L (adapters/feedl.py, Swarm parent; on whenever FEEDL_WS, FEEDL_SITE, FEEDL_NAME are set)
+    "FEEDL_MAX_EVENTS": 40,        # ... cricket games whose markets are pulled per run
+    "FEEDL_HORIZON_HOURS": 240.0,  # ... only matches starting within this many hours (10 days)
+    "FEEDL_BUDGET_SECS": 150.0,    # ... starts no request after this long
     "DATA_REFRESH": 0 if IN_DATA_REPO else 1,  # 0 = never git-pull the data repo (e.g. when running inside it)
     "MIN_ODDS_MILESTONE": 1.25,
     "WEATHER": 1,                  # Open-Meteo forecast per event (free, no key); 0 = off

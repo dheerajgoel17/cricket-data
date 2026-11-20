@@ -61,6 +61,10 @@ env:
   FEEDJ_NAME: ${{ secrets.FEEDJ_NAME }}
   FEEDJ_RELAY: ${{ secrets.FEEDJ_RELAY }}
   FEEDJ_RELAY_KEY: ${{ secrets.FEEDJ_RELAY_KEY }}
+  FEEDL_WS: ${{ secrets.FEEDL_WS }}
+  FEEDL_SITE: ${{ secrets.FEEDL_SITE }}
+  FEEDL_NAME: ${{ secrets.FEEDL_NAME }}
+  FEEDL_SOURCE: ${{ secrets.FEEDL_SOURCE }}
 
 permissions:
   contents: write
