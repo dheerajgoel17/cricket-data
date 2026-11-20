@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-20 18:12 IST
+# Cricket value bets - 2026-11-20 18:18 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1455 prices
-- **smarkets**: ok, 519 prices
+- **moviodds_bet365**: ok, 1506 prices
+- **smarkets**: ok, 552 prices
 - **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
-- **feedl**: ok, 440 prices, 21 events
+- **feedl**: ok, 440 prices, 22 events
 - **feedk**: ok, 134 prices, 6 events
 - **feedg**: ok, 24 prices, 3 events
-- **feede**: ok, 416 prices, 16 events
-- **feedf**: ok, 350 prices, 8 events
-- **feedj**: ok, 633 prices, 10 events
-- **feedh**: ok, 1341 prices, 61 events
+- **feedf**: ok, 358 prices, 8 events
+- **feede**: ok, 474 prices, 19 events
+- **feedj**: ok, 521 prices, 8 events
+- **feedh**: ok, 1495 prices, 63 events
 
-Matches starting in next 168h: **34**, markets priced: **395**, value bets: **9** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **37**, markets priced: **430**, value bets: **9** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -41,8 +41,8 @@ Matches starting in next 168h: **34**, markets priced: **395**, value bets: **9*
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-21 13:45 IST Australia vs England / Batsman Total Match Sixes / J Fraser-McGurk under 0.5 @ 3.00 (moviodds_bet365): edge 36.9%, model 0.5254, market 0.4
-- 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 34.0%, model 0.3088, market 0.2227
+- 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 35.3%, model 0.3155, market 0.2227
 
-Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Bahawalpur Region (male), Dm Jamali Region (male), Elite Cricket Academy (male), Faisalabad Region (male), Garden Route Badgers (W) (female), Garden Route Badgers (female), Karachi Region Blues (male), Karachi Whites (male), Karnataka (W) (female), Lahore Region Blues (male), Larkana Region (male), Lions (W) (female), Lions (female), Milan Icons (male), Omr Checker (male), Peshawar Region (male), Quetta Region (male), Railways (W) (female), Rawalpindi Region (male), Roma Gladiators (male), Rome Gladiators (male), South Western Districts (male)
+Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Bahawalpur Region (male), Dm Jamali Region (male), Dolphins (W) (female), Dolphins (female), Elite Cricket Academy (male), Faisalabad Region (male), Garden Route Badgers (W) (female), Garden Route Badgers (female), Karachi Region Blues (male), Karachi Whites (male), Karnataka (W) (female), Lahore Region Blues (male), Larkana Region (male), Lions (W) (female), Lions (female), Milan Icons (male), Omr Checker (male), Peshawar Blues (male), Peshawar Region (male), Quetta Region (male), Railways (W) (female), Rawalpindi Region (male), Roma Gladiators (male), Rome Gladiators (male), Sialkot Blues (male), South Western Districts (male), Western Province (W) (female), Western Province (female)
 
-Runtime 149.1s. Snapshot: `odds_20261120T124208Z.jsonl.gz`
+Runtime 108.8s. Snapshot: `odds_20261120T124848Z.jsonl.gz`
