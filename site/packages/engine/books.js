@@ -14,9 +14,9 @@ export const BOOK_STEMS = {
   dafabet: "Dafabet",
   "1xbet": "1xBet",
   bcgame: "bc.game",
-  swarm: "Swarm",
+  vbet: "VBET",
 };
-const BUILTIN_FILES = { bet365: "bet365.svg", ladbrokes: "ladbrokes.svg", polymarket: "polymarket.svg", "1xbet": "1xbet.svg", swarm: "swarm.svg" };
+const BUILTIN_FILES = { bet365: "bet365.svg", ladbrokes: "ladbrokes.svg", polymarket: "polymarket.svg", "1xbet": "1xbet.svg" };
 
 let stems = { ...BOOK_STEMS };
 let files = {};

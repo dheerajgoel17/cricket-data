@@ -35,8 +35,8 @@
   "name": "bc.game",
   "file": "bcgame.png"
  },
- "swarm": {
-  "name": "Swarm",
-  "file": "swarm.svg"
+ "vbet": {
+  "name": "VBET",
+  "file": "vbet.png"
  }
 }

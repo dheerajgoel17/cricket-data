@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-20 — Book mark: VBET (Feed L)
+- **Path:** `site/public/books/books.json`, `site/public/books/vbet.png`, `site/packages/engine/books.js`
+- **Change:** Feed L's published book mark is VBET (`vbet.png`); removed the temporary Swarm stem/svg. Manifest-driven — apps pick it up from `books.json` without a native update.
+- **Callers:** book badges / odds tables wherever `bookLogo` / `BOOK_STEMS` resolve a feed source
+
 ### 2026-11-15 — AndroidAppBanner: session dismiss + hide when installed
 - **Path:** `site/src/components/app/android-app-banner.tsx`, `site/src/lib/android-app.ts`, `site/public/manifest.webmanifest`, `site/public/.well-known/assetlinks.json`
 - **Change:** × collapses for this visit only (`sessionStorage`); next visit shows the promo again. Banner stays hidden when Chrome reports package `cash.fancy.app` already installed (`getInstalledRelatedApps` + related_applications + Digital Asset Links). Download still resolves the latest release `.apk`.
