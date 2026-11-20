@@ -10,7 +10,7 @@ import { join } from "node:path";
 import { LIVE_TTL_MS } from "@cricket/engine/live.js";
 import { createFeed } from "@cricket/engine/feed.js";
 import { identityIndex, NO_IDENTITY } from "@cricket/engine/identity.js";
-import { wire } from "@cricket/engine/wrap.js";
+import { wireSync } from "@cricket/engine/wrap-node.js";
 
 // Where the pages live is configuration, not code: LIVE_SOURCE_BASE (no trailing slash) comes from the deployment's environment variables.
 const base = () => {
@@ -63,7 +63,7 @@ const feed = createFeed({ base, getJson, getText, getHtml, loadIdentity });
 const snapshot = () => feed.snapshot();
 
 async function send(res, status, body) {
-  const out = await wire(body, process.env.DATA_WRAP_KEY);
+  const out = wireSync(body, process.env.DATA_WRAP_KEY);
   return res.status(status).json(out);
 }
 

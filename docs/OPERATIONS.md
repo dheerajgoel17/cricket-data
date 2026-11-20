@@ -110,6 +110,8 @@ The "Data guard" step of `site.yml` (PROJECT_GUIDE 5.8) stops the job before the
 Everything runs on free tiers (GitHub Actions on a public repo, Vercel Hobby, Supabase free). Watch: Supabase free projects pause after inactivity (the hourly sync keeps it active);
 1 GB storage / 500 MB DB; Vercel function limits; xAI Grok is the one **metered** dependency (a few hundred tokens per question), remove `XAI_API_KEY` to go fully free.
 
+**Vercel Fluid Active CPU (Hobby 4 h per rolling 30 days):** read it at the team's Usage page (Fluid Active CPU, by project); Hobby has no per-function breakdown, metrics API or billing API (checked 2026-11-20: ~3 h 48 m used, ~10 min a day). The polled routes (`/api/live`, `/api/inplay`, `/api/state`) run about once per cache window per region while anyone has the site open, so their CPU per run is what counts. Wrapping a ~200 KB `/api/live` body with `wrap.js` (one awaited Web Crypto digest per 32 bytes) cost ~40-75 ms of CPU; the functions now use `wrap-node.js` (`wireSync`, byte-identical output, ~7 ms). Keep any new per-request work in these routes synchronous and small, and never use `wrap.js` in a Node function.
+
 **Vercel Functions Storage (Hobby 10 GB):** driven by serverless bundle size, not static `/data`. `api/og` / `api/share` must only `includeFiles` the four small card JSON files (`index` / `photos` / `lines` / `fixtures`), books and fonts — never `public/data/p/*` or a `public/data/*.json` glob. L5 form fetches `matches.json` and one `p/NN.json` over HTTP with `x-cd-k` (= `DATA_WRAP_KEY`). `share.js` imports `load-data.js`, not `og.js`. After fat deploys: `npx vercel remove cricket-props-hub --safe --yes`; check with `npx vercel inspect <url>`.
 
 

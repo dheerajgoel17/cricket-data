@@ -3,7 +3,7 @@
 // (scripts/inplay-snapshot.mjs, started every minute by the scheduler Worker); this route only reads that row with the project's public key, so the feed's address never leaves GitHub.
 // A copy older than STALE_MS is not shown (an old price is worse than none), and without SUPABASE_URL / SUPABASE_ANON_KEY the list is empty. Nothing is stored here or in the pre-match files.
 import { LIVE_TTL_MS } from "@cricket/engine/live.js";
-import { wire } from "@cricket/engine/wrap.js";
+import { wireSync } from "@cricket/engine/wrap-node.js";
 
 const UA = "cricket-props-hub-inplay/0.1 (server)";
 const FETCH_MS = 6000;
@@ -37,7 +37,7 @@ export async function snapshot(now = Date.now()) {
 export const lastBody = () => last?.body || null;
 
 async function send(res, status, body) {
-  return res.status(status).json(await wire(body, process.env.DATA_WRAP_KEY));
+  return res.status(status).json(wireSync(body, process.env.DATA_WRAP_KEY));
 }
 
 export default async function handler(req, res) {
