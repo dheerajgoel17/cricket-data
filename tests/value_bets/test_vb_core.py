@@ -177,3 +177,27 @@ def test_trailing_w_marks_a_womens_side():
     assert norm_team("Melbourne Renegades W") == ("melbourne renegades", "female")
     assert norm_team("Melbourne Renegades Women") == norm_team("Melbourne Renegades (W)") == ("melbourne renegades", "female")
     assert norm_team("West Indies")[1] is None
+
+
+def test_a_test_relisted_on_a_later_morning_joins_its_schedule_fixture():
+    """A book (1xBet) lists a Test again under day 2's start with no competition text: it must join the Test's schedule row, or its format falls back to the last meeting (an ODI)."""
+    from datetime import datetime, timezone
+
+    from value_bets.pipeline import fixture_for_cluster
+
+    tres = TeamResolver({"male": {"New Zealand": 100, "India": 120}})
+    fixtures = [
+        {"gender": "male", "team_a": "New Zealand", "team_b": "India", "start_utc": "2026-11-18T22:00Z", "format": "Test", "venue": "Basin Reserve"},
+        {"gender": "male", "team_a": "New Zealand", "team_b": "India", "start_utc": "2026-11-27T22:00Z", "format": "Test", "venue": "Hagley Oval"},
+    ]
+    base = {"gender": "male", "canon_teams": ["India", "New Zealand"]}
+    day2 = {**base, "start": datetime(2026, 11, 19, 22, 0, tzinfo=timezone.utc)}
+    day4 = {**base, "start": datetime(2026, 11, 21, 22, 0, tzinfo=timezone.utc)}
+    second = {**base, "start": datetime(2026, 11, 27, 21, 30, tzinfo=timezone.utc)}
+    before = {**base, "start": datetime(2026, 11, 17, 22, 0, tzinfo=timezone.utc)}  # a Test is never joined to a start before its own first morning (beyond the delta)
+    assert fixture_for_cluster(day2, fixtures, tres)["venue"] == "Basin Reserve"
+    assert fixture_for_cluster(day4, fixtures, tres)["venue"] == "Basin Reserve"
+    assert fixture_for_cluster(second, fixtures, tres)["venue"] == "Hagley Oval"
+    assert fixture_for_cluster(before, fixtures, tres) is None
+    odi = [{**fixtures[0], "format": "ODI"}]
+    assert fixture_for_cluster(day2, odi, tres) is None  # only a multi-day match is restamped day by day

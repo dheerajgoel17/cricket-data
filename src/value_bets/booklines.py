@@ -257,6 +257,8 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
             y = restamp(x)
             if not alive(y):
                 continue
+            if kind == "lines" and y.get("match") in test_names and y.get("fmt") != "Test":
+                continue  # a leftover of a pull that filed this Test under another format (no fixture join, no "test" in the competition): its real lines are the Test ones, carried or re-priced
             k = row_key(kind, y)
             if k not in by:
                 by[k] = y
