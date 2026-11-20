@@ -63,5 +63,15 @@
   "edge": 0.0587,
   "start_utc": "2026-11-21T04:30:00Z",
   "alerted_at": "2026-11-20T18:36:21.195263+00:00"
+ },
+ "male|Australia|England|2026-11-21|batter_sixes||Philip Salt under 0.5|0.5|under": {
+  "edge": 0.0841,
+  "start_utc": "2026-11-21T08:15:00Z",
+  "alerted_at": "2026-11-20T22:35:47.451801+00:00"
+ },
+ "female|Adelaide Strikers Women|Brisbane Heat Women|2026-11-22|batter_fours||Grace Harris under 2.5|2.5|under": {
+  "edge": 0.0679,
+  "start_utc": "2026-11-22T04:40:00Z",
+  "alerted_at": "2026-11-20T22:35:47.451801+00:00"
  }
 }
