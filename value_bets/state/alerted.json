@@ -1,14 +1,4 @@
 {
- "female|Adelaide Strikers Women|Melbourne Renegades Women|2026-11-20|batter_milestone||Hayley Matthews 50+ yes|49.5|over": {
-  "edge": 0.1527,
-  "start_utc": "2026-11-20T08:11:00Z",
-  "alerted_at": "2026-11-18T08:33:35.599272+00:00"
- },
- "female|Adelaide Strikers Women|Melbourne Renegades Women|2026-11-20|batter_fours||Laura Wolvaardt under 2.5|2.5|under": {
-  "edge": 0.0621,
-  "start_utc": "2026-11-20T08:10:00Z",
-  "alerted_at": "2026-11-18T03:34:37.728389+00:00"
- },
  "male|Australia|England|2026-11-21|batter_sixes||Tom Banton under 0.5|0.5|under": {
   "edge": 0.107,
   "start_utc": "2026-11-21T08:15:00Z",

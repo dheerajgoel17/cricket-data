@@ -1,19 +1,19 @@
-# Cricket value bets - 2026-11-20 13:00 IST
+# Cricket value bets - 2026-11-20 14:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: error - HTTPError: HTTP Error 401: Unauthorized
 - **feedi**: error - HTTP 403: <!DOCTYPE html><html lang="en-US"><head><title>Just a moment...</title><meta http-equiv="Content-Type" content="text/htm
-- **smarkets**: ok, 463 prices
+- **smarkets**: ok, 511 prices
 - **feedg**: ok, 16 prices, 2 events
-- **feedk**: ok, 158 prices, 7 events
-- **feede**: ok, 530 prices, 22 events
-- **feedj**: ok, 550 prices, 11 events
+- **feedk**: ok, 126 prices, 6 events
+- **feede**: ok, 502 prices, 19 events
+- **feedj**: ok, 566 prices, 11 events
+- **feedf**: ok, 490 prices, 14 events
 - **feedh**: ok, 1235 prices, 56 events
-- **feedf**: ok, 526 prices, 18 events
 
-Matches starting in next 168h: **31**, markets priced: **293**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **26**, markets priced: **277**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -24,8 +24,8 @@ Matches starting in next 168h: **31**, markets priced: **293**, value bets: **1*
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-21 20:00 IST Desert Vipers vs Mi Emirates / Top Batsman - Mi Emirates / Kieron Pollard @ 11.00 (feedh_d): edge 33.0%, model 0.1867, market 0.0856
-- 11-21 13:45 IST Australia vs England / Top Batsman - England / Will Jacks @ 14.00 (feedh_d): edge 43.6%, model 0.127, market 0.0894
+- 11-21 13:45 IST Australia vs England / Top Batsman - England / Will Jacks @ 14.00 (feedh_d): edge 46.8%, model 0.1335, market 0.0894
 
 Unmatched team names (add to mappings/teams.csv): Karnataka (W) (female), Larkana Region (male), Milan Icons (male), Omr Checker (male), Peshawar Region (male), Railways (W) (female), Roma Gladiators (male), Speedworld Security Solutions (male)
 
-Runtime 171.3s. Snapshot: `odds_20261120T073031Z.jsonl.gz`
+Runtime 163.3s. Snapshot: `odds_20261120T083032Z.jsonl.gz`
