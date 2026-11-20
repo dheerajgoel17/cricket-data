@@ -33,3 +33,19 @@ test("fetchStoreJson reads /data over HTTP with the wrap-key header", async () =
     server.close();
   }
 });
+
+test("the data origin is the production domain, never the protected deployment address", async () => {
+  const keep = { b: process.env.SHARE_DATA_BASE, p: process.env.VERCEL_PROJECT_PRODUCTION_URL, v: process.env.VERCEL_URL };
+  try {
+    delete process.env.SHARE_DATA_BASE;
+    process.env.VERCEL_PROJECT_PRODUCTION_URL = "prod.example.test"; process.env.VERCEL_URL = "dep-abc.example.test";
+    const { dataOrigin } = await import(`../api/og.js?origin=${Date.now()}`);
+    assert.equal(dataOrigin(), "https://prod.example.test");
+    process.env.SHARE_DATA_BASE = "https://set.example.test/";
+    assert.equal(dataOrigin(), "https://set.example.test");
+    delete process.env.SHARE_DATA_BASE; delete process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    assert.equal(dataOrigin(), "https://dep-abc.example.test");
+  } finally {
+    for (const [k, v] of [["SHARE_DATA_BASE", keep.b], ["VERCEL_PROJECT_PRODUCTION_URL", keep.p], ["VERCEL_URL", keep.v]]) { if (v === undefined) delete process.env[k]; else process.env[k] = v; }
+  }
+});
