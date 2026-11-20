@@ -33,5 +33,10 @@
   "edge": 0.0664,
   "start_utc": "2026-11-21T08:15:00Z",
   "alerted_at": "2026-11-20T01:34:58.639644+00:00"
+ },
+ "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_runs||Ellyse Perry under 29.5|29.5|under": {
+  "edge": 0.0596,
+  "start_utc": "2026-11-21T04:30:00Z",
+  "alerted_at": "2026-11-20T02:34:02.098401+00:00"
  }
 }
