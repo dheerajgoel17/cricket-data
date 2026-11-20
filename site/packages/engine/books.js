@@ -16,7 +16,7 @@ export const BOOK_STEMS = {
   bcgame: "bc.game",
   swarm: "Swarm",
 };
-const BUILTIN_FILES = { bet365: "bet365.svg", ladbrokes: "ladbrokes.svg", polymarket: "polymarket.svg", "1xbet": "1xbet.svg" };
+const BUILTIN_FILES = { bet365: "bet365.svg", ladbrokes: "ladbrokes.svg", polymarket: "polymarket.svg", "1xbet": "1xbet.svg", swarm: "swarm.svg" };
 
 let stems = { ...BOOK_STEMS };
 let files = {};
