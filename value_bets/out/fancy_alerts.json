@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-20T14:35:19Z",
+ "generated_at_utc": "2026-11-20T15:35:07Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -326,29 +326,6 @@
    "chance": 0.6333,
    "edge": 0.1717,
    "edge_pct": 17.2,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-21-lumbini-lions-v-sudurpaschim-royals|top_score||0|under",
-   "fixture_id": "2026-11-21-lumbini-lions-v-sudurpaschim-royals",
-   "match": "Lumbini Lions vs Sudurpaschim Royals",
-   "format": "T20",
-   "series": "NPL 2026",
-   "start_utc": "2026-11-21T11:15:00Z",
-   "start_ist": "2026-11-21 16:45 IST",
-   "key": "top_score",
-   "team": null,
-   "inn": 0,
-   "side": "under",
-   "line": 60.5,
-   "best_odds": 1.85,
-   "best_source": "bc.game",
-   "hits": 24,
-   "played": 36,
-   "window": 20,
-   "chance": 0.6304,
-   "edge": 0.1663,
-   "edge_pct": 16.6,
    "bat_first": false
   },
   {
