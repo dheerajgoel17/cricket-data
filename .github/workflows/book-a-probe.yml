@@ -1,0 +1,51 @@
+name: Book A probe
+
+# Read-only: can we pull Book A (bet365) cricket player props as a free guest from Actions?
+# Hard PASS/FAIL (exit 1 on fail). Never prints host, URL, cookies, or tokens.
+# Set secret BOOK_A_ORIGIN. Optional: BOOK_A_PATHS (comma-separated relative paths),
+# BOOK_A_IMPERSONATE (pin one curl_cffi profile).
+# Commits nothing. PR path filter only on the probe files; production cutover needs 3× PASS.
+on:
+  pull_request:
+    paths:
+      - "scripts/probe_book_a.py"
+      - "src/value_bets/book_a_probe.py"
+      - ".github/workflows/book-a-probe.yml"
+  workflow_dispatch:
+    inputs:
+      impersonate:
+        description: Optional curl_cffi impersonate profile (overrides BOOK_A_IMPERSONATE)
+        type: string
+        default: ""
+
+concurrency:
+  group: book-a-probe
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BOOK_A_ORIGIN: ${{ secrets.BOOK_A_ORIGIN }}
+      BOOK_A_PATHS: ${{ secrets.BOOK_A_PATHS }}
+      BOOK_A_IMPERSONATE: ${{ inputs.impersonate || secrets.BOOK_A_IMPERSONATE || vars.BOOK_A_IMPERSONATE }}
+      GITHUB_ACTIONS: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[value-bets]"
+      - name: Probe Book A
+        run: |
+          set +e
+          python scripts/probe_book_a.py | tee -a "$GITHUB_STEP_SUMMARY"
+          code=${PIPESTATUS[0]}
+          set -e
+          exit "$code"

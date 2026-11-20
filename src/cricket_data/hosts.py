@@ -4,7 +4,8 @@
   LIVE_SITEMAP_DIR   its sitemap directory name
   IMG_CDN_BASE       its image host
   BASE_DATA_URL      the base ball-by-ball dataset root
-  PRICE_FEED_URL     the price feed page      EXCHANGE_API_URL   the exchange API root
+  PRICE_FEED_URL     the price feed page (Book A mirror)      BOOK_A_ORIGIN   Book A sportsbook origin (direct guest probe only)
+  EXCHANGE_API_URL   the exchange API root
   FEEDK_URL          the root of the shared sportsbook feed behind Feed K      FEEDK_BOOKS   its books, "id=Name,id=Name" (account id, published name)
   FEEDE_BOOKS        Feed E's books, "id=Name@root,id=Name@root" (short id, published name, feed root)
   FEEDH_URL          Feed H's sportsbook root      FEEDH_NAME   the name its prices are published under
