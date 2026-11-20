@@ -1,22 +1,24 @@
-# Cricket value bets - 2026-11-20 18:00 IST
+# Cricket value bets - 2026-11-20 18:12 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1455 prices
-- **smarkets**: ok, 488 prices
+- **smarkets**: ok, 519 prices
+- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
+- **feedl**: ok, 440 prices, 21 events
 - **feedk**: ok, 134 prices, 6 events
 - **feedg**: ok, 24 prices, 3 events
-- **feede**: ok, 358 prices, 13 events
-- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
+- **feede**: ok, 416 prices, 16 events
 - **feedf**: ok, 350 prices, 8 events
-- **feedj**: ok, 519 prices, 9 events
-- **feedh**: ok, 1195 prices, 58 events
+- **feedj**: ok, 633 prices, 10 events
+- **feedh**: ok, 1341 prices, 61 events
 
-Matches starting in next 168h: **28**, markets priced: **371**, value bets: **8** (new alerts: 5). Min edge 5%.
+Matches starting in next 168h: **34**, markets priced: **395**, value bets: **9** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
+| 11-21 06:30 IST | Hobart Hurricanes vs Sydney Thunder | M13710 batter_fours | Nicola Carey under 2.5 | 1.77 @ feedj_d | 1.64 | 0.6764 | 8.2% | 2.00% | medium |
 | 11-21 10:00 IST | Sydney Sixers vs Perth Scorchers | Ellyse Perry - Over/Under 29.5 Runs | Ellyse Perry under 29.5 | 1.83 @ feede_lb | 1.73 | 0.6314 | 6.0% | 1.80% | medium |
 | 11-21 13:45 IST | Australia vs England | Batsman Total Match Sixes | AHT Donald under 0.5 | 2.75 @ moviodds_bet365 | 2.30 | 0.4511 | 19.7% | 2.00% | medium |
 | 11-21 13:45 IST | Australia vs England | M13710 batter_fours | Harry Brook under 2.5 | 1.77 @ feedj_d | 1.64 | 0.6735 | 7.9% | 2.00% | medium |
@@ -27,6 +29,7 @@ Matches starting in next 168h: **28**, markets priced: **371**, value bets: **8*
 | 11-23 13:30 IST | South Africa vs Bangladesh | Bowler Total Match Wickets | Hasan Mahmud over 3.5 | 2.38 @ moviodds_bet365 | 2.21 | 0.5279 | 7.7% | 1.39% | low |
 
 ### Why / notes per bet
+- **Hobart Hurricanes vs Sydney Thunder / M13710 batter_fours / Nicola Carey under 2.5** - why: Model 68% vs market 56% for under 2.5 fours; form 2.2 fours/inn recency-weighted T20 (n_eff 46.4; last 5: 3, 0, 9, 10, 0), bats in 84% of games played; at Bellerive Oval, Hobart: 26 inns avg 2.0; context adj: venue environment +9%; weather: rain chance up to 100%. Notes: 2 market source(s) for fair price; model 0.676 vs market 0.558; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 100% rain chance, 5.3 mm forecast during the match - shortened match or void props possible
 - **Sydney Sixers vs Perth Scorchers / Ellyse Perry - Over/Under 29.5 Runs / Ellyse Perry under 29.5** - why: Model 63% vs market 54% for under 29.5 runs; form 31.5 runs/inn recency-weighted T20 (n_eff 76.7; last 5: 45, 3, 30, 59, 84), bats in 95% of games played; at North Sydney Oval: 39 inns avg 38.3; weather: rain chance up to 74%. Notes: 2 market source(s) for fair price; model 0.631 vs market 0.536; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 74% rain chance, 0.3 mm forecast during the match - shortened match or void props possible
 - **Australia vs England / Batsman Total Match Sixes / AHT Donald under 0.5** - why: Model 45% vs market 42% for under 0.5 sixes; form 2.0 sixes/inn recency-weighted T20 (n_eff 32.4; last 5: 0, 1, 1, 2, 2), bats in 98% of games played; context adj: venue environment -15%; weather: high humidity 90%. Notes: 2 market source(s) for fair price; model 0.451 vs market 0.422; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting
 - **Australia vs England / M13710 batter_fours / Harry Brook under 2.5** - why: Model 67% vs market 56% for under 2.5 fours; form 2.5 fours/inn recency-weighted T20 (n_eff 50.9; last 5: 3, 1, 10, 7, 1), bats in 92% of games played; at Melbourne Cricket Ground, Melbourne: 3 inns avg 0.7; vs Australia: 3 inns avg 1.3; context adj: venue environment +2%, at this venue -7%, team H2H context -1%; weather: high humidity 90%. Notes: 2 market source(s) for fair price; model 0.674 vs market 0.558; assumes bet void if player doesn't bat/bowl - check book rules
@@ -38,7 +41,8 @@ Matches starting in next 168h: **28**, markets priced: **371**, value bets: **8*
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-21 13:45 IST Australia vs England / Batsman Total Match Sixes / J Fraser-McGurk under 0.5 @ 3.00 (moviodds_bet365): edge 36.9%, model 0.5254, market 0.4
+- 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 34.0%, model 0.3088, market 0.2227
 
-Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Bahawalpur Region (male), Dm Jamali Region (male), Elite Cricket Academy (male), Karachi Whites (male), Karnataka (W) (female), Lahore Region Blues (male), Larkana Region (male), Milan Icons (male), Omr Checker (male), Peshawar Region (male), Quetta Region (male), Railways (W) (female), Rawalpindi Region (male), Roma Gladiators (male), Rome Gladiators (male)
+Unmatched team names (add to mappings/teams.csv): Abbottabad Region (male), Bahawalpur Region (male), Dm Jamali Region (male), Elite Cricket Academy (male), Faisalabad Region (male), Garden Route Badgers (W) (female), Garden Route Badgers (female), Karachi Region Blues (male), Karachi Whites (male), Karnataka (W) (female), Lahore Region Blues (male), Larkana Region (male), Lions (W) (female), Lions (female), Milan Icons (male), Omr Checker (male), Peshawar Region (male), Quetta Region (male), Railways (W) (female), Rawalpindi Region (male), Roma Gladiators (male), Rome Gladiators (male), South Western Districts (male)
 
-Runtime 119.8s. Snapshot: `odds_20261120T123039Z.jsonl.gz`
+Runtime 149.1s. Snapshot: `odds_20261120T124208Z.jsonl.gz`
