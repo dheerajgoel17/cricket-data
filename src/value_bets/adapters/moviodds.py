@@ -1,6 +1,7 @@
 """Feed P: free unofficial mirror of Book A prices (no key). Bookmaker prices, back only.
 Its robots.txt disallows /odds for crawlers; we make one request per run."""
 import re
+import urllib.error
 
 from cricket_data.hosts import host
 
@@ -35,7 +36,16 @@ LADDER_RE = re.compile(r"^\s*(\d+)\+")
 
 
 def fetch(fetched_at):
-    d = http_json(host("PRICE_FEED_URL"), timeout=45)[0]
+    url = host("PRICE_FEED_URL")
+    try:
+        d = http_json(url, timeout=45)[0]
+    except urllib.error.HTTPError as e:
+        # 401 almost always means the GitHub secret PRICE_FEED_URL is stale or gated — rotate it (no key in code).
+        if e.code == 401:
+            raise urllib.error.HTTPError(
+                e.url, 401, f"{e.reason}; check/rotate repository secret PRICE_FEED_URL", e.hdrs, None,
+            ) from e
+        raise
     rows = []
     for m in d.get("matches", []):
         name = f"{m['home']} vs {m['away']}"

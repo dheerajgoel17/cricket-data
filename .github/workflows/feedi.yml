@@ -1,8 +1,9 @@
 name: Feed I probe
 
-# Dispatch only: pull Feed I directly with curl_cffi (Chrome TLS; Cloudflare blocks the Mumbai relay for this book).
+# Dispatch only: pull Feed I directly with curl_cffi (Chrome TLS ladder; Cloudflare blocks the Mumbai relay for this book).
 # Nothing committed. A pull request never runs this (the repository is public).
 # Set secrets FEEDI_URL and FEEDI_NAME (optional FEEDI_PARTNER unused by the current guest calls).
+# Optional secret/var FEEDI_IMPERSONATE pins one curl_cffi profile (e.g. chrome136) when the default ladder fails.
 on:
   workflow_dispatch:
     inputs:
@@ -10,6 +11,10 @@ on:
         description: Also probe LiveFeed (in-play listing + one game when listed)
         type: boolean
         default: true
+      impersonate:
+        description: Optional curl_cffi impersonate profile (overrides FEEDI_IMPERSONATE)
+        type: string
+        default: ""
 
 concurrency:
   group: feedi-probe
@@ -26,6 +31,7 @@ jobs:
       FEEDI_URL: ${{ secrets.FEEDI_URL }}
       FEEDI_NAME: ${{ secrets.FEEDI_NAME }}
       FEEDI_PARTNER: ${{ secrets.FEEDI_PARTNER }}
+      FEEDI_IMPERSONATE: ${{ inputs.impersonate || secrets.FEEDI_IMPERSONATE || vars.FEEDI_IMPERSONATE }}
       GITHUB_ACTIONS: "true"
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +41,23 @@ jobs:
           cache: pip
       - name: Install
         run: pip install -e ".[value-bets]"
+      - name: curl_cffi / warm canary
+        run: |
+          python - <<'PY'
+          import curl_cffi
+          from value_bets.adapters import feedi
+          from cricket_data.hosts import host
+          print(f"curl_cffi={curl_cffi.__version__}")
+          print(f"ladder={feedi._impersonate_ladder()}")
+          s = feedi.settings()
+          if not s:
+              print("FEEDI_URL / FEEDI_NAME not set")
+              raise SystemExit(1)
+          base = host("FEEDI_URL")
+          feedi._session = None
+          sess = feedi._session_for(base)
+          print(f"warmed impersonate={getattr(sess, '_feedi_impersonate', '?')} base_host_ok")
+          PY
       - name: Feed I pre-match
         run: |
           set +e
