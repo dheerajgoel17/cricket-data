@@ -5,6 +5,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { cardFields, cardQuery, propForm, renderCard } from "@cricket/engine/card.js";
 import { renderPoster } from "@cricket/engine/poster.js";
+import { fancyPosterFields, renderFancyPoster } from "@cricket/engine/fancy-poster.js";
+import { teamLogos } from "@cricket/engine/photos.js";
 import { dominantFormat } from "@cricket/engine/props.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { createStore } from "@cricket/engine/store.js";
@@ -163,6 +165,20 @@ export default async function handler(req, res) {
   }
   try {
     const q = req.query || {};
+    if (q.poster && q.f && q.fm) { // the 4:5 Match Fancy poster: one market of one fixture (/fixture/<id>/fancy?fm=&sc=)
+      const data = loadData(), store = await loadStore();
+      const ff = store && data.fixtures && data.lines ? fancyPosterFields(store, data.lines, data.fixtures, { id: String(q.f), fm: String(q.fm), sc: q.sc }) : null;
+      if (!ff) { res.statusCode = 404; res.setHeader("Cache-Control", "no-store"); return res.end(); }
+      const side = (n) => (ff.female && !/\bwomen\b|\(w\)/i.test(n) ? `${n} Women` : n);
+      const [aLogo, bLogo] = await Promise.all([firstPhoto(teamLogos(data.photos, side(ff.a))), firstPhoto(teamLogos(data.photos, side(ff.b)))]);
+      const png = await renderFancyPoster(ff, { aLogo, bLogo, fonts: { bold: join(process.cwd(), FONTS.bold), regular: join(process.cwd(), FONTS.regular), num: join(process.cwd(), FONTS.num) } });
+      res.statusCode = 200;
+      res.setHeader("Content-Type", "image/png");
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
+      res.setHeader("Content-Length", String(png.length));
+      return res.end(png);
+    }
     let f = cardFields(q.path != null ? cardQuery(q.path) : q, loadData()); // /card/<path>.jpg (vercel.json) or the plain query
     if (!f) return sendJpeg(res, await plainJpeg());
     const names = await withTimeout(loadNames(), 1500, {});

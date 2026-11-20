@@ -88,6 +88,13 @@ test("middleware: an assistant is refused on /data, /api and the gate; a trainin
   assert.equal(await call("/data/meta.json", people[0], { "sec-fetch-site": "same-origin" }), undefined);
 });
 
+test("middleware: the card route is the only /api path an assistant reaches (it checks its own key); every other route stays refused", async () => {
+  for (const ua of assistants) {
+    assert.equal(await call("/api/card", ua), undefined);
+    for (const path of ["/api/og", "/api/cardx", "/api/card/x", "/api/live", "/api/inplay", "/data/lines.json"]) assert.equal((await call(path, ua)).status, 403, `${ua} ${path}`);
+  }
+});
+
 test("middleware: an assistant opening a player page is sent to the share HTML, and the /api/share request it becomes is not refused", async () => {
   const real = globalThis.fetch;
   let asked = null;

@@ -36,6 +36,10 @@
       "maxDuration": 15,
       "includeFiles": "{public/data/index.json,public/data/photos.json,public/data/lines.json,public/data/fixtures.json,public/books/*,public/icon-192.png,fonts/satoshi/*.woff,node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-*-normal.woff}"
     },
+    "api/card.js": {
+      "maxDuration": 15,
+      "includeFiles": "{public/data/index.json,public/data/photos.json,public/data/lines.json,public/data/fixtures.json,public/books/*,public/icon-192.png,fonts/satoshi/*.woff,node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-*-normal.woff}"
+    },
     "api/share.js": {
       "maxDuration": 10,
       "includeFiles": "{public/data/index.json,public/data/photos.json,public/data/lines.json,public/data/fixtures.json}"
