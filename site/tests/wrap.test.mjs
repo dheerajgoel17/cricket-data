@@ -29,3 +29,19 @@ test("wire wraps only when a key is set, so a Network-tab body is not readable J
   assert.equal(w.matches, undefined);
   assert.deepEqual(await unwrap(w, "ci-test-key"), doc);
 });
+
+test("wrapSync (the Node functions' wrap) is byte-identical to wrap for the same iv, at every block edge, and unwrap reads it", async () => {
+  const { wrapSync, wireSync } = await import("@cricket/engine/wrap-node.js");
+  const iv = new Uint8Array(16).map((_, i) => i * 7 + 1);
+  for (const n of [0, 1, 30, 31, 32, 33, 63, 64, 65, 2047, 2048, 2049, 100_000]) {
+    const doc = { s: "é✓x".repeat(Math.ceil(n / 3)).slice(0, n) };
+    const a = await wrap(doc, "ci-test-key", iv), b = wrapSync(doc, "ci-test-key", iv);
+    assert.deepEqual(b, a, `size ${n}`);
+    assert.deepEqual(await unwrap(b, "ci-test-key"), doc);
+  }
+  const doc = { asOf: "x", matches: [{ id: "a" }] };
+  assert.deepEqual(wireSync(doc, ""), doc);
+  assert.deepEqual(wireSync(doc, "  "), doc);
+  assert.deepEqual(await unwrap(wireSync(doc, " ci-test-key "), "ci-test-key"), doc);
+  assert.notDeepEqual(wrapSync(doc, "ci-test-key"), wrapSync(doc, "ci-test-key"), "a fresh iv each time");
+});

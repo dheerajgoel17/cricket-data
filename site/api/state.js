@@ -2,14 +2,14 @@
 // browser finds a match with the same lookup. Written every few minutes by scripts/state-sync.mjs; read here with the project's public (anon) key. Without SUPABASE_URL and
 // SUPABASE_ANON_KEY it answers 503 and the site keeps working the phase out itself, as before. Wrapped with DATA_WRAP_KEY when set, like the other feeds.
 import { toLiveShape } from "@cricket/engine/state.js";
-import { wire } from "@cricket/engine/wrap.js";
+import { wireSync } from "@cricket/engine/wrap-node.js";
 
 const TTL_S = 10;
 const WINDOW_DAYS = 8; // matches that have started in the last week and a bit, plus everything still open
 const UA = "cricket-props-hub-state/0.1 (server)";
 
 async function send(res, status, body) {
-  return res.status(status).json(await wire(body, process.env.DATA_WRAP_KEY));
+  return res.status(status).json(wireSync(body, process.env.DATA_WRAP_KEY));
 }
 
 export default async function handler(req, res) {
