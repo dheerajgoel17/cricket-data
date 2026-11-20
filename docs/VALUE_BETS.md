@@ -50,7 +50,7 @@ artifact `odds-snapshots-<run_id>` and kept 90 days (the maximum), which keeps `
 
 ## Sources
 * `smarkets`: public exchange API (top batsman/bowler, venue). `moviodds_bet365`: unofficial Book A mirror (batter runs, sixes and fours
-  O/U, bowler wickets O/U, 50/100 Yes/No, batter/bowler milestone ladders, top batter/bowler). Both are keyless.
+  O/U, bowler wickets O/U, 50/100 Yes/No, batter/bowler milestone ladders, top batter/bowler). Pre-match only: one board GET per hourly run with free `PRICE_FEED_KEY` (`X-API-Key`); keep that key off the in-play snapshot so the ~5k/month free quota lasts.
 * `feedk` (Feed K, `adapters/feedk.py`): a public, login-free sportsbook feed several operators share. It is on whenever the secrets `FEEDK_URL` and
   `FEEDK_BOOKS` are set (no need to list it in `CV_SOURCES`) and reports "skipped" otherwise. Each configured book is one source, published under the name
   given in `FEEDK_BOOKS`, so a line on the site shows every book's over/under next to the others. It reads player runs / sixes / fours / wickets O/U and the

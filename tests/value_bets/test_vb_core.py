@@ -104,13 +104,31 @@ def test_moviodds_parse(monkeypatch):
         {"group_name": "To Win the Match", "label": "India", "odds_dec": 1.33, "market_id": "1246"},
         {"group_name": "Batsman Match Runs", "side": "Over", "line": "SV Samson", "handicap": "27.5",
          "label": "27.5", "n2": "India", "odds_dec": 1.8333, "market_id": "300331"},
-        {"group_name": "Player of the Match", "label": "X", "odds_dec": 9.0, "market_id": "346"}]}]}
-    monkeypatch.setattr(moviodds, "http_json", lambda *a, **k: (sample, {}))
+        {"group_name": "Player of the Match", "label": "X", "odds_dec": 9.0, "market_id": "346"}]},
+                          {"id": "2", "home": "A", "away": "B", "league": "x", "in_play": True, "kickoff_utc": "2026-10-17T13:30:00Z",
+                           "quotes": [{"group_name": "Batsman Match Runs", "side": "Over", "line": "X", "handicap": "10.5",
+                                       "label": "10.5", "n2": "A", "odds_dec": 1.9, "market_id": "9"}]}]}
+    seen = {}
+
+    def fake_http(url, **kw):
+        seen["headers"] = kw.get("headers") or {}
+        return sample, {}
+
+    monkeypatch.setenv("PRICE_FEED_KEY", "mo_test_key")
+    monkeypatch.setattr(moviodds, "http_json", fake_http)
+    monkeypatch.setattr(moviodds, "host", lambda name: "https://feed.invalid/odds?sport=cricket")
     rows, _ = moviodds.fetch("t")
-    assert len(rows) == 2
+    assert seen["headers"].get("X-API-Key") == "mo_test_key"
+    assert len(rows) == 2  # in-play match dropped
     r = rows[1]
     assert r["market_type"] == "batter_runs" and r["line"] == 27.5 and r["side"] == "over"
     assert r["start_ist"] == "2026-10-17 19:00 IST"
+    assert r["in_play"] is False
+
+
+def test_moviodds_api_headers_empty_without_key(monkeypatch):
+    monkeypatch.delenv("PRICE_FEED_KEY", raising=False)
+    assert moviodds.api_headers() == {}
 
 
 def test_alert_dedupe(monkeypatch, tmp_path):

@@ -1,5 +1,12 @@
-"""Feed P: free unofficial mirror of Book A prices (no key). Bookmaker prices, back only.
-Its robots.txt disallows /odds for crawlers; we make one request per run."""
+"""Feed P: unofficial mirror of Book A prices (pre-match). Bookmaker prices, back only.
+
+One GET per hourly run of ``PRICE_FEED_URL`` (cricket board). Free tier ~5k requests/month —
+keep the key off the in-play snapshot (that would burn the quota). Auth: repository secret
+``PRICE_FEED_KEY`` as ``X-API-Key`` (required since the mirror gated keyless access).
+"""
+from __future__ import annotations
+
+import os
 import re
 import urllib.error
 
@@ -35,19 +42,29 @@ YESNO_LINE = {"Batsman to Score a Fifty in the Match": 49.5, "Batsman to score a
 LADDER_RE = re.compile(r"^\s*(\d+)\+")
 
 
+def api_headers() -> dict[str, str]:
+    """``X-API-Key`` from ``PRICE_FEED_KEY`` when set (never logged)."""
+    key = os.environ.get("PRICE_FEED_KEY", "").strip()
+    return {"X-API-Key": key} if key else {}
+
+
 def fetch(fetched_at):
     url = host("PRICE_FEED_URL")
+    headers = api_headers()
     try:
-        d = http_json(url, timeout=45)[0]
+        d = http_json(url, timeout=45, headers=headers)[0]
     except urllib.error.HTTPError as e:
-        # 401 almost always means the GitHub secret PRICE_FEED_URL is stale or gated — rotate it (no key in code).
+        # 401 = missing/invalid PRICE_FEED_KEY (or stale URL). Key never goes in the message.
         if e.code == 401:
+            hint = "set/rotate PRICE_FEED_KEY (X-API-Key)" if not headers else "invalid/revoked PRICE_FEED_KEY or stale PRICE_FEED_URL"
             raise urllib.error.HTTPError(
-                e.url, 401, f"{e.reason}; check/rotate repository secret PRICE_FEED_URL", e.hdrs, None,
+                e.url, 401, f"{e.reason}; {hint}", e.hdrs, None,
             ) from e
         raise
     rows = []
     for m in d.get("matches", []):
+        if m.get("in_play"):
+            continue  # pre-match only; in-play stays off this free-tier key
         name = f"{m['home']} vs {m['away']}"
         for q in m.get("quotes", []):
             mt = MAP.get((q.get("group_name") or "").strip())
@@ -91,7 +108,7 @@ def fetch(fetched_at):
                 gk += f":{player}:{line}"
             rows.append(row(source=NAME, source_type="bookmaker", event_id=m["id"], match=name, team_a=m["home"],
                             team_b=m["away"], gender_hint=gender_hint(m["home"], m["away"]),
-                            competition=m.get("league"), start_utc=m.get("kickoff_utc"), in_play=bool(m.get("in_play")),
+                            competition=m.get("league"), start_utc=m.get("kickoff_utc"), in_play=False,
                             market_type=mt, market_raw=q.get("group_name"), group_key=gk, selection=sel,
                             player=player, team=team, line=line, side=side, back=q.get("odds_dec"),
                             fetched_at=fetched_at, ms_scope=ms_scope))

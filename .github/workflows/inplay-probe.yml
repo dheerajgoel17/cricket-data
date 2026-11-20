@@ -9,6 +9,7 @@ on:
 
 env:
   PRICE_FEED_URL: ${{ secrets.PRICE_FEED_URL }}
+  PRICE_FEED_KEY: ${{ secrets.PRICE_FEED_KEY }}
 
 permissions:
   contents: read
