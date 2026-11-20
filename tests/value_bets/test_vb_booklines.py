@@ -447,3 +447,11 @@ def test_a_line_with_no_usable_start_is_not_treated_as_started():
     prev = pull(tline("sk", 31.5, ["Ladbrokes"]))
     kept, held = hold_started(pull(tline("sk", 36.5, ["Ladbrokes"], None)), prev, utc(2026, 11, 9, 12, 0))
     assert held["lines"] == 0 and len(kept["lines"]) == 1
+
+
+def test_a_test_filed_as_an_odi_in_the_previous_pull_does_not_carry_the_odi_lines():
+    """A pull that filed a Test's lines as ODI (no fixture join, no format text) left them in the file; once the Test lines exist they are not carried on beside them (the site read the ODI and hid the Test)."""
+    prev = doc(("India vs NZ", "2026-10-27T07:00:00Z", "Test"))
+    prev["lines"].append({**prev["lines"][0], "fmt": "ODI", "player": "Q"})
+    out = carry_started(doc(("India vs NZ", "2026-10-27T07:00:00Z", "Test")), prev, NOW)
+    assert [(x["fmt"], x["player"]) for x in out["lines"]] == [("Test", "P")]

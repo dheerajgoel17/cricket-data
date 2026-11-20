@@ -256,19 +256,30 @@ def fixture_for_cluster(c, fixtures, tres):
     matches, the two sides match, and the kickoffs differ by less than ``MATCH_START_DELTA_HOURS``. That delta is the
     join (books and the schedule often disagree by a few hours), not a display window: a match six days out still maps
     when both starts are on that day. A later meeting of the same two sides is a different parent.
+
+    A Test is the exception to the delta: a book lists it again each morning under that day's start (one lists day 2 only, with no competition text), so a book start up to
+    ``testend.TEST_WINDOW`` after the schedule's first morning is the same Test. Without the join that day-2 event has no fixture, its format falls back to the last meeting
+    (an ODI) and the site hides the Test.
     """
     teams, start = c.get("canon_teams"), c.get("start")
     if not teams or not start:
         return None
     delta = config.get("MATCH_START_DELTA_HOURS") * 3600
+    window = testend.TEST_WINDOW.total_seconds()
+    best, best_gap = None, None
     for f in fixtures:
         g = f.get("gender") or "male"
         fa = tres.resolve(f["team_a"], g)
         fb = tres.resolve(f["team_b"], g)
         st = parse_ts(f.get("start_utc"))
-        if g == c["gender"] and {fa, fb} == set(teams) and st and abs((st - start).total_seconds()) < delta:
-            return f
-    return None
+        if g != c["gender"] or {fa, fb} != set(teams) or not st:
+            continue
+        gap = (start - st).total_seconds()
+        multi = (f.get("format") or "") in ("Test", "FC")
+        if abs(gap) < delta or (multi and 0 <= gap < window):
+            if best is None or abs(gap) < best_gap:
+                best, best_gap = f, abs(gap)
+    return best
 
 
 def detect_fmt(texts, has_draw, fixture_fmt, last_meeting_fmt):
