@@ -25,8 +25,6 @@ const IDENTITY_FILE = "public/data/identity.json"; // the player-identity table 
 const IDENTITY_TTL_MS = 30 * 60e3;
 const IDENTITY_RETRY_MS = 60e3;
 
-let identity = { t: 0, ttl: 0, idx: NO_IDENTITY };
-
 async function getJson(url) {
   const r = await fetch(url, { headers: { "user-agent": UA, accept: "application/json" }, signal: AbortSignal.timeout(FETCH_MS) });
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -49,32 +47,37 @@ async function getHtml(url) {
  * The player-identity table (our id <-> the source's id, the names the books use), from the file shipped with this deployment, else from IDENTITY_URL or the site's own
  * production domain. Without it names decide, as before: a missing table costs matches, never a wrong number.
  */
-async function loadIdentity() {
-  if (Date.now() - identity.t < identity.ttl) return identity.idx;
-  let doc = await readFile(join(process.cwd(), IDENTITY_FILE), "utf8").then(JSON.parse).catch(() => null);
-  const url = process.env.IDENTITY_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/data/identity.json` : "");
-  if (!doc && url) doc = await getJson(url).catch(() => null);
-  const idx = identityIndex(doc);
-  identity = { t: Date.now(), ttl: idx.size ? IDENTITY_TTL_MS : IDENTITY_RETRY_MS, idx };
-  return idx;
+function identityLoader(readIdentity) {
+  let identity = { t: 0, ttl: 0, idx: NO_IDENTITY };
+  return async () => {
+    if (Date.now() - identity.t < identity.ttl) return identity.idx;
+    let doc = await readIdentity().catch(() => null);
+    const url = process.env.IDENTITY_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/data/identity.json` : "");
+    if (!doc && url) doc = await getJson(url).catch(() => null);
+    const idx = identityIndex(doc);
+    identity = { t: Date.now(), ttl: idx.size ? IDENTITY_TTL_MS : IDENTITY_RETRY_MS, idx };
+    return idx;
+  };
 }
-
-const feed = createFeed({ base, getJson, getText, getHtml, loadIdentity });
-const snapshot = () => feed.snapshot();
 
 async function send(res, status, body) {
   const out = wireSync(body, process.env.DATA_WRAP_KEY);
   return res.status(status).json(out);
 }
 
-export default async function handler(req, res) {
-  res.setHeader("Cache-Control", `public, s-maxage=${LIVE_TTL_MS / 1000}, stale-while-revalidate=45`);
-  if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
-  try {
-    return send(res, 200, await snapshot());
-  } catch (e) {
-    if (feed.last()) return send(res, 200, { ...feed.last(), stale: true });
-    const msg = e.name === "TimeoutError" ? "timeout" : String(e.message || "unavailable").slice(0, 80);
-    return send(res, 502, { error: msg, asOf: new Date().toISOString(), source: "live", matches: [] });
-  }
+export function liveHandler(readIdentity = () => readFile(join(process.cwd(), IDENTITY_FILE), "utf8").then(JSON.parse)) {
+  const feed = createFeed({ base, getJson, getText, getHtml, loadIdentity: identityLoader(readIdentity) });
+  return async function handler(req, res) {
+    res.setHeader("Cache-Control", `public, s-maxage=${LIVE_TTL_MS / 1000}, stale-while-revalidate=45`);
+    if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
+    try {
+      return send(res, 200, await feed.snapshot());
+    } catch (e) {
+      if (feed.last()) return send(res, 200, { ...feed.last(), stale: true });
+      const msg = e.name === "TimeoutError" ? "timeout" : String(e.message || "unavailable").slice(0, 80);
+      return send(res, 502, { error: msg, asOf: new Date().toISOString(), source: "live", matches: [] });
+    }
+  };
 }
+
+export default liveHandler();

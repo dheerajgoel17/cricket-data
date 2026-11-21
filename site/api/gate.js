@@ -37,7 +37,7 @@ export default async function handler(req, res) {
   const secret = (process.env.DATA_WRAP_KEY || "").trim();
   if (secret) {
     const token = sign(secret, Math.floor(Date.now() / 1000) + 12 * 3600);
-    const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+    const secure = req.secure || process.env.NODE_ENV === "production" ? "; Secure" : "";
     res.setHeader("Set-Cookie", `cdg=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=43200${secure}`);
     res.setHeader("X-Cd-K", secret);
     res.setHeader("Access-Control-Expose-Headers", "X-Cd-K");

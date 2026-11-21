@@ -17,6 +17,10 @@ on:
       sync_limit:
         description: "Max images to copy into our own store this run (first backfill: 6000)"
         default: "1500"
+      cloudflare_only:
+        description: "Publish a Cloudflare fallback build"
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths: ["site/**", "src/cricket_site/**", ".github/workflows/site.yml"]
@@ -171,7 +175,7 @@ jobs:
           rm -f site/public/data/crex_index.json
           python -m cricket_site.wrap --dir site/public/data
       - name: Deploy to Vercel
-        if: github.event_name != 'pull_request' && env.VERCEL_PROJECT_ID != ''
+        if: github.event_name != 'pull_request' && env.VERCEL_PROJECT_ID != '' && !inputs.cloudflare_only && vars.SITE_HOST != 'cloudflare'
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           SHARE_DATA_BASE: ${{ vars.SITE_URL }}
@@ -186,6 +190,25 @@ jobs:
             --build-env "VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY" \
             --build-env "VITE_ANDROID_APP_URL=$VITE_ANDROID_APP_URL" \
             --env "DATA_WRAP_KEY=$DATA_WRAP_KEY"
+      - name: Deploy Cloudflare fallback
+        if: github.event_name != 'pull_request' && (inputs.cloudflare_only || vars.SITE_HOST == 'cloudflare')
+        working-directory: site
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: |
+          test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$DATA_WRAP_KEY" &&
+            test -n "$LIVE_SOURCE_BASE" && test -n "$SUPABASE_URL" && test -n "$SUPABASE_ANON_KEY"
+          test -s public/data/identity.json
+          npm run build
+          umask 077
+          file=$(mktemp)
+          trap 'rm -f "$file"' EXIT
+          node -e 'const names = ["DATA_WRAP_KEY", "LIVE_SOURCE_BASE", "SUPABASE_URL", "SUPABASE_ANON_KEY"]; process.stdout.write(JSON.stringify(Object.fromEntries(names.map(name => [name, process.env[name]]))))' > "$file"
+          npx --yes wrangler@4.166.0 deploy --config cloudflare/wrangler.jsonc --secrets-file "$file"
       - name: Deploy preview (pull requests from this repository)
         id: preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && env.VERCEL_PROJECT_ID != ''

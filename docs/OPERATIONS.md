@@ -115,6 +115,16 @@ Everything runs on free tiers (GitHub Actions on a public repo, Vercel Hobby, Su
 **Vercel Functions Storage (Hobby 10 GB):** driven by serverless bundle size, not static `/data`. `api/og` / `api/share` must only `includeFiles` the four small card JSON files (`index` / `photos` / `lines` / `fixtures`), books and fonts — never `public/data/p/*` or a `public/data/*.json` glob. L5 form fetches `matches.json` and one `p/NN.json` over HTTP with `x-cd-k` (= `DATA_WRAP_KEY`). `share.js` imports `load-data.js`, not `og.js`. After fat deploys: `npx vercel remove cricket-props-hub --safe --yes`; check with `npx vercel inspect <url>`.
 
 
+## Cloudflare website fallback
+
+The Site workflow can publish the same guarded data build to a separate Cloudflare Worker. In repository settings, set `CLOUDFLARE_ACCOUNT_ID` as a variable and `CLOUDFLARE_API_TOKEN` as an Actions secret scoped to editing Workers scripts in that account. It reuses the site's existing data and Supabase settings. Enable the account's Workers preview domain before the first deploy.
+
+1. Run the Site workflow with `cloudflare_only` checked. Test the preview address printed by Wrangler. Check a direct fixture link, the protected data gate, and live scores and odds during an active match. Check preview logs for asset access, errors, and Worker and Durable Object CPU and invocation counts. For Supabase Auth testing, add the preview URL to allowed redirects temporarily or test on the final domain after cutover.
+2. Record the current domain target. Once the preview passes, attach the site domain to the Worker and verify HTTPS, sign-in, saved lists, mobile, and the live API on that domain. Set the repository variable `SITE_HOST=cloudflare` so scheduled Site runs publish there. Confirm the next scheduled run updates the site.
+3. Restore the previous domain target and clear `SITE_HOST` if a rollback is needed and Vercel is serving traffic. During a Vercel pause, revert the Cloudflare Worker to the last healthy version instead.
+
+The three live feeds share short-lived prepared responses in SQLite-backed Durable Objects. Worker requests and Durable Object requests count toward their respective free limits. Check both during a busy match. Custom share images return unavailable on the fallback, shared links redirect to the underlying page, and Telegram can send text. The Vercel ad-admin API is absent on the fallback.
+
 ## Mumbai relay (Feed G on Vercel bom1, Feed H on Cloudflare) — free only
 Feed G's book refuses GitHub's US servers (403) but answers from India. **No paid VPS, residential proxy, or self-hosted runner.** Two free hops live in `relay/`; each gives a different India egress IP:
 
