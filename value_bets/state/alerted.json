@@ -19,11 +19,6 @@
   "start_utc": "2026-11-21T08:15:00Z",
   "alerted_at": "2026-11-20T23:35:47.816988+00:00"
  },
- "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_runs||Ellyse Perry under 29.5|29.5|under": {
-  "edge": 0.0596,
-  "start_utc": "2026-11-21T04:30:00Z",
-  "alerted_at": "2026-11-20T02:34:02.098401+00:00"
- },
  "male|Australia|England|2026-11-21|batter_sixes||AHT Donald under 0.5|0.5|under": {
   "edge": 0.1972,
   "start_utc": "2026-11-21T08:15:00Z",
@@ -54,11 +49,6 @@
   "start_utc": "2026-11-21T08:15:00Z",
   "alerted_at": "2026-11-20T16:33:13.856582+00:00"
  },
- "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_fours||Ellyse Perry under 3.5|3.5|under": {
-  "edge": 0.0587,
-  "start_utc": "2026-11-21T04:30:00Z",
-  "alerted_at": "2026-11-20T18:36:21.195263+00:00"
- },
  "male|Australia|England|2026-11-21|batter_sixes||Philip Salt under 0.5|0.5|under": {
   "edge": 0.0841,
   "start_utc": "2026-11-21T08:15:00Z",
@@ -78,21 +68,6 @@
   "edge": 0.0572,
   "start_utc": "2026-11-22T04:40:00Z",
   "alerted_at": "2026-11-21T00:36:33.522642+00:00"
- },
- "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_sixes||Ashleigh Gardner under 0.5|0.5|under": {
-  "edge": 0.1795,
-  "start_utc": "2026-11-21T04:30:00Z",
-  "alerted_at": "2026-11-21T02:37:12.745265+00:00"
- },
- "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_fours||Ashleigh Gardner under 2.5|2.5|under": {
-  "edge": 0.1371,
-  "start_utc": "2026-11-21T04:30:00Z",
-  "alerted_at": "2026-11-21T02:37:12.745265+00:00"
- },
- "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_runs||Beth Mooney under 29.5|29.5|under": {
-  "edge": 0.0503,
-  "start_utc": "2026-11-21T04:30:00Z",
-  "alerted_at": "2026-11-21T03:35:42.523157+00:00"
  },
  "male|Australia|England|2026-11-21|batter_runs||J Fraser-McGurk under 20.5|20.5|under": {
   "edge": 0.055,
