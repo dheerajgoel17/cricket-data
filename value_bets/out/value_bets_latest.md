@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-22 01:10 IST
+# Cricket value bets - 2026-11-22 02:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1808 prices
 - **smarkets**: ok, 509 prices
-- **feedl**: ok, 577 prices, 32 events
 - **feedk**: ok, 221 prices, 7 events
+- **feedl**: ok, 610 prices, 33 events
 - **feedg**: ok, 40 prices, 5 events
 - **feedh**: ok, 1736 prices, 91 events
 - **feede**: ok, 844 prices, 37 events
-- **feedj**: ok, 999 prices, 20 events
-- **feedf**: ok, 850 prices, 26 events, stopped time budget
-- **feedi**: ok, 1886 prices, 51 events, stopped time budget
+- **feedj**: ok, 1170 prices, 24 events
+- **feedf**: ok, 918 prices, 27 events
+- **feedi**: ok, 1852 prices, 41 events, stopped time budget
 
-Matches starting in next 168h: **54**, markets priced: **579**, value bets: **9** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **55**, markets priced: **588**, value bets: **9** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -43,6 +43,6 @@ Matches starting in next 168h: **54**, markets priced: **579**, value bets: **9*
 - 11-22 10:10 IST Brisbane Heat vs Adelaide Strikers / M13711 batter_sixes / Orla Prendergast over 0.5 @ 5.60 (feedj_d): edge 33.2%, model 0.294, market 0.192
 - 11-22 10:10 IST Brisbane Heat (W) vs Adelaide Strikers (W) / Batsman Total Match Sixes / ME Bouchier over 0.5 @ 5.50 (moviodds_bet365): edge 52.7%, model 0.2838, market 0.2725
 
-Unmatched team names (add to mappings/teams.csv): Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), Dolphins (Women) (female), Dolphins (female), Garden Route Badgers (W) (female), Garden Route Badgers (female), Lions (W) (female), Lions (Women) (female), Lions (female), Lokseva Academy (male), MID West Rhinos (male), Roma Gladiators (male), South Western Districts (Women) (female), South Western Districts (male), Sunny 11 Pratishtan (male), Western Province (W) (female), Western Province (Women) (female), Western Province (female)
+Unmatched team names (add to mappings/teams.csv): Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), Dolphins (female), Garden Route Badgers (W) (female), Garden Route Badgers (female), Lions (W) (female), Lions (Women) (female), Lions (female), Lokseva Academy (male), MID West Rhinos (male), Roma Gladiators (male), SW Districts (male), South Western Districts (Women) (female), South Western Districts (male), Sunny 11 Pratishtan (male), Western Province (W) (female), Western Province (female)
 
-Runtime 352.5s. Snapshot: `odds_20261121T194006Z.jsonl.gz`
+Runtime 348.7s. Snapshot: `odds_20261121T203040Z.jsonl.gz`
