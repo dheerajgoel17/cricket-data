@@ -66,7 +66,7 @@ type HistorySeed = { v: number; build: string; generated_at_utc: string; rows: R
  * year's, vs today's opponent, and the model's edge on the better side (`modelSide`, `engine/props-view.js`): the hit rate of the window shown pulled toward the market's no-vig chance, for the over and for the under.
  * Only those lines are scored (each costs a player file), the files come several at a time, and the rows are in `data` as they finish (`scoring` says more are coming).
  */
-export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all") {
+export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all", phase?: HomePhase, live?: any) {
   const { store, rz, matchesReady, names } = useData();
   const qc = useQueryClient();
   const lines = useLinesLive();
@@ -80,12 +80,17 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   });
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const scope = JSON.stringify([today, inns, teams ?? day, !!archive]);
+  const scope = JSON.stringify([today, inns, teams ?? day, !!archive, phase]);
+  const scopedLines = useMemo(() => {
+    const all = doc.data?.lines || [];
+    return phase ? all.filter((l: any) => lineHomePhase({ start: l.start_utc, fmt: l.fmt, match: l.match }, live) === phase) : all;
+  }, [doc.data?.lines, phase, live]);
+  const phaseKey = phase ? [...new Set(scopedLines.map((l: any) => `${l.match}|${l.start_utc}|${l.fmt}`))].sort().join(";") : "";
   const scopeKey = ["hot-props", scope] as const;
   // books generation only — live_sig must not rebuild history; quotes/live rows are patched after (see merge below).
   // Do not put fixtures.isLoading in the key: flipping true→false used to open a new cache entry and flash HomePropsSkeleton on remount.
-  const key = [...scopeKey, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null, canSeed ? seed.data?.generated_at_utc : null];
-  const liveLines = useMemo(() => archive ? [] : hotLines((doc.data?.lines || []).filter(isLiveLine), teams ? { teams, archive: false } : { day }, Date.now()), [archive, doc.data, teams, day]);
+  const key = [...scopeKey, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null, canSeed ? seed.data?.generated_at_utc : null, phaseKey];
+  const liveLines = useMemo(() => archive ? [] : hotLines(scopedLines.filter(isLiveLine), teams ? { teams, archive: false } : { day }, Date.now()), [archive, scopedLines, teams, day]);
   const liveKey = useMemo(() => liveThresholdKey(liveLines), [liveLines]);
   const rows = useQuery({
     queryKey: key,
@@ -96,7 +101,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
       // an archived match is read whatever its age: only that match's lines, none of the day filters
-      const todays = { lines: hotLines(prematchLines(doc.data.lines), teams ? { teams, archive: !!archive } : { day }, now) };
+      const todays = { lines: hotLines(prematchLines(scopedLines), teams ? { teams, archive: !!archive } : { day }, now) };
       // one row per player, stat and match: a series has several matches between the same sides, each priced on its own. A live line is a row of its own beside the pre-match one: that stays (it is the bet we settle) and the live line is added once it is passed
       const isLive = (l: any) => !!l.books?.some((x: any) => x.live);
       const keys = new Map<string, any>();

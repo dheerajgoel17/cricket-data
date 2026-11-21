@@ -2651,7 +2651,6 @@
       "site/src/components/app/home-phase-bar.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/fixture-card.tsx",
-      "site/src/components/app/hot-home.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/skeletons.tsx"
     ]

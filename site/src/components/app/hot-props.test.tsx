@@ -4,9 +4,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const env = vi.hoisted(() => ({ doc: null as any, store: null as any, plans: [] as any[], filters: [] as any[] }));
+const env = vi.hoisted(() => ({ doc: null as any, store: null as any, seed: null as any, plans: [] as any[], filters: [] as any[] }));
 vi.mock("@/lib/feeds", () => ({ loadLines: async () => env.doc, loadLive: async () => null, loadRail: async () => null, loadArchive: async () => null, loadState: async () => null }));
-vi.mock("@/lib/data", () => ({ useData: () => ({ store: env.store, rz: {}, identity: {} }) }));
+vi.mock("@/lib/data", () => ({ useData: () => ({ store: env.store, rz: {}, identity: {} }), loadJson: async () => env.seed }));
 vi.mock("@cricket/engine/plan.js", () => ({
   runPlan: async (_s: any, _r: any, _p: any, hints: any) => {
     env.plans.push(hints.playerIdx);
@@ -17,6 +17,7 @@ vi.mock("@cricket/engine/plan.js", () => ({
 }));
 
 import { useHotRows } from "./hot-props";
+import { lineKey } from "@cricket/engine/hot-rows.js";
 
 const at = (d: number, h: number) => new Date(2026, 9, d, h).toISOString();
 const NOW = new Date(2026, 9, 28, 12).getTime();
@@ -28,6 +29,7 @@ function fakeStore(players: number, nshard: number) {
   const finish = (n: number) => { const how = fate.get(n); if (how && pending.has(n)) how === "land" ? pending.get(n)![0]() : pending.get(n)![1](new Error("HTTP 500")); };
   return {
     P: { id: Array.from({ length: players }, (_, i) => `id${i}`) }, nshard,
+    meta: { built_at: "test-build" },
     shardOf: (i: number) => i % nshard, playerName: (i: number) => `Player ${i}`,
     shard(n: number) {
       if (!shards.has(n)) { requested.push(n); shards.set(n, new Promise((res, rej) => pending.set(n, [() => res({}), rej]))); finish(n); }
@@ -50,6 +52,7 @@ beforeEach(() => {
   vi.useFakeTimers({ now: NOW, toFake: ["setTimeout", "clearTimeout", "Date"] });
   env.plans = [];
   env.filters = [];
+  env.seed = null;
   // 60 players over 12 files; today has players 0-35 (three to a file), tomorrow 36-37, and a third day 22 more lines scored only when that day is asked
   env.store = fakeStore(60, 12);
   env.doc = { generated_at_utc: "2026-10-28T05:00:00Z", events: [], fancy: [], lines: [
@@ -80,6 +83,18 @@ describe("useHotRows batting innings", () => {
 });
 
 describe("useHotRows", () => {
+  it("uses published history without requesting a player file and keeps current odds", async () => {
+    const l = env.doc.lines[0];
+    env.doc.lines = [l];
+    env.seed = { v: 1, build: "test-build", generated_at_utc: "test", rows: {
+      [lineKey(l)]: { idx: 0, line: l.line, l10: { played: 8, hits: 5 }, last: [], max: 30, opp: "Pakistan", venue: "" },
+    } };
+    const { result } = run();
+    await settle();
+    expect(result.current.data?.[0]).toMatchObject({ pid: "id0", over: 1.9, l10: { played: 8, hits: 5 } });
+    expect(env.store.requested).toEqual([]);
+    expect(env.plans).toEqual([]);
+  });
   it("asks for the player files the selected day's lines need, the first file alone and then several at once", async () => {
     const { result } = run(0);
     await flush();

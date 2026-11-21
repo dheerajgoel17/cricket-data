@@ -39,11 +39,11 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const { identity } = useData();
   const { fixtures } = useHomeRail();
   // Today + tomorrow: home chips include tomorrow's fixtures (e.g. WBBL); scoring only day 0 left those chips fancy-only.
-  const today = useHotRows(undefined, undefined, 0);
-  const tomorrow = useHotRows(undefined, undefined, 1);
+  const today = useHotRows(undefined, undefined, 0, "all", phase, live.data);
+  const tomorrow = useHotRows(undefined, undefined, 1, "all", phase, live.data);
   const data = useMemo(() => [...(today.data || []), ...(tomorrow.data || [])], [today.data, tomorrow.data]);
   const isLoading = today.isLoading;
-  const { cards, ready } = useFancyCards();
+  const { cards, ready } = useFancyCards(phase);
   const matchOf = (r: any) => { const [a, b] = String(r.match).split(/\s+vs\s+/i); return liveForFixture(live.data, { a, b, start: r.start, fmt: r.fmt }); };
   const asLine = (r: any) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line, inn: r.inn });
   const soFarOf = (r: any) => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });

@@ -141,11 +141,17 @@ export class Cards {
     const photo = f.photos?.find((value) => /^https:\/\//.test(value));
     const width = poster ? 1080 : 1200, height = poster ? 1350 : 630;
     const type = poster ? "png" : "jpeg";
-    const r = await this.env.BROWSER.quickAction("screenshot", {
+    const options = {
       html: cardHtml(f, text, photo),
       viewport: { width, height },
       screenshotOptions: { type, ...(poster ? {} : { quality: 80 }), clip: { x: 0, y: 0, width, height } },
-    });
+    };
+    let r = await this.env.BROWSER.quickAction("screenshot", options);
+    if (r.status === 429 || r.status >= 500) {
+      await r.body?.cancel();
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      r = await this.env.BROWSER.quickAction("screenshot", options);
+    }
     if (!r.ok || !r.headers.get("content-type")?.startsWith(`image/${type}`)) throw new Error("card rendering unavailable");
     const image = {
       bytes: await r.arrayBuffer(),
