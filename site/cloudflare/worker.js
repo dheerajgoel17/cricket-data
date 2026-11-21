@@ -1,15 +1,19 @@
 import gate from "../api/gate.js";
+import adsAdmin from "../api/ads-admin.js";
 import geo from "../api/geo.js";
 import inplay from "../api/inplay.js";
 import { liveHandler } from "../api/live.js";
 import { unwrapJson } from "../api/load-data.js";
 import state from "../api/state.js";
-import middleware from "../middleware.js";
+import middleware, { CRAWLER, crawlerSharePath } from "../middleware.js";
+import { media } from "./cards.js";
+export { Cards } from "./cards.js";
 
 const ttl = new Map([["/api/live", 15], ["/api/inplay", 15], ["/api/state", 10]]);
 const routes = new Map([
   ["/api/gate", gate],
   ["/api/geo", geo],
+  ["/api/ads-admin", adsAdmin],
 ]);
 
 async function runHandler(handler, request) {
@@ -17,6 +21,23 @@ async function runHandler(handler, request) {
   let status = 200;
   let body;
   const req = { method: request.method, headers: Object.fromEntries(request.headers), secure: true };
+  if (handler === adsAdmin && request.method === "POST") {
+    const reader = request.body?.getReader();
+    const decoder = new TextDecoder();
+    let size = 0;
+    req.body = "";
+    while (reader) {
+      const part = await reader.read();
+      if (part.done) break;
+      size += part.value.length;
+      if (size > 8192) {
+        await reader.cancel();
+        return Response.json({ error: "Request too large" }, { status: 413 });
+      }
+      req.body += decoder.decode(part.value, { stream: true });
+    }
+    req.body += decoder.decode();
+  }
   req.headers["x-forwarded-for"] = request.headers.get("cf-connecting-ip") || "?";
   const res = {
     setHeader(name, value) { headers.set(name, value); },
@@ -25,15 +46,6 @@ async function runHandler(handler, request) {
   };
   await handler(req, res);
   return Response.json(body, { status, headers });
-}
-
-function sharePage(path) {
-  const parts = path.split("/").filter(Boolean).slice(1);
-  if (parts[0] === "pid") parts[0] = "player";
-  if (!["player", "fixture", "venue"].includes(parts[0]) || !/^[\w-]+$/.test(parts[1] || "")) return "/";
-  const query = parts[0] === "player" && parts[2] && parts[3]
-    ? "?" + new URLSearchParams({ stat: parts[2], line: parts[3] }) : "";
-  return "/" + parts.slice(0, 2).join("/") + query;
 }
 
 // One object per feed shares a prepared response across visitors and edge locations.
@@ -95,12 +107,19 @@ export default {
       return Response.json({ error: "Fallback is not configured" }, { status: 503 });
     }
     if (path.startsWith("/card/") || path === "/api/card" || path === "/api/og") {
-      return new Response("Share image unavailable", { status: 503, headers: { "Cache-Control": "no-store" } });
+      try { return await media(request, env, ctx); }
+      catch {
+        if (path.startsWith("/card/")) return Response.redirect(new URL("/og.png", url), 302);
+        return Response.json({ error: "Card rendering temporarily unavailable" }, { status: 503 });
+      }
     }
     if (path.startsWith("/share/") || path === "/api/share") {
-      const target = path === "/api/share" ? "/share/" + (url.searchParams.get("path") || "") : path;
-      return Response.redirect(new URL(sharePage(target), url), 302);
+      return media(request, env, ctx, path === "/api/share" ? url.searchParams.get("path") || "" : path.slice(7));
     }
+    if (CRAWLER.test(request.headers.get("user-agent") || "") && /^\/(?:player|fixture|venue)\//.test(path)) {
+      return media(request, env, ctx, crawlerSharePath(url));
+    }
+    if (!path.startsWith("/data/") && !path.startsWith("/api/")) return env.ASSETS.fetch(request);
     const denied = await middleware(request);
     if (denied) return denied;
     if (path.startsWith("/api/")) {

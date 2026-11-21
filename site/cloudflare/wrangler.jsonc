@@ -5,15 +5,23 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "vars": { "NODE_ENV": "production" },
+  "browser": { "binding": "BROWSER" },
+  "alias": { "@napi-rs/canvas": "./native-canvas.js" },
   "durable_objects": {
-    "bindings": [{ "name": "SNAPSHOTS", "class_name": "Snapshots" }]
+    "bindings": [
+      { "name": "SNAPSHOTS", "class_name": "Snapshots" },
+      { "name": "CARDS", "class_name": "Cards" }
+    ]
   },
-  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Snapshots"] }],
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Snapshots"] },
+    { "tag": "v2", "new_sqlite_classes": ["Cards"] }
+  ],
   "assets": {
     "directory": "../dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*", "/data/*", "/card/*", "/share/*"]
+    "run_worker_first": ["/api/*", "/data/*", "/card/*", "/share/*", "/player/*", "/fixture/*", "/venue/*"]
   },
   "observability": { "enabled": true }
 }
