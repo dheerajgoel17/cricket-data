@@ -41,7 +41,7 @@ Working list for bringing the app (`mobile/`) and the web (`site/`) onto one des
 | B15 | Empty state | `EmptyState` | `ui/empty-state` | code |
 | B16 | Error boundary | `error-boundary` | none | **gap** |
 | B17 | Player picker, odds table, forms, result view, alt lines, viz, home mix table, live feed, note | web | none | web-only on purpose (Tools / Odds); confirm per item |
-| B18 | Ads | `ad-slot`, `stats-ad` | none | web-only (app is free, no ads) |
+| B18 | Ads | `ad-slot`, `stats-ad` (catalogue cleared; remount later) | none | web-only (app is free, no ads) |
 
 ## C. Motion
 

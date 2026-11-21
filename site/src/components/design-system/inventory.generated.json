@@ -1481,7 +1481,6 @@
       "site/src/components/app/chip.tsx",
       "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/badges.tsx",
-      "site/src/components/app/stats-ad.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/skeletons.tsx",
@@ -1777,7 +1776,6 @@
       "site/src/components/app/live-markets.tsx",
       "site/src/components/app/mini-bars.tsx",
       "site/src/components/app/fancy-lines.tsx",
-      "site/src/components/app/ad-slot.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/pill-group.tsx",
@@ -2080,9 +2078,7 @@
     "exports": [
       "StatsAd"
     ],
-    "dependencies": [
-      "site/src/components/app/ad-slot.tsx"
-    ]
+    "dependencies": []
   },
   {
     "path": "site/src/components/app/status-label.tsx",
@@ -2171,9 +2167,7 @@
     "exports": [
       "IosTabBar"
     ],
-    "dependencies": [
-      "site/src/components/app/ad-slot.tsx"
-    ]
+    "dependencies": []
   },
   {
     "path": "site/src/components/layout/Shell.tsx",
@@ -2761,7 +2755,6 @@
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/forms.tsx",
       "site/src/components/app/pill-group.tsx",
-      "site/src/components/app/stats-ad.tsx",
       "site/src/components/app/tournament-stats.tsx"
     ]
   },
@@ -2790,7 +2783,6 @@
     "dependencies": [
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/hot-props.tsx",
-      "site/src/components/app/ad-slot.tsx",
       "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/match-fancy.tsx",
       "site/src/components/app/pill-group.tsx",
@@ -2825,7 +2817,6 @@
       "site/src/components/app/result.tsx",
       "site/src/pages/Home.tsx",
       "site/src/components/app/skeletons.tsx",
-      "site/src/components/app/stats-ad.tsx",
       "site/src/components/app/tournament-stats.tsx"
     ]
   },
@@ -2854,7 +2845,6 @@
       "site/src/components/app/star.tsx",
       "site/src/components/app/player-name.tsx",
       "site/src/components/app/portrait.tsx",
-      "site/src/components/app/ad-slot.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/result.tsx",
@@ -2905,8 +2895,7 @@
       "site/src/components/app/forms.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/badges.tsx",
-      "site/src/components/app/forms.tsx",
-      "site/src/components/app/stats-ad.tsx"
+      "site/src/components/app/forms.tsx"
     ]
   },
   {

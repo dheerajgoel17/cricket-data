@@ -26,7 +26,6 @@ import { EmptyState } from "@/components/app/empty-state";
 import { ResultView } from "@/components/app/result";
 import { NextMatch } from "./Home";
 import { ListSkeleton } from "@/components/app/skeletons";
-import { StatsAd } from "@/components/app/stats-ad";
 import { TournamentStats } from "@/components/app/tournament-stats";
 
 const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest runs in an over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
@@ -41,7 +40,6 @@ export function CompetitionsPage() {
   const rows = all.filter(([e]) => !t || store.events[e].toLowerCase().includes(t)).slice(0, 80);
   return (
     <div className="flex flex-col gap-stack">
-      <StatsAd />
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
       <Input type="search" aria-label="Search competitions" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} />
@@ -85,7 +83,6 @@ export function LeaguePage() {
   const name = store.events[e];
   return (
     <div className="flex flex-col gap-stack">
-      <StatsAd />
       <Crumbs items={[["Home", "/"], ["Competitions", "/competitions"], [name]]} />
       <EntityHero badge={<LeagueBadge name={name} size="xl" />} name={name} sub={`${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}`} meta={[data.fmtName, `${data.tt.size} teams`]} />
       <PillTabs layoutId="lg-tab" scrollable tabs={[["stats", "Stats"], ["overview", "Markets"], ["teams", "Teams"], ["results", "Results"]]} value={tab} onChange={(t) => setQ({ tab: t })}>
@@ -145,7 +142,6 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
   const tabs: [string, string][] = isTeam ? [["grid", "Player grid"], ["markets", "Markets"], ["top", "Top batter"]] : [["markets", "Markets"], ["top", "Top batter"]];
   return (
     <div className="flex flex-col gap-stack">
-      <StatsAd />
       <Crumbs items={[["Home", "/"], [isTeam ? "Teams" : "Venues", `/teams?tab=${isTeam ? "teams" : "venues"}`], [label]]} />
       {isTeam ? (
         <HeroWash page accent={sideAccent(store.teams[idx].n)} className="-mx-gutter px-gutter">

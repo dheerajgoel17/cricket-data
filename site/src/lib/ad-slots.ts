@@ -1,6 +1,8 @@
-/** Catalogue of banner slots: sizes and which paths mount them. Keep in sync with `ad_slots` seeds in supabase/migrations/20261112_manual_ads.sql and 20261112_ad_slots_props.sql. */
+/** Catalogue of banner slots: sizes and which paths mount them.
+ * Keep in sync with `ad_slots` rows in Supabase when remounting.
+ * Empty until placements are remapped — no path mounts ads. */
 
-export type AdSlotId = "fancy_detail_top" | "stats_top" | "player_detail_top" | "props_list_top";
+export type AdSlotId = string;
 
 export type AdSlotDef = {
   id: AdSlotId;
@@ -10,40 +12,8 @@ export type AdSlotDef = {
   paths: RegExp[];
 };
 
-export const AD_SLOTS: AdSlotDef[] = [
-  {
-    id: "fancy_detail_top",
-    label: "Match Fancy detail top strip",
-    sizeNote: "Full-bleed strip, about 1.75 × row height, square corners (GIF/PNG/WebP).",
-    paths: [/^\/fixture\/[^/]+\/fancy\/?$/],
-  },
-  {
-    id: "player_detail_top",
-    label: "Player prop detail top strip",
-    sizeNote: "Full-bleed strip, about 1.75 × row height, square corners (GIF/PNG/WebP).",
-    paths: [/^\/player\/[^/]+\/?$/],
-  },
-  {
-    id: "props_list_top",
-    label: "Player props list top strip",
-    sizeNote: "Full-bleed strip, about 1.75 × row height, square corners (GIF/PNG/WebP).",
-    paths: [/^\/props\/?$/],
-  },
-  {
-    id: "stats_top",
-    label: "Stats pages top strip",
-    sizeNote: "Full-bleed strip, about 1.75 × row height, square corners (GIF/PNG/WebP).",
-    paths: [
-      /^\/leagues?(\/|$)/,
-      /^\/competitions$/,
-      /^\/teams?(\/|$)/,
-      /^\/venue\//,
-      /^\/players$/,
-      /^\/glossary$/,
-      /^\/about$/,
-    ],
-  },
-];
+/** No live mounts until a remapped catalogue is added. */
+export const AD_SLOTS: AdSlotDef[] = [];
 
 export const adSlotById = (id: string) => AD_SLOTS.find((s) => s.id === id);
 

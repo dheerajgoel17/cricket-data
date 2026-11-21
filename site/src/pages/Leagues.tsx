@@ -13,7 +13,6 @@ import { LeagueBadge } from "@/components/app/badges";
 import { EmptyState } from "@/components/app/empty-state";
 import { useQ } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
-import { StatsAd } from "@/components/app/stats-ad";
 import { TournamentStats } from "@/components/app/tournament-stats";
 
 /** Leagues listed first, in this order, when they are live or due to start: Big Bash on top (the women's season live, the men's due). */
@@ -48,7 +47,6 @@ export function LeaguesPage() {
   return (
     <div className="flex flex-col gap-section">
       <TabTitle>Leagues</TabTitle>
-      <StatsAd />
       <section aria-label="Leagues" className="flex flex-col gap-snug">
         <div className="flex items-center justify-end">
           <Link to="/competitions" className={more}>All competitions<ArrowRightIcon className="size-3.5" aria-hidden /></Link>

@@ -1,6 +1,4 @@
-import { AdSlot } from "./ad-slot";
-
-/** Top strip on stats pages (manual creative or AdSense; hidden when empty). */
+/** Stats-page ad strip — unused while the slot catalogue is empty; remount when slots are remapped. */
 export function StatsAd() {
-  return <AdSlot slotId="stats_top" />;
+  return null;
 }

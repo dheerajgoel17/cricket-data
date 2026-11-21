@@ -147,7 +147,7 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | Sheets / drawers | shadcn `Sheet` | Filters, game detail — not primary navigation |
 | Tab bar / sidebar | `IosTabBar`, desktop source list | Shell chrome |
 | Star / save | `star.tsx` (Heroicons) | Saved props / players / teams |
-| Ads | `AdSlot` | Slot catalogue only; empty = no layout |
+| Ads | `AdSlot` | Catalogue cleared; remount when remapped; empty = no layout |
 
 ### Responsive variants
 
@@ -228,7 +228,7 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 | Legal / Tools / Odds / Glossary | web-only | **Web-only on purpose** (no twins yet) |
 | Ask LLM UI | removed (`/ask` → `/`) | — |
 | ResultView | `/pair`, team markets | — (web-only) |
-| Ads | `AdSlot` | — (web-only) |
+| Ads | `AdSlot` | — (web-only; catalogue cleared) |
 
 When adding a web-only widget the app also needs, design the twin here first; do not force the web component into Metro.
 

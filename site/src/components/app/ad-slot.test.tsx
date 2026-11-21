@@ -10,8 +10,13 @@ vi.mock("@/lib/manual-ads", () => ({
   fetchManualPlacement: (...a: unknown[]) => manual.fetch(...a),
   creativePublicUrl: (...a: unknown[]) => manual.url(...a),
 }));
+// Catalogue is empty in product; force allowlist so AdSense unit paths still exercise AdSlot.
+vi.mock("@/lib/ads", async (importOriginal) => {
+  const real = await importOriginal<typeof import("@/lib/ads")>();
+  return { ...real, adsAllowed: () => true };
+});
 
-const wrap = (path: string, slotId: "fancy_detail_top" | "stats_top" | "player_detail_top" = "fancy_detail_top", adsenseSlot = "1234567890") => {
+const wrap = (path: string, slotId = "slot_a", adsenseSlot = "1234567890") => {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={qc}>

@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-21 — Ads: clear slot catalogue and product mounts
+- **Path:** `site/src/lib/ad-slots.ts`, `AdSlot` / `StatsAd` call sites, `IosTabBar`, `supabase/migrations/20261121_clear_ad_slots.sql`
+- **Change:** Removed all product `AdSlot` / `StatsAd` mounts and emptied `AD_SLOTS` (wrong inventory map). Prod `ad_placements` / `ad_slots` cleared; admin + `AdSlot` infra kept for a remapped catalogue.
+- **Callers:** none until remount; `/admin/ads` shows empty-catalogue state
+
 ### 2026-11-20 — Book mark: VBET (Feed L)
 - **Path:** `site/public/books/books.json`, `site/public/books/vbet.png`, `site/packages/engine/books.js`
 - **Change:** Feed L's published book mark is VBET (`vbet.png`); removed the temporary Swarm stem/svg. Manifest-driven — apps pick it up from `books.json` without a native update.
