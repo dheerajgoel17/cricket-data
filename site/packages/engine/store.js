@@ -5,12 +5,12 @@ import { norm } from "./util.js";
 import { unwrap } from "./wrap.js";
 
 /**
- * @param {{ base?: string, fetchJson?: (p: string) => Promise<any>, urlFor?: (url: string) => string, wrapKey?: string, deferMatches?: boolean }} [opts]
+ * @param {{ base?: string, fetchJson?: (p: string) => Promise<any>, urlFor?: (url: string) => string, wrapKey?: string, deferMatches?: boolean, lazyMatches?: boolean }} [opts]
  * `urlFor`: maps each file's URL before it is fetched (the site adds a content version, so the browser can keep the file for good).
  * `deferMatches`: return once the index is in and keep `matches.json` on `store.ready`. The home rail only needs fixtures;
  * player, team and fancy pages wait for `ready` (it attaches `M` and `n`).
  */
-export async function createStore({ base = "data/", fetchJson, urlFor, wrapKey, deferMatches = false } = {}) {
+export async function createStore({ base = "data/", fetchJson, urlFor, wrapKey, deferMatches = false, lazyMatches = false } = {}) {
   const get = fetchJson || (async (p) => {
     const r = await fetch(urlFor ? urlFor(base + p) : base + p, { credentials: "same-origin" });
     if (!r.ok) throw new Error(`${p}: HTTP ${r.status}`);
@@ -18,20 +18,25 @@ export async function createStore({ base = "data/", fetchJson, urlFor, wrapKey, 
   });
   // Start matches with the index so home can paint sooner, but if meta/index fail first the floating
   // matches promise must not become an unhandledRejection (og card load with no data origin).
-  const matchesP = get("matches.json");
+  const matchesP = lazyMatches && deferMatches ? null : get("matches.json");
   let meta, index;
   try {
     [meta, index] = await Promise.all([get("meta.json"), get("index.json")]);
   } catch (e) {
-    matchesP.catch(() => {});
+    matchesP?.catch(() => {});
     throw e;
   }
   const store = new Store(meta, index, deferMatches ? null : await matchesP, get);
-  store.ready = matchesP.then((doc) => {
+  const attach = (doc) => {
     store.M = doc;
     store.n = doc.id.length;
     return store;
-  });
+  };
+  if (matchesP) store.ready = matchesP.then(attach);
+  else {
+    let history;
+    Object.defineProperty(store, "ready", { get: () => history ||= get("matches.json").then(attach) });
+  }
   if (!deferMatches) await store.ready;
   return store;
 }

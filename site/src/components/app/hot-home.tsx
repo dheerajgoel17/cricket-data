@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import { modelSide, sideRate } from "@cricket/engine/props-view.js";
@@ -38,12 +38,20 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const live = useLiveDoc();
   const { identity } = useData();
   const { fixtures } = useHomeRail();
+  const [preferSeeds, setPreferSeeds] = useState(() => typeof matchMedia === "function" && matchMedia("(max-width: 767px)").matches);
+  useEffect(() => {
+    if (!preferSeeds) return;
+    const engage = () => setPreferSeeds(false);
+    const events = ["scroll", "pointerdown", "keydown"];
+    events.forEach((event) => window.addEventListener(event, engage, { passive: true, once: true }));
+    return () => events.forEach((event) => window.removeEventListener(event, engage));
+  }, [preferSeeds]);
   // Today + tomorrow: home chips include tomorrow's fixtures (e.g. WBBL); scoring only day 0 left those chips fancy-only.
-  const today = useHotRows(undefined, undefined, 0, "all", phase, live.data);
-  const tomorrow = useHotRows(undefined, undefined, 1, "all", phase, live.data);
+  const today = useHotRows(undefined, undefined, 0, "all", phase, live.data, preferSeeds);
+  const tomorrow = useHotRows(undefined, undefined, 1, "all", phase, live.data, preferSeeds);
   const data = useMemo(() => [...(today.data || []), ...(tomorrow.data || [])], [today.data, tomorrow.data]);
   const isLoading = today.isLoading;
-  const { cards, ready } = useFancyCards(phase);
+  const { cards, ready } = useFancyCards(phase, preferSeeds);
   const matchOf = (r: any) => { const [a, b] = String(r.match).split(/\s+vs\s+/i); return liveForFixture(live.data, { a, b, start: r.start, fmt: r.fmt }); };
   const asLine = (r: any) => ({ pid: r.pid, player: r.name, book_name: r.bookName, team: r.team, stat: r.stat, line: r.line, inn: r.inn });
   const soFarOf = (r: any) => lineStanding(matchOf(r), asLine(r), identity, { stored: r.stored, settled: r.settled });

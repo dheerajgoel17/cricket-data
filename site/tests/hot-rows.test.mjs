@@ -6,6 +6,8 @@ import { join } from "node:path";
 import { booksOf, groupByChip, historyRecord, isLiveLine, lineKey, matchChipId, liveThresholdKey, patchHotQuotes, prematchLines, rowLineKey, scoreLine, seedRow } from "@cricket/engine/hot-rows.js";
 import { buildDoc, wantedLines } from "../scripts/hot-rows.mjs";
 import { fixtureDir, loadFixture } from "./helpers.mjs";
+import { Store } from "@cricket/engine/store.js";
+import { collectOverview, fancyInputs } from "@cricket/engine/fancy-edge.js";
 
 const NOW = Date.parse("2026-11-03T05:00:00Z");
 const KOHLI = "3e808d3b";
@@ -95,4 +97,23 @@ test("the script writes the history of each priced line under its key, and fails
   await writeFile(join(data, "fixtures.json"), "[]");
   await assert.rejects(buildDoc({ dataDir: data, linesPath: lines, now: NOW }), /no fixtures/);
   assert.match(await readFile(lines, "utf8"), /Alpha vs Beta/);
+});
+
+test("a compact home sample reproduces scores after the odds change", async () => {
+  const { store } = await loadFixture();
+  const f = { ...FIXTURE, a_ix: store.teams.findIndex((t) => t.n === FIXTURE.a), b_ix: store.teams.findIndex((t) => t.n === FIXTURE.b) };
+  const { data, lines } = await dataDir([line()]);
+  await writeFile(join(data, "fixtures.json"), JSON.stringify([f]));
+  const original = { lines: [], fancy: [{ match: "Alpha vs Beta", start_utc: line().start_utc, fmt: "T20", key: "match_sixes", scope: "match", line: 4.5, over: 1.8, under: 2.1, source: "bet365" }] };
+  await writeFile(join(data, "lines.json"), JSON.stringify(original));
+  const fancyOut = join(data, "home-fancy.json");
+  await buildDoc({ dataDir: data, linesPath: lines, fancyOut, now: NOW });
+  const packed = JSON.parse(await readFile(fancyOut, "utf8"));
+  const card = packed.cards[f.id];
+  const compact = new Store(store.meta, store.index, packed.matches, store.get);
+  const fxInfo = { a: f.a, b: f.b, fmt: f.fmt, startMs: Date.parse(f.start) };
+  const doc = { ...original, fancy: [{ ...original.fancy[0], over: 1.95 }] };
+  const full = collectOverview({ store, doc, fxInfo, ...fancyInputs(store, f) });
+  assert.ok(full.length, "fixture has a priced overview");
+  assert.deepEqual(collectOverview({ store: compact, doc, fxInfo, ms: card.ms, ground: card.ground, teams: [[f.a, f.a_ix], [f.b, f.b_ix]] }), full);
 });
