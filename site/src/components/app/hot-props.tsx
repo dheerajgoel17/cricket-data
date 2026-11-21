@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { LIVE_TTL_MS, liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
-import { groupByChip, isLiveLine, lineKey, liveThresholdKey, patchHotQuotes, prematchLines, scoreLine } from "@cricket/engine/hot-rows.js";
+import { booksOf, groupByChip, isLiveLine, lineKey, liveThresholdKey, patchHotQuotes, prematchLines, scoreLine, seedRow } from "@cricket/engine/hot-rows.js";
 import { Tick } from "./tick";
 import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
@@ -23,7 +23,7 @@ import { useLiveDoc } from "@/hooks/useLive";
 import { useRail } from "@/hooks/useRail";
 import { arrangeFixtures, homeTeam } from "@/lib/priority";
 import { useFixtures } from "@/hooks/useEngine";
-import { useData } from "@/lib/data";
+import { loadJson, useData } from "@/lib/data";
 import { EmptyState } from "./empty-state";
 import { StickyFilterBand } from "./page";
 import { EMPTY_PHASE } from "./home-phase-bar";
@@ -59,36 +59,49 @@ const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
 type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; live?: boolean; opened?: number; underAt?: { line: number; price: number }; underOnly?: boolean };
 interface Row { gender: number | null; comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
+type HistorySeed = { v: number; build: string; generated_at_utc: string; rows: Record<string, any> };
 
 /**
  * The bookmaker player lines of one day (`day`: 0 today, 1 tomorrow) or, with `teams`, of one match, each scored from the player's own history by the engine: L10 hit rate, this
  * year's, vs today's opponent, and the model's edge on the better side (`modelSide`, `engine/props-view.js`): the hit rate of the window shown pulled toward the market's no-vig chance, for the over and for the under.
  * Only those lines are scored (each costs a player file), the files come several at a time, and the rows are in `data` as they finish (`scoring` says more are coming).
  */
-export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all") {
+export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all", phase?: HomePhase, live?: any) {
   const { store, rz, matchesReady, names } = useData();
   const qc = useQueryClient();
   const lines = useLinesLive();
   const fixtures = useFixtures(); // each match's ground, for the venue window
+  const canSeed = !archive && !teams && inns === "all";
+  const seed = useQuery({
+    queryKey: ["hot-rows-seed"],
+    enabled: canSeed,
+    staleTime: 10 * 60_000,
+    queryFn: async () => await loadJson("/data/hot-rows.json") as HistorySeed | null,
+  });
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
   const today = new Date().toDateString();
-  const scope = JSON.stringify([today, inns, teams ?? day, !!archive]);
+  const scope = JSON.stringify([today, inns, teams ?? day, !!archive, phase]);
+  const scopedLines = useMemo(() => {
+    const all = doc.data?.lines || [];
+    return phase ? all.filter((l: any) => lineHomePhase({ start: l.start_utc, fmt: l.fmt, match: l.match }, live) === phase) : all;
+  }, [doc.data?.lines, phase, live]);
+  const phaseKey = phase ? [...new Set(scopedLines.map((l: any) => `${l.match}|${l.start_utc}|${l.fmt}`))].sort().join(";") : "";
   const scopeKey = ["hot-props", scope] as const;
   // books generation only — live_sig must not rebuild history; quotes/live rows are patched after (see merge below).
   // Do not put fixtures.isLoading in the key: flipping true→false used to open a new cache entry and flash HomePropsSkeleton on remount.
-  const key = [...scopeKey, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null];
-  const liveLines = useMemo(() => archive ? [] : hotLines((doc.data?.lines || []).filter(isLiveLine), teams ? { teams, archive: false } : { day }, Date.now()), [archive, doc.data, teams, day]);
+  const key = [...scopeKey, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null, canSeed ? seed.data?.generated_at_utc : null, phaseKey];
+  const liveLines = useMemo(() => archive ? [] : hotLines(scopedLines.filter(isLiveLine), teams ? { teams, archive: false } : { day }, Date.now()), [archive, scopedLines, teams, day]);
   const liveKey = useMemo(() => liveThresholdKey(liveLines), [liveLines]);
   const rows = useQuery({
     queryKey: key,
     placeholderData: (previous, query) => query?.queryKey[1] === scope ? previous : undefined,
-    enabled: !!doc.data && !fixtures.isLoading && matchesReady !== false,
+    enabled: !!doc.data && !fixtures.isLoading && (canSeed ? seed.isFetched : matchesReady !== false),
     staleTime: 10 * 60_000,
     gcTime: 60 * 60_000,
     queryFn: async (): Promise<Row[]> => {
       const now = Date.now();
       // an archived match is read whatever its age: only that match's lines, none of the day filters
-      const todays = { lines: hotLines(prematchLines(doc.data.lines), teams ? { teams, archive: !!archive } : { day }, now) };
+      const todays = { lines: hotLines(prematchLines(scopedLines), teams ? { teams, archive: !!archive } : { day }, now) };
       // one row per player, stat and match: a series has several matches between the same sides, each priced on its own. A live line is a row of its own beside the pre-match one: that stays (it is the bet we settle) and the live line is added once it is passed
       const isLive = (l: any) => !!l.books?.some((x: any) => x.live);
       const keys = new Map<string, any>();
@@ -133,7 +146,20 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         published = Date.now();
         qc.setQueryData(key, [...out]);
       };
-      const groups = prioritizeHotGroups(byShard([...keys.values()], (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), now);
+      const seedDoc = canSeed && seed.data?.v === 1 && seed.data.build === store.meta.built_at ? seed.data : null;
+      const history = seedDoc?.rows;
+      const byChip = history ? groupByChip(todays.lines) : null;
+      const todo = [];
+      for (const l of keys.values()) {
+        const r = byChip && history && seedRow({ store, l, b: booksOf(l, byChip, now), rec: history[lineKey(l)], names });
+        if (!r) { todo.push(l); continue; }
+        const fixture = (fixtures.data || []).find((f: any) => sameFixture({ match: r.match, start_utc: r.start, fmt: l.fmt }, f));
+        out.push({ ...r, day: hotDay(r.start, l.fmt, now), gender: fixture?.gender === "female" ? 1 : fixture?.gender === "male" ? 0 : null } as Row);
+      }
+      if (!todo.length) return out;
+      publish();
+      await store.ready;
+      const groups = prioritizeHotGroups(byShard(todo, (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), now);
       const scoreGroup = async (g: { shard: number; lines: any[] }) => {
         await store.shard(g.shard).catch(() => {}); // a file that does not load costs its own rows (the plan answers "not ok" for them), not the page
         for (let i = 0; i < g.lines.length; i += 4) { await Promise.all(g.lines.slice(i, i + 4).map(score)); publish(); await yieldToMain(); }
@@ -171,7 +197,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const otherDay = useMemo(() => (teams ? 0 : otherHotCount(doc.data?.lines || [], day)), [doc.data, teams, day]); // other days' lines, only counted: the day switch stays when this day has none
   // while the bookmaker file is still loading the query is idle (not "loading"): treat that as loading too, so the empty message never flashes
   const scoring = (rows.isFetching && !rows.isPlaceholderData) || (liveExtra.isFetching && !liveExtra.isPlaceholderData);
-  return { ...rows, data, isLoading: !data.length && (rows.isLoading || (!rows.isError && !doc.data)), scoring, otherDay };
+  return { ...rows, data, isLoading: !data.length && (rows.isLoading || (canSeed && seed.isPending) || (!rows.isError && !doc.data)), scoring, otherDay };
 }
 
 const Spark = ({ r }: { r: Row }) => <MiniBars last={r.last} line={r.line} max={r.max} />;

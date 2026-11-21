@@ -10,6 +10,7 @@ import { useLiveDoc } from "@/hooks/useLive";
 import { fancyStanding, liveForFixture } from "@cricket/engine/live.js";
 import { collectOverview } from "@/components/app/match-fancy";
 import { arrangeFixtures, homeTeam } from "@/lib/priority";
+import { phaseOf, type HomePhase } from "@/lib/home-phase";
 
 const yieldToMain = () => new Promise<void>((r) => { const sc = (globalThis as any).scheduler; if (sc?.yield) sc.yield().then(r); else setTimeout(r, 0); });
 
@@ -20,12 +21,15 @@ const yieldToMain = () => new Promise<void>((r) => { const sc = (globalThis as a
  * is open while it runs stays responsive (it used to freeze the page change that opened it, which showed as a blank page), and coming back to it is instant.
  * Cards follow the home rail: matches in play first, then standing. Live so-far is overlaid from the 15 s poll (`fancyStanding`), not baked into the 10-minute scored rows.
  */
-export function useFancyCards() {
+export function useFancyCards(phase?: HomePhase) {
   const { store, matchesReady } = useData();
   const { fixtures: all, ready, doc } = usePricedFixtures();
   const live = useLiveDoc();
   // a finished match has nothing left to bet on: fancy lists the matches in play and to come (a finished match keeps its own page and its archive)
-  const fixtures = useMemo(() => all.filter((f: any) => fixtureState(f, liveForFixture(live.data, f)?.status) !== "final"), [all, live.data]);
+  const fixtures = useMemo(() => all.filter((f: any) => {
+    const state = fixtureState(f, liveForFixture(live.data, f)?.status);
+    return state !== "final" && (!phase || phaseOf(state) === phase);
+  }), [all, live.data, phase]);
   const ids = fixtures.map((f: any) => f.id || `${f.a}${f.b}${f.start}`).join("|");
   const q = useQuery({
     queryKey: ["fancy-cards", doc?.generated_at_utc ?? "", ids],

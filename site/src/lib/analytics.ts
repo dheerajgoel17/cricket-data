@@ -3,7 +3,9 @@ import { track as gaTrack } from "./ga";
 
 /** A named event with a few small string or number properties (what was tapped, never who). Sent to the host analytics and to GA when the tag is on. A failure here never reaches the page. */
 export function track(name: string, props?: Record<string, string | number>) {
-  try { send(name, props); } catch { /* blocked or offline: nothing to do */ }
+  if (import.meta.env.VITE_SITE_HOST !== "cloudflare") {
+    try { send(name, props); } catch { /* blocked or offline: nothing to do */ }
+  }
   try { gaTrack(name, props); } catch { /* no tag */ }
 }
 

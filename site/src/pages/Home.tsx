@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { liveForFixture } from "@cricket/engine/live.js";
@@ -13,9 +13,10 @@ import { useHomeRail } from "@/hooks/useHomeRail";
 import { useLiveDoc } from "@/hooks/useLive";
 import { TeamBadge } from "@/components/app/badges";
 import { FixtureRail } from "@/components/app/fixture-card";
-import { HotHome } from "@/components/app/hot-home";
 import { Muted } from "@/components/app/page";
-import { RailSkeleton } from "@/components/app/skeletons";
+import { HomePropsSkeleton, RailSkeleton } from "@/components/app/skeletons";
+
+const HotHome = lazy(() => import("@/components/app/hot-home").then((m) => ({ default: m.HotHome })));
 
 export function HomePage() {
   setTitle("Cricket fixtures, hot player props and stats");
@@ -35,7 +36,7 @@ export function HomePage() {
       <HomePhaseBar value={phase} counts={counts} onChange={(p) => setQ({ view: p })} />
       <div className="flex flex-col gap-section pt-stack">
         {ready ? <FixtureRail fx={shown} /> : <RailSkeleton />}
-        <HotHome phase={phase} />
+        <Suspense fallback={<HomePropsSkeleton />}><HotHome phase={phase} /></Suspense>
       </div>
     </div>
   );

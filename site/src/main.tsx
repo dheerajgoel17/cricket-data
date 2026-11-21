@@ -88,8 +88,8 @@ createRoot(document.getElementById("root")!).render(
             </AuthProvider>
           </BrowserRouter>
           <Toaster />
-          <Analytics />
-          <SpeedInsights />
+          {import.meta.env.VITE_SITE_HOST !== "cloudflare" && <Analytics />}
+          {import.meta.env.VITE_SITE_HOST !== "cloudflare" && <SpeedInsights />}
         </TooltipProvider>
       </MotionConfig>
     </QueryClientProvider>}

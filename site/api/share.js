@@ -36,12 +36,12 @@ export function isPerson(headers = {}) {
   return headers["sec-fetch-mode"] === "navigate" && headers["sec-fetch-dest"] === "document";
 }
 
-export default function handler(req, res) {
+export function handleShare(req, res, data, requestOrigin) {
   const parsed = parseShare(req.query?.path);
-  const fields = parsed && cardFields(parsed.card, loadData());
+  const fields = parsed && cardFields(parsed.card, data);
   const text = cardText(fields);
   const host = req.headers["x-forwarded-host"] || req.headers.host || "";
-  const origin = host ? `https://${String(host).split(",")[0]}` : "";
+  const origin = requestOrigin || (host ? `https://${String(host).split(",")[0]}` : "");
   if (!parsed || !text || !origin) { res.statusCode = 302; res.setHeader("Location", "/"); return res.end(); }
   const page = `${origin}${parsed.page}`;
   if (isPerson(req.headers)) {
@@ -65,4 +65,8 @@ ${tags}<link rel="image_src" href="${esc(image)}" />
 <a href="${esc(page)}"><img src="${esc(image)}" width="1200" height="630" alt="${esc(text.title)}" style="width:100%;max-width:1200px;height:auto;display:block" /></a>
 <p style="margin:16px"><a href="${esc(page)}" style="display:inline-block;padding:12px 20px;border-radius:999px;background:#27da8e;color:#0f0f0f;font:600 16px system-ui,sans-serif;text-decoration:none">Open on Fancy.cash</a></p>
 </body></html>`);
+}
+
+export default function handler(req, res) {
+  return handleShare(req, res, loadData());
 }

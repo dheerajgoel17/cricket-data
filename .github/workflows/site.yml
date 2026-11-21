@@ -198,7 +198,10 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          CARD_API_KEY: ${{ secrets.CARD_API_KEY }}
           SITE_URL: ${{ vars.SITE_URL }}
+          VITE_SITE_HOST: cloudflare
         run: |
           test -n "$CLOUDFLARE_API_TOKEN" && test -n "$CLOUDFLARE_ACCOUNT_ID" && test -n "$DATA_WRAP_KEY" &&
             test -n "$LIVE_SOURCE_BASE" && test -n "$SUPABASE_URL" && test -n "$SUPABASE_ANON_KEY"
@@ -207,8 +210,10 @@ jobs:
           umask 077
           file=$(mktemp)
           trap 'rm -f "$file"' EXIT
-          node -e 'const names = ["DATA_WRAP_KEY", "LIVE_SOURCE_BASE", "SUPABASE_URL", "SUPABASE_ANON_KEY"]; process.stdout.write(JSON.stringify(Object.fromEntries(names.map(name => [name, process.env[name]]))))' > "$file"
-          npx --yes wrangler@4.166.0 deploy --config cloudflare/wrangler.jsonc --secrets-file "$file"
+          node -e 'const names = ["DATA_WRAP_KEY", "LIVE_SOURCE_BASE", "SUPABASE_URL", "SUPABASE_ANON_KEY", "SUPABASE_SERVICE_KEY", "CARD_API_KEY"]; process.stdout.write(JSON.stringify(Object.fromEntries(names.filter(name => process.env[name]).map(name => [name, process.env[name]]))))' > "$file"
+          worker=cricket-props-fallback
+          if [ "$GITHUB_REF_NAME" != main ]; then worker=cricket-props-performance-preview; fi
+          npx --yes wrangler@4.166.0 deploy --name "$worker" --config cloudflare/wrangler.jsonc --secrets-file "$file"
       - name: Deploy preview (pull requests from this repository)
         id: preview
         if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && env.VERCEL_PROJECT_ID != ''

@@ -24,17 +24,25 @@ async function loadIdentity(base: string) {
   return identityIndex(await loadJson(`${base}identity.json`));
 }
 
-async function boot(): Promise<Data> {
+async function boot() {
   const k = await gateKey();
   setWrapKey(k);
-  const store = await createStore({ base: "/data/", urlFor: dataUrl, wrapKey: k, deferMatches: true });
-  if (!store?.P?.id?.length) throw new Error("index.json: empty");
-  const [photos, identity, names] = await Promise.all([
+  const extras = Promise.all([
     loadJson("/data/photos.json").then((p) => (p || {}) as Photos),
     loadIdentity("/data/"),
     loadJson("/data/names.json").then((n) => (n && typeof n === "object" ? n : {}) as Record<string, string>),
   ]);
-  return { store, rz: new Resolver(store), photos, identity, names, matchesReady: false };
+  const store = await createStore({
+    deferMatches: true,
+    fetchJson: async (path: string) => {
+      const response = await fetch(dataUrl(`/data/${path}`), { credentials: "same-origin", priority: path === "matches.json" ? "low" : "auto" });
+      if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
+      return readJson(response);
+    },
+  });
+  if (!store?.P?.id?.length) throw new Error("index.json: empty");
+  const data: Data = { store, rz: new Resolver(store), photos: {}, identity: identityIndex(null), names: {}, matchesReady: false };
+  return { data, extras };
 }
 
 const retryable = (e: unknown) => /HTTP 403|empty|Unexpected token/.test(String((e as Error)?.message || e));
@@ -50,15 +58,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setData(null);
     (async () => {
       try {
-        let out: Data;
+        let out: Awaited<ReturnType<typeof boot>>;
         try { out = await boot(); }
         catch (e) {
           if (!retryable(e)) throw e;
           await new Promise((r) => setTimeout(r, 80)); // the gate cookie is sometimes not on the next request yet
           out = await boot();
         }
-        if (live) setData(out);
-        out.store.ready.then(() => { if (live) setData((d) => (d && d.store === out.store ? { ...d, matchesReady: true } : d)); })
+        if (live) setData(out.data);
+        void out.extras.then(([photos, identity, names]) => {
+          if (live) setData((d) => (d && d.store === out.data.store ? { ...d, photos, identity, names } : d));
+        });
+        out.data.store.ready.then(() => { if (live) setData((d) => (d && d.store === out.data.store ? { ...d, matchesReady: true } : d)); })
           .catch((e: unknown) => { if (live) setError((e as Error).message); });
       } catch (e) { if (live) setError((e as Error).message); }
     })();

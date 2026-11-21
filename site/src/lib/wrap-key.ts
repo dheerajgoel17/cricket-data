@@ -2,6 +2,33 @@
 import { isWrapped, unwrap } from "@cricket/engine/wrap.js";
 
 let key: string | undefined;
+let worker: Worker | undefined;
+let nextId = 0;
+const pending = new Map<number, { resolve: (value: unknown) => void; reject: () => void }>();
+
+function offThread(doc: unknown, secret: string): Promise<unknown> {
+  if (!worker) {
+    worker = new Worker(new URL("./unwrap.worker.ts", import.meta.url), { type: "module" });
+    worker.onmessage = ({ data }) => {
+      const request = pending.get(data.id);
+      pending.delete(data.id);
+      if (data.failed) request?.reject();
+      else request?.resolve(data.value);
+    };
+    worker.onerror = () => {
+      worker?.terminate();
+      worker = undefined;
+      for (const request of pending.values()) request.reject();
+      pending.clear();
+    };
+  }
+  return new Promise((resolve, reject) => {
+    const id = ++nextId;
+    pending.set(id, { resolve, reject });
+    try { worker?.postMessage({ id, doc, secret }); }
+    catch (e) { pending.delete(id); reject(e); }
+  });
+}
 
 export function setWrapKey(v?: string) {
   key = v || undefined;
@@ -31,6 +58,9 @@ export async function gateKey(): Promise<string | undefined> {
 /** JSON from a same-origin fetch: unwrap when the body is `{v,iv,ct}`. */
 export async function readJson(r: Response): Promise<unknown> {
   const doc = await r.json();
-  const secret = isWrapped(doc) ? await gateKey() : key;
-  return unwrap(doc, secret);
+  if (!isWrapped(doc)) return doc;
+  const secret = await gateKey();
+  if (!secret || typeof Worker === "undefined") return unwrap(doc, secret);
+  try { return await offThread(doc, secret); }
+  catch { return unwrap(doc, secret); }
 }

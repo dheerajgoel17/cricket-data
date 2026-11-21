@@ -5,7 +5,6 @@ import { syncAds } from "@/lib/ads";
 import { AppSkeleton, PageSkeleton } from "@/components/app/skeletons";
 import { ErrorBoundary } from "@/components/app/error-boundary";
 import { HomePage } from "@/pages/Home";
-import { FixturePage } from "@/pages/Fixtures";
 import { EmptyState } from "@/components/app/empty-state";
 import { Button } from "@/components/ui/button";
 import { useData } from "@/lib/data";
@@ -24,7 +23,7 @@ function NotFoundPage() {
 const Player = lazy(() => import("@/pages/Player").then((m) => ({ default: m.PlayerPage })));
 
 const page = <T extends Record<string, unknown>>(mod: () => Promise<T>, name: keyof T) => lazy(() => mod().then((m) => ({ default: m[name] as React.ComponentType })));
-// Fixture is eager like Home — Player → /fixture/... must not wait on Suspense PageSkeleton for the chunk.
+const FixturePage = page(() => import("@/pages/Fixtures"), "FixturePage");
 const TrendsPage = page(() => import("@/pages/Fixtures"), "TrendsPage");
 const LeaguesPage = page(() => import("@/pages/Leagues"), "LeaguesPage");
 const CompetitionsPage = page(() => import("@/pages/Markets"), "CompetitionsPage"), LeaguePage = page(() => import("@/pages/Markets"), "LeaguePage");
