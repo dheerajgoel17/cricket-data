@@ -1,0 +1,7 @@
+{
+  "name": "cricket-props-www-redirect",
+  "main": "www-redirect.js",
+  "compatibility_date": "2026-11-21",
+  "workers_dev": false,
+  "routes": [{ "pattern": "www.fancy.cash/*", "zone_name": "fancy.cash" }]
+}
