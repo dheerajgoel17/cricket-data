@@ -78,5 +78,10 @@
   "edge": 0.0542,
   "start_utc": "2026-11-22T08:10:00Z",
   "alerted_at": "2026-11-20T23:35:47.816988+00:00"
+ },
+ "female|Adelaide Strikers Women|Brisbane Heat Women|2026-11-22|batter_fours||Laura Wolvaardt under 3.5|3.5|under": {
+  "edge": 0.0572,
+  "start_utc": "2026-11-22T04:40:00Z",
+  "alerted_at": "2026-11-21T00:36:33.522642+00:00"
  }
 }
