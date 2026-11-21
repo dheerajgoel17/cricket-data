@@ -2,6 +2,20 @@
   "date": "2026-11-21",
   "event": "",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 60,
+      "runs": 76,
+      "team": "Milan Icons",
+      "wickets": 9
+    },
+    {
+      "balls": 53,
+      "runs": 80,
+      "team": "Venice Livewire",
+      "wickets": 4
+    }
+  ],
   "match_id": "crex-mi-vs-vl-4th-t10-italia-t10-league-2026-match-updates-157G",
   "match_type": "T20",
   "player_of_match": "",
