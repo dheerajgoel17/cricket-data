@@ -35,9 +35,19 @@ export async function buildDoc({ dataDir, linesPath, now = Date.now(), fancyOut 
       if (!f.id || f.noProps || !Number.isFinite(startMs) || startMs < now - keepMsFor(f.fmt) || startMs > now + 11 * 864e5 || !fixtureBooks(home, f).fancy) continue;
       const { ms, ground, teams } = fancyInputs(store, f);
       const rows = collectOverview({ store, doc: home, fxInfo: { a: f.a, b: f.b, fmt: f.fmt, startMs }, ms, ground, teams });
-      cards[f.id] = { ms, rows };
+      cards[f.id] = { ms, ground: ground || [], rows };
     }
-    await writeFile(fancyOut, JSON.stringify({ v: 1, build: meta.built_at, lines_generated_at_utc: home.generated_at_utc, cards }), "utf8");
+    // A fresh quote can use the exact same historical sample without downloading the full archive.
+    const indices = [...new Set(Object.values(cards).flatMap(({ ms, ground }) => [...ms, ...ground]))].sort((a, b) => a - b);
+    const compactIndex = new Map(indices.map((match, index) => [match, index]));
+    const matches = Object.fromEntries(Object.entries(store.M).map(([key, values]) => [
+      key, Array.isArray(values) && values.length === store.n ? indices.map((m) => values[m]) : values,
+    ]));
+    for (const card of Object.values(cards)) {
+      card.ms = card.ms.map((m) => compactIndex.get(m));
+      card.ground = card.ground.map((m) => compactIndex.get(m));
+    }
+    await writeFile(fancyOut, JSON.stringify({ v: 2, build: meta.built_at, lines_generated_at_utc: home.generated_at_utc, cards, matches }), "utf8");
   }
   const names = namesFile && typeof namesFile === "object" ? namesFile : {};
   const rz = new Resolver(store);
