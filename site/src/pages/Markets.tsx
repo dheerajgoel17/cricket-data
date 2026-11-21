@@ -11,7 +11,7 @@ import { STATS } from "@cricket/engine/rules.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
-import { num, pc } from "@/lib/format";
+import { num, odds, pc } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { useHeaderFlush } from "@/lib/header-slot";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
@@ -23,7 +23,8 @@ import { PillGroup } from "@/components/app/pill-group";
 import { GridTable } from "@/components/app/grid";
 import { LeagueBadge, TeamBadge } from "@/components/app/badges";
 import { StarButton } from "@/components/app/star";
-import { Crumbs, DataTable, Muted, PageTitle, Panel, StickyFilterBand } from "@/components/app/page";
+import { Crumbs, DataTable, Muted, OddsText, PageTitle, Panel, StickyFilterBand } from "@/components/app/page";
+import { PlayerName } from "@/components/app/player-name";
 import { EmptyState } from "@/components/app/empty-state";
 import { ResultView } from "@/components/app/result";
 import { NextMatch } from "./Home";
@@ -32,6 +33,25 @@ import { FixtureCard } from "@/components/app/fixture-card";
 import { TournamentStats } from "@/components/app/tournament-stats";
 
 const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest runs in an over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
+
+function TeamBattingLeaders({ result, format }: { result: any; format: string }) {
+  if (!result.ok || !result.rows.length) return <EmptyState title="No batting leaders for this format" body={result.error || "Choose another format to see the leaderboard."} />;
+  return (
+    <section className="flex flex-col gap-snug" aria-labelledby="team-batting-leaders">
+      <div className="flex flex-col gap-hair">
+        <h2 id="team-batting-leaders" className="text-title font-emphasis">Top batters</h2>
+        <Muted>{result.sample.n} {format} matches where the team batted first.</Muted>
+      </div>
+      <DataTable bleed columns={["Batter", "Sole", "Tied", "Sole %", "Fair odds"]} rows={result.rows.map((row: any) => [
+        <Link key={row.player} to={`/player/${row.player}?fmt=${FORMATS.indexOf(format)}`} className="font-label hover:text-primary focus-visible:outline-ring">
+          <PlayerName idx={row.player} always fallback={row.name} />
+        </Link>,
+        row.sole, row.tied, pc(row.pSole), <OddsText>{odds(row.fairSole)}</OddsText>,
+      ])} />
+      <Muted>Fair odds use outright top scores. Ties are counted separately.</Muted>
+    </section>
+  );
+}
 
 export function CompetitionsPage() {
   setTitle("Cricket competitions");
@@ -107,8 +127,17 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
   const [q, setQ] = useQ();
   const label = isTeam ? store.teamName(idx) : store.venueName(idx);
   const valid = Number.isInteger(idx) && idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length);
-  const fmt = q.fmt ?? "T20";
-  const fmtName = FORMATS.includes(fmt) ? fmt : "T20";
+  const teamFormats = useMemo(() => {
+    if (!isTeam || !valid || !store.M) return [];
+    const counts = FORMATS.map(() => 0);
+    for (let m = 0; m < store.n; m++) {
+      if (store.M.a[m] === idx || store.M.b[m] === idx) counts[store.M.f[m]]++;
+    }
+    return FORMATS.map((name, i) => ({ name, count: counts[i] })).filter(({ count }) => count > 0);
+  }, [isTeam, valid, idx, store]);
+  const defaultFormat = teamFormats.reduce((best, f) => f.count > best.count ? f : best, { name: "T20", count: 0 }).name;
+  const offeredFormats = teamFormats.length ? teamFormats.map(({ name }) => name) : FORMATS;
+  const fmtName = offeredFormats.includes(q.fmt) ? q.fmt : defaultFormat;
   const tab = (isTeam ? ["grid", "markets", "top"] : ["markets", "top"]).includes(q.tab) ? q.tab : isTeam ? "grid" : "markets";
   const plan = { kind: "match_market", market: q.market || null, line: q.line ? Number(q.line) : null, side: "over",
     filters: { format: fmtName, opposition: q.opp || null, venue_type: q.vt || null, since: q.since || null, until: q.until || null, last_n: q.last ? Number(q.last) : null, gender: isTeam && valid ? (store.genderOfTeam(idx) ? "female" : "male") : null } };
@@ -162,7 +191,7 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
         <StickyFilterBand>
           <div className="border-b border-hairline px-gutter pt-snug">
             <PillGroup sub layoutId="team-format" label="Format" value={fmtName} onChange={(next) => setQ({ fmt: next })}
-              items={FORMATS.map((f: string) => [f, f])} />
+              items={offeredFormats.map((f: string) => [f, f])} />
           </div>
         </StickyFilterBand>
       )}
@@ -174,8 +203,8 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
         </TabsContent>}
         <TabsContent value="markets" className="flex flex-col gap-stack">{form}{isTeam && <Muted>Team markets use matches where the team batted first.</Muted>}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
         <TabsContent value="top" className="flex flex-col gap-stack">
-          <h2 className="text-title font-emphasis">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>
-          {top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}
+          {top.data ? (isTeam ? <TeamBattingLeaders result={top.data} format={fmtName} /> : <ResultView r={top.data} />)
+            : top.isError ? <EmptyState title="Could not load batting leaders" body="Try another format or reload the page." /> : <ListSkeleton rows={4} />}
         </TabsContent>
       </PillTabs>
       {isTeam && nextFx && (
