@@ -15,7 +15,7 @@ import { num, pc } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { useHeaderFlush } from "@/lib/header-slot";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
-import { Field, HOME_AWAY, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
+import { DirectorySearch, Field, HOME_AWAY, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { EntityHero } from "@/components/app/entity-hero";
 import { HeroWash, sideAccent } from "@/components/app/hero-wash";
 import { PillTabs } from "@/components/app/pill-tabs";
@@ -45,8 +45,8 @@ export function CompetitionsPage() {
     <div className="flex flex-col gap-stack">
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
-      <Input type="search" aria-label="Search competitions" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} />
-      <Panel flat>
+      <DirectorySearch label="Search competitions" value={text} onChange={(value) => { setText(value); setQ({ q: value }); }} />
+      {rows.length ? <Panel flat>
         {rows.map(([e, c]) => (
           <Link key={e} to={`/league/${e}`} className="flex min-h-row items-center gap-snug border-b border-hairline px-inset py-snug last:border-b-0 hover:bg-accent">
             <LeagueBadge name={store.events[e]} size="md" />
@@ -55,7 +55,7 @@ export function CompetitionsPage() {
             <ArrowRightIcon className="size-4 text-muted-foreground" />
           </Link>
         ))}
-      </Panel>
+      </Panel> : <EmptyState compact title="No competitions found" body="Try a different search." />}
     </div>
   );
 }

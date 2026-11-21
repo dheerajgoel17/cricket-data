@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-21 — Directory and statistics pages
+- **Path:** `site/src/components/app/forms.tsx`, `site/src/components/app/result.tsx`, and the generated design inventory
+- **Change:** Reuses one search input and clear action across the site directories. Empty directories use EmptyState. Shared analytics results use the same hairline heading and table rhythm as fixture and player stats.
+- **Callers:** Players, Teams, Venues, Competitions, Glossary, Partnerships and Team Markets
+
 ### 2026-11-21 — Team detail layout
 - **Path:** `site/src/pages/Markets.tsx` and the generated design inventory
 - **Change:** Team detail uses the shared EntityHero, StickyFilterBand, format pills, section tabs, GridTable, and FixtureCard. The selected format applies across Player grid, Markets, and Top batter. The next fixture uses the same card as Home.

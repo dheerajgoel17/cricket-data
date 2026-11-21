@@ -249,7 +249,7 @@ Full `App.tsx` route checklist:
 | `/player/:id` | Aligned | Bleed tables + EmptyState |
 | `/teams`, `/team/:id` | Aligned | Directory bleed; detail uses EntityHero, sticky format pills, section tabs, GridTable and the shared FixtureCard |
 | `/venue/:id` | Aligned | Ground |
-| `/competitions` | Aligned | Markets list; EmptyState; GOVERNED |
+| `/competitions` | Aligned | Shared directory search, result rows and EmptyState |
 | `/pair` | Aligned | ResultView host (not Ask); EmptyState idle; GOVERNED |
 | `/tools`, `/odds`, `/glossary`, `/about`, `/players` | Secondary | Simple hub; tokens + EmptyState + PillGroup |
 | `/trends` | Secondary | Tools-adjacent GridFilterBar |
@@ -262,11 +262,11 @@ Full `App.tsx` route checklist:
 
 | Surface | Phone | `md` | `lg+` | Stats tables |
 | --- | --- | --- | --- | --- |
-| Home rail | Snap cards, tab bar | Same | Sidebar + rail; tape above full-width props | — |
+| Home rail | Snap cards, tab bar | Same | Sidebar + rail above full-width props | — |
 | Player stats | Chart-first; O/U meters + `SideBook`/`BookTable`; quiet `WindowPills`; Lines \| Game log \| Splits \| When it hits; no Alt lines / At a glance / phone gauge | Same | `DetailSplit` + sticky Lines; Game log / Splits / When it hits tabs | `TABLE_HEAD` + bleed |
 | ResultView (`/pair`, team markets) | Bleed ladders / corr / log / splits | Same | Same | `TABLE_HEAD` + bleed |
 | Markets (competition) | Bleed overview / teams / results | Same | Same | `TABLE_HEAD` + bleed |
-| Simple (teams & venues) | Bleed directory table | Same | Same | `TABLE_HEAD` + bleed |
+| Directories (players, teams, venues, competitions) | Shared title, search and empty state | Same | Same | `TABLE_HEAD` + bleed where tabular |
 | Team / venue | Grid + ResultView markets | Same | Same | ResultView bleed |
 | Competitions / Leagues | Tournament boards in cards | Same | Multi-col boards | `BOARD_HEAD` inset |
 | Screener / filters | Sheet | Sheet | Drawer-friendly width | — |
@@ -286,7 +286,7 @@ Full `App.tsx` route checklist:
 | --- | --- |
 | Home | FlashList / snap cards, EmptyState, skeletons, native tabs |
 | Props / Fancy tabs | FlashList, EmptyState, prop / fancy row chrome |
-| Leagues / Saved / Contact | EmptyState, lists / mailto |
+| Leagues | EmptyState, league selector and tournament boards |
 | Search | EmptyState |
 | Competitions | EmptyState on search miss |
 | Player | EmptyState unknown/error/filter miss; Segmented; DataTable `bleed`; `Bleed` game log; ChoiceChip filters; PageHeader |

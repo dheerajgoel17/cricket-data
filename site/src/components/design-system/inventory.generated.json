@@ -1437,12 +1437,15 @@
     "platform": "web",
     "route": false,
     "exports": [
+      "DirectorySearch",
       "Field",
       "HOME",
       "LiveForm",
       "NativeSelect"
     ],
-    "dependencies": []
+    "dependencies": [
+      "site/src/components/ui/input-group.tsx"
+    ]
   },
   {
     "path": "site/src/components/app/grid-filters.tsx",
@@ -1916,8 +1919,8 @@
     "dependencies": [
       "site/src/components/ui/accordion.tsx",
       "site/src/components/ui/badge.tsx",
-      "site/src/components/ui/card.tsx",
       "site/src/components/app/page.tsx",
+      "site/src/components/app/empty-state.tsx",
       "site/src/components/app/chart.tsx",
       "site/src/components/app/viz.tsx"
     ]
@@ -2787,7 +2790,6 @@
       "site/src/components/ui/badge.tsx",
       "site/src/components/ui/card.tsx",
       "site/src/components/ui/input.tsx",
-      "site/src/components/ui/input-group.tsx",
       "site/src/components/ui/item.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
