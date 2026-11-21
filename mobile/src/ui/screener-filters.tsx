@@ -25,7 +25,7 @@ export interface FilterChoices {
   winLabel: Record<string, string>;
 }
 
-/** Props screener filters: draft until Apply (site ScreenerFilters). Modal sheet; saved combos sync with Saved. */
+/** Props screener filters: draft until Apply (site ScreenerFilters). Modal sheet; named combos sync with the account. */
 export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }: {
   open: boolean; onOpenChange: (o: boolean) => void; state: Screener; onApply: (s: Screener) => void; choices: FilterChoices;
 }) {
@@ -113,7 +113,7 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
                   const n = name.trim() || "My filters";
                   save(n, screenerQuery(draft));
                   setName("");
-                  setNote(`Saved as “${n}”. Find it under Saved.`);
+                  setNote(`Saved as “${n}”.`);
                 }} style={styles.saveBtn}><Text style={styles.saveTxt}>Save</Text></Press>
               </View>
               {note ? <Text style={styles.hint}>{note}</Text> : <Text style={styles.hint}>Saved on this device (and your account when signed in).</Text>}

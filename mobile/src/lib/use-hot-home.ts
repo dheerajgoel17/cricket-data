@@ -16,7 +16,6 @@ import { fixtureState } from "@/lib/rail";
 import { useHotView } from "@/lib/use-hot";
 import { useLive } from "@/lib/use-live";
 import { useRail } from "@/lib/use-rail";
-import type { TapeRow } from "@/ui/market-tape";
 
 /** Prefer the site's L10≥6 bar; while the first wave is still thin, show thinner samples so Home is not blank for seconds. */
 const HOME_PLAYED = 6;
@@ -28,7 +27,7 @@ export type MixItem =
 
 type FxBlock = { f: any; items: MixItem[] };
 
-/** Home Props block state: tape, match chips, and the mixed rows for the selected fixture (FlashList data). */
+/** Home Props block state: match chips and the mixed rows for the selected fixture (FlashList data). */
 export function useHotHome(phase: HomePhase) {
   const d0 = useHotView({ day: 0 }, phase);
   // Tomorrow's lines only after today has something to show — cold start was scoring both days at once (~2× JS work).
@@ -87,11 +86,6 @@ export function useHotHome(phase: HomePhase) {
   const sel = blocks.some((b) => b.f.id === pick) ? pick : (blocks[0]?.f.id || "");
   const block = blocks.find((b) => b.f.id === sel) || null;
 
-  const tape = useMemo<TapeRow[]>(() => timed("home tape", () => d0.rows.map((r) => {
-    const s = soFarOf(r);
-    return { idx: r.idx, pid: r.pid, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
-  })), [d0.rows, soFarOf]);
-
   // Paint as soon as Hot has any rows (or fancy cards); do not block on fancy finishing.
   const loading = isLoading && !blocks.length;
   const fixtures = blocks.map(({ f }) => f);
@@ -110,7 +104,7 @@ export function useHotHome(phase: HomePhase) {
     fancyMarketPath(item.f.id, { fm: fancyFm(item.r.key, item.r.inn || 0), sc: item.r.scope >= 0 ? item.r.scope : null });
 
   return {
-    tape, fixtures, tags, items, sel, setPick, block,
+    fixtures, tags, items, sel, setPick, block,
     loading, scoring, error, isLoading, soFarOf, outOf, openFancy,
   };
 }

@@ -15,6 +15,26 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-21 — Ground: match phase tabs + stack rhythm
+- **Path:** `site/src/lib/ground.ts`, `site/src/components/app/fixture-ground.tsx`, `mobile/src/ui/ground-page.tsx`
+- **Change:** Matches list splits into Resulted / In play / Scheduled (`partitionGroundMatches`); panel major blocks use `gap-stack`; metrics bleed edge-to-edge; secondary fact rows drop forced `min-h` so they match the 2×2 Fact padding. Fixture embeds prefer live/scheduled.
+- **Callers:** Fixture Ground chip, `/fixture/:id/ground`, `/venue/:id`, mobile Ground page
+
+### 2026-11-21 — Fixture Match Fancy: edge hairline + stack rhythm
+- **Path:** `site/src/components/app/match-fancy.tsx`, `hot-props.tsx`, `pages/Fixtures.tsx`, `mobile/src/ui/match-fancy.tsx`
+- **Change:** Scope / L10 filter `border-b` bleeds edge-to-edge (`-mx-gutter` + `px-gutter`, app twin). Fixture page vertical rhythm uses `gap-stack` (between) instead of `gap-section` under the scoreboard hairline.
+- **Callers:** Fixture Match Fancy + Props filter rows; fixture loading skeleton
+
+### 2026-11-21 — MarketTape removed from product
+- **Path:** `site/src/components/app/hot-home.tsx`, `hot-props.tsx`, `mobile/src/ui/hot-home.tsx`, `mobile/src/lib/use-hot-home.ts` (deleted `market-tape.tsx` twins)
+- **Change:** High odds hits / low odds misses UI removed from Home and Props. Engine `tape.js` kept for alerts/settlement helpers.
+- **Callers:** none in product chrome
+
+### 2026-11-21 — Nav: drop Saved, Contact, More
+- **Path:** `site/src/components/layout/nav.ts`, `Shell.tsx`, `Header.tsx`, `IosTabBar.tsx`, `home-phase-bar.tsx`, `mobile/src/lib/tabs.ts`, `mobile/src/ui/phase-bar.tsx`, `App.tsx`
+- **Change:** Bottom tabs and sidebar are Fixtures / Props / Fancy / Leagues only. Removed Saved and Contact pages/tabs, header Saved link, sidebar More group, and Home More sheet (web + app). Old `/saved` and `/contact` redirect home. Watchlist starring + `lib/saved` remain.
+- **Callers:** Shell, IosTabBar, Home phase bar, mobile TabBar / PhaseBar, GlobalSearch / app search, auth post-sign-in default
+
 ### 2026-11-21 — Ads: clear slot catalogue and product mounts
 - **Path:** `site/src/lib/ad-slots.ts`, `AdSlot` / `StatsAd` call sites, `IosTabBar`, `supabase/migrations/20261121_clear_ad_slots.sql`
 - **Change:** Removed all product `AdSlot` / `StatsAd` mounts and emptied `AD_SLOTS` (wrong inventory map). Prod `ad_placements` / `ad_slots` cleared; admin + `AdSlot` infra kept for a remapped catalogue.

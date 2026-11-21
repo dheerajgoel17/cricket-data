@@ -8,20 +8,16 @@ import { useHotHome } from "@/lib/use-hot-home";
 import { EmptyState } from "@/ui/empty-state";
 import { OverviewRow } from "@/ui/fancy-row";
 import { MatchChips } from "@/ui/match-chip";
-import { MarketTape } from "@/ui/market-tape";
 import { SkeletonGroup, Working } from "@/ui/motion";
-import { TapeSkeleton } from "@/ui/skeletons";
 import { PropRow } from "@/ui/prop-row";
 import { color, space, type, rhythm } from "@/ui/tokens";
 
-/** Home below the match rail: market tape, fixture hashtags, mixed props for the chosen match. */
+/** Home below the match rail: fixture hashtags, mixed props for the chosen match. */
 export function HotHome({ phase }: { phase: HomePhase }) {
   const {
-    tape, fixtures, tags, items, sel, setPick, block,
-    loading, scoring, error, isLoading, soFarOf, outOf, openFancy,
+    fixtures, tags, items, sel, setPick, block,
+    loading, scoring, error, soFarOf, outOf, openFancy,
   } = useHotHome(phase);
-  // The whole block (tape, chips, rows) is one mount: Home mounts it as a transition, so it is built in slices; nothing is staged in after, which moved the rows under the finger.
-  if (tape.length) mark("first-hot-rows", `n=${tape.length}`);
   if (items.length) mark("first-props", `n=${items.length}`);
   if (block) mark("first-prop-block", `n=${block.items.length}`);
   if (items.length && !scoring) mark("scoring-done", `rows=${items.length}`);
@@ -29,7 +25,6 @@ export function HotHome({ phase }: { phase: HomePhase }) {
 
   return (
     <View style={styles.wrap}>
-      {isLoading ? <View style={styles.pad}><TapeSkeleton /></View> : tape.length ? <View style={styles.pad}><MarketTape rows={tape} /></View> : null}
       <View style={styles.pad}><Text style={styles.headTitle}>Props</Text></View>
       {loading && !block ? (
         <Working label="Scoring today's lines…" rows={4} />
@@ -58,7 +53,7 @@ export function HotHome({ phase }: { phase: HomePhase }) {
   );
 }
 
-/** The Props section before the schedule is in: title + rows only (no tape slot — phases without a tape would jump). */
+/** The Props section before the schedule is in: title + rows. */
 export function HotHomeSkeleton() {
   return (
     <SkeletonGroup style={styles.wrap}>

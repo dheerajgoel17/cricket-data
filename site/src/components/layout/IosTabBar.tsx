@@ -5,7 +5,7 @@ import { defineCustomElement as defineLabel } from "@ionic/core/components/ion-l
 import { defineCustomElement as defineTabBar } from "@ionic/core/components/ion-tab-bar.js";
 import { defineCustomElement as defineTabButton } from "@ionic/core/components/ion-tab-button.js";
 import { defineCustomElement as defineIcon } from "ionicons/components/ion-icon.js";
-import { bookmark, bookmarkOutline, calendar, calendarOutline, dice, diceOutline, mail, mailOutline, statsChart, statsChartOutline, trophy, trophyOutline } from "ionicons/icons";
+import { calendar, calendarOutline, dice, diceOutline, statsChart, statsChartOutline, trophy, trophyOutline } from "ionicons/icons";
 import { goProduct, isDesignHost } from "@/lib/design-host";
 import { TAB_NAV } from "./nav";
 
@@ -15,7 +15,7 @@ initialize({ mode: "ios" });
 for (const define of [defineLabel, defineTabBar, defineTabButton, defineIcon]) define();
 
 const ICON: Record<string, [string, string]> = {
-  "/": [calendarOutline, calendar], "/props": [statsChartOutline, statsChart], "/fancy": [diceOutline, dice], "/leagues": [trophyOutline, trophy], "/saved": [bookmarkOutline, bookmark], "/contact": [mailOutline, mail],
+  "/": [calendarOutline, calendar], "/props": [statsChartOutline, statsChart], "/fancy": [diceOutline, dice], "/leagues": [trophyOutline, trophy],
 };
 
 /**

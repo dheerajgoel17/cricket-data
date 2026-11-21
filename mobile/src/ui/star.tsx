@@ -27,7 +27,7 @@ export function StarButton({ idx, kind = "player", size = 40 }: { idx: number; k
   const key = `${kind}:${idx}`;
   const on = has(key);
   return (
-    <Press accessibilityRole="button" accessibilityLabel={on ? "Remove from Saved" : "Save"} accessibilityState={{ selected: on }}
+    <Press accessibilityRole="button" accessibilityLabel={on ? "Remove from watchlist" : "Save"} accessibilityState={{ selected: on }}
       onPress={() => {
         if (!user) { openSignIn(); return; }
         const now = toggle(key);

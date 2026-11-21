@@ -34,7 +34,7 @@ Working list for bringing the app (`mobile/`) and the web (`site/`) onto one des
 | B8 | Props row | `hot-props` | `ui/prop-row` | ok (Props seen) |
 | B9 | Fancy row | `fancy-lines` | `ui/fancy-row` | code |
 | B10 | Live board | `live-board` | `ui/live-board` | code |
-| B11 | Market tape (high odds hits) | `market-tape` | `ui/market-tape` | ok (Home seen) |
+| B11 | Market tape (high odds hits) | removed | removed | n/a |
 | B12 | Skeletons | `skeletons` | `ui/skeletons` | code |
 | B13 | Data table / bleed | `DataTable` | `ui/data-table` | ok (League seen) |
 | B14 | Tournament stats | `tournament-stats` | `ui/tournament-stats` | ok (League seen) |

@@ -48,7 +48,7 @@ export function DesignShell({ children, className }: { children: ReactNode; clas
   return <div className={cn("mx-auto w-full max-w-screen-xl px-gutter", className)}>{children}</div>;
 }
 
-/** Product paths opened on the design host (Saved, tab bar, deep links) go to the live site. */
+/** Product paths opened on the design host (tab bar, deep links) go to the live site. */
 function ProductHandoff() {
   const { pathname, search, hash } = useLocation();
   useEffect(() => {
@@ -93,7 +93,7 @@ function DocsSidebar({
 }
 
 /**
- * Product chrome on the catalogue host: Header (Auth, Saved, GlobalSearch) + Sidebar + IosTabBar.
+ * Product chrome on the catalogue host: Header (Auth, GlobalSearch) + Sidebar + IosTabBar.
  * Entity routes hand off to fancy.cash.
  */
 export function DesignDocsShell({

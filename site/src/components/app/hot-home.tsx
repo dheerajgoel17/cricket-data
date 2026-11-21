@@ -16,7 +16,6 @@ import { MatchChip } from "./fixture-card";
 import { OverviewRow } from "./fancy-lines";
 import { HomeMixDenseTable } from "./home-mix-table";
 import { PropRow, useHotRows } from "./hot-props";
-import { MarketTape } from "./market-tape";
 import { PillGroup } from "./pill-group";
 import { HOME_TOP, mixHomeRows } from "@/lib/hot-lines";
 import { fancyRowPath } from "@/lib/fancy-path";
@@ -30,7 +29,7 @@ type MixItem =
 type FxBlock = { f: any; items: MixItem[] };
 
 /**
- * Home below the rail: market tape, fixture chips, then Top-`HOME_TOP` interleaved props + fancy.
+ * Home below the rail: fixture chips, then Top-`HOME_TOP` interleaved props + fancy.
  * Compact scan list below `lg`; one dense mixed table from `lg` (not separate PropLines / FancyLines).
  * Fixture pages keep full PropLines / FancyLines.
  */
@@ -82,15 +81,9 @@ export function HotHome({ phase }: { phase?: HomePhase } = {}) {
   const sel = blocks.some((b) => b.f.id === pick) ? pick : (blocks[0]?.f.id || "");
   const block = blocks.find((b) => b.f.id === sel) || null;
 
-  const tapeRows = useMemo(() => (today.data || []).filter((r) => (!phase || lineHomePhase(r, live.data) === phase)).map((r) => {
-    const s = soFarOf(r);
-    return { idx: r.idx, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
-  }), [today.data, live.data, identity, phase]);
-
   const loading = !blocks.length && (isLoading || tomorrow.isLoading || today.scoring || tomorrow.scoring || !ready);
   return (
     <section aria-label="Props" className="flex flex-col gap-stack">
-      <div className="empty:hidden"><MarketTape rows={tapeRows} /></div>
       <h2 className="text-title font-emphasis tracking-tight">Props</h2>
       {loading ? <HomePropsSkeleton /> : blocks.length ? (
         <div className="flex flex-col gap-stack">

@@ -245,6 +245,55 @@ export function filterGames(fx: any[], fmt: string, gender: GenderFilter) {
     && (!gender || f.gender === gender || (!f.gender && gender === "male")));
 }
 
+/** Bucket for Resulted / In play / Scheduled tabs on the ground matches list. */
+export type GroundMatchPhase = "resulted" | "live" | "scheduled";
+
+export const GROUND_MATCH_PHASES: [GroundMatchPhase, string][] = [
+  ["resulted", "Resulted"],
+  ["live", "In play"],
+  ["scheduled", "Scheduled"],
+];
+
+/** Same evidence rules as tourStatusAtGround, per fixture. */
+export function groundMatchPhase(
+  g: { start: string; status?: string; source?: string },
+  now = Date.now(),
+): GroundMatchPhase {
+  const st = String(g.status || "").toLowerCase();
+  if (g.source === "history" || st === "completed" || st === "final") return "resulted";
+  if (st === "live" || st === "started") return "live";
+  const started = g.start.length > 10 ? Date.parse(g.start) <= now : false;
+  return started ? "live" : "scheduled";
+}
+
+export function partitionGroundMatches(fx: any[], now = Date.now()) {
+  const resulted: any[] = [], live: any[] = [], scheduled: any[] = [];
+  for (const f of fx) {
+    const p = groundMatchPhase(f, now);
+    if (p === "resulted") resulted.push(f);
+    else if (p === "live") live.push(f);
+    else scheduled.push(f);
+  }
+  return { resulted, live, scheduled };
+}
+
+/** Prefer live, then scheduled, then resulted — so a fixture embed opens on what’s still on. */
+export function defaultGroundMatchPhase(
+  parts: { resulted: any[]; live: any[]; scheduled: any[] },
+  preferUpcoming = false,
+): GroundMatchPhase {
+  if (preferUpcoming) {
+    if (parts.live.length) return "live";
+    if (parts.scheduled.length) return "scheduled";
+    if (parts.resulted.length) return "resulted";
+  } else {
+    if (parts.resulted.length) return "resulted";
+    if (parts.live.length) return "live";
+    if (parts.scheduled.length) return "scheduled";
+  }
+  return "resulted";
+}
+
 export function fixtureHasGround(store: any, venue?: string): boolean {
   return !!(venue && (venueIndices(store, venue).length || venueStem(venue)));
 }

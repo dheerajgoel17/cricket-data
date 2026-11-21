@@ -169,7 +169,7 @@ export function FixturePage() {
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle(fx ? `${fx.a} v ${fx.b}: stats, props and listed lines` : "Match preview, player grid and trends");
   // Soft archive / books fetch: keep header + chrome when fx is already known from the cached schedule (Player → fixture). Full skeleton only on cold first load.
-  if (isLoading && !fx) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
+  if (isLoading && !fx) return <div className="flex flex-col gap-stack"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return (
     <div className="flex flex-col items-stretch gap-snug pt-snug">
       <EmptyState title="Fixture gone" body="That match is no longer in the schedule." />
@@ -197,8 +197,9 @@ export function FixturePage() {
   if (groundDetail) {
     return <FixtureGroundPanel venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender, fmt: fx.fmt }} />;
   }
+  // gap-stack (between), not gap-section: header already has its own edge hairline — one fixture composition.
   return (
-    <div className="flex flex-col gap-section">
+    <div className="flex flex-col gap-stack">
       <h1 className="sr-only">{fx.a} v {fx.b}</h1>
       <MatchHeader f={fx} match={match} live={live} />
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (

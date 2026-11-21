@@ -8,7 +8,11 @@ import { sameFixture } from "@cricket/engine/lines.js";
 import { MATCH_MARKETS, marketReport, selectMatches, topBatters } from "@cricket/engine/markets.js";
 import { FORMATS } from "@cricket/engine/util.js";
 import { matchDateLabel, odds, pc } from "@site/lib/format";
-import { genderFilterLabel, groundGames, groundSummary, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter } from "@site/lib/ground";
+import {
+  defaultGroundMatchPhase, genderFilterLabel, groundGames, GROUND_MATCH_PHASES, groundSummary, MARKET_CHIPS,
+  partitionGroundMatches, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts,
+  type GenderFilter, type GroundMatchPhase,
+} from "@site/lib/ground";
 import { fetchVenueWx, groundClock } from "@site/lib/venue-wx";
 import { groundMatchFilters } from "@/lib/ground-filters";
 import { useStore } from "@/lib/use-store";
@@ -95,7 +99,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
 
         {activeSection === "markets"
           ? <GroundMarkets store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} />
-          : <GroundMatches key={`${activeFmt}|${gender}`} list={list} />}
+          : <GroundMatches key={`${activeFmt}|${gender}`} list={list} preferUpcoming={!!fixtureId} />}
       </ScrollView>
     </PageAtmosphere>
   );
@@ -176,27 +180,60 @@ function GroundConditions({ count, weather, loading, unavailable }: { count: num
   );
 }
 
-function GroundMatches({ list }: { list: any[] }) {
+function GroundMatches({ list, preferUpcoming }: { list: any[]; preferUpcoming?: boolean }) {
   const [shown, setShown] = useState(PAGE);
   const scores = useQuery(liveQuery), lines = useQuery(linesQuery);
   const now = useNow(30_000);
+  const parts = useMemo(() => partitionGroundMatches(list, now), [list, now]);
+  const [phase, setPhase] = useState<GroundMatchPhase>(() => defaultGroundMatchPhase(parts, !!preferUpcoming));
+  useEffect(() => {
+    setPhase(defaultGroundMatchPhase(partitionGroundMatches(list, Date.now()), !!preferUpcoming));
+    setShown(PAGE);
+  }, [list, preferUpcoming]);
+  useEffect(() => {
+    if (!parts[phase].length) {
+      const next = defaultGroundMatchPhase(parts, !!preferUpcoming);
+      if (next !== phase) setPhase(next);
+    }
+  }, [parts, phase, preferUpcoming]);
+  const active = parts[phase];
+  const phaseItems: [GroundMatchPhase, string, number][] = GROUND_MATCH_PHASES.map(([id, label]) => [id, label, parts[id].length]);
   return (
-    <View style={[styles.pad, styles.stack, styles.section]}>
+    <View style={[styles.pad, styles.stack, styles.matchSection]}>
       <View style={styles.titleRow}><Text style={styles.h2} accessibilityRole="header">Matches at this ground</Text><Text style={styles.count}>{list.length}</Text></View>
-      {!list.length ? <EmptyState compact title="No matches" body="Try another format or gender filter." /> : list.slice(0, shown).map((f) => {
-        const historical = f.source === "history";
-        const match = historical ? null : liveMatchFor(scores.data, lines.data, f);
-        // The live lookup can fall back to a different game between the same teams.
-        const live = match?.start && sameFixture({ match: `${f.a} vs ${f.b}`, start_utc: match.start, fmt: match.fmt }, f) ? match : null;
-        const item: RailItem = { fixture: f, state: fixtureState(f, live?.status, now), live, noProps: !historical && !!f.noProps };
-        return <View key={f.id || f._key || `${f.a}-${f.b}-${f.start}`} style={styles.match}>
-          <Text style={styles.note}>{matchDateLabel(f.start)}</Text>
-          <FixtureCard item={item} now={now} link={!historical} />
-        </View>;
-      })}
-      {list.length > shown ? <Press accessibilityRole="button" onPress={() => setShown((n) => n + PAGE)} style={styles.more}>
-        <Text style={styles.moreText}>Show more matches · {list.length - shown} left</Text>
-      </Press> : null}
+      {!list.length ? (
+        <EmptyState compact title="No matches" body="Try another format or gender filter." />
+      ) : (
+        <>
+          <Bleed>
+            <LineTabs<GroundMatchPhase>
+              label="Match status"
+              value={phase}
+              onChange={(id) => { setPhase(id); setShown(PAGE); }}
+              items={phaseItems}
+            />
+          </Bleed>
+          {!active.length ? (
+            <EmptyState
+              compact
+              title={phase === "resulted" ? "No results yet" : phase === "live" ? "Nothing in play" : "Nothing scheduled"}
+              body={phase === "resulted" ? "Completed games at this ground will show here." : phase === "live" ? "Live or started games will show here." : "Upcoming fixtures at this ground will show here."}
+            />
+          ) : active.slice(0, shown).map((f) => {
+            const historical = f.source === "history";
+            const match = historical ? null : liveMatchFor(scores.data, lines.data, f);
+            const live = match?.start && sameFixture({ match: `${f.a} vs ${f.b}`, start_utc: match.start, fmt: match.fmt }, f) ? match : null;
+            const item: RailItem = { fixture: f, state: fixtureState(f, live?.status, now), live, noProps: !historical && !!f.noProps };
+            return <View key={f.id || f._key || `${f.a}-${f.b}-${f.start}`} style={styles.match}>
+              <Text style={styles.note}>{matchDateLabel(f.start)}</Text>
+              <FixtureCard item={item} now={now} link={!historical} />
+            </View>;
+          })}
+          {active.length > shown ? <Press accessibilityRole="button" onPress={() => setShown((n) => n + PAGE)} style={styles.more}>
+            <Text style={styles.moreText}>Show more matches · {active.length - shown} left</Text>
+          </Press> : null}
+        </>
+      )}
     </View>
   );
 }
@@ -326,6 +363,7 @@ const styles = StyleSheet.create({
   filters: { paddingTop: space.stack, paddingBottom: space.group },
   conditions: { gap: space.hair },
   match: { gap: rhythm.within },
+  matchSection: { paddingTop: space.stack },
   section: { paddingTop: rhythm.section },
   marketCard: { ...surface.card, padding: space.inset, gap: space.stack },
   pin: { width: 42, height: 42, borderRadius: radius.control, backgroundColor: color.secondary, alignItems: "center", justifyContent: "center" },
@@ -339,7 +377,7 @@ const styles = StyleSheet.create({
   gridCellR: { borderRightWidth: 0 },
   gridCellB: { borderBottomWidth: StyleSheet.hairlineWidth },
   secList: { borderTopWidth: 0 },
-  secRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, minHeight: 44, paddingHorizontal: space.snug, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
+  secRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: space.snug, paddingHorizontal: space.snug, paddingVertical: space.snug, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   secVal: { flexShrink: 1, textAlign: "right", ...num, fontSize: fs.metric, color: color.foreground },
   kpiK: { ...cap, color: color["muted-foreground"] },
   kpiV: { ...num, fontSize: fs.figure, color: color.foreground },

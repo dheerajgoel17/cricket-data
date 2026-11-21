@@ -6,7 +6,7 @@ import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGrou
 import { AndroidAppBanner } from "@/components/app/android-app-banner";
 import { Header } from "./Header";
 import { IosTabBar } from "./IosTabBar";
-import { MAIN_NAV, MORE_NAV } from "./nav";
+import { MAIN_NAV } from "./nav";
 import { useMetaSync } from "@/lib/title";
 import { HeaderSlotProvider, usePageWashColor, useScrolled } from "@/lib/header-slot";
 
@@ -27,20 +27,6 @@ function AppSidebar() {
                 <SidebarMenuItem key={to}>
                   <SidebarMenuButton asChild isActive={match(pathname)} tooltip={label} className={navBtn}>
                     <NavLink to={to}><Icon /><span>{label}</span></NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel className="label-cap text-footnote text-muted-foreground">More</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {MORE_NAV.map(([label, to]) => (
-                <SidebarMenuItem key={to}>
-                  <SidebarMenuButton asChild isActive={pathname === to || (to !== "/" && pathname.startsWith(to))} tooltip={label} className={navBtn}>
-                    <NavLink to={to}><span>{label}</span></NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

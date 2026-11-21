@@ -287,7 +287,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
         </StickyFilterBand>
       ) : (
         <div className="flex flex-col gap-snug">
-          <div className="flex min-w-0 items-center gap-snug border-b border-hairline">
+          {/* Edge-to-edge hairline like HomePhaseBar / StickyFilterBand (page gutter would inset the rule). */}
+          <div className="-mx-gutter flex min-w-0 items-center gap-snug border-b border-hairline px-gutter">
             {scopes.length > 1 ? (
               <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
                 className="min-w-0 flex-1"

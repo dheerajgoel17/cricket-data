@@ -61,8 +61,6 @@ export const ROUTES = {
   glossary: { title: "Cricket stats terms explained", description: "Hit rate, fair price, edge, fancy lines, void rules and the other terms used on the site, in plain words." },
   about: { title: "Rules, data and how it works", description: "Where the numbers come from, how void and settlement rules work, and what the site does not do." },
   pair: { title: "Batting partnerships", description: "Who is dismissed first, how big the stands are and how a pair does by format, opposition and venue." },
-  saved: { title: "Saved", description: DEFAULT_DESC, noindex: true },
-  contact: { title: "Contact Fancy.cash", description: "Email Fancy.cash for business, tech issues, privacy or general questions: tech@fancy.cash." },
 };
 
 /** Nested paths that must stay out of search (not first-segment ROUTES). */

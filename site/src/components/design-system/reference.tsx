@@ -52,7 +52,7 @@ function ButtonSpec() {
 }
 
 const patterns = [
-  ["Authentication", "Sign-in sheet → email form → callback → session → Saved", "Keep the current screen behind sign-in and restore focus after dismissing.", "site/src/components/app/sign-in-sheet.tsx · mobile/src/ui/sign-in-sheet.tsx"],
+  ["Authentication", "Sign-in sheet → email form → callback → session → watchlist sync", "Keep the current screen behind sign-in and restore focus after dismissing.", "site/src/components/app/sign-in-sheet.tsx · mobile/src/ui/sign-in-sheet.tsx"],
   ["Search", "Search trigger → query → grouped results → entity route", "Give the field an accessible name and preserve a clear no-results state.", "site/src/components/layout/GlobalSearch.tsx · mobile/src/app/search.tsx"],
   ["Filtering and sorting", "Filters → draft selection → Apply → filtered rows", "Keep the current selection visible. Offer a reset when filters exclude all results.", "site/src/components/app/screener-filters.tsx · mobile/src/ui/screener-filters.tsx"],
   ["Loading, refresh and errors", "Cold fetch → shaped skeleton → content, empty state, or error", "Keep cached content visible during refresh. Reserve retry for failures and distinguish failures from valid empty results.", "site/src/components/app/hot-home.tsx · mobile/src/ui/motion.tsx"],
