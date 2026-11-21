@@ -2726,6 +2726,7 @@
       "site/src/components/app/badges.tsx",
       "site/src/components/app/star.tsx",
       "site/src/components/app/page.tsx",
+      "site/src/components/app/player-name.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/result.tsx",
       "site/src/pages/Home.tsx",
