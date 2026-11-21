@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fixtureBooks } from "@cricket/engine/lines.js";
 import { fancyInputs } from "@cricket/engine/fancy-edge.js";
-import { useData } from "@/lib/data";
+import { loadJson, useData } from "@/lib/data";
 import { fixtureStart } from "@/lib/format";
 import { fixtureState, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveDoc } from "@/hooks/useLive";
@@ -22,9 +22,15 @@ const yieldToMain = () => new Promise<void>((r) => { const sc = (globalThis as a
  * Cards follow the home rail: matches in play first, then standing. Live so-far is overlaid from the 15 s poll (`fancyStanding`), not baked into the 10-minute scored rows.
  */
 export function useFancyCards(phase?: HomePhase) {
-  const { store, matchesReady } = useData();
+  const { store, matchesReady, loadHistory } = useData();
   const { fixtures: all, ready, doc } = usePricedFixtures();
   const live = useLiveDoc();
+  const seed = useQuery({
+    queryKey: ["home-fancy-seed"],
+    enabled: phase != null,
+    staleTime: 10 * 60_000,
+    queryFn: async () => await loadJson("/data/home-fancy.json") as { v: number; build: string; lines_generated_at_utc: string; cards: Record<string, { ms: number[]; rows: any[] }> } | null,
+  });
   // a finished match has nothing left to bet on: fancy lists the matches in play and to come (a finished match keeps its own page and its archive)
   const fixtures = useMemo(() => all.filter((f: any) => {
     const state = fixtureState(f, liveForFixture(live.data, f)?.status);
@@ -32,12 +38,15 @@ export function useFancyCards(phase?: HomePhase) {
   }), [all, live.data, phase]);
   const ids = fixtures.map((f: any) => f.id || `${f.a}${f.b}${f.start}`).join("|");
   const q = useQuery({
-    queryKey: ["fancy-cards", doc?.generated_at_utc ?? "", ids],
-    enabled: ready && !!doc && matchesReady !== false,
+    queryKey: ["fancy-cards", doc?.generated_at_utc ?? "", ids, phase != null ? seed.data?.build ?? "home" : "detail"],
+    enabled: ready && !!doc && (phase != null ? seed.isFetched : matchesReady !== false),
     staleTime: 10 * 60_000,
     queryFn: async () => {
       const out: any[] = [];
+      const seeded = seed.data?.v === 1 && seed.data.build === store.meta.built_at && seed.data.lines_generated_at_utc === doc.generated_at_utc ? seed.data.cards : null;
       for (const f of fixtures.filter((x: any) => !x.noProps && fixtureBooks(doc, x).fancy)) {
+        if (seeded?.[f.id]) { out.push({ f, ...seeded[f.id] }); continue; }
+        await loadHistory();
         const fx = { a: f.a, b: f.b, fmt: f.fmt, startMs: fixtureStart(f).getTime() };
         const { ms, ground, teams } = fancyInputs(store, f); // the sides' last matches and the ground's: the same ones the alerts are scored on (engine/fancy-edge.js)
         out.push({ f, ms, rows: collectOverview({ store, doc, fxInfo: fx, ms, teams: teams as [string, number][], ground }) });

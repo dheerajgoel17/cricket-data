@@ -63,7 +63,7 @@ createRoot(document.getElementById("root")!).render(
           <TooltipProvider>
             <BrowserRouter>
               <AuthProvider>
-                <DataProvider>
+                <DataProvider eagerHistory>
                   <Suspense fallback={designFallback}>
                     <Routes>
                       <Route path="/auth/callback" element={<DesignAuthHandoff />} />

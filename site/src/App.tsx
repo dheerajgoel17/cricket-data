@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, Navigate, Outlet, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import { Shell } from "@/components/layout/Shell";
 import { syncAds } from "@/lib/ads";
@@ -58,7 +58,14 @@ function Analytics() {
 
 /** Every page except home reads matches.json. Home paints the rail from the fixture file while that download finishes. */
 function HistoryGate() {
-  const { matchesReady } = useData();
+  const { matchesReady, loadHistory } = useData();
+  const [error, setError] = useState(false);
+  useEffect(() => {
+    let current = true;
+    if (matchesReady === false) void loadHistory().catch(() => { if (current) setError(true); });
+    return () => { current = false; };
+  }, [matchesReady, loadHistory]);
+  if (error && !matchesReady) return <EmptyState title="Could not load match history" body="Reload to try again." />;
   if (matchesReady === false) return <PageSkeleton />;
   return <Outlet />;
 }
