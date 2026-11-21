@@ -33,5 +33,10 @@
   "edge": 0.0623,
   "start_utc": "2026-11-22T08:10:00Z",
   "alerted_at": "2026-11-21T08:35:37.890233+00:00"
+ },
+ "male|Abu Dhabi Knight Riders|Dubai Capitals|2026-11-22|batter_fours||Sediqullah Atal under 1.5|1.5|under": {
+  "edge": 0.0971,
+  "start_utc": "2026-11-22T14:30:00Z",
+  "alerted_at": "2026-11-21T16:35:01.398428+00:00"
  }
 }

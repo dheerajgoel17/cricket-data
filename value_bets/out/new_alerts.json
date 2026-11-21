@@ -1,4 +1,69 @@
 {
- "generated_at_ist": "2026-11-21 21:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-21 22:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|Abu Dhabi Knight Riders|Dubai Capitals|2026-11-22",
+   "match": "Dubai Capitals vs Abu Dhabi Knight Riders",
+   "start_utc": "2026-11-22T14:30:00Z",
+   "start_ist": "2026-11-22 20:00 IST",
+   "format": "T20",
+   "gender": "male",
+   "market_type": "batter_fours",
+   "market": "M13710 batter_fours",
+   "team_scope": "",
+   "selection": "Sediqullah Atal under 1.5",
+   "player_matched_as": "Sediqullah Atal",
+   "player_id": "3c28853f",
+   "player_team": "Dubai Capitals",
+   "stat": "fours",
+   "inn": 0,
+   "line": 1.5,
+   "side": "under",
+   "best_odds": 1.98,
+   "best_source": "feedj_d",
+   "effective_odds_after_commission": 1.98,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.1003,
+   "implied_prob": 0.5051,
+   "fair_odds": 1.805,
+   "fair_prob": 0.5541,
+   "model_prob": 0.6202,
+   "market_prob": 0.5,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0971,
+   "edge_pct": 9.71,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 62% vs market 50% for under 1.5 fours; form 1.2 fours/inn recency-weighted T20 (n_eff 28.5; last 5: 2, 2, 0, 0, 2), bats in 98% of games played; at Dubai International Cricket Stadium, Dubai: 8 inns avg 1.0; vs Abu Dhabi Knight Riders: 1 inns avg 0.0; context adj: at this venue -3%, team H2H context +10%",
+   "notes": "2 market source(s) for fair price; model 0.620 vs market 0.500; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 28.5,
+    "expected": 1.59,
+    "nb_alpha": 0.958,
+    "p_bats_or_bowls": 0.98,
+    "venue_matched": "dubai international cricket stadium",
+    "context_terms": [
+     "p_bat",
+     "env_fours",
+     "ven_fours",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 66,
+    "cloud_pct": 37,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "feda8e710e63413a",
+   "alert_key": "male|Abu Dhabi Knight Riders|Dubai Capitals|2026-11-22|batter_fours||Sediqullah Atal under 1.5|1.5|under",
+   "alerted_at_ist": "2026-11-21 22:05 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
