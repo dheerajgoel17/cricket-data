@@ -1,34 +1,4 @@
 {
- "male|Australia|England|2026-11-21|batter_sixes||Tom Banton under 0.5|0.5|under": {
-  "edge": 0.107,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-20T01:34:58.639644+00:00"
- },
- "male|Australia|England|2026-11-21|batter_fours||Tim David under 1.5|1.5|under": {
-  "edge": 0.0789,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-20T01:34:58.639644+00:00"
- },
- "male|Australia|England|2026-11-21|batter_fours||Philip Salt under 2.5|2.5|under": {
-  "edge": 0.1156,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-20T23:35:47.816988+00:00"
- },
- "male|Australia|England|2026-11-21|batter_fours||Mitchell Marsh under 2.5|2.5|under": {
-  "edge": 0.1353,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-20T23:35:47.816988+00:00"
- },
- "male|Australia|England|2026-11-21|batter_sixes||AHT Donald under 0.5|0.5|under": {
-  "edge": 0.1972,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-20T12:32:37.516453+00:00"
- },
- "male|Australia|England|2026-11-21|batter_fours||Harry Brook under 2.5|2.5|under": {
-  "edge": 0.1164,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-20T23:35:47.816988+00:00"
- },
  "male|Bangladesh|South Africa|2026-11-23|bowler_milestone||Hasan Mahmud 5+ yes|4.5|over": {
   "edge": 0.2476,
   "start_utc": "2026-11-23T08:00:00Z",
@@ -43,16 +13,6 @@
   "edge": 0.0766,
   "start_utc": "2026-11-23T08:00:00Z",
   "alerted_at": "2026-11-20T12:32:37.516453+00:00"
- },
- "male|Australia|England|2026-11-21|batter_sixes||J Fraser-McGurk under 0.5|0.5|under": {
-  "edge": 0.2552,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-20T16:33:13.856582+00:00"
- },
- "male|Australia|England|2026-11-21|batter_sixes||Philip Salt under 0.5|0.5|under": {
-  "edge": 0.0841,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-20T22:35:47.451801+00:00"
  },
  "female|Adelaide Strikers Women|Brisbane Heat Women|2026-11-22|batter_fours||Grace Harris under 2.5|2.5|under": {
   "edge": 0.0679,
@@ -69,9 +29,9 @@
   "start_utc": "2026-11-22T04:40:00Z",
   "alerted_at": "2026-11-21T00:36:33.522642+00:00"
  },
- "male|Australia|England|2026-11-21|batter_runs||J Fraser-McGurk under 20.5|20.5|under": {
-  "edge": 0.055,
-  "start_utc": "2026-11-21T08:15:00Z",
-  "alerted_at": "2026-11-21T03:35:42.523157+00:00"
+ "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-22|batter_fours||Hayley Matthews over 2.5|2.5|over": {
+  "edge": 0.0623,
+  "start_utc": "2026-11-22T08:10:00Z",
+  "alerted_at": "2026-11-21T08:35:37.890233+00:00"
  }
 }
