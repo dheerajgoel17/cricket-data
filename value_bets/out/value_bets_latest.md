@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-21 10:00 IST
+# Cricket value bets - 2026-11-21 11:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1907 prices
-- **smarkets**: ok, 543 prices
+- **moviodds_bet365**: ok, 1925 prices
+- **smarkets**: ok, 548 prices
 - **feedk**: ok, 207 prices, 6 events
-- **feedl**: ok, 636 prices, 31 events
+- **feedl**: ok, 652 prices, 30 events
 - **feedg**: ok, 32 prices, 4 events
-- **feedj**: ok, 766 prices, 9 events
-- **feedh**: ok, 1710 prices, 91 events
-- **feede**: ok, 928 prices, 40 events
-- **feedf**: ok, 806 prices, 27 events, stopped time budget
-- **feedi**: ok, 1976 prices, 56 events
+- **feedj**: ok, 645 prices, 7 events
+- **feede**: ok, 948 prices, 37 events
+- **feedh**: ok, 1649 prices, 87 events
+- **feedf**: ok, 848 prices, 28 events, stopped time budget
+- **feedi**: ok, 1908 prices, 56 events
 
-Matches starting in next 168h: **50**, markets priced: **566**, value bets: **10** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **51**, markets priced: **553**, value bets: **10** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -46,8 +46,8 @@ Matches starting in next 168h: **50**, markets priced: **566**, value bets: **10
 - 11-22 10:10 IST Brisbane Heat vs Adelaide Strikers / M13711 batter_sixes / Orla Prendergast over 0.5 @ 5.60 (feedj_d): edge 32.4%, model 0.2941, market 0.1892
 - 11-22 10:10 IST Brisbane Heat (W) vs Adelaide Strikers (W) / Batsman Total Match Sixes / ME Bouchier over 0.5 @ 5.50 (moviodds_bet365): edge 38.1%, model 0.2838, market 0.2242
 - 11-22 10:10 IST Brisbane Heat (Women) vs Adelaide Strikers (Women) / G9181 batter_sixes / Maia Bouchier over 0.5 @ 5.50 (feedi_d): edge 38.0%, model 0.2838, market 0.2242
-- 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 34.0%, model 0.3088, market 0.2227
+- 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 34.9%, model 0.3138, market 0.2227
 
-Unmatched team names (add to mappings/teams.csv): Dolphins (W) (female), Dolphins (Women) (female), Dolphins (female), Elite Cricket Academy (male), Garden Route Badgers (W) (female), Garden Route Badgers (female), Lions (W) (female), Lions (Women) (female), Lions (female), Omr Checker (male), South Western Districts (Women) (female), South Western Districts (male), Venice Livewire (male), Western Province (W) (female), Western Province (Women) (female), Western Province (female)
+Unmatched team names (add to mappings/teams.csv): Dolphins (W) (female), Dolphins (Women) (female), Dolphins (female), Elite Cricket Academy (male), Garden Route Badgers (W) (female), Garden Route Badgers (female), Lions (W) (female), Lions (Women) (female), Lions (female), Muscat Shaheens (W) (female), Omr Checker (male), Sohar Smashers (W) (female), South Western Districts (Women) (female), South Western Districts (male), Venice Livewire (male), Western Province (W) (female), Western Province (Women) (female), Western Province (female)
 
-Runtime 343.8s. Snapshot: `odds_20261121T043040Z.jsonl.gz`
+Runtime 324.1s. Snapshot: `odds_20261121T053041Z.jsonl.gz`
