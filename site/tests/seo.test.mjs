@@ -21,7 +21,6 @@ test("titles carry the brand once, and a page that names itself gets a descripti
   assert.equal(pageMeta("/privacy").noindex, true);
   assert.equal(pageMeta("/design-system").noindex, true);
   assert.equal(pageMeta("/design-system", "x").description, UNLISTED["design-system"].description);
-  assert.equal(pageMeta("/saved", "Saved").noindex, true);
 });
 
 test("share tags cover Facebook, X, LinkedIn, WhatsApp, Discord and Slack: image size, alt, large-card, theme colour", () => {
@@ -57,7 +56,7 @@ test("every page gets its own title, description, canonical link and structured 
   assert.match(render(TPL, by["team/1"]), /India Women: stats and player grid/); // the women's side keeps its name
   assert.ok(by["league/0"] && !by["player/9"]); // a player the data does not know gets no page
   assert.match(render(TPL, by["venue/0"]), /<title>Sharjah Cricket Stadium, Sharjah: ground stats/);
-  assert.match(render(TPL, by.saved), /noindex, follow/);
+  assert.ok(!by.saved && !by.contact);
   assert.ok(!by.privacy && !by["privacy-policy"] && !by.docs && !by["terms-of-use"]);
   assert.doesNotMatch(render(TPL, by[""]), /href="\/privacy|href="\/docs|href="\/terms/);
 });

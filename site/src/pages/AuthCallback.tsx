@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getSupabase } from "@/lib/supabase";
 import { EmptyState } from "@/components/app/empty-state";
 
-/** Finishes the OAuth / email-confirm redirect, then returns to the path stored before sign-in (or Saved). */
+/** Finishes the OAuth / email-confirm redirect, then returns to the path stored before sign-in (or home). */
 export function AuthCallbackPage() {
   const nav = useNavigate();
   const { search } = useLocation();
@@ -36,8 +36,8 @@ export function AuthCallbackPage() {
       const fromQuery = params.get("next");
       const stored = sessionStorage.getItem("cph-auth-next");
       sessionStorage.removeItem("cph-auth-next");
-      const next = (fromQuery && fromQuery.startsWith("/") ? fromQuery : null) || stored || "/saved";
-      nav(next.startsWith("/") ? next : "/saved", { replace: true });
+      const next = (fromQuery && fromQuery.startsWith("/") ? fromQuery : null) || stored || "/";
+      nav(next.startsWith("/") ? next : "/", { replace: true });
     })();
     return () => { alive = false; };
   }, [nav, search]);

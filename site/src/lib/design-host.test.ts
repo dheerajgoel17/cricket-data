@@ -17,7 +17,6 @@ describe("design-host", () => {
     expect(isDesignCataloguePath("/")).toBe(true);
     expect(isDesignCataloguePath("/docs/buttons")).toBe(true);
     expect(isDesignCataloguePath("/search")).toBe(true);
-    expect(isDesignCataloguePath("/saved")).toBe(false);
     expect(isDesignCataloguePath("/auth/callback")).toBe(false);
     expect(isDesignCataloguePath("/props")).toBe(false);
   });
@@ -25,8 +24,8 @@ describe("design-host", () => {
   it("goProduct assigns to PRODUCT_ORIGIN", () => {
     const assign = vi.fn();
     vi.stubGlobal("location", { ...location, assign });
-    goProduct("/saved");
-    expect(assign).toHaveBeenCalledWith(`${PRODUCT_ORIGIN}/saved`);
+    goProduct("/fancy");
+    expect(assign).toHaveBeenCalledWith(`${PRODUCT_ORIGIN}/fancy`);
     goProduct("props");
     expect(assign).toHaveBeenCalledWith(`${PRODUCT_ORIGIN}/props`);
   });

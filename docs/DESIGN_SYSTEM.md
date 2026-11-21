@@ -190,7 +190,7 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Page header | `PageHeader` | Native chrome (unfilled; sits on `PageAtmosphere`) |
 | Page atmosphere | `ui/page-atmosphere` | Elevated canvas on stack pages + `EntityHeroWash` in scroll hero (web `HeroWash` twin) |
 | Accordion | `ui/accordion` | Twin of filters/splits |
-| Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`) | **Native-exclusive**: the one sheet shell (filters, More); never a hand-built `Modal` |
+| Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`) | **Native-exclusive**: the one sheet shell (filters); never a hand-built `Modal` |
 | Button | `ui/button` (`Button`: primary / secondary, md at the platform touch height, sm at the control height) | Web twin: `components/ui/button.tsx`; never style a `Press` into a button |
 | Search box | `ui/search-field` (`SearchField`) | One box for Search and Competitions |
 | Filters button | `ui/chips` (`FilterButton`: icon, label, active-count badge) | Web twin: `FilterButton` in `components/app/chip.tsx`; one per page, beside the chip row |
@@ -224,7 +224,7 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 | Page atmosphere | `HeroWash` | `PageAtmosphere` + `EntityHeroWash` — twin |
 | Forms | `LiveForm` / Field | Accordion + ChoiceChip / sheets |
 | Metric / StatTile | `Metric` / `StatTile` | `Metric` in `data-table` |
-| Contact | mailto Card | Contact tab |
+| Contact | removed (`/contact` → `/`; mailto `tech@fancy.cash` on legal) | removed |
 | Legal / Tools / Odds / Glossary | web-only | **Web-only on purpose** (no twins yet) |
 | Ask LLM UI | removed (`/ask` → `/`) | — |
 | ResultView | `/pair`, team markets | — (web-only) |
@@ -251,16 +251,14 @@ Full `App.tsx` route checklist:
 | `/venue/:id` | Aligned | Ground |
 | `/competitions` | Aligned | Markets list; EmptyState; GOVERNED |
 | `/pair` | Aligned | ResultView host (not Ask); EmptyState idle; GOVERNED |
-| `/saved` | Aligned | EmptyState |
-| `/contact` | Aligned | Mailto Card; GOVERNED |
 | `/tools`, `/odds`, `/glossary`, `/about`, `/players` | Secondary | Simple hub; tokens + EmptyState + PillGroup |
 | `/trends` | Secondary | Tools-adjacent GridFilterBar |
 | `/privacy-policy`, `/terms-of-use`, `/docs` | Secondary | Legal; GOVERNED |
 | `/admin/ads` | Secondary | Admin; GOVERNED |
 | `/auth/callback` | Infra | Auth only |
-| `/design-system` | Catalogue | Living DS page; noindex; More nav |
+| `/design-system` | Catalogue | Living DS page; noindex |
 | `*` | Aligned | EmptyState 404 |
-| `/ask` | Redirect | → `/` — do not catalogue as Ask |
+| `/ask`, `/saved`, `/contact` | Redirect | → `/` — removed from chrome |
 
 | Surface | Phone | `md` | `lg+` | Stats tables |
 | --- | --- | --- | --- | --- |
@@ -304,7 +302,7 @@ Full `App.tsx` route checklist:
 
 ## Living catalogue (web)
 
-**`/design-system`** (`site/src/pages/DesignSystem.tsx`) is the in-product reference: colour / type / space / motion swatches and live variants of buttons, chips, PillGroup / PillTabs, EmptyState, Note, StatTile, DataTable bleed, TeamBadge sizes, BookTable, LadderRow, forms, and icons. Linked from More → Design system. `noindex` (UNLISTED); no ads; loads without waiting on `matches.json`.
+**`/design-system`** (`site/src/pages/DesignSystem.tsx`) is the in-product reference: colour / type / space / motion swatches and live variants of buttons, chips, PillGroup / PillTabs, EmptyState, Note, StatTile, DataTable bleed, TeamBadge sizes, BookTable, LadderRow, forms, and icons. Opened at `/design-system` (catalogue host). `noindex` (UNLISTED); no ads; loads without waiting on `matches.json`.
 
 When you add a product component job, show a Spec on that page and update the catalogue tables above.
 

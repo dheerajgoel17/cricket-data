@@ -98,11 +98,13 @@ function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) 
       </div>
     </HeaderActions>
   );
+  // `self-start`: parent is flex-col (stretch); without it the desktop Back hit target spans the full content width.
   const backBtn = (
-    <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 hidden items-center rounded-lg px-1 py-tight text-body text-primary lg:flex transition-opacity active:opacity-40"><ChevronLeftIcon className="size-5" />Back</button>
+    <button type="button" aria-label="Back" onClick={() => (history.length > 1 ? nav(-1) : nav("/"))} className="-ml-2 hidden w-fit items-center self-start rounded-lg px-1 py-tight text-body text-primary transition-opacity active:opacity-40 lg:inline-flex"><ChevronLeftIcon className="size-5" />Back</button>
   );
+  // data-flush zeros Shell pt (phone scoreboard under the bar). Desktop Back needs lg:pt-stack (Player / Fancy crumbs pattern).
   return (
-    <section data-flush aria-label="Match overview" className="flex flex-col gap-snug">
+    <section data-flush aria-label="Match overview" className="flex flex-col gap-snug lg:pt-stack">
       {backBtn}
       {actions}
       <div className="-mx-gutter flex min-w-0 flex-col overflow-hidden border-b border-hairline bg-card">
@@ -169,7 +171,7 @@ export function FixturePage() {
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle(fx ? `${fx.a} v ${fx.b}: stats, props and listed lines` : "Match preview, player grid and trends");
   // Soft archive / books fetch: keep header + chrome when fx is already known from the cached schedule (Player → fixture). Full skeleton only on cold first load.
-  if (isLoading && !fx) return <div className="flex flex-col gap-section"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
+  if (isLoading && !fx) return <div className="flex flex-col gap-stack"><MatchHeaderSkeleton /><RowsSkeleton /></div>;
   if (!fx) return (
     <div className="flex flex-col items-stretch gap-snug pt-snug">
       <EmptyState title="Fixture gone" body="That match is no longer in the schedule." />
@@ -197,8 +199,9 @@ export function FixturePage() {
   if (groundDetail) {
     return <FixtureGroundPanel venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender, fmt: fx.fmt }} />;
   }
+  // gap-stack (between), not gap-section: header already has its own edge hairline — one fixture composition.
   return (
-    <div className="flex flex-col gap-section">
+    <div className="flex flex-col gap-stack">
       <h1 className="sr-only">{fx.a} v {fx.b}</h1>
       <MatchHeader f={fx} match={match} live={live} />
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (

@@ -398,8 +398,18 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
 
 const styles = StyleSheet.create({
   root: { gap: rhythm.between },
-  filterRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  chipFlex: { flex: 1, minWidth: 0, marginHorizontal: -space.gutter },
+  /** Edge-to-edge hairline under scope + L10 (site MatchFancy list twin). */
+  filterRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.snug,
+    marginHorizontal: -space.gutter,
+    paddingHorizontal: space.gutter,
+    paddingBottom: space.snug,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: color.hairline,
+  },
+  chipFlex: { flex: 1, minWidth: 0 },
   activeRow: { gap: space.snug, paddingVertical: space.tight },
   clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
   sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },

@@ -1,7 +1,7 @@
 /** Standalone catalogue hostname (design.fancy.cash). Product app stays on its own host. */
 export const DESIGN_SYSTEM_HOST = import.meta.env.VITE_DESIGN_SYSTEM_HOST || "design.fancy.cash";
 
-/** Product site origin for Saved / search results / tab destinations from the catalogue host. */
+/** Product site origin for search results / tab destinations from the catalogue host. */
 export const PRODUCT_ORIGIN = String(import.meta.env.VITE_SITE_URL || "https://fancy.cash").replace(/\/+$/, "");
 
 export function isDesignHost(hostname = typeof location !== "undefined" ? location.hostname : ""): boolean {

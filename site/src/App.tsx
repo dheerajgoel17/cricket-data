@@ -30,12 +30,11 @@ const LeaguesPage = page(() => import("@/pages/Leagues"), "LeaguesPage");
 const CompetitionsPage = page(() => import("@/pages/Markets"), "CompetitionsPage"), LeaguePage = page(() => import("@/pages/Markets"), "LeaguePage");
 const PropsPage = page(() => import("@/pages/Lists"), "PropsPage"), FancyPage = page(() => import("@/pages/Lists"), "FancyPage"), PairPage = page(() => import("@/pages/Tools"), "PairPage");
 const ToolsPage = page(() => import("@/pages/Simple"), "ToolsPage"), OddsPage = page(() => import("@/pages/Simple"), "OddsPage"), GlossaryPage = page(() => import("@/pages/Simple"), "GlossaryPage");
-const AboutPage = page(() => import("@/pages/Simple"), "AboutPage"), SavedPage = page(() => import("@/pages/Saved"), "SavedPage"), PlayersPage = page(() => import("@/pages/Simple"), "PlayersPage"), TeamsPage = page(() => import("@/pages/Simple"), "TeamsPage");
+const AboutPage = page(() => import("@/pages/Simple"), "AboutPage"), PlayersPage = page(() => import("@/pages/Simple"), "PlayersPage"), TeamsPage = page(() => import("@/pages/Simple"), "TeamsPage");
 const AuthCallbackPage = page(() => import("@/pages/AuthCallback"), "AuthCallbackPage");
 const PrivacyPage = page(() => import("@/pages/Legal"), "PrivacyPage"), TermsPage = page(() => import("@/pages/Legal"), "TermsPage"), DisclaimerPage = page(() => import("@/pages/Legal"), "DisclaimerPage");
 const TeamPage = lazy(() => import("@/pages/Markets").then((m) => ({ default: () => <m.MarketPage kind="team" /> })));
 const VenuePage = lazy(() => import("@/components/app/fixture-ground").then((m) => ({ default: m.VenueGroundPage })));
-const ContactPage = page(() => import("@/pages/Contact"), "ContactPage");
 const AdminAdsPage = page(() => import("@/pages/AdminAds"), "AdminAdsPage");
 const AdminCardPage = page(() => import("@/pages/AdminCard"), "AdminCardPage");
 
@@ -84,7 +83,7 @@ export function App() {
             <Route path="tools" element={<ToolsPage />} /><Route path="features" element={<Navigate to="/tools" replace />} />
             <Route path="odds" element={<OddsPage />} />
             <Route path="glossary" element={<GlossaryPage />} />
-            <Route path="saved" element={<SavedPage />} />
+            <Route path="saved" element={<Navigate to="/" replace />} />
             <Route path="admin/ads" element={<AdminAdsPage />} />
             <Route path="admin/card" element={<AdminCardPage />} />
             <Route path="auth/callback" element={<AuthCallbackPage />} />
@@ -98,7 +97,7 @@ export function App() {
             <Route path="props" element={<PropsPage />} /><Route path="fancy" element={<FancyPage />} />
             <Route path="ask" element={<Navigate to="/" replace />} />
             <Route path="about" element={<AboutPage />} />
-            <Route path="contact" element={<ContactPage />} />
+            <Route path="contact" element={<Navigate to="/" replace />} />
             <Route path="privacy-policy" element={<PrivacyPage />} />
             <Route path="privacy" element={<Navigate to="/privacy-policy" replace />} />
             <Route path="terms-of-use" element={<TermsPage />} />

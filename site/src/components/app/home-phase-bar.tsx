@@ -1,8 +1,4 @@
-import { NavLink } from "react-router-dom";
-import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
-import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MORE_NAV } from "@/components/layout/nav";
 import { track } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 import { HOME_PHASES, type HomePhase } from "@/lib/home-phase";
@@ -27,44 +23,18 @@ export function HomePhaseBar({ value, counts, onChange }: { value: HomePhase; co
   };
   return (
     <nav data-flush aria-label="Match state" className="-mx-gutter border-b border-hairline px-gutter">
-      <div className="flex min-w-0 items-stretch gap-snug">
-        <Tabs value={value} onValueChange={pick} className="min-w-0 flex-1 gap-0">
-          <TabsList variant="line" aria-label="Fixture phase" className="h-auto w-full justify-start gap-stack rounded-none bg-transparent p-0 group-data-[orientation=horizontal]/tabs:h-auto">
-            {HOME_PHASES.map(([id, label]) => (
-              <TabsTrigger key={id} value={id} className={phaseTab}>
-                <span className="flex items-center gap-hair">
-                  {label}
-                  <span className="text-caption font-label tabular-nums opacity-70">{counts[id]}</span>
-                </span>
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-        <Sheet>
-          <SheetTrigger asChild>
-            <button type="button" aria-label="More" className="my-auto grid size-control shrink-0 place-items-center rounded-[var(--chip-radius)] text-muted-foreground hover:bg-surface-hover hover:text-foreground">
-              <EllipsisHorizontalIcon className="size-5" />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="bottom" showCloseButton={false} className="rounded-t-3xl border-0 bg-popover/80 px-inset pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-snug backdrop-blur-2xl backdrop-saturate-150 sm:mx-auto sm:max-w-md">
-            <div aria-hidden className="mx-auto h-1.5 w-10 rounded-full bg-foreground/25" />
-            <SheetHeader className="flex-row items-center justify-between p-0 pt-stack">
-              <SheetTitle className="text-title font-emphasis tracking-tight">More</SheetTitle>
-              <SheetClose className="text-body font-label text-primary active:opacity-50">Done</SheetClose>
-            </SheetHeader>
-            <SheetDescription className="sr-only">Players, tools and the rest of the site</SheetDescription>
-            <ul className="grid gap-hair pt-group">
-              {MORE_NAV.map(([label, to]) => (
-                <li key={to}>
-                  <SheetClose asChild>
-                    <NavLink to={to} className="flex min-h-control items-center rounded-xl px-3 text-body hover:bg-surface-hover">{label}</NavLink>
-                  </SheetClose>
-                </li>
-              ))}
-            </ul>
-          </SheetContent>
-        </Sheet>
-      </div>
+      <Tabs value={value} onValueChange={pick} className="min-w-0 gap-0">
+        <TabsList variant="line" aria-label="Fixture phase" className="h-auto w-full justify-start gap-stack rounded-none bg-transparent p-0 group-data-[orientation=horizontal]/tabs:h-auto">
+          {HOME_PHASES.map(([id, label]) => (
+            <TabsTrigger key={id} value={id} className={phaseTab}>
+              <span className="flex items-center gap-hair">
+                {label}
+                <span className="text-caption font-label tabular-nums opacity-70">{counts[id]}</span>
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
     </nav>
   );
 }

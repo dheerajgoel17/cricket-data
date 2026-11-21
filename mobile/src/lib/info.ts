@@ -59,12 +59,4 @@ export const INFO: Record<string, Info> = {
       ["Windows", "L5, L10 and so on look back over that many games; All is every game on the chart."],
     ],
   },
-  tape: {
-    title: "Market tape",
-    points: [
-      ["High odds hits", "Overs priced at 2.50 or longer that have already cleared."],
-      ["Low odds misses", "Overs priced at 1.40 or shorter that have already missed."],
-      ["Source", "Scorecards from the live feed, refreshed about every 15 seconds."],
-    ],
-  },
 };

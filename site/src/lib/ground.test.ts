@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { selectMatches, venueStem } from "@cricket/engine/markets.js";
-import { filterGames, groundGames, groundSummary, majorityFormat, powerplayOvers, venueParts } from "./ground";
+import {
+  defaultGroundMatchPhase, filterGames, groundGames, groundMatchPhase, groundSummary,
+  majorityFormat, partitionGroundMatches, powerplayOvers, venueParts,
+} from "./ground";
 
 const G = [
   { fmt: "T20", gender: "male" }, { fmt: "T20", gender: "female" }, { fmt: "T20" }, { fmt: "ODI", gender: "male" },
@@ -50,6 +53,27 @@ describe("ground page rules", () => {
     expect(filterGames(G, "T20", "male")).toHaveLength(2);
     expect(filterGames(G, "T20", "female")).toHaveLength(1);
     expect(filterGames(G, "ODI", "female")).toHaveLength(0);
+  });
+  it("buckets matches into resulted / in play / scheduled", () => {
+    const now = Date.parse("2026-06-01T12:00:00Z");
+    expect(groundMatchPhase({ start: "2025-01-01T00:00:00Z", source: "history" }, now)).toBe("resulted");
+    expect(groundMatchPhase({ start: "2026-05-01T00:00:00Z", status: "Completed" }, now)).toBe("resulted");
+    expect(groundMatchPhase({ start: "2026-06-01T10:00:00Z", status: "Live" }, now)).toBe("live");
+    expect(groundMatchPhase({ start: "2026-06-01T10:00:00Z", status: "Started" }, now)).toBe("live");
+    expect(groundMatchPhase({ start: "2026-06-01T10:00:00Z" }, now)).toBe("live");
+    expect(groundMatchPhase({ start: "2026-06-02T10:00:00Z" }, now)).toBe("scheduled");
+    const parts = partitionGroundMatches([
+      { start: "2025-01-01T00:00:00Z", source: "history" },
+      { start: "2026-06-01T10:00:00Z", status: "Live" },
+      { start: "2026-06-02T10:00:00Z" },
+      { start: "2026-06-03T10:00:00Z" },
+    ], now);
+    expect(parts.resulted).toHaveLength(1);
+    expect(parts.live).toHaveLength(1);
+    expect(parts.scheduled).toHaveLength(2);
+    expect(defaultGroundMatchPhase(parts, true)).toBe("live");
+    expect(defaultGroundMatchPhase({ resulted: parts.resulted, live: [], scheduled: parts.scheduled }, true)).toBe("scheduled");
+    expect(defaultGroundMatchPhase(parts, false)).toBe("resulted");
   });
   it("includes both Optus Stadium names in the fixture list and ODI market sample", () => {
     const venues = ["Perth Stadium, Perth", "Optus Stadium, Perth", "WACA Ground, Perth"];

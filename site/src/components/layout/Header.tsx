@@ -1,10 +1,8 @@
 import { useId, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { BRAND } from "@/lib/brand";
-import { BookmarkIcon, ChevronLeftIcon, MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, MagnifyingGlassIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "@/lib/auth";
-import { useSaved } from "@/lib/saved";
-import { isDesignHost, PRODUCT_ORIGIN } from "@/lib/design-host";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { SearchDialog, SearchField, useSearchDialog } from "./GlobalSearch";
 import { isTopLevel } from "./nav";
@@ -29,28 +27,6 @@ export function Brand() {
     <Link to="/" aria-label={`${BRAND} home`} className="group flex shrink-0 items-center gap-snug rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring">
       <BrandMark className="size-9 transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:-rotate-6 group-active:scale-[0.97]" />
       <span className="text-title font-emphasis leading-none tracking-tight text-foreground">Fancy.cash</span>
-    </Link>
-  );
-}
-
-function SavedLink() {
-  const { list } = useSaved();
-  const label = list.length ? `Saved, ${list.length}` : "Saved";
-  const className = "relative grid size-control place-items-center rounded-full bg-muted text-foreground transition-[transform,background-color] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-surface-hover active:scale-[0.97]";
-  const badge = list.length > 0 ? <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-primary px-1 text-caption font-emphasis text-primary-foreground">{list.length}</span> : null;
-  // Design host has no /saved route — open the product app.
-  if (isDesignHost()) {
-    return (
-      <a href={`${PRODUCT_ORIGIN}/saved`} aria-label={label} className={className}>
-        <BookmarkIcon className="size-4" />
-        {badge}
-      </a>
-    );
-  }
-  return (
-    <Link to="/saved" aria-label={label} className={className}>
-      <BookmarkIcon className="size-4" />
-      {badge}
     </Link>
   );
 }
@@ -83,7 +59,7 @@ function AccountControl() {
   );
 }
 
-/** Top bar: logo, centred search on wide screens, account + saved on the right. */
+/** Top bar: logo, centred search on wide screens, account on the right. */
 export function Header() {
   const search = useSearchDialog();
   const { pathname } = useLocation();
@@ -107,7 +83,6 @@ export function Header() {
           <button type="button" aria-label="Search" onClick={search.show} className="grid size-control place-items-center rounded-full bg-muted md:hidden"><MagnifyingGlassIcon className="size-4" /></button>
           {own ? <SearchField onOpen={search.show} className="hidden w-56 md:flex lg:w-72" /> : null}
           <AccountControl />
-          <span className="hidden lg:contents"><SavedLink /></span>
         </div> : null}
       </div>
       <SearchDialog open={search.open} onOpenChange={search.setOpen} onCloseAutoFocus={search.restoreFocus} />

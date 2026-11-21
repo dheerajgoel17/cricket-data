@@ -79,7 +79,7 @@ export function SearchDialog({ open, onOpenChange, onCloseAutoFocus }: { open: b
         {query === text && text.trim().length >= 2 && n === 0 && <CommandEmpty>No player, team, match or ground matches “{text.trim()}”</CommandEmpty>}
         {text.trim().length < 2 && (
           <>
-            <CommandGroup heading="Go to">{[["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Saved", "/saved"]].map(([l, to]) => <CommandItem key={to} value={`go ${l}`} onSelect={() => go(to)}>{l}</CommandItem>)}</CommandGroup>
+            <CommandGroup heading="Go to">{[["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Leagues", "/leagues"]].map(([l, to]) => <CommandItem key={to} value={`go ${l}`} onSelect={() => go(to)}>{l}</CommandItem>)}</CommandGroup>
             {seen.length > 0 && <CommandGroup heading="Recently viewed">{seen.map((i) => <CommandItem key={`r${i}`} value={`recent ${i}`} onSelect={() => go(`/player/${i}`)}><PlayerBadge idx={i} size="xs" /><PlayerName idx={i} /><span className="ml-auto text-footnote text-muted-foreground">{store.teamName(store.P.tm[i])}</span></CommandItem>)}</CommandGroup>}
           </>
         )}

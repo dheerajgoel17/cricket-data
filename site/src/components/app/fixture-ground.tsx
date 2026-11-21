@@ -17,7 +17,11 @@ import { useData } from "@/lib/data";
 import { useFixtures } from "@/hooks/useEngine";
 import { useNow } from "@/lib/clock";
 import { matchDateLabel, odds, pc } from "@/lib/format";
-import { filterGames, genderFilterLabel, groundGames, groundSummary, majorityFormat, MARKET_CHIPS, seriesName, tourDatesAtGround, tourStatusAtGround, venueParts, type GenderFilter, type GroundSummary, type TourStatus } from "@/lib/ground";
+import {
+  defaultGroundMatchPhase, filterGames, genderFilterLabel, groundGames, GROUND_MATCH_PHASES, groundSummary,
+  majorityFormat, MARKET_CHIPS, partitionGroundMatches, seriesName, tourDatesAtGround, tourStatusAtGround,
+  venueParts, type GenderFilter, type GroundMatchPhase, type GroundSummary, type TourStatus,
+} from "@/lib/ground";
 import { setTitle } from "@/lib/title";
 import { fetchVenueWx, groundClock } from "@/lib/venue-wx";
 import { Button } from "@/components/ui/button";
@@ -27,6 +31,7 @@ import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { DetailSplit, StickyFilterBand, StickyPanel, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
+import { PillGroup } from "@/components/app/pill-group";
 import { cn } from "@/lib/utils";
 import { GroundSkeleton } from "@/components/app/skeletons";
 import { AnimatedNumber } from "@/components/app/animated-number";
@@ -166,7 +171,7 @@ function GroundStats({ store, venueIndexes, fmt, gender }: { store: any; venueIn
         </dl>
         <dl className="border-t border-hairline">
           {secondary.map(([k, v]) => (
-            <div key={k} className="flex min-h-11 items-center justify-between gap-snug border-t border-hairline px-snug py-snug first:border-t-0">
+            <div key={k} className="flex items-center justify-between gap-snug border-t border-hairline px-snug py-snug first:border-t-0">
               <dt className="label-cap shrink-0 text-muted-foreground">{k}</dt>
               <dd className="min-w-0 text-right font-condensed text-metric font-label tabular-nums">{v}</dd>
             </div>
@@ -182,11 +187,32 @@ function GroundStats({ store, venueIndexes, fmt, gender }: { store: any; venueIn
 const MATCH_PAGE_EMBED = 4;
 const MATCH_PAGE_FULL = 8;
 
-function GroundMatches({ list, pageSize }: { list: any[]; pageSize: number }) {
+function GroundMatches({ list, pageSize, preferUpcoming }: { list: any[]; pageSize: number; preferUpcoming?: boolean }) {
+  const now = useNow(30_000);
+  const parts = useMemo(() => partitionGroundMatches(list, now), [list, now]);
+  const [phase, setPhase] = useState<GroundMatchPhase>(() => defaultGroundMatchPhase(parts, !!preferUpcoming));
   const [shown, setShown] = useState(pageSize);
-  useEffect(() => { setShown(pageSize); }, [list, pageSize]);
+  // Reset tab + page when format/gender list or embed context changes (not on every clock tick).
+  useEffect(() => {
+    setPhase(defaultGroundMatchPhase(partitionGroundMatches(list, Date.now()), !!preferUpcoming));
+    setShown(pageSize);
+  }, [list, pageSize, preferUpcoming]);
+  useEffect(() => {
+    if (!parts[phase].length) {
+      const next = defaultGroundMatchPhase(parts, !!preferUpcoming);
+      if (next !== phase) setPhase(next);
+    }
+  }, [parts, phase, preferUpcoming]);
+  const active = parts[phase];
+  const phaseItems: [string, ReactNode][] = GROUND_MATCH_PHASES.map(([id, label]) => [
+    id,
+    <span key={id} className="inline-flex items-center gap-hair">
+      {label}
+      <span className="tabular-nums text-muted-foreground">{parts[id].length}</span>
+    </span>,
+  ]);
   return (
-    <section className="flex flex-col gap-snug">
+    <section className="flex flex-col gap-stack">
       <div className="flex items-baseline justify-between gap-snug">
         <h2 className="text-title font-emphasis tracking-tight">Matches</h2>
         <span className="font-condensed text-callout font-label tabular-nums text-muted-foreground">{list.length}</span>
@@ -195,18 +221,38 @@ function GroundMatches({ list, pageSize }: { list: any[]; pageSize: number }) {
         <EmptyState compact title="No matches" body="Nothing at this ground for the filters you picked." />
       ) : (
         <>
-          <ul className="flex flex-col gap-snug" aria-label="Matches at this ground">
-            {list.slice(0, shown).map((f, i) => (
-              <li key={f.id || f._key || `${f.a}-${f.b}-${f.start}`}>
-                <FixtureCard f={f} i={Math.min(i, 6)} />
-              </li>
-            ))}
-          </ul>
-          {list.length > shown ? (
-            <Button type="button" variant="secondary" className="h-control w-full rounded-2xl text-callout shadow-none" onClick={() => setShown((n) => n + pageSize)}>
-              Show more · {list.length - shown} left
-            </Button>
-          ) : null}
+          <div className="-mx-gutter border-b border-hairline px-gutter">
+            <PillGroup
+              sub
+              layoutId="ground-match-phase"
+              label="Match status"
+              items={phaseItems}
+              value={phase}
+              onChange={(v) => { setPhase(v as GroundMatchPhase); setShown(pageSize); }}
+            />
+          </div>
+          {!active.length ? (
+            <EmptyState
+              compact
+              title={phase === "resulted" ? "No results yet" : phase === "live" ? "Nothing in play" : "Nothing scheduled"}
+              body={phase === "resulted" ? "Completed games at this ground will show here." : phase === "live" ? "Live or started games will show here." : "Upcoming fixtures at this ground will show here."}
+            />
+          ) : (
+            <>
+              <ul className="flex flex-col gap-snug" aria-label={`${GROUND_MATCH_PHASES.find(([id]) => id === phase)?.[1] || "Matches"} at this ground`}>
+                {active.slice(0, shown).map((f, i) => (
+                  <li key={f.id || f._key || `${f.a}-${f.b}-${f.start}`}>
+                    <FixtureCard f={f} i={Math.min(i, 6)} />
+                  </li>
+                ))}
+              </ul>
+              {active.length > shown ? (
+                <Button type="button" variant="secondary" className="h-control w-full rounded-2xl text-callout shadow-none" onClick={() => setShown((n) => n + pageSize)}>
+                  Show more · {active.length - shown} left
+                </Button>
+              ) : null}
+            </>
+          )}
         </>
       )}
     </section>
@@ -468,7 +514,7 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
 
   const metrics = (
     <>
-      <div className="grid grid-cols-3 divide-x divide-hairline border-y border-hairline py-snug">
+      <div className="-mx-gutter grid grid-cols-3 divide-x divide-hairline border-y border-hairline px-gutter py-snug">
         <div className="px-snug first:pl-0"><Metric k="Matches" v={atGround.length} /></div>
         <div className="px-snug">
           <Metric
@@ -492,9 +538,9 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
   );
   const tour = from && fixtureId ? <TourChip from={from} fixtureId={fixtureId} atGround={atGround} now={now} /> : null;
 
-  // Same vertical rhythm as Match Fancy detail (gap-snug throughout).
+  // Major blocks use gap-stack; intro / stats / markets keep gap-snug inside.
   return (
-    <div className="flex flex-col gap-snug">
+    <div className="flex flex-col gap-stack">
       {embedded ? (
         <div className="flex flex-col gap-snug">
           <div className="flex items-center gap-snug">
@@ -557,7 +603,12 @@ export function FixtureGroundPanel({ venue, fixtureId, from, embedded }: {
       {/* Fancy rhythm: stats → Markets → collapsed Matches (not a long dump before prices). */}
       {primary >= 0 ? <GroundStats store={store} venueIndexes={venueIndices} fmt={activeFmt} gender={gender} /> : null}
       {primary >= 0 ? <GroundMarkets store={store} venueIndexes={venueIndices} fmt={activeFmt} gender={gender} /> : null}
-      <GroundMatches key={`${activeFmt}|${gender}`} list={shown} pageSize={embedded ? MATCH_PAGE_EMBED : MATCH_PAGE_FULL} />
+      <GroundMatches
+        key={`${activeFmt}|${gender}`}
+        list={shown}
+        pageSize={embedded ? MATCH_PAGE_EMBED : MATCH_PAGE_FULL}
+        preferUpcoming={!!embedded || !!fixtureId}
+      />
     </div>
   );
 }

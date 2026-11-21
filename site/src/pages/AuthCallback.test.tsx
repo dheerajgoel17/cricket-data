@@ -32,15 +32,15 @@ describe("AuthCallbackPage", () => {
   it("prefers ?next= over sessionStorage after a successful code exchange", async () => {
     sessionStorage.setItem("cph-auth-next", "/props");
     render(
-      <MemoryRouter initialEntries={["/auth/callback?code=abc&next=%2Fsaved"]}>
+      <MemoryRouter initialEntries={["/auth/callback?code=abc&next=%2Ffancy"]}>
         <Routes>
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
-          <Route path="/saved" element={<p>Saved page</p>} />
+          <Route path="/fancy" element={<p>Fancy page</p>} />
           <Route path="/props" element={<p>Props page</p>} />
         </Routes>
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByText("Saved page")).toBeVisible());
+    await waitFor(() => expect(screen.getByText("Fancy page")).toBeVisible());
     expect(exchangeCodeForSession).toHaveBeenCalled();
     expect(sessionStorage.getItem("cph-auth-next")).toBeNull();
   });
@@ -52,11 +52,11 @@ describe("AuthCallbackPage", () => {
       <MemoryRouter initialEntries={["/auth/callback?code=used"]}>
         <Routes>
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
-          <Route path="/saved" element={<p>Saved page</p>} />
+          <Route path="/" element={<p>Home page</p>} />
         </Routes>
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByText("Saved page")).toBeVisible());
+    await waitFor(() => expect(screen.getByText("Home page")).toBeVisible());
     expect(getSession).toHaveBeenCalled();
   });
 });

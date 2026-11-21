@@ -53,7 +53,7 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
   const link = () => `${location.origin}/props${screenerQuery(draft)}`;
   const apply = () => { onApply(draft); onOpenChange(false); };
   const copy = async () => { try { await navigator.clipboard.writeText(link()); toast("Link copied"); } catch { toast("Copy failed: select the address bar instead"); } };
-  const keep = () => { if (!screenerQuery(draft)) return toast("Set a filter first, then save it."); const n = name.trim() || "My filters"; save(n, screenerQuery(draft)); setName(""); toast(`Saved as “${n}”. Find it under Saved.`); };
+  const keep = () => { if (!screenerQuery(draft)) return toast("Set a filter first, then save it."); const n = name.trim() || "My filters"; save(n, screenerQuery(draft)); setName(""); toast(`Saved as “${n}”.`); };
   const all = (v: string) => ["all", v] as [string, string];
 
   return (

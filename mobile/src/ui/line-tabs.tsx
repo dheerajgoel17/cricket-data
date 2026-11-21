@@ -13,7 +13,7 @@ const GLIDE = spring.settle;
 /**
  * Underline tabs on a hairline (the site's `Tabs variant="line"`: Home's In play / Pre-match / Completed, a player's formats): text tabs as wide as their labels, the chosen one in
  * the accent colour, and one underline that glides to it on a spring (UI thread; its first placement, and reduce motion, are instant). A tab may carry a quieter count. `right` sits
- * at the end of the row (More, Filters). Wrap is transparent so a parent canvas / `BlurBar` accent wash shows through (opaque `color.background` punched a hole in player atmosphere).
+ * at the end of the row (Filters). Wrap is transparent so a parent canvas / `BlurBar` accent wash shows through (opaque `color.background` punched a hole in player atmosphere).
  */
 export function LineTabs<T extends string>({ items, value: valueProp, onChange: onChangeProp, label, right, flush }: { items: [id: T, label: string, count?: number | string][]; value: T; onChange: (id: T) => void; label: string; right?: ReactNode; /** No hairline under the row (it sits inside another bar that has one). */ flush?: boolean }) {
   const [value, onChange] = useChoice(valueProp, onChangeProp);

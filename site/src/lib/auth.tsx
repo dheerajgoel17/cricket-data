@@ -4,7 +4,7 @@ import { isDesignHost, PRODUCT_ORIGIN } from "@/lib/design-host";
 import { authConfigured, getSupabase } from "@/lib/supabase";
 
 /** OAuth / email-confirm must finish on the product origin — the design host has no AuthCallback route and sessions are origin-scoped. */
-function authCallbackUrl(next = "/saved") {
+function authCallbackUrl(next = "/") {
   const path = next.startsWith("/") ? next : `/${next}`;
   if (isDesignHost()) return `${PRODUCT_ORIGIN}/auth/callback?next=${encodeURIComponent(path)}`;
   return `${location.origin}/auth/callback`;
@@ -55,11 +55,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signInWithGoogle = useCallback(async () => {
     const sb = getSupabase();
     if (!sb) return { error: "Sign-in is not configured for this build." };
-    // Design host cannot keep the post-OAuth next path in sessionStorage (different origin) — finish on product /saved.
+    // Design host cannot keep the post-OAuth next path in sessionStorage (different origin) — finish on product home.
     if (!isDesignHost()) sessionStorage.setItem("cph-auth-next", nextPath());
     const { error } = await sb.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: authCallbackUrl(isDesignHost() ? "/saved" : nextPath()) },
+      options: { redirectTo: authCallbackUrl(isDesignHost() ? "/" : nextPath()) },
     });
     return { error: error?.message ?? null };
   }, []);
@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data, error } = await sb.auth.signUp({
       email: email.trim(),
       password,
-      options: { emailRedirectTo: authCallbackUrl("/saved") },
+      options: { emailRedirectTo: authCallbackUrl("/") },
     });
     if (error) return { error: error.message };
     // Autoconfirm projects return a session; confirm-email projects leave session null until the link is opened.

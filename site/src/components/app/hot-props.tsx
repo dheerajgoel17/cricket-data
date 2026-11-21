@@ -9,7 +9,6 @@ import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
 import { LIVE_TTL_MS, liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
 import { groupByChip, isLiveLine, lineKey, liveThresholdKey, patchHotQuotes, prematchLines, scoreLine } from "@cricket/engine/hot-rows.js";
-import { MarketTape } from "./market-tape";
 import { Tick } from "./tick";
 import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag } from "@cricket/engine/lines.js";
 import { runPlan } from "@cricket/engine/plan.js";
@@ -521,15 +520,10 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
   }), [dayRows, teams, matchChips]);
   const active = activeFilters(sc, { day: (d) => hotDayLabels().find(([k]) => k === d)?.[1] ?? d, match: (id) => choices.matches.find((m) => m.id === id)?.label ?? id });
   const priced = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : true)), [data, teams, start]);
-  const tapeRows = useMemo(() => (data || []).map((r) => {
-    const s = soFarOf(r);
-    return { idx: r.idx, name: r.name, stat: r.stat, line: r.line, over: r.over, fmt: r.fmt, inn: r.inn, verdict: s?.verdict ?? null, v: s?.v };
-  }), [data, live.data, identity]);
   if (!isLoading && !scoring && !priced.length && !otherDay) return null;
   const waiting = isLoading || (scoring && !rows.length); // rows are still coming in and none of those so far is in this window: not "no rows" yet
   return (
     <section aria-label="Player props" className="flex flex-col gap-stack">
-      {!waiting ? <div className="hidden lg:block"><MarketTape quiet rows={tapeRows} /></div> : null}
       {urlState && !isLoading && (
         <PillGroup layoutId="hot-day" label="Day" value={day} onChange={(v) => update({ day: v, match: "all" })} items={hotDayLabels()} className="min-w-0" />
       )}
@@ -559,7 +553,7 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
         </StickyFilterBand>
       ) : (
         <div className="flex flex-col">
-          <div className="flex min-w-0 items-center gap-snug border-b border-hairline">
+          <div className="-mx-gutter flex min-w-0 items-center gap-snug border-b border-hairline px-gutter">
             <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
             <FilterButton count={active.length} onClick={() => setFiltersOpen(true)} />
           </div>
@@ -593,8 +587,6 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
           />
         )}
       </AnimatedHeight>
-      {/* on a phone the rows come first and the tape follows them (it used to push the first prop below the fold) */}
-      {!waiting ? <div className="lg:hidden"><MarketTape quiet rows={tapeRows} /></div> : null}
     </section>
   );
 }
