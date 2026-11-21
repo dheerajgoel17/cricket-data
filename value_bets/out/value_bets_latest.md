@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-21 14:00 IST
+# Cricket value bets - 2026-11-21 15:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1865 prices
-- **smarkets**: ok, 570 prices
+- **moviodds_bet365**: ok, 1849 prices
+- **smarkets**: ok, 510 prices
 - **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
-- **feedl**: ok, 567 prices, 27 events
+- **feedl**: ok, 561 prices, 27 events
 - **feedk**: ok, 159 prices, 6 events
 - **feedg**: ok, 24 prices, 3 events
-- **feedj**: ok, 616 prices, 7 events
-- **feede**: ok, 822 prices, 33 events
-- **feedh**: ok, 1462 prices, 78 events
-- **feedf**: ok, 808 prices, 28 events
+- **feedj**: ok, 487 prices, 5 events
+- **feede**: ok, 798 prices, 33 events
+- **feedh**: ok, 1416 prices, 77 events
+- **feedf**: ok, 788 prices, 28 events
 
-Matches starting in next 168h: **43**, markets priced: **493**, value bets: **4** (new alerts: 1). Min edge 5%.
+Matches starting in next 168h: **43**, markets priced: **481**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -32,10 +32,10 @@ Matches starting in next 168h: **43**, markets priced: **493**, value bets: **4*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-21 20:00 IST Desert Vipers vs MI Emirates / Batter Milestones / F Zaman 50+ yes @ 6.50 (moviodds_bet365): edge 31.1%, model 0.1741, market 0.2242
 - 11-21 20:00 IST Desert Vipers vs MI Emirates / Batsman to Score a Fifty in the Match / F Zaman 50+ yes @ 6.50 (moviodds_bet365): edge 31.7%, model 0.1741, market 0.2259
-- 11-22 10:10 IST Brisbane Heat vs Adelaide Strikers / M13711 batter_sixes / Orla Prendergast over 0.5 @ 5.60 (feedj_d): edge 32.4%, model 0.294, market 0.1892
+- 11-22 10:10 IST Brisbane Heat vs Adelaide Strikers / M13711 batter_sixes / Orla Prendergast over 0.5 @ 5.60 (feedj_d): edge 51.1%, model 0.294, market 0.25
 - 11-22 10:10 IST Brisbane Heat (W) vs Adelaide Strikers (W) / Batsman Total Match Sixes / ME Bouchier over 0.5 @ 5.50 (moviodds_bet365): edge 53.8%, model 0.2838, market 0.2763
 - 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 60.8%, model 0.3731, market 0.2659
 
 Unmatched team names (add to mappings/teams.csv): Dolphins (W) (female), Elite Cricket Academy (male), Garden Route Badgers (W) (female), Lions (W) (female), Muscat Thunders (W) (female), OCA Strikers (W) (female), Omr Checker (male), Venice Livewire (male), Western Province (W) (female)
 
-Runtime 308.2s. Snapshot: `odds_20261121T083030Z.jsonl.gz`
+Runtime 273.2s. Snapshot: `odds_20261121T093040Z.jsonl.gz`
