@@ -27,7 +27,6 @@ import { Crumbs, DataTable, Muted, OddsText, PageTitle, Panel, StickyFilterBand 
 import { PlayerName } from "@/components/app/player-name";
 import { EmptyState } from "@/components/app/empty-state";
 import { ResultView } from "@/components/app/result";
-import { NextMatch } from "./Home";
 import { ListSkeleton } from "@/components/app/skeletons";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { TournamentStats } from "@/components/app/tournament-stats";
@@ -186,7 +185,6 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
       ) : (
         <EntityHero name={label} sub={ground ? `${ground.total} matches` : "Ground"} meta={[fmtName, ...(ground?.by || [])]} />
       )}
-      {!isTeam && nextFx ? <NextMatch f={nextFx} /> : null}
       {isTeam && (
         <StickyFilterBand>
           <div className="border-b border-hairline px-gutter pt-snug">
@@ -207,9 +205,9 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
             : top.isError ? <EmptyState title="Could not load batting leaders" body="Try another format or reload the page." /> : <ListSkeleton rows={4} />}
         </TabsContent>
       </PillTabs>
-      {isTeam && nextFx && (
-        <section className="flex flex-col gap-snug" aria-labelledby="team-next-match">
-          <h2 id="team-next-match" className="text-title font-emphasis">Next match</h2>
+      {nextFx && (
+        <section className="flex flex-col gap-snug" aria-labelledby="market-next-match">
+          <h2 id="market-next-match" className="text-title font-emphasis">Next match</h2>
           <div className="w-full max-w-(--fixture-card)"><FixtureCard f={nextFx} /></div>
         </section>
       )}

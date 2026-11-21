@@ -2643,18 +2643,12 @@
     "platform": "web",
     "route": true,
     "exports": [
-      "Countdown",
-      "HomePage",
-      "NextMatch"
+      "HomePage"
     ],
     "dependencies": [
-      "site/src/components/ui/badge.tsx",
-      "site/src/components/ui/card.tsx",
       "site/src/components/app/forms.tsx",
       "site/src/components/app/home-phase-bar.tsx",
-      "site/src/components/app/badges.tsx",
       "site/src/components/app/fixture-card.tsx",
-      "site/src/components/app/page.tsx",
       "site/src/components/app/skeletons.tsx"
     ]
   },
@@ -2732,7 +2726,6 @@
       "site/src/components/app/player-name.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/result.tsx",
-      "site/src/pages/Home.tsx",
       "site/src/components/app/skeletons.tsx",
       "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/tournament-stats.tsx"
