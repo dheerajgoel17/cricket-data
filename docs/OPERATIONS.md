@@ -125,6 +125,8 @@ The Site workflow can publish the same guarded data build to a separate Cloudfla
 
 The three live feeds share short-lived prepared responses in SQLite-backed Durable Objects. Worker requests and Durable Object requests count toward their respective free limits. Check both during a busy match. Custom share images return unavailable on the fallback, shared links redirect to the underlying page, and Telegram can send text. The Vercel ad-admin API is absent on the fallback.
 
+The production fallback uses the exact-host Worker route `fancy.cash/*` and keeps the original DNS record in place. Remove that Worker route to return traffic to the original host if it is healthy. The `www` alias has a separate redirect Worker so it can redirect visitors even when Vercel is paused. Deploy the redirect with `npx --yes wrangler@4.166.0 deploy --config site/cloudflare/www-redirect.wrangler.jsonc` using an account with Workers Routes access.
+
 ## Mumbai relay (Feed G on Vercel bom1, Feed H on Cloudflare) — free only
 Feed G's book refuses GitHub's US servers (403) but answers from India. **No paid VPS, residential proxy, or self-hosted runner.** Two free hops live in `relay/`; each gives a different India egress IP:
 

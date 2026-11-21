@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import worker from "../cloudflare/worker.js";
+import wwwRedirect from "../cloudflare/www-redirect.js";
+
+test("the www alias redirects to the canonical host and preserves the URL", () => {
+  const response = wwwRedirect.fetch(new Request("https://www.fancy.cash/fixture/example?tab=props"));
+  assert.equal(response.status, 308);
+  assert.equal(response.headers.get("location"), "https://fancy.cash/fixture/example?tab=props");
+});
 
 test("fallback protects site data and keeps shared player links usable", async () => {
   const prior = process.env.DATA_WRAP_KEY;
