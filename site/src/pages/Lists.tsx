@@ -14,7 +14,6 @@ import { setTitle } from "@/lib/title";
 import { cn } from "@/lib/utils";
 import { EmptyState } from "@/components/app/empty-state";
 import { HotProps } from "@/components/app/hot-props";
-import { AdSlot } from "@/components/app/ad-slot";
 import { LiveScore, MatchChip, NO_SCORE, startsIn } from "@/components/app/fixture-card";
 import { FancyLines, fancyFm } from "@/components/app/match-fancy";
 import { PillGroup } from "@/components/app/pill-group";
@@ -49,7 +48,6 @@ export function PropsPage() {
   return (
     <div className="flex flex-col gap-stack">
       <TabTitle>Player props</TabTitle>
-      <AdSlot slotId="props_list_top" />
       <HotProps syncUrl />
     </div>
   );

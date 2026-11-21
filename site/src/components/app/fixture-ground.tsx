@@ -25,7 +25,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ActiveChip, Chip } from "@/components/app/chip";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
-import { StatsAd } from "@/components/app/stats-ad";
 import { DetailSplit, StickyFilterBand, StickyPanel, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { cn } from "@/lib/utils";
@@ -571,7 +570,6 @@ export function VenueGroundPage() {
   if (!(idx >= 0 && idx < store.venues.length)) return <EmptyState title="Unknown ground" body="This ground is not in the stats data." />;
   return (
     <div className="flex flex-col gap-snug">
-      <StatsAd />
       <FixtureGroundPanel venue={store.venues[idx]} />
     </div>
   );

@@ -52,7 +52,6 @@ import { PlayerName, isHexPlayerId, resolvePlayerLabel } from "@/components/app/
 import { PlayerPortrait } from "@/components/app/portrait";
 import { sendShare, sendShareImage, sharePlayerUrl } from "@/lib/share";
 import { shareText } from "@cricket/engine/share-text.js";
-import { AdSlot } from "@/components/app/ad-slot";
 import { Crumbs, DataTable, DetailSplit, StickyFilterBand, StickyPanel, TABLE_BLEED, TABLE_HEAD } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { LadderTable, SplitTables } from "@/components/app/result";
@@ -271,7 +270,6 @@ function PlayerScreen({ idx }: { idx: number }) {
       <HeroWash page accent={sideAccent(side)} className="-mx-gutter px-gutter">
         <PlayerHeader {...{ idx, name, fmts }} team={side} teamIx={sideIx} test={FORMATS[fmtVal] === "Test"} />
       </HeroWash>
-      <AdSlot slotId="player_detail_top" />
       {loading ? <PlayerSkeleton />
         : res.data.ok ? <Loaded key={`${stat}-${fmtVal}-${JSON.stringify(plan.filters)}-${plan.venue}-${plan.competition}-${book ? 1 : 0}`} {...{ idx, name, pid, stat, next: nextMatch, res: res.data, q, book, navigateWith, scope, fmt: FORMATS[fmtVal] }} />
         : <EmptyState title="Could not load games" body={String(res.data.error || "Try again in a moment.")} />}

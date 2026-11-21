@@ -20,7 +20,6 @@ import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { FORMATS } from "@cricket/engine/util.js";
 import { useQ } from "@/components/app/forms";
 import { setTitle } from "@/lib/title";
-import { StatsAd } from "@/components/app/stats-ad";
 void localWhen; void num; void tzName; void TeamBadge;
 
 const TOOLS: [string, string, string, string][] = [["trends", "Player trends", "Players whose recent games clear a line, for any upcoming match.", "Popular"],
@@ -115,7 +114,6 @@ export function GlossaryPage() {
   const list = GLOSS.filter((g) => (c === "All" || g[2] === c) && (l === "All" || g[1] === l) && (!t || (g[0] + g[3]).toLowerCase().includes(t.toLowerCase())));
   return (
     <div className="flex flex-col gap-stack">
-      <StatsAd />
       <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Cricket stats explained"]]} />
       <PageTitle sub="Every market, rule and number on this site, in plain words.">Cricket stats explained</PageTitle>
       <Card className="flex-row flex-wrap items-center gap-stack p-inset shadow-none">
@@ -161,7 +159,6 @@ export function AboutPage() {
   const list = (xs: string[]) => <ul className="flex list-disc flex-col gap-tight pl-inset">{xs.map((r) => <li key={r} className="text-callout text-muted-foreground">{r}</li>)}</ul>;
   return (
     <div className="flex flex-col gap-stack">
-      <StatsAd />
       <Crumbs items={[["Home", "/"], ["Rules & data"]]} />
       <PageTitle>Rules, definitions and data</PageTitle>
       <Card className="px-inset shadow-none"><Accordion type="single" collapsible defaultValue="rules">
@@ -185,7 +182,6 @@ export function PlayersPage() {
   const change = (v: string) => { setText(v); setQ({ q: v }); };
   return (
     <div className="flex flex-col gap-stack">
-      <StatsAd />
       <h1 className="text-title font-emphasis tracking-tight">Players</h1>
       <InputGroup className="h-control rounded-[10px] border-0 bg-muted">
         <InputGroupAddon><MagnifyingGlassIcon className="size-4" /></InputGroupAddon>
@@ -230,7 +226,6 @@ export function TeamsPage() {
   }, [tab, text, store, rz]);
   return (
     <div className="flex flex-col gap-stack">
-      <StatsAd />
       <PageTitle>Teams &amp; venues</PageTitle>
       <PillGroup segmented layoutId="tv-tab" label="Directory" value={tab} onChange={(k) => setQ({ tab: k })} items={[["teams", "Teams"], ["venues", "Venues"]]} />
       <Input type="search" aria-label={`Search ${tab}`} placeholder={`Search ${tab}`} value={text} onChange={(e) => setText(e.target.value)} />

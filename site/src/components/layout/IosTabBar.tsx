@@ -6,8 +6,6 @@ import { defineCustomElement as defineTabBar } from "@ionic/core/components/ion-
 import { defineCustomElement as defineTabButton } from "@ionic/core/components/ion-tab-button.js";
 import { defineCustomElement as defineIcon } from "ionicons/components/ion-icon.js";
 import { bookmark, bookmarkOutline, calendar, calendarOutline, dice, diceOutline, mail, mailOutline, statsChart, statsChartOutline, trophy, trophyOutline } from "ionicons/icons";
-import { AdSlot } from "@/components/app/ad-slot";
-import { slotForPath } from "@/lib/ad-slots";
 import { goProduct, isDesignHost } from "@/lib/design-host";
 import { TAB_NAV } from "./nav";
 
@@ -21,15 +19,14 @@ const ICON: Record<string, [string, string]> = {
 };
 
 /**
- * Phones and tablets (below lg). Fixed dock: optional catalogue ad above the tab bar when the path has a slot,
- * then the Ionic tab bar. Height is written to `--phone-dock-h` so Shell can clear it (empty ads reserve nothing).
+ * Phones and tablets (below lg). Fixed dock: Ionic tab bar only (ad slots remount later).
+ * Height is written to `--phone-dock-h` so Shell can clear it.
  */
 export function IosTabBar() {
   const { pathname } = useLocation();
   const nav = useNavigate();
   // Catalogue host is not a product route — never light a tab as selected (clicks still goProduct).
   const current = isDesignHost() ? "" : (TAB_NAV.find((t) => t.match(pathname))?.to ?? "");
-  const slot = slotForPath(pathname);
   const dock = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = dock.current;
@@ -39,10 +36,9 @@ export function IosTabBar() {
     const ro = new ResizeObserver(sync);
     ro.observe(el);
     return () => { ro.disconnect(); document.documentElement.style.removeProperty("--phone-dock-h"); };
-  }, [pathname, slot]);
+  }, [pathname]);
   return (
     <div ref={dock} className="fixed inset-x-0 bottom-0 z-60 lg:hidden">
-      {slot && <AdSlot slotId={slot} className="mx-0 border-b-0 border-t border-hairline bg-background" />}
       <ion-tab-bar translucent selected-tab={current} aria-label="Sections">
         {TAB_NAV.map(({ to, label }) => {
           const on = to === current, [outline, filled] = ICON[to] ?? ICON["/"];

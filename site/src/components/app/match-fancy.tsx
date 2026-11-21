@@ -43,7 +43,6 @@ import { LiveMarketRow } from "./live-markets";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { ValueBars } from "./mini-bars";
 import { FancyLines } from "./fancy-lines";
-import { AdSlot } from "./ad-slot";
 import { Crumbs } from "./page";
 import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
@@ -304,7 +303,6 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
           )}
         </div>
       )}
-      {mode === "detail" && <AdSlot slotId="fancy_detail_top" />}
       <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
         onApply={({ win: w, here: h }) => set({ mw: w === 10 ? "" : String(w), mv: h ? "1" : "" })} />
 

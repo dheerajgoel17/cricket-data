@@ -109,17 +109,18 @@ export function AdminAdsPage() {
 }
 
 function PlacementsPanel({ rows, loading, onChange }: { rows: ManualPlacement[]; loading: boolean; onChange: () => void }) {
-  const [slotId, setSlotId] = useState<AdSlotId>("fancy_detail_top");
+  const [slotId, setSlotId] = useState<AdSlotId>(AD_SLOTS[0]?.id ?? "");
   const [name, setName] = useState("");
   const [href, setHref] = useState("https://");
   const [alt, setAlt] = useState("");
   const [priority, setPriority] = useState(0);
   const [file, setFile] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
-  const slot = AD_SLOTS.find((s) => s.id === slotId)!;
+  const slot = AD_SLOTS.find((s) => s.id === slotId);
 
   const save = async () => {
     const sb = getSupabase();
+    if (!slot) { toast("No slots in catalogue yet"); return; }
     if (!sb || !file) { toast("Choose an image"); return; }
     if (!CREATIVE_MIME.includes(file.type as any)) { toast("Use GIF, PNG, WebP or JPEG"); return; }
     if (file.size > CREATIVE_MAX_BYTES) { toast("Max 2 MB"); return; }
@@ -169,19 +170,25 @@ function PlacementsPanel({ rows, loading, onChange }: { rows: ManualPlacement[];
     <div className="flex flex-col gap-section">
       <section className="grid gap-snug rounded-2xl bg-card p-inset ring-1 ring-hairline">
         <h2 className="text-body font-emphasis">New placement</h2>
+        {!AD_SLOTS.length ? (
+          <EmptyState compact title="No slots yet" body="The slot catalogue is empty. Remap mounts in ad-slots.ts (and seed ad_slots) before posting creatives." />
+        ) : (
+          <>
         <label className="grid gap-hair text-callout">
           Slot
           <select className="h-control rounded-lg border border-input bg-background px-snug" value={slotId} onChange={(e) => setSlotId(e.target.value as AdSlotId)}>
             {AD_SLOTS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
           </select>
         </label>
-        <p className="text-footnote text-muted-foreground">{slot.sizeNote} · {slot.paths.map((r) => r.source).join(" · ")}</p>
+        <p className="text-footnote text-muted-foreground">{slot?.sizeNote} · {slot?.paths.map((r) => r.source).join(" · ")}</p>
         <Input placeholder="Name (book / campaign)" value={name} onChange={(e) => setName(e.target.value)} />
         <Input placeholder="Click URL (https://…)" value={href} onChange={(e) => setHref(e.target.value)} />
         <Input placeholder="Alt text" value={alt} onChange={(e) => setAlt(e.target.value)} />
         <Input type="number" placeholder="Priority (higher wins)" value={priority} onChange={(e) => setPriority(Number(e.target.value))} />
         <Input type="file" accept={CREATIVE_MIME.join(",")} onChange={(e) => setFile(e.target.files?.[0] || null)} />
         <Button type="button" disabled={busy} className="w-fit rounded-full" onClick={() => void save()}>{busy ? "Saving…" : "Save placement"}</Button>
+          </>
+        )}
       </section>
 
       <section className="flex flex-col gap-snug">
