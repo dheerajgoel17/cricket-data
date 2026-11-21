@@ -78,5 +78,15 @@
   "edge": 0.0572,
   "start_utc": "2026-11-22T04:40:00Z",
   "alerted_at": "2026-11-21T00:36:33.522642+00:00"
+ },
+ "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_sixes||Ashleigh Gardner under 0.5|0.5|under": {
+  "edge": 0.1795,
+  "start_utc": "2026-11-21T04:30:00Z",
+  "alerted_at": "2026-11-21T02:37:12.745265+00:00"
+ },
+ "female|Perth Scorchers Women|Sydney Sixers Women|2026-11-21|batter_fours||Ashleigh Gardner under 2.5|2.5|under": {
+  "edge": 0.1371,
+  "start_utc": "2026-11-21T04:30:00Z",
+  "alerted_at": "2026-11-21T02:37:12.745265+00:00"
  }
 }
