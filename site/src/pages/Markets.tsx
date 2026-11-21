@@ -13,19 +13,22 @@ import { useData } from "@/lib/data";
 import { collectGrid } from "@/lib/grid";
 import { num, pc } from "@/lib/format";
 import { setTitle } from "@/lib/title";
+import { useHeaderFlush } from "@/lib/header-slot";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
 import { Field, HOME_AWAY, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { EntityHero } from "@/components/app/entity-hero";
 import { HeroWash, sideAccent } from "@/components/app/hero-wash";
 import { PillTabs } from "@/components/app/pill-tabs";
+import { PillGroup } from "@/components/app/pill-group";
 import { GridTable } from "@/components/app/grid";
 import { LeagueBadge, TeamBadge } from "@/components/app/badges";
 import { StarButton } from "@/components/app/star";
-import { Crumbs, DataTable, Muted, PageTitle, Panel } from "@/components/app/page";
+import { Crumbs, DataTable, Muted, PageTitle, Panel, StickyFilterBand } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { ResultView } from "@/components/app/result";
 import { NextMatch } from "./Home";
 import { ListSkeleton } from "@/components/app/skeletons";
+import { FixtureCard } from "@/components/app/fixture-card";
 import { TournamentStats } from "@/components/app/tournament-stats";
 
 const MARKETS: [string, string][] = [["", "all markets"], ["match_sixes", "match sixes"], ["match_fours", "match fours"], ["match_runs", "match runs"], ["match_30s", "30s"], ["match_50s", "50s"], ["highest_over", "highest runs in an over"], ["max_conceded", "most conceded by a bowler"], ["top_score", "top score"]];
@@ -100,17 +103,20 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
   const { id } = useParams();
   const idx = Number(id);
   const isTeam = kind === "team";
+  useHeaderFlush(isTeam);
   const [q, setQ] = useQ();
   const label = isTeam ? store.teamName(idx) : store.venueName(idx);
+  const valid = Number.isInteger(idx) && idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length);
   const fmt = q.fmt ?? "T20";
   const fmtName = FORMATS.includes(fmt) ? fmt : "T20";
   const tab = (isTeam ? ["grid", "markets", "top"] : ["markets", "top"]).includes(q.tab) ? q.tab : isTeam ? "grid" : "markets";
   const plan = { kind: "match_market", market: q.market || null, line: q.line ? Number(q.line) : null, side: "over",
-    filters: { format: fmt, opposition: q.opp || null, venue_type: q.vt || null, since: q.since || null, until: q.until || null, last_n: q.last ? Number(q.last) : null, gender: isTeam ? (store.genderOfTeam(idx) ? "female" : "male") : null } };
+    filters: { format: fmtName, opposition: q.opp || null, venue_type: q.vt || null, since: q.since || null, until: q.until || null, last_n: q.last ? Number(q.last) : null, gender: isTeam && valid ? (store.genderOfTeam(idx) ? "female" : "male") : null } };
   const hints = isTeam ? { teamIdx: idx } : { venueIdx: idx };
-  const res = useRunPlan(plan, hints), top = useRunPlan({ ...plan, kind: "top_batter", market: null }, hints);
+  const res = useRunPlan(plan, hints, valid && tab === "markets");
+  const top = useRunPlan({ ...plan, kind: "top_batter", market: null }, hints, valid && tab === "top");
   const gstat = (STATS as any)[q.gstat] ? q.gstat : "sixes", gline = q.gline !== undefined && q.gline !== "" ? Number(q.gline) : 0.5;
-  const grid = useQuery({ queryKey: ["team-grid", idx, fmtName, gstat], enabled: isTeam, queryFn: () => collectGrid(store, idx, fmtName, gstat) });
+  const grid = useQuery({ queryKey: ["team-grid", idx, fmtName, gstat], enabled: isTeam && valid && tab === "grid", queryFn: () => collectGrid(store, idx, fmtName, gstat) });
   const { data: fixtures } = useFixtures();
   const ground = useMemo(() => {
     if (isTeam || idx < 0 || idx >= store.venues.length) return null;
@@ -124,13 +130,13 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
     if (isTeam) return list.find((f) => (f.a_ix === idx || f.b_ix === idx) && soon(f)) || null;
     return list.find((f) => venueIndices(store, f.venue).includes(idx) && soon(f)) || null;
   }, [fixtures, isTeam, idx, store]);
-  setTitle(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length) ? (isTeam ? `${store.teamName(idx)}: stats and player grid` : `${store.venues[idx]}: ground stats`) : isTeam ? "Team stats and player grid" : "Ground stats");
-  if (!(idx >= 0 && idx < (isTeam ? store.teams.length : store.venues.length))) {
+  setTitle(valid ? (isTeam ? `${label}: stats and player grid` : `${label}: ground stats`) : isTeam ? "Team stats and player grid" : "Ground stats");
+  if (!valid) {
     return <EmptyState title={`Unknown ${kind}`} body={`That ${kind} is not in the data.`} />;
   }
   const form = (
     <LiveForm onValues={(v) => setQ({ ...v })}>
-      <Field label="Format"><NativeSelect name="fmt" options={FORMATS.map((f: string) => [f, f])} defaultValue={fmt} /></Field>
+      {!isTeam && <Field label="Format"><NativeSelect name="fmt" options={FORMATS.map((f: string) => [f, f])} defaultValue={fmtName} /></Field>}
       {isTeam && <Field label="Opposition"><Input name="opp" list="dl-teams" defaultValue={q.opp} className="w-40" /></Field>}
       {isTeam && <Field label="Home/away"><NativeSelect name="vt" options={HOME_AWAY} defaultValue={q.vt} /></Field>}
       <Field label="Market"><NativeSelect name="market" options={MARKETS} defaultValue={q.market} /></Field>
@@ -146,28 +152,42 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
       {isTeam ? (
         <HeroWash page accent={sideAccent(store.teams[idx].n)} className="-mx-gutter px-gutter">
           <EntityHero badge={<TeamBadge name={store.teams[idx].n} size="xl" />} name={label} sub={store.teams[idx].g ? "Women's cricket" : "Men's cricket"}
-            meta={[`${fmtName} markets`, "team markets use the side batting first"]} save={<StarButton kind="team" idx={idx} />} />
+            save={<StarButton kind="team" idx={idx} />} />
         </HeroWash>
       ) : (
         <EntityHero name={label} sub={ground ? `${ground.total} matches` : "Ground"} meta={[fmtName, ...(ground?.by || [])]} />
       )}
-      {nextFx ? <NextMatch f={nextFx} /> : null}
+      {!isTeam && nextFx ? <NextMatch f={nextFx} /> : null}
+      {isTeam && (
+        <StickyFilterBand>
+          <div className="border-b border-hairline px-gutter pt-snug">
+            <PillGroup sub layoutId="team-format" label="Format" value={fmtName} onChange={(next) => setQ({ fmt: next })}
+              items={FORMATS.map((f: string) => [f, f])} />
+          </div>
+        </StickyFilterBand>
+      )}
       <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
-      <PillTabs layoutId="mk-tab" tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>
+      <PillTabs layoutId="mk-tab" scrollable tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>
         {isTeam && <TabsContent value="grid" className="flex flex-col gap-stack">
           <LiveForm onValues={(v) => setQ({ gstat: v.gstat, gline: v.gline })}><Field label="Stat"><NativeSelect name="gstat" options={Object.entries(STATS).map(([k, v]: any) => [k, v.label])} defaultValue={gstat} /></Field><Field label="Line"><Input name="gline" type="number" step="0.5" defaultValue={gline} className="w-24" /></Field></LiveForm>
-          {grid.data ? <><GridTable g={grid.data} teamIdx={idx} line={gline} /><Muted>{(STATS as any)[gstat].label} over {gline} across this team's last {grid.data.fx.length} {fmtName} fixtures. A dash means the player was not in the XI; VOID means he was in the XI but did not {(STATS as any)[gstat].side === "bat" ? "bat" : "bowl"}, so the bet is void.</Muted></> : <ListSkeleton rows={4} />}
+          {grid.data ? <><GridTable g={grid.data} teamIdx={idx} line={gline} /><Muted>{(STATS as any)[gstat].label} over {gline} across this team's last {grid.data.fx.length} {fmtName} fixtures. A dash means the player was not in the XI. VOID means the player was in the XI but did not {(STATS as any)[gstat].side === "bat" ? "bat" : "bowl"}.</Muted></> : grid.isError ? <EmptyState title="Could not load the player grid" body="Try another format or reload the page." /> : <ListSkeleton rows={4} />}
         </TabsContent>}
-        <TabsContent value="markets" className="flex flex-col gap-stack">{form}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
+        <TabsContent value="markets" className="flex flex-col gap-stack">{form}{isTeam && <Muted>Team markets use matches where the team batted first.</Muted>}{res.data ? <ResultView r={res.data} /> : <ListSkeleton rows={4} />}</TabsContent>
         <TabsContent value="top" className="flex flex-col gap-stack">
           <h2 className="text-title font-emphasis">{isTeam ? "Top batter (team batting first)" : "Top batter in the match"}</h2>
           {top.data ? <ResultView r={top.data} /> : <ListSkeleton rows={4} />}
         </TabsContent>
       </PillTabs>
-      <Card className="gap-hair px-inset py-stack shadow-none">
+      {isTeam && nextFx && (
+        <section className="flex flex-col gap-snug" aria-labelledby="team-next-match">
+          <h2 id="team-next-match" className="text-title font-emphasis">Next match</h2>
+          <div className="w-full max-w-(--fixture-card)"><FixtureCard f={nextFx} /></div>
+        </section>
+      )}
+      {!isTeam && <Card className="gap-hair px-inset py-stack shadow-none">
         <h3 className="text-title font-label">About {label}</h3>
-        <Muted>{isTeam ? `${label} ${fmtName} stats: match markets (sixes, fours, 30s, 50s, highest over, top batter) and a player grid for the last fixtures. Every figure is computed from ball-by-ball data and shown with its sample size. Fair price are 1 ÷ hit rate and carry no margin.` : `${label} ground stats: ${ground?.total || 0} matches in the data${ground?.by.length ? ` (${ground.by.join(", ")})` : ""}. Match markets (runs, sixes, fours, 30s, 50s, highest over, top batter) use ${fmtName} only, never mixed with another format. Every figure is computed from ball-by-ball data and shown with its sample size.`}</Muted>
-      </Card>
+        <Muted>{`${label} ground stats: ${ground?.total || 0} matches in the data${ground?.by.length ? ` (${ground.by.join(", ")})` : ""}. Match markets (runs, sixes, fours, 30s, 50s, highest over, top batter) use ${fmtName} only, never mixed with another format. Every figure is computed from ball-by-ball data and shown with its sample size.`}</Muted>
+      </Card>}
       <Link to="/teams" className="sr-only">Teams</Link>
     </div>
   );
