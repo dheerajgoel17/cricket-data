@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-21 — Team detail layout
+- **Path:** `site/src/pages/Markets.tsx` and the generated design inventory
+- **Change:** Team detail uses the shared EntityHero, StickyFilterBand, format pills, section tabs, GridTable, and FixtureCard. The selected format applies across Player grid, Markets, and Top batter. The next fixture uses the same card as Home.
+- **Callers:** `/team/:id` on web
+
 ### 2026-11-21 — Match Fancy list: scope stays on table
 - **Path:** `site/src/components/app/match-fancy.tsx`
 - **Change:** List-mode Match / AUS / ENG scope chips write only `sc` (clear `fm`). Writing `fm` previously tripped Fixtures’ `?tab=fancy&fm=` → `/fancy` redirect.
