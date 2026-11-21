@@ -25,7 +25,7 @@ function normalizeCard(url) {
     out.set("line", String(Number(query.line)));
   }
   if (query.poster === "1" && player) out.set("poster", "1");
-  else if (query.poster === "1" && out.has("f") && /^[\w-]{1,100}$/.test(query.fm || "")) {
+  else if (query.poster === "1" && out.has("f") && /^[\w-]{1,100}(?::[12])?$/.test(query.fm || "")) {
     out.set("poster", "1");
     out.set("fm", query.fm);
     out.set("sc", /^-?\d{1,6}$/.test(query.sc || "") ? String(Number(query.sc)) : "-1");
