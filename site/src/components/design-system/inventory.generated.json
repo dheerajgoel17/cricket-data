@@ -9,21 +9,6 @@
     ]
   },
   {
-    "path": "mobile/src/app/(tabs)/contact.tsx",
-    "platform": "native",
-    "route": true,
-    "exports": [],
-    "dependencies": [
-      "mobile/src/ui/icon-badge.tsx",
-      "mobile/src/ui/button.tsx",
-      "mobile/src/ui/lazy-tab.tsx",
-      "mobile/src/ui/press.tsx",
-      "mobile/src/ui/text.tsx",
-      "mobile/src/ui/brand.tsx",
-      "mobile/src/ui/tab-fade.tsx"
-    ]
-  },
-  {
     "path": "mobile/src/app/(tabs)/fancy.tsx",
     "platform": "native",
     "route": true,
@@ -97,27 +82,6 @@
       "mobile/src/ui/prop-row.tsx",
       "mobile/src/ui/screener-filters.tsx",
       "mobile/src/ui/text.tsx",
-      "mobile/src/ui/tab-fade.tsx"
-    ]
-  },
-  {
-    "path": "mobile/src/app/(tabs)/saved.tsx",
-    "platform": "native",
-    "route": true,
-    "exports": [],
-    "dependencies": [
-      "mobile/src/ui/round-button.tsx",
-      "mobile/src/ui/button.tsx",
-      "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/lazy-tab.tsx",
-      "mobile/src/ui/press.tsx",
-      "mobile/src/ui/text.tsx",
-      "mobile/src/ui/brand.tsx",
-      "mobile/src/ui/empty-state.tsx",
-      "mobile/src/ui/list.tsx",
-      "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/player-avatar.tsx",
-      "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
   },
@@ -675,9 +639,7 @@
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/fancy-row.tsx",
       "mobile/src/ui/match-chip.tsx",
-      "mobile/src/ui/market-tape.tsx",
       "mobile/src/ui/motion.tsx",
-      "mobile/src/ui/skeletons.tsx",
       "mobile/src/ui/prop-row.tsx"
     ]
   },
@@ -825,23 +787,6 @@
     ]
   },
   {
-    "path": "mobile/src/ui/market-tape.tsx",
-    "platform": "native",
-    "route": false,
-    "exports": [
-      "MarketTape"
-    ],
-    "dependencies": [
-      "mobile/src/ui/press.tsx",
-      "mobile/src/ui/text.tsx",
-      "mobile/src/ui/icons.tsx",
-      "mobile/src/ui/info-button.tsx",
-      "mobile/src/ui/segmented.tsx",
-      "mobile/src/ui/player-avatar.tsx",
-      "mobile/src/ui/tick.tsx"
-    ]
-  },
-  {
     "path": "mobile/src/ui/match-chip.tsx",
     "platform": "native",
     "route": false,
@@ -980,10 +925,7 @@
       "PhaseBar"
     ],
     "dependencies": [
-      "mobile/src/ui/sheet.tsx",
-      "mobile/src/ui/line-tabs.tsx",
-      "mobile/src/ui/press.tsx",
-      "mobile/src/ui/text.tsx"
+      "mobile/src/ui/line-tabs.tsx"
     ]
   },
   {
@@ -1483,6 +1425,7 @@
       "site/src/components/app/badges.tsx",
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/pill-group.tsx",
       "site/src/components/app/skeletons.tsx",
       "site/src/components/app/animated-number.tsx",
       "site/src/components/app/mini-bars.tsx",
@@ -1585,7 +1528,6 @@
       "HomePhaseBar"
     ],
     "dependencies": [
-      "site/src/components/ui/sheet.tsx",
       "site/src/components/ui/tabs.tsx"
     ]
   },
@@ -1603,7 +1545,6 @@
       "site/src/components/app/fancy-lines.tsx",
       "site/src/components/app/home-mix-table.tsx",
       "site/src/components/app/hot-props.tsx",
-      "site/src/components/app/market-tape.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/skeletons.tsx"
     ]
@@ -1629,7 +1570,6 @@
       "site/src/components/app/scroll-row.tsx",
       "site/src/components/app/animated-height.tsx",
       "site/src/components/app/skeletons.tsx",
-      "site/src/components/app/market-tape.tsx",
       "site/src/components/app/tick.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/page.tsx",
@@ -1727,20 +1667,6 @@
     "dependencies": [
       "site/src/components/app/status-label.tsx",
       "site/src/components/app/tick.tsx"
-    ]
-  },
-  {
-    "path": "site/src/components/app/market-tape.tsx",
-    "platform": "web",
-    "route": false,
-    "exports": [
-      "MarketTape"
-    ],
-    "dependencies": [
-      "site/src/components/ui/popover.tsx",
-      "site/src/components/app/pill-group.tsx",
-      "site/src/components/app/tick.tsx",
-      "site/src/components/app/badges.tsx"
     ]
   },
   {
@@ -2646,19 +2572,6 @@
     ]
   },
   {
-    "path": "site/src/pages/Contact.tsx",
-    "platform": "web",
-    "route": true,
-    "exports": [
-      "ContactPage"
-    ],
-    "dependencies": [
-      "site/src/components/ui/button.tsx",
-      "site/src/components/ui/card.tsx",
-      "site/src/components/ui/separator.tsx"
-    ]
-  },
-  {
     "path": "site/src/pages/DesignSystem.tsx",
     "platform": "web",
     "route": true,
@@ -2854,21 +2767,6 @@
       "site/src/components/app/tick.tsx",
       "site/src/components/ui/popover.tsx",
       "site/src/components/app/chip.tsx"
-    ]
-  },
-  {
-    "path": "site/src/pages/Saved.tsx",
-    "platform": "web",
-    "route": true,
-    "exports": [
-      "SavedPage"
-    ],
-    "dependencies": [
-      "site/src/components/app/reflow.tsx",
-      "site/src/components/app/empty-state.tsx",
-      "site/src/components/app/badges.tsx",
-      "site/src/components/app/player-name.tsx",
-      "site/src/components/ui/button.tsx"
     ]
   },
   {
