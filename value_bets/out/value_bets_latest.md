@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-22 02:00 IST
+# Cricket value bets - 2026-11-22 04:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1808 prices
+- **moviodds_bet365**: ok, 1825 prices
 - **smarkets**: ok, 509 prices
-- **feedk**: ok, 221 prices, 7 events
-- **feedl**: ok, 610 prices, 33 events
-- **feedg**: ok, 40 prices, 5 events
-- **feedh**: ok, 1736 prices, 91 events
+- **feedk**: ok, 215 prices, 6 events
+- **feedl**: ok, 650 prices, 33 events
+- **feedg**: ok, 40 prices, 6 events
+- **feedh**: ok, 1736 prices, 87 events
 - **feede**: ok, 844 prices, 37 events
-- **feedj**: ok, 1170 prices, 24 events
+- **feedj**: ok, 1076 prices, 23 events
 - **feedf**: ok, 918 prices, 27 events
-- **feedi**: ok, 1852 prices, 41 events, stopped time budget
+- **feedi**: ok, 1978 prices, 57 events
 
-Matches starting in next 168h: **55**, markets priced: **588**, value bets: **9** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **59**, markets priced: **600**, value bets: **9** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -22,10 +22,10 @@ Matches starting in next 168h: **55**, markets priced: **588**, value bets: **9*
 | 11-22 10:10 IST | Brisbane Heat (Women) vs Adelaide Strikers (Women) | G9182 batter_fours | Laura Wolvaardt under 3.5 | 1.91 @ feedi_d | 1.81 | 0.5973 | 5.7% | 1.57% | medium |
 | 11-22 13:40 IST | Melbourne Stars vs Melbourne Renegades | M13710 batter_fours | Hayley Matthews over 2.5 | 1.98 @ feedj_d | 1.86 | 0.5365 | 6.2% | 1.59% | medium |
 | 11-22 13:40 IST | Melbourne Stars (Women) vs Melbourne Renegades (Women) | G9182 batter_fours | Sophie Molineux under 1.5 | 2.00 @ feedi_d | 1.90 | 0.6051 | 5.2% | 1.30% | medium |
-| 11-22 19:30 IST | Sharjah Warriorz vs Gulf Giants | G9181 batter_sixes | Ibrahim Zadran under 0.5 | 2.10 @ feedi_d | 1.70 | 0.5616 | 23.3% | 2.00% | medium |
-| 11-22 19:30 IST | Sharjah Warriorz vs Gulf Giants | G9182 batter_fours | Rahmanullah Gurbaz under 1.5 | 2.05 @ feedi_d | 1.94 | 0.5535 | 5.8% | 1.38% | medium |
+| 11-22 15:30 IST | Sharjah Warriorz vs Gulf Giants | G9181 batter_sixes | Ibrahim Zadran under 0.5 | 2.10 @ feedi_d | 1.70 | 0.5616 | 23.3% | 2.00% | medium |
+| 11-22 15:30 IST | Sharjah Warriorz vs Gulf Giants | G9182 batter_fours | Rahmanullah Gurbaz under 1.5 | 2.05 @ feedi_d | 1.94 | 0.5535 | 5.8% | 1.38% | medium |
 | 11-22 20:00 IST | Dubai Capitals vs Abu Dhabi Knight Riders | Batter Total Match Fours | A Sharafu under 1.5 | 2.20 @ moviodds_bet365 | 1.97 | 0.5351 | 11.7% | 2.00% | medium |
-| 11-22 20:00 IST | Dubai Capitals vs Abu Dhabi Knight Riders | G9182 batter_fours | Sediqullah Atal under 1.5 | 2.00 @ feedi_d | 1.84 | 0.6202 | 8.6% | 2.00% | medium |
+| 11-22 20:00 IST | Dubai Capitals vs Abu Dhabi Knight Riders | G9182 batter_fours | Sediqullah Atal under 1.5 | 2.00 @ feedi_d | 1.80 | 0.6202 | 10.8% | 2.00% | medium |
 | 11-24 13:45 IST | Australia vs England | G9181 batter_sixes | Jake Fraser-McGurk under 0.5 | 2.62 @ feedi_d | 2.40 | 0.4941 | 9.6% | 1.48% | medium |
 
 ### Why / notes per bet
@@ -36,13 +36,13 @@ Matches starting in next 168h: **55**, markets priced: **588**, value bets: **9*
 - **Sharjah Warriorz vs Gulf Giants / G9181 batter_sixes / Ibrahim Zadran under 0.5** - why: Model 56% vs market 61% for under 0.5 sixes; form 0.7 sixes/inn recency-weighted T20 (n_eff 35.2; last 5: 0, 0, 0, 1, 0), bats in 96% of games played; at Sharjah Cricket Stadium, Sharjah: 18 inns avg 0.8; context adj: venue environment +11%. Notes: 2 market source(s) for fair price; model 0.562 vs market 0.608; assumes bet void if player doesn't bat/bowl - check book rules
 - **Sharjah Warriorz vs Gulf Giants / G9182 batter_fours / Rahmanullah Gurbaz under 1.5** - why: Model 55% vs market 49% for under 1.5 fours; form 1.9 fours/inn recency-weighted T20 (n_eff 62.2; last 5: 0, 2, 3, 0, 0), bats in 98% of games played; at Sharjah Cricket Stadium, Sharjah: 23 inns avg 1.3; vs Sharjah Warriorz: 3 inns avg 1.0; context adj: venue environment -3%, at this venue -8%, team H2H context +4%. Notes: 2 market source(s) for fair price; model 0.553 vs market 0.485; assumes bet void if player doesn't bat/bowl - check book rules
 - **Dubai Capitals vs Abu Dhabi Knight Riders / Batter Total Match Fours / A Sharafu under 1.5** - why: Model 54% vs market 49% for under 1.5 fours; form 2.4 fours/inn recency-weighted T20 (n_eff 44.1; last 5: 5, 1, 1, 0, 1), bats in 95% of games played; at Dubai International Cricket Stadium, Dubai: 15 inns avg 1.5; vs Dubai Capitals: 7 inns avg 1.4; context adj: at this venue -8%, team H2H context -1%. Notes: 2 market source(s) for fair price; model 0.535 vs market 0.485; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting
-- **Dubai Capitals vs Abu Dhabi Knight Riders / G9182 batter_fours / Sediqullah Atal under 1.5** - why: Model 62% vs market 48% for under 1.5 fours; form 1.2 fours/inn recency-weighted T20 (n_eff 28.5; last 5: 2, 2, 0, 0, 2), bats in 98% of games played; at Dubai International Cricket Stadium, Dubai: 8 inns avg 1.0; vs Abu Dhabi Knight Riders: 1 inns avg 0.0; context adj: at this venue -3%, team H2H context +10%. Notes: 3 market source(s) for fair price; model 0.620 vs market 0.480; assumes bet void if player doesn't bat/bowl - check book rules
+- **Dubai Capitals vs Abu Dhabi Knight Riders / G9182 batter_fours / Sediqullah Atal under 1.5** - why: Model 62% vs market 50% for under 1.5 fours; form 1.2 fours/inn recency-weighted T20 (n_eff 28.5; last 5: 2, 2, 0, 0, 2), bats in 98% of games played; at Dubai International Cricket Stadium, Dubai: 8 inns avg 1.0; vs Abu Dhabi Knight Riders: 1 inns avg 0.0; context adj: at this venue -3%, team H2H context +10%. Notes: 2 market source(s) for fair price; model 0.620 vs market 0.500; assumes bet void if player doesn't bat/bowl - check book rules
 - **Australia vs England / G9181 batter_sixes / Jake Fraser-McGurk under 0.5** - why: Model 49% vs market 35% for under 0.5 sixes; form 1.2 sixes/inn recency-weighted T20 (n_eff 33.7; last 5: 0, 0, 5, 1, 1), bats in 95% of games played; venue unknown/unmatched (venue terms neutral); vs England: 2 inns avg 1.0. Notes: 2 market source(s) for fair price; model 0.494 vs market 0.355; assumes bet void if player doesn't bat/bowl - check book rules
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-22 10:10 IST Brisbane Heat vs Adelaide Strikers / M13711 batter_sixes / Orla Prendergast over 0.5 @ 5.60 (feedj_d): edge 33.2%, model 0.294, market 0.192
 - 11-22 10:10 IST Brisbane Heat (W) vs Adelaide Strikers (W) / Batsman Total Match Sixes / ME Bouchier over 0.5 @ 5.50 (moviodds_bet365): edge 52.7%, model 0.2838, market 0.2725
 
-Unmatched team names (add to mappings/teams.csv): Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), Dolphins (female), Garden Route Badgers (W) (female), Garden Route Badgers (female), Lions (W) (female), Lions (Women) (female), Lions (female), Lokseva Academy (male), MID West Rhinos (male), Roma Gladiators (male), SW Districts (male), South Western Districts (Women) (female), South Western Districts (male), Sunny 11 Pratishtan (male), Western Province (W) (female), Western Province (female)
+Unmatched team names (add to mappings/teams.csv): Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), Dolphins (Women) (female), Dolphins (female), FATA Region (male), Garden Route Badgers (W) (female), Garden Route Badgers (female), Islamabad Region (male), Lions (W) (female), Lions (Women) (female), Lions (female), Lokseva Academy (male), MID West Rhinos (male), Mashonaland Eagles (male), Mid West Rhinos (male), Roma Gladiators (male), SW Districts (male), South Western Districts (Women) (female), South Western Districts (male), Sunny 11 Pratishtan (male), Western Province (W) (female), Western Province (Women) (female), Western Province (female)
 
-Runtime 348.7s. Snapshot: `odds_20261121T203040Z.jsonl.gz`
+Runtime 315.4s. Snapshot: `odds_20261121T223031Z.jsonl.gz`
