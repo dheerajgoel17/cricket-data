@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-21 — Match Fancy list: scope stays on table
+- **Path:** `site/src/components/app/match-fancy.tsx`
+- **Change:** List-mode Match / AUS / ENG scope chips write only `sc` (clear `fm`). Writing `fm` previously tripped Fixtures’ `?tab=fancy&fm=` → `/fancy` redirect.
+- **Callers:** Fixture Match Fancy tab
+
 ### 2026-11-21 — Ground: match phase tabs + stack rhythm
 - **Path:** `site/src/lib/ground.ts`, `site/src/components/app/fixture-ground.tsx`, `mobile/src/ui/ground-page.tsx`
 - **Change:** Matches list splits into Resulted / In play / Scheduled (`partitionGroundMatches`); panel major blocks use `gap-stack`; metrics bleed edge-to-edge; secondary fact rows drop forced `min-h` so they match the 2×2 Fact padding. Fixture embeds prefer live/scheduled.

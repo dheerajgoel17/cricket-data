@@ -124,6 +124,11 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const fmtIdx = FORMATS.indexOf(fmt);
   const marketLabel = (k: string) => (scope < 0 ? MATCH_KEYS : TEAM_KEYS).find(([id]) => id === k)?.[1] ?? (k === "top_batter" ? "Top batter" : ((scope < 0 ? MATCH_MARKETS : TEAM_TOTAL_MARKETS) as any)[k]?.label as string);
   const setScope = (v: string) => {
+    // List mode only filters the priced-lines table — never write `fm` (Fixtures redirects `?tab=fancy&fm=` to the dedicated market page).
+    if (mode === "list") {
+      set({ sc: v === "-1" ? "" : v, fm: "" });
+      return;
+    }
     const next = Number(v), nextFm = peerFm(fm, keysFor(next)) || "";
     const keep = nextFm !== "" && lineOn(nextFm, next, line);
     set({ sc: v === "-1" ? "" : v, fm: nextFm, ...(keep ? { ml: line } : {}) }, keep);
@@ -132,10 +137,11 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
     const keep = lineOn(v, scope, line);
     set({ fm: v, ...(keep ? { ml: line } : {}) }, keep);
   };
-  // keep the URL on the remapped market when Match ↔ team keys differ (Fours stays Fours)
+  // keep the URL on the remapped market when Match ↔ team keys differ (Fours stays Fours) — detail page only
   useEffect(() => {
+    if (mode === "list") return;
     if (wantFm && fm && wantFm !== fm && peerFm(wantFm, keyList) === fm) set({ fm });
-  }, [wantFm, fm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [wantFm, fm, mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // the ground: the matches played there (the data spells one ground several ways), for the sample switch and the note under the over / under cards
   const venueIdx = useMemo(() => (venueIndices as (s: any, n: string) => number[])(store, fx.venue), [store, fx.venue]);
