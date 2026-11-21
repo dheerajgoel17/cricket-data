@@ -24,6 +24,17 @@ async function loadIdentity(base: string) {
   return identityIndex(await loadJson(`${base}identity.json`));
 }
 
+function lazyResolver(store: Awaited<ReturnType<typeof createStore>>) {
+  let resolver: Resolver | undefined;
+  return new Proxy({} as Resolver, {
+    get(_target, key) {
+      const target = resolver ??= new Resolver(store);
+      const value = Reflect.get(target, key);
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+  });
+}
+
 async function boot() {
   const k = await gateKey();
   setWrapKey(k);
@@ -42,7 +53,7 @@ async function boot() {
     },
   });
   if (!store?.P?.id?.length) throw new Error("index.json: empty");
-  const data: Data = { store, rz: new Resolver(store), photos: {}, identity: identityIndex(null), names: {}, matchesReady: false };
+  const data: Data = { store, rz: lazyResolver(store), photos: {}, identity: identityIndex(null), names: {}, matchesReady: false };
   return { data, extras };
 }
 
