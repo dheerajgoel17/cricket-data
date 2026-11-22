@@ -1,5 +1,5 @@
 import { useChoice } from "@/lib/use-choice";
-import { ChipScroll } from "@/ui/h-scroll";
+import { HScroll } from "@/ui/h-scroll";
 import { Platform, StyleSheet, View } from "react-native";
 import { chipFillTransition, chipTextTransition } from "@/ui/chips";
 import { Press } from "@/ui/press";
@@ -46,7 +46,7 @@ export function MatchChips({ items, value: valueProp, onChange: onChangeProp, ta
   const [value, onChange] = useChoice(valueProp, onChangeProp);
   const calm = useReducedMotion();
   return (
-    <ChipScroll
+    <HScroll
       contentContainerStyle={styles.row}
       accessibilityRole="tablist"
       decelerationRate={Platform.OS === "ios" ? "fast" : 0.9}
@@ -57,7 +57,7 @@ export function MatchChips({ items, value: valueProp, onChange: onChangeProp, ta
       {items.map((f) => (
         <MatchChip key={f.id} calm={calm} f={f} tag={tags?.[f.id]} on={f.id === value} onPress={() => { if (f.id !== value) { void tick(); onChange(f.id); } }} />
       ))}
-    </ChipScroll>
+    </HScroll>
   );
 }
 

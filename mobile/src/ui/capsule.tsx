@@ -1,5 +1,5 @@
 import { useChoice } from "@/lib/use-choice";
-import { ChipScroll } from "@/ui/h-scroll";
+import { HScroll } from "@/ui/h-scroll";
 import { StyleSheet, View } from "react-native";
 import { chipFillTransition, chipTextTransition } from "@/ui/chips";
 import { Press } from "@/ui/press";
@@ -17,9 +17,9 @@ export function CapsuleTabs({ items, value: valueProp, onChange: onChangeProp, l
   const calm = useReducedMotion();
   return (
     <View style={[styles.track, flush && styles.flush]}>
-      <ChipScroll fade={!flush} contentContainerStyle={styles.row} accessibilityRole="tablist" accessibilityLabel={label}>
+      <HScroll contentContainerStyle={styles.row} accessibilityRole="tablist" accessibilityLabel={label}>
         {items.map(([id, text, muted]) => <Tab key={id} calm={calm} text={text} muted={muted} on={id === value} onPress={() => { if (id !== value) { void Haptics.selectionAsync(); onChange(id); } }} />)}
-      </ChipScroll>
+      </HScroll>
     </View>
   );
 }

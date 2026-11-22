@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { useChoice } from "@/lib/use-choice";
-import { ChipScroll } from "@/ui/h-scroll";
+import { HScroll } from "@/ui/h-scroll";
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { Press } from "@/ui/press";
 import Animated, { useReducedMotion } from "react-native-reanimated";
@@ -14,11 +14,11 @@ export function Chips({ items, value: valueProp, onChange: onChangeProp, flush }
   const [value, onChange] = useChoice(valueProp, onChangeProp);
   const calm = useReducedMotion();
   return (
-    <ChipScroll fade={!flush} contentContainerStyle={flush ? styles.flushRow : styles.row} accessibilityRole="tablist">
+    <HScroll contentContainerStyle={flush ? styles.flushRow : styles.row} accessibilityRole="tablist">
       {items.map(([id, label, count, muted]) => (
         <Chip key={id} calm={calm} label={label} count={count} muted={muted} on={id === value} onPress={() => { if (id !== value) { void Haptics.selectionAsync(); onChange(id); } }} />
       ))}
-    </ChipScroll>
+    </HScroll>
   );
 }
 
