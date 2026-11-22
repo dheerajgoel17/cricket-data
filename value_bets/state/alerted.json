@@ -14,31 +14,6 @@
   "start_utc": "2026-11-23T08:00:00Z",
   "alerted_at": "2026-11-20T12:32:37.516453+00:00"
  },
- "male|Abu Dhabi Knight Riders|Dubai Capitals|2026-11-22|batter_fours||Sediqullah Atal under 1.5|1.5|under": {
-  "edge": 0.0971,
-  "start_utc": "2026-11-22T14:30:00Z",
-  "alerted_at": "2026-11-21T16:35:01.398428+00:00"
- },
- "male|Gulf Giants|Sharjah Warriorz|2026-11-22|batter_sixes||Ibrahim Zadran under 0.5|0.5|under": {
-  "edge": 0.2757,
-  "start_utc": "2026-11-22T14:00:00Z",
-  "alerted_at": "2026-11-21T18:36:23.687330+00:00"
- },
- "male|Gulf Giants|Sharjah Warriorz|2026-11-22|batter_fours||Rahmanullah Gurbaz under 1.5|1.5|under": {
-  "edge": 0.0744,
-  "start_utc": "2026-11-22T14:00:00Z",
-  "alerted_at": "2026-11-21T18:36:23.687330+00:00"
- },
- "male|Gulf Giants|Sharjah Warriorz|2026-11-22|batter_fours||Sikandar Raza under 1.5|1.5|under": {
-  "edge": 0.0649,
-  "start_utc": "2026-11-22T14:00:00Z",
-  "alerted_at": "2026-11-21T18:36:23.687330+00:00"
- },
- "male|Abu Dhabi Knight Riders|Dubai Capitals|2026-11-22|batter_fours||A Sharafu under 1.5|1.5|under": {
-  "edge": 0.1169,
-  "start_utc": "2026-11-22T14:30:00Z",
-  "alerted_at": "2026-11-21T18:36:23.687330+00:00"
- },
  "male|Australia|England|2026-11-24|batter_sixes||Jake Fraser-McGurk under 0.5|0.5|under": {
   "edge": 0.0961,
   "start_utc": "2026-11-24T08:15:00Z",
