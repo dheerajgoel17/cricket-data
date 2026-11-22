@@ -2,6 +2,20 @@
   "date": "2026-11-22",
   "event": "",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 30,
+      "runs": 54,
+      "team": "Venice Livewire",
+      "wickets": 4
+    },
+    {
+      "balls": 26,
+      "runs": 59,
+      "team": "Napoli Knights",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-nk-vs-vl-5th-t10-italia-t10-league-2026-match-updates-157H",
   "match_type": "T20",
   "player_of_match": "",

@@ -2,6 +2,32 @@
   "date": "2026-11-19",
   "event": "",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 363,
+      "runs": 235,
+      "team": "Dolphins",
+      "wickets": 10
+    },
+    {
+      "balls": 505,
+      "runs": 251,
+      "team": "Western Province",
+      "wickets": 10
+    },
+    {
+      "balls": 557,
+      "runs": 294,
+      "team": "Dolphins",
+      "wickets": 10
+    },
+    {
+      "balls": 598,
+      "runs": 253,
+      "team": "Western Province",
+      "wickets": 10
+    }
+  ],
   "match_id": "crex-dol-vs-wp-10th-first-class-csa-4-day-series-division-1-2026-27-match-updates-1572",
   "match_type": "MDM",
   "player_of_match": "",
