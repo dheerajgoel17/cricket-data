@@ -205,3 +205,23 @@ def test_haryana_ankit_kumar_links_to_his_profile_among_namesakes():
     assert table["s"][pid] == "26U"
     assert added[pid] == "26U"
     assert review == []
+
+
+def test_verified_priced_player_links_replace_conflicting_photo_matches():
+    from pathlib import Path
+
+    overrides = I.load_overrides(Path(__file__).resolve().parents[2] / "data")
+    cases = [
+        ("e4cdf230", "DG", "anukul roy", "OXJ", "alex roy", "e4cdf230"),
+        ("5d69930d", "8IL", "daniel smith", "8IL", "daniel smith", "35205dfc"),
+        ("dd572696", "AAU", "haider ali", "17L", "haider ali", "dd572696"),
+        ("8e554b6b", "CMY", "abdul samad", "CMY", "abdul samad", "8e514b4c"),
+    ]
+    for pid, sid, name, conflicting_sid, conflicting_name, conflicting_pid in cases:
+        sitemap = list({sid: name, conflicting_sid: conflicting_name}.items())
+        table, _, added, _ = I.build(
+            {conflicting_pid: f"c:{conflicting_sid}"}, sitemap, {}, {},
+            {pid: overrides[pid]},
+        )
+        assert table["s"] == {pid: sid}
+        assert added == {pid: sid}
