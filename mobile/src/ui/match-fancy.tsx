@@ -236,20 +236,17 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
         <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />
       ) : null}
       {mode === "list" && (overview.length > 0 || liveScored.length > 0) ? (
-        <View style={{ gap: space.snug }}>
-          {liveMatch?.status === "live" ? <Text style={styles.note}>So far this match, delayed up to about 20 seconds. Not used for settlement.</Text> : null}
-          <View style={styles.bleed}>
-            {overview.map((r: any, i: number) => (
-              <Reflow key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
-                <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
-              </Reflow>
-            ))}
-            {liveScored.map(({ m, r }, i) => (
-              <View key={`live-${i}-${m.market}`} style={(overview.length > 0 || i > 0) && styles.sep}>
-                <LiveMarketRow m={m} scored={r} />
-              </View>
-            ))}
-          </View>
+        <View style={styles.bleed}>
+          {overview.map((r: any, i: number) => (
+            <Reflow key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
+              <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
+            </Reflow>
+          ))}
+          {liveScored.map(({ m, r }, i) => (
+            <View key={`live-${i}-${m.market}`} style={(overview.length > 0 || i > 0) && styles.sep}>
+              <LiveMarketRow m={m} scored={r} />
+            </View>
+          ))}
         </View>
       ) : null}
 
