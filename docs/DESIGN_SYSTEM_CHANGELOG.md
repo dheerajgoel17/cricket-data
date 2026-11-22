@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-22 — Chip scroll edges and selection
+- **Path:** `mobile/src/ui/h-scroll.tsx`, `mobile/src/ui/chips.tsx`, `mobile/src/ui/capsule.tsx`, `mobile/src/ui/match-chip.tsx`
+- **Change:** Full-width chip rails fade toward hidden content, with the native Android edge fade and UI-thread iOS gradient opacity. Selection colors use short transitions and update instantly with Reduce Motion.
+- **Callers:** Mobile chip rails, capsule tabs and match chips
+
 ### 2026-11-22 — Mobile filter and list spacing
 - **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/grid-table.tsx`, `mobile/src/ui/hot-home.tsx`
 - **Change:** Share filter bar padding and active-chip spacing across screens. Grid and Custom line use the compact filter sheet. Home's mixed market list gives each row one divider.
