@@ -17,7 +17,7 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ### 2026-11-22 — Mobile fixture prop filters
 - **Path:** `mobile/src/app/fixture/[id]/index.tsx`, `mobile/src/ui/sheet.tsx`, `mobile/src/ui/match-fancy.tsx`
-- **Change:** Fixture Props uses a hit-rate window button beside the prop-type chips. It uses the same compact sheet as Match Fancy, with window, sort and team choices. Both filter rows use even vertical padding, and the sheet uses consistent spacing between sections. Match Fancy omits the Bookmaker lines heading.
+- **Change:** Fixture Props uses a hit-rate window button beside the prop-type chips. It uses the same compact sheet as Match Fancy, with window, sort and team choices. Both filter rows use even vertical padding, and the sheet uses consistent spacing between sections. Match Fancy starts its market list directly below the filters and uses a single hairline between rows.
 - **Callers:** Mobile Fixture Props and Match Fancy
 
 ### 2026-11-21 — Directory and statistics pages

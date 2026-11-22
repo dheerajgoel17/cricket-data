@@ -197,10 +197,10 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
   if (!store || !matchesReady) return <Working label="Loading…" shape="rows" />;
 
   return (
-    <View style={styles.root}>
+    <View style={mode === "detail" ? styles.root : undefined}>
       <View style={styles.filterRow}>
         {scopes.length > 1 ? (
-          <View style={styles.chipFlex}><Chips items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
+          <View style={styles.chipFlex}><Chips flush items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
         ) : <View style={styles.chipFlex} />}
         <FilterButton label={`L${win}`} count={activeN} onPress={() => setFiltersOpen(true)} />
       </View>
@@ -238,14 +238,12 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       {mode === "list" && (overview.length > 0 || liveScored.length > 0) ? (
         <View style={styles.bleed}>
           {overview.map((r: any, i: number) => (
-            <Reflow key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
-              <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
+            <Reflow key={r.id || fancyFm(r.key, r.inn || 0)}>
+              <OverviewRow separated={i > 0} r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
             </Reflow>
           ))}
           {liveScored.map(({ m, r }, i) => (
-            <View key={`live-${i}-${m.market}`} style={(overview.length > 0 || i > 0) && styles.sep}>
-              <LiveMarketRow m={m} scored={r} />
-            </View>
+            <LiveMarketRow key={`live-${i}-${m.market}`} m={m} scored={r} separated={overview.length > 0 || i > 0} />
           ))}
         </View>
       ) : null}
@@ -403,12 +401,11 @@ const styles = StyleSheet.create({
     borderBottomColor: color.hairline,
   },
   chipFlex: { flex: 1, minWidth: 0 },
-  activeRow: { gap: space.snug, paddingVertical: space.tight },
+  activeRow: { gap: space.snug, paddingVertical: space.snug },
   clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
   h3: { ...t.bodyLabel, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
   bleed: { marginHorizontal: -space.gutter },
-  sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   live: { ...type.callout, color: color.primary },
   stats: { flexDirection: "row", alignItems: "flex-end", gap: space.group },

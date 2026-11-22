@@ -34,6 +34,7 @@ import { BlurBar, BlurTargetView, useChromeScrim, useCollapseOnScroll } from "@/
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { CapsuleTabs } from "@/ui/capsule";
 import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton } from "@/ui/chips";
+import { HScroll } from "@/ui/h-scroll";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { GridFilters, GridTable, TrendList } from "@/ui/grid-table";
@@ -167,10 +168,10 @@ export default function FixturePage() {
                     }} />
                   </View>
                   {active.length ? (
-                    <View style={styles.activeRow}>
+                    <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
                       {active.map((filter) => <ActiveChip key={filter.key} label={`${filter.label} ${filter.value}`} onClear={() => setFilters((s) => clearFilter(s, filter.key))} />)}
                       <Press accessibilityRole="button" onPress={() => setFilters((s) => ({ ...s, win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team }))}><Text style={styles.clearAll}>Clear all</Text></Press>
-                    </View>
+                    </HScroll>
                   ) : null}
                   {isLoading ? (
                     <Working label="Scoring this match's lines…" rows={4} />
@@ -265,7 +266,7 @@ const styles = StyleSheet.create({
   bleed: { marginHorizontal: -space.gutter },
   toolbar: { flexDirection: "row", alignItems: "center", paddingHorizontal: space.gutter, paddingVertical: space.snug, gap: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   chipFlex: { flex: 1, minWidth: 0 },
-  activeRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingBottom: space.snug },
+  activeRow: { alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   clearAll: { ...t.calloutLabel, color: color.primary },
   sections: { paddingTop: rhythm.top },
   gridHead: { flexDirection: "row", alignItems: "center", gap: space.tight },

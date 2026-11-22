@@ -10,10 +10,10 @@ import { AnimatedText, Text } from "@/ui/text";
 import { color, control, radius, space, type, font, tint, duration, t, d, state, icon } from "@/ui/tokens";
 
 /** The site's series chips: one row that scrolls sideways, the chosen one filled with the accent colour (the fill fades between chips); each carries how many matches it holds. */
-export function Chips({ items, value: valueProp, onChange: onChangeProp }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void }) {
+export function Chips({ items, value: valueProp, onChange: onChangeProp, flush }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void; flush?: boolean }) {
   const [value, onChange] = useChoice(valueProp, onChangeProp);
   return (
-    <HScroll contentContainerStyle={styles.row} accessibilityRole="tablist">
+    <HScroll contentContainerStyle={flush ? styles.flushRow : styles.row} accessibilityRole="tablist">
       {items.map(([id, label, count, muted]) => (
         <Chip key={id} label={label} count={count} muted={muted} on={id === value} onPress={() => { if (id !== value) { void Haptics.selectionAsync(); onChange(id); } }} />
       ))}
@@ -73,6 +73,7 @@ export function ChoiceRow({ children }: { children: ReactNode }) {
 }
 
 const styles = StyleSheet.create({
+  flushRow: { gap: space.tight },
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },
   label: { ...t.calloutLabel },

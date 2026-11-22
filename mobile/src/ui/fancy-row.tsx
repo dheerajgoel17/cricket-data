@@ -40,7 +40,7 @@ export function BookList({ books, shown }: { books: { source: string; over: numb
  * Scan list row (site OverviewRow / PropLines-compact twin): crest · label · one priced side · Edge · MiniBars.
  * `inset`: pad with card inset (Fancy MatchCard) instead of page gutter (full-bleed lists).
  */
-export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset }: { r: any; onOpen?: () => void; active?: boolean; standing?: Standing | null; sub?: string; extra?: ReactNode; inset?: boolean }) {
+export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset, separated = true }: { r: any; onOpen?: () => void; active?: boolean; standing?: Standing | null; sub?: string; extra?: ReactNode; inset?: boolean; separated?: boolean }) {
   const under = r.side === "under";
   const lean = under ? "U" : "O";
   const leanLine = under && r.underLine != null ? r.underLine : r.overLine != null ? r.overLine : r.line;
@@ -50,7 +50,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset }: 
   const edgeColor = r.edge == null ? color["muted-foreground"] : r.edge > 0 ? color.primary : color.miss;
   const padX = inset ? space.inset : space.gutter;
   return (
-    <View style={[styles.row, active && styles.active]}>
+    <View style={[separated && styles.row, active && styles.active]}>
       <Press onPress={onOpen} disabled={!onOpen} accessibilityRole="button" accessibilityLabel={`Open ${r.label}`} style={[styles.main, { paddingHorizontal: padX }]}>
         {r.team
           ? <TeamBadge name={r.team} size={control} />

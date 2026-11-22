@@ -11,12 +11,13 @@ function leanSide(over: number, under: number) {
  * Match Fancy `liveRows`: same OverviewRow as scored fancy — `live` → In Play Market.
  * Prefer `scored` from `scoreLiveOuRow` (Edge + L10). No book logo.
  */
-export function LiveMarketRow({ m, scored }: { m: any; scored?: any | null }) {
-  if (scored) return <OverviewRow r={scored} />;
+export function LiveMarketRow({ m, scored, separated }: { m: any; scored?: any | null; separated?: boolean }) {
+  if (scored) return <OverviewRow separated={separated} r={scored} />;
   if (m.kind === "ou") {
     const side = leanSide(m.over, m.under);
     return (
       <OverviewRow
+        separated={separated}
         r={{
           label: m.market,
           live: true,
@@ -33,6 +34,7 @@ export function LiveMarketRow({ m, scored }: { m: any; scored?: any | null }) {
   const first = m.outcomes?.[0];
   return (
     <OverviewRow
+      separated={separated}
       r={{
         label: m.market,
         live: true,
