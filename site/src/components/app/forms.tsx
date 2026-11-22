@@ -1,8 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, type FormEvent, type ReactNode } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 
 export type Q = Record<string, string>;
+
+export function DirectorySearch({ label, value, onChange, className }: { label: string; value: string; onChange: (value: string) => void; className?: string }) {
+  return (
+    <InputGroup className={cn("h-control rounded-(--chip-radius) border-0 bg-muted", className)}>
+      <InputGroupAddon><MagnifyingGlassIcon className="size-4" aria-hidden /></InputGroupAddon>
+      <InputGroupInput type="search" placeholder={label} aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} className="text-body" />
+      {value && <InputGroupAddon align="inline-end"><InputGroupButton size="icon-xs" aria-label={`Clear ${label.toLowerCase()}`} onClick={() => onChange("")}><XMarkIcon className="size-4" aria-hidden /></InputGroupButton></InputGroupAddon>}
+    </InputGroup>
+  );
+}
 
 /** The page's query string as an object, plus a setter that merges (empty values are dropped). */
 export function useQ(): [Q, (patch: Record<string, unknown>, opts?: { replace?: boolean }) => void] {

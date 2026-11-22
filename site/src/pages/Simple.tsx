@@ -6,15 +6,14 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ChevronRightIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from "@/components/ui/item";
 import { RULES } from "@cricket/engine/rules.js";
 import { useData } from "@/lib/data";
 import { localWhen, num, odds, pc, tzName } from "@/lib/format";
 import { Crumbs, DataTable, Muted, OddsText, PageTitle, StatTile } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
-import { Field, NativeSelect } from "@/components/app/forms";
+import { DirectorySearch, Field, NativeSelect } from "@/components/app/forms";
 import { PillGroup } from "@/components/app/pill-group";
 import { PlayerBadge, TeamBadge } from "@/components/app/badges";
 import { FORMATS } from "@cricket/engine/util.js";
@@ -117,7 +116,7 @@ export function GlossaryPage() {
       <Crumbs items={[["Home", "/"], ["Tools", "/tools"], ["Cricket stats explained"]]} />
       <PageTitle sub="Every market, rule and number on this site, in plain words.">Cricket stats explained</PageTitle>
       <Card className="flex-row flex-wrap items-center gap-stack p-inset shadow-none">
-        <Input type="search" aria-label="Search stats and rules" placeholder="Search stats and rules" value={t} onChange={(e) => setT(e.target.value)} className="min-w-52 flex-1" />
+        <DirectorySearch label="Search stats and rules" value={t} onChange={setT} className="min-w-52 flex-1" />
         <NativeSelect name="c" options={cats.map((x) => [x, x])} defaultValue={c} onChange={(e) => setC(e.target.value)} />
         <NativeSelect name="l" options={levels.map((x) => [x, x])} defaultValue={l} onChange={(e) => setL(e.target.value)} />
       </Card>
@@ -182,12 +181,8 @@ export function PlayersPage() {
   const change = (v: string) => { setText(v); setQ({ q: v }); };
   return (
     <div className="flex flex-col gap-stack">
-      <h1 className="text-title font-emphasis tracking-tight">Players</h1>
-      <InputGroup className="h-control rounded-[10px] border-0 bg-muted">
-        <InputGroupAddon><MagnifyingGlassIcon className="size-4" /></InputGroupAddon>
-        <InputGroupInput type="search" placeholder="Search a player (typos ok)" aria-label="Search players" value={text} onChange={(e) => change(e.target.value)} className="text-body" />
-        {text && <InputGroupAddon align="inline-end"><InputGroupButton size="icon-xs" aria-label="Clear" onClick={() => change("")}><XMarkIcon className="size-4" /></InputGroupButton></InputGroupAddon>}
-      </InputGroup>
+      <PageTitle>Players</PageTitle>
+      <DirectorySearch label="Search players" value={text} onChange={change} />
       {t.length < 2 ? <EmptyState compact title="Type at least two letters" body="Search finds players by name (typos ok)." />
         : !rows.length ? <EmptyState compact title={`No player matches “${t}”`} body="Try another spelling." /> : (
           <ul className="overflow-hidden rounded-2xl bg-card ring-1 ring-hairline">
@@ -228,8 +223,9 @@ export function TeamsPage() {
     <div className="flex flex-col gap-stack">
       <PageTitle>Teams &amp; venues</PageTitle>
       <PillGroup segmented layoutId="tv-tab" label="Directory" value={tab} onChange={(k) => setQ({ tab: k })} items={[["teams", "Teams"], ["venues", "Venues"]]} />
-      <Input type="search" aria-label={`Search ${tab}`} placeholder={`Search ${tab}`} value={text} onChange={(e) => setText(e.target.value)} />
-      <DataTable bleed columns={[tab === "teams" ? "Team" : "Venue", "Matches"]} rows={rows.map(([n, i, c]) => [<Link key={i} className="text-primary" to={`/${tab === "teams" ? "team" : "venue"}/${i}`}>{n}</Link>, c])} />
+      <DirectorySearch label={`Search ${tab}`} value={text} onChange={(value) => { setText(value); setQ({ q: value }); }} />
+      {rows.length ? <DataTable bleed columns={[tab === "teams" ? "Team" : "Venue", "Matches"]} rows={rows.map(([n, i, c]) => [<Link key={i} className="text-primary" to={`/${tab === "teams" ? "team" : "venue"}/${i}`}>{n}</Link>, c])} /> :
+        <EmptyState compact title={`No ${tab} found`} body="Try a different search." />}
     </div>
   );
 }

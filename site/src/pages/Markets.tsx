@@ -15,7 +15,7 @@ import { num, odds, pc } from "@/lib/format";
 import { setTitle } from "@/lib/title";
 import { useHeaderFlush } from "@/lib/header-slot";
 import { useFixtures, useRunPlan } from "@/hooks/useEngine";
-import { Field, HOME_AWAY, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
+import { DirectorySearch, Field, HOME_AWAY, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
 import { EntityHero } from "@/components/app/entity-hero";
 import { HeroWash, sideAccent } from "@/components/app/hero-wash";
 import { PillTabs } from "@/components/app/pill-tabs";
@@ -27,7 +27,6 @@ import { Crumbs, DataTable, Muted, OddsText, PageTitle, Panel, StickyFilterBand 
 import { PlayerName } from "@/components/app/player-name";
 import { EmptyState } from "@/components/app/empty-state";
 import { ResultView } from "@/components/app/result";
-import { NextMatch } from "./Home";
 import { ListSkeleton } from "@/components/app/skeletons";
 import { FixtureCard } from "@/components/app/fixture-card";
 import { TournamentStats } from "@/components/app/tournament-stats";
@@ -65,8 +64,8 @@ export function CompetitionsPage() {
     <div className="flex flex-col gap-stack">
       <Crumbs items={[["Home", "/"], ["Competitions"]]} />
       <PageTitle>Competitions</PageTitle>
-      <Input type="search" aria-label="Search competitions" placeholder="Search competitions" value={text} onChange={(e) => { setText(e.target.value); setQ({ q: e.target.value }); }} />
-      <Panel flat>
+      <DirectorySearch label="Search competitions" value={text} onChange={(value) => { setText(value); setQ({ q: value }); }} />
+      {rows.length ? <Panel flat>
         {rows.map(([e, c]) => (
           <Link key={e} to={`/league/${e}`} className="flex min-h-row items-center gap-snug border-b border-hairline px-inset py-snug last:border-b-0 hover:bg-accent">
             <LeagueBadge name={store.events[e]} size="md" />
@@ -75,7 +74,7 @@ export function CompetitionsPage() {
             <ArrowRightIcon className="size-4 text-muted-foreground" />
           </Link>
         ))}
-      </Panel>
+      </Panel> : <EmptyState compact title="No competitions found" body="Try a different search." />}
     </div>
   );
 }
@@ -186,7 +185,6 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
       ) : (
         <EntityHero name={label} sub={ground ? `${ground.total} matches` : "Ground"} meta={[fmtName, ...(ground?.by || [])]} />
       )}
-      {!isTeam && nextFx ? <NextMatch f={nextFx} /> : null}
       {isTeam && (
         <StickyFilterBand>
           <div className="border-b border-hairline px-gutter pt-snug">
@@ -207,9 +205,9 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
             : top.isError ? <EmptyState title="Could not load batting leaders" body="Try another format or reload the page." /> : <ListSkeleton rows={4} />}
         </TabsContent>
       </PillTabs>
-      {isTeam && nextFx && (
-        <section className="flex flex-col gap-snug" aria-labelledby="team-next-match">
-          <h2 id="team-next-match" className="text-title font-emphasis">Next match</h2>
+      {nextFx && (
+        <section className="flex flex-col gap-snug" aria-labelledby="market-next-match">
+          <h2 id="market-next-match" className="text-title font-emphasis">Next match</h2>
           <div className="w-full max-w-(--fixture-card)"><FixtureCard f={nextFx} /></div>
         </section>
       )}

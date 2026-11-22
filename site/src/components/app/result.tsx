@@ -2,9 +2,9 @@
 import { Link } from "react-router-dom";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { odds, num, pc } from "@/lib/format";
 import { Chips, DataTable, Muted, OddsText, Panel, StatGridCards, StatTile } from "./page";
+import { EmptyState } from "./empty-state";
 import { ChartBars } from "./chart";
 import { RateHeatStrip } from "./viz";
 import { rateClass } from "@/lib/heat";
@@ -38,15 +38,15 @@ export function SplitTables({ splits, title = (k: string) => k }: { splits: Reco
 
 /** Turns a runPlan() result into UI. Every number shown here was computed by the engine from the data. */
 export function ResultView({ r, source }: { r: any; source?: string }) {
-  if (!r.ok) return <Card className="border-destructive px-inset py-snug shadow-none"><p>{r.error}</p></Card>;
+  if (!r.ok) return <EmptyState compact title="No results" body={r.error} />;
   return (
     <div className="grid gap-stack">
-      <Card className="gap-hair border-l-4 border-l-primary px-inset py-snug shadow-none">
+      <header className="flex flex-col gap-hair border-b border-hairline pb-snug">
         {source ? <Badge variant="secondary" className="w-fit">{source}</Badge> : null}
         <h2 className="text-title font-emphasis leading-snug">{r.headline}</h2>
         <Muted>Sample size: {r.sample.n} {r.sample.unit}.</Muted>
         <Chips list={r.filters} />
-      </Card>
+      </header>
       {r.kind === "player_prop" && <PlayerProp r={r} />}
       {r.kind === "partnership" && <Partnership r={r} />}
       {r.kind === "match_market" && r.tables.filter((t: any) => t.n).map((t: any) => (
