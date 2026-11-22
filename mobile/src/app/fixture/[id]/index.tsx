@@ -74,14 +74,14 @@ export default function FixturePage() {
   const scope = useMemo(() => (f && f.fmt !== "FC" && tab === "props" ? { teams: [f.a, f.b] as [string, string], archive: archived } : undefined), [f, tab, archived]);
   const [filters, setFilters] = useState<Screener>(DEFAULTS);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [draft, setDraft] = useState({ win: DEFAULTS.win, sort: DEFAULTS.sort });
+  const [draft, setDraft] = useState({ win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team });
   const { rows, isLoading, scoring, error, soFarOf, outOf, matchOf } = useHotView(scope, undefined, archived ? doc : undefined);
   // this match: the same two sides, a Test on any of its days, not the series' next game
   const here = useMemo(() => (f ? rows.filter((r) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: f.a, b: f.b, start: f.start, fmt: f.fmt })) : []), [rows, f]);
   const statKeys = useMemo(() => [...new Set(here.map((r) => r.stat))], [here]);
   const stat = statKeys.includes(filters.stat) ? filters.stat : "all";
   const propTeams = useMemo(() => options(here, "team"), [here]);
-  const active = activeFilters(filters).filter(({ key }) => key !== "team");
+  const active = activeFilters(filters);
   const shown = useMemo(() => {
     const { win } = filters;
     const scored = here
@@ -159,18 +159,17 @@ export default function FixturePage() {
                 <>
                   <View style={styles.toolbar}>
                     <View style={styles.chipFlex}>
-                      {propTeams.length ? <Chips items={[["all", "Match"], ...propTeams.map((team) => [team, abbr(team)] as [string, string])]} value={filters.team} onChange={(team) => setFilters((s) => ({ ...s, team }))} /> : null}
+                      <CapsuleTabs flush label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={(stat) => setFilters((s) => ({ ...s, stat }))} />
                     </View>
                     <FilterButton label={WIN_LABEL[filters.win]} count={active.length} onPress={() => {
-                      setDraft({ win: filters.win, sort: filters.sort });
+                      setDraft({ win: filters.win, sort: filters.sort, team: filters.team });
                       setFiltersOpen(true);
                     }} />
                   </View>
-                  {statKeys.length > 1 ? <CapsuleTabs label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={(stat) => setFilters((s) => ({ ...s, stat }))} /> : null}
                   {active.length ? (
                     <View style={styles.activeRow}>
                       {active.map((filter) => <ActiveChip key={filter.key} label={`${filter.label} ${filter.value}`} onClear={() => setFilters((s) => clearFilter(s, filter.key))} />)}
-                      <Press accessibilityRole="button" onPress={() => setFilters((s) => ({ ...s, win: DEFAULTS.win, sort: DEFAULTS.sort }))}><Text style={styles.clearAll}>Clear all</Text></Press>
+                      <Press accessibilityRole="button" onPress={() => setFilters((s) => ({ ...s, win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team }))}><Text style={styles.clearAll}>Clear all</Text></Press>
                     </View>
                   ) : null}
                   {isLoading ? (
@@ -185,7 +184,7 @@ export default function FixturePage() {
                   ) : scoring ? (
                     <Working label="Scoring this match's lines…" />
                   ) : (
-                    <View style={styles.pad}><EmptyState title={active.length || filters.team !== "all" || stat !== "all" ? "No props match these filters" : here.length ? "Not enough history" : "No props yet"} body={active.length || filters.team !== "all" || stat !== "all" ? "Change a filter to see more props." : here.length ? "Try a different hit-rate window." : "No player props are priced for this match yet."} /></View>
+                    <View style={styles.pad}><EmptyState title={active.length || stat !== "all" ? "No props match these filters" : here.length ? "Not enough history" : "No props yet"} body={active.length || stat !== "all" ? "Change a filter to see more props." : here.length ? "Try a different hit-rate window." : "No player props are priced for this match yet."} /></View>
                   )}
                 </>
               ) : tab === "fancy" ? (
@@ -229,7 +228,7 @@ export default function FixturePage() {
       </View>
       {tab === "props" ? (
         <FilterSheet visible={filtersOpen} onClose={() => setFiltersOpen(false)}
-          onClear={() => setDraft({ win: DEFAULTS.win, sort: DEFAULTS.sort })}
+          onClear={() => setDraft({ win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team })}
           onApply={() => { setFilters((s) => ({ ...s, ...draft })); setFiltersOpen(false); }}
         >
           <FilterSection label="Hit-rate window">
@@ -238,6 +237,14 @@ export default function FixturePage() {
           <FilterSection label="Sort">
             <ChoiceRow>{(Object.keys(SORT_LABEL) as Sort[]).map((sort) => <ChoiceChip key={sort} label={SORT_LABEL[sort]} on={draft.sort === sort} onPress={() => setDraft((d) => ({ ...d, sort }))} />)}</ChoiceRow>
           </FilterSection>
+          {propTeams.length ? (
+            <FilterSection label="Team">
+              <ChoiceRow>
+                <ChoiceChip label="Any team" on={draft.team === "all"} onPress={() => setDraft((d) => ({ ...d, team: "all" }))} />
+                {propTeams.map((team) => <ChoiceChip key={team} label={team} on={draft.team === team} onPress={() => setDraft((d) => ({ ...d, team }))} />)}
+              </ChoiceRow>
+            </FilterSection>
+          ) : null}
         </FilterSheet>
       ) : null}
       <TabFade withTabBar={false} />
