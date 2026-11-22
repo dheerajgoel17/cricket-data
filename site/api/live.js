@@ -1,4 +1,4 @@
-// GET /api/live -> {asOf, source, matches[]} (wrapped with DATA_WRAP_KEY when set). Source A only, cached ~15 s.
+// GET /api/live -> {asOf, source, matches[]} (wrapped with DATA_WRAP_KEY when set). Source A only, cached ~3 s.
 // The source's home list still shows a Test at stumps after the schedule page (live and upcoming only, cached ~5 min) has dropped it; both pages give match URLs and scores. Only matches the books price are kept.
 // A finished match drops off those pages soon after the end; a priced one that began in the keep window (24 h, 6 days for a Test, including close of play) is then read from its own match page (the path is in our schedule file).
 // For live ones (and ones about to start) the match page (max-age 10 s) adds fresh scores, the current pair, partnership and run rates,
@@ -7,7 +7,7 @@
 // so the browser does no matching of its own. While a match is on that is "so far"; a "final" state in a finished match is its result (the archive job stores those).
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { LIVE_TTL_MS } from "@cricket/engine/live.js";
+import { LIVE_SCORE_TTL_MS } from "@cricket/engine/live.js";
 import { createFeed } from "@cricket/engine/feed.js";
 import { identityIndex, NO_IDENTITY } from "@cricket/engine/identity.js";
 import { wireSync } from "@cricket/engine/wrap-node.js";
@@ -66,13 +66,14 @@ async function send(res, status, body) {
 }
 
 export function liveHandler(readIdentity = () => readFile(join(process.cwd(), IDENTITY_FILE), "utf8").then(JSON.parse)) {
-  const feed = createFeed({ base, getJson, getText, getHtml, loadIdentity: identityLoader(readIdentity) });
+  const feed = createFeed({ base, getJson, getText, getHtml, loadIdentity: identityLoader(readIdentity), ttlMs: LIVE_SCORE_TTL_MS });
   return async function handler(req, res) {
-    res.setHeader("Cache-Control", `public, s-maxage=${LIVE_TTL_MS / 1000}, stale-while-revalidate=45`);
+    res.setHeader("Cache-Control", `public, s-maxage=${LIVE_SCORE_TTL_MS / 1000}`);
     if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
     try {
       return send(res, 200, await feed.snapshot());
     } catch (e) {
+      res.setHeader("Cache-Control", "no-store");
       if (feed.last()) return send(res, 200, { ...feed.last(), stale: true });
       const msg = e.name === "TimeoutError" ? "timeout" : String(e.message || "unavailable").slice(0, 80);
       return send(res, 502, { error: msg, asOf: new Date().toISOString(), source: "live", matches: [] });

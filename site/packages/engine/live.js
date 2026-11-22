@@ -5,6 +5,11 @@ import { BOOK_WINDOW_MS as LINE_BOOK_WINDOW, TEST_KEEP_MS, keepMsFor, sameFmt, s
 import { SAME_SIDE, norm, surnamesEq } from "./util.js";
 
 export const LIVE_TTL_MS = 15_000;
+export const LIVE_SCORE_TTL_MS = 3_000;
+
+export function liveScorePollMs(doc) {
+  return doc?.matches?.some((match) => match.status === "live") ? LIVE_SCORE_TTL_MS : LIVE_TTL_MS;
+}
 export const BOOK_WINDOW_MS = LINE_BOOK_WINDOW;
 /** A Test is priced and played over several days; the books keep it for 6 days and so must the live feed. */
 export const TEST_WINDOW_MS = TEST_KEEP_MS;

@@ -78,3 +78,33 @@ test("snapshot returns live cards without waiting on a slow finished card", asyn
   assert.ok((done2?.players || []).length > 0, "the finished card is kept for the next snapshot");
   assert.ok(calls.some((u) => u.includes("/match/done")), "the finished card was still requested");
 });
+
+test("the fast score feed refreshes live cards while reusing discovery and completed cards", async () => {
+  const calls = [];
+  let at = Date.parse(START) - 12 * 60 * 60_000;
+  const feed = createFeed({
+    now: () => at,
+    ttlMs: 3000,
+    base: () => "https://src.test",
+    getJson: async () => ({ lines: [
+      { match: "West Indies vs Bangladesh", start_utc: START, fmt: "Test" },
+      { match: "India vs New Zealand", start_utc: "2026-11-04T03:00:00Z", fmt: "ODI" },
+    ] }),
+    getText: async () => "",
+    loadIdentity: async () => NO_IDENTITY,
+    getHtml: async (url) => {
+      calls.push(url);
+      return url.includes("/match/") ? livePage : schedule;
+    },
+  });
+  const first = await feed.snapshot();
+  assert.deepEqual(first.matches.map((match) => match.id), ["LIVE1", "DONE1"]);
+  assert.equal(first.delaySec, 3);
+  at += 2999;
+  assert.equal(await feed.snapshot(), first);
+  at += 1;
+  assert.notEqual(await feed.snapshot(), first);
+  assert.equal(calls.filter((url) => url.endsWith("/schedule")).length, 1);
+  assert.equal(calls.filter((url) => url.endsWith("/match/live")).length, 2);
+  assert.equal(calls.filter((url) => url.endsWith("/match/done")).length, 1);
+});

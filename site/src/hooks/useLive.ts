@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { bookFixtures, fixtureInBooks, liveForFixture } from "@cricket/engine/live.js";
 import { linesQuery, liveQuery } from "@/lib/queries";
 
-/** The /api/live body, polled every ~15 s (see `liveQuery`). */
+/** The /api/live body, polled every ~3 s while a match is live (see `liveQuery`). */
 export function useLiveDoc() {
   return useQuery(liveQuery);
 }

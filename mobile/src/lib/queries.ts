@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppState } from "react-native";
 import { focusManager, queryOptions } from "@tanstack/react-query";
-import { LIVE_TTL_MS, mergeBoardLive } from "@cricket/engine/live.js";
+import { LIVE_SCORE_TTL_MS, LIVE_TTL_MS, liveScorePollMs, mergeBoardLive } from "@cricket/engine/live.js";
 import { getJson, peekJson } from "@/lib/net";
 import { readLive, saveLive } from "@/lib/storage";
 
@@ -13,7 +13,7 @@ async function loadBoardScores(): Promise<any | null> {
   } catch { return null; }
 }
 
-// Feeds the Home rail reads. Same cadence as the site: the fixture and book files are fresh for 10 minutes, /api/live is polled every ~15 s.
+// Feeds the Home rail reads. Same cadence as the site: the fixture and book files are fresh for 10 minutes, /api/live is polled every ~3 s during live play.
 // Both start from the copy kept by the last launch when it is under 3 hours old (counted as stale, so the real one is asked for at once): the rail and the kept Hot rows paint while the request is out.
 export const KEPT_MS = 3 * 60 * 60e3;
 /** Keep shared feeds in memory after leaving a screen so back-navigation does not rebuild from empty (default react-query gc is ~5 min). */
@@ -48,8 +48,8 @@ export const liveQuery = queryOptions({
       return readLive()?.body ?? null;
     }
   },
-  refetchInterval: LIVE_TTL_MS,
-  staleTime: LIVE_TTL_MS,
+  refetchInterval: (query) => liveScorePollMs(query.state.data),
+  staleTime: LIVE_SCORE_TTL_MS,
   gcTime: FEED_GC_MS,
   placeholderData: (p: any) => p,
   // Kept live paints scores at once; useLive({ defer }) only delays the network refetch on Android.
