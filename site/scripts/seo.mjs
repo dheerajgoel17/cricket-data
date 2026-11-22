@@ -7,7 +7,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { BRAND, DEFAULT_DESC, ROUTES, TAGLINE, fullTitle, pageMeta, shareMetas } from "../src/lib/seo.js";
 import { bookFixtures, fixtureInBooks } from "@cricket/engine/live.js";
-import { isFixtureId } from "@cricket/engine/lines.js";
+import { isFixtureId, keepMsFor } from "@cricket/engine/lines.js";
 import { cardPath } from "@cricket/engine/card-path.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -46,16 +46,16 @@ export function render(template, page) {
 export function homeSnapshot(fixtures, lines, now = Date.now()) {
   const books = bookFixtures(lines);
   const priced = fixtures.filter((f) => isFixtureId(f.id) && !f.noProps && fixtureInBooks(books, f));
-  const live = priced.filter((f) => f.status === "Live" && f.cardScores?.some((s) => s?.display));
+  const live = priced.filter((f) => f.status === "Live" && Date.parse(f.start) > now - keepMsFor(f.fmt));
   const upcoming = priced.filter((f) => !["Live", "Started", "Completed"].includes(f.status) && Date.parse(f.start) > now)
     .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
-  const rows = (live.length ? live : upcoming).slice(0, 4);
+  const rows = live.length ? live : upcoming.slice(0, 4);
   if (!rows.length) return "";
   const cards = rows.map((f) => {
     const teams = [f.a, f.b].map((name, i) => `<div class="flex min-w-0 items-center gap-snug"><span aria-hidden="true" class="inline-grid size-9 shrink-0 place-items-center text-caption text-muted-foreground">${esc(String(name).split(/\s+/).slice(0, 3).map((word) => word[0]).join(""))}</span><span class="min-w-0 flex-1 truncate text-body font-emphasis">${esc(name)}</span><span class="text-footnote tabular-nums">${esc(f.cardScores?.[i]?.display)}</span></div>`).join("");
     const status = f.status === "Live" ? "Live" : "Upcoming";
     const start = new Date(f.start);
-    const detail = status === "Live" ? "Live score" : `<time datetime="${esc(f.start)}">${esc(start.toUTCString().replace(/:00 GMT$/, " UTC"))}</time>`;
+    const detail = status === "Live" ? (f.cardScores?.some((s) => s?.display) ? "Live score" : "Score updating") : `<time datetime="${esc(f.start)}">${esc(start.toUTCString().replace(/:00 GMT$/, " UTC"))}</time>`;
     return `<div role="listitem" class="w-(--fixture-card) shrink-0 snap-start"><a href="/fixture/${esc(f.id)}" class="flex min-h-48 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-inset ring-hairline"><span class="text-footnote font-label text-muted-foreground">${status} · ${esc(f.fmt)}${f.gender === "female" ? " · W" : ""}</span>${teams}<div class="mt-auto flex min-w-0 items-center justify-between gap-snug pt-tight"><div class="grid min-w-0"><span class="truncate text-footnote font-label">${detail}</span><span class="truncate text-caption text-muted-foreground">${esc(f.venue)}</span></div><span class="text-footnote font-label text-primary">Props</span></div></a></div>`;
   }).join("");
   const label = live.length ? "In play" : "Pre-match";
