@@ -22,7 +22,7 @@ import { useLive } from "@/lib/use-live";
  * in-play poll does not rebuild the list. New live-priced lines are scored in a small
  * follow-up query; quote moves are patched onto existing rows (`patchHotQuotes`).
  */
-export function useHotRows(scope?: HotScope, doc?: any, innings?: "first" | "second") {
+export function useHotRows(scope?: HotScope, doc?: any) {
   // Do not auto-fetch the stats store on Home — matches.json + Resolver is a multi-second JS stall.
   // Seed/snap paint first; loadStore runs only when a leftover line truly needs player files.
   const stats = useQuery({ ...storeQuery, enabled: false });
@@ -36,8 +36,8 @@ export function useHotRows(scope?: HotScope, doc?: any, innings?: "first" | "sec
   const liveLines = useMemo(() => !scope || doc ? [] : hotLines((lines.data?.lines || []).filter(isLiveLine), scope, Date.now()), [scope, doc, lines.data]);
   const liveKey = useMemo(() => liveThresholdKey(liveLines), [liveLines]);
   // books generation only — live ticks must not invalidate this cache
-  const baseKey = ["hot-rows-prematch", what, stamp, generated, doc ? lines.data?.lines?.length : "", seedQ.data?.generated_at_utc ?? "", ...(innings ? [innings] : [])];
-  const snapKey = scope && "day" in scope && !doc && !innings ? hotSnapKey(what, stamp) : null;
+  const baseKey = ["hot-rows-prematch", what, stamp, generated, doc ? lines.data?.lines?.length : "", seedQ.data?.generated_at_utc ?? ""];
+  const snapKey = scope && "day" in scope && !doc ? hotSnapKey(what, stamp) : null;
   const snap = useMemo(() => (snapKey ? readHotSnap(snapKey) : null), [snapKey]);
   const loadStore = () => qc.ensureQueryData(storeQuery);
 
@@ -46,13 +46,12 @@ export function useHotRows(scope?: HotScope, doc?: any, innings?: "first" | "sec
     enabled: !!scope && !!lines.data && fixtures.isSuccess && seedQ.isFetched,
     staleTime: 10 * 60_000,
     gcTime: FEED_GC_MS,
-    placeholderData: (prev: Row[] | undefined, query) =>
-      query?.queryKey[6] === innings ? prev ?? snap?.rows : snap?.rows,
+    placeholderData: (prev: Row[] | undefined) => prev ?? snap?.rows,
     queryFn: async () => {
       if (snap && snapKey && snap.generated === generated && snap.rows.length) return snap.rows;
       const out = await scoreHotRows({
         store: stats.data?.store, rz: stats.data?.rz, loadStore,
-        lines: prematchLines(lines.data.lines), fixtures: fixtures.data!, scope: scope!, seed, innings, names: stats.data?.names ?? null,
+        lines: prematchLines(lines.data.lines), fixtures: fixtures.data!, scope: scope!, seed, names: stats.data?.names ?? null,
         seedOnly: Platform.OS === "android" && !!scope && "day" in scope && !stats.data,
         onRows: (r) => qc.setQueryData(baseKey, r),
       });
@@ -64,14 +63,14 @@ export function useHotRows(scope?: HotScope, doc?: any, innings?: "first" | "sec
   // Live-only history scoring needs the store. Android day scope stays on the seed — when useLinesLive later fills the store cache, do not kick off a multi-second leftover score on Home.
   const androidDay = Platform.OS === "android" && !!scope && "day" in scope;
   const liveExtra = useQuery({
-    queryKey: ["hot-rows-live", what, stamp, generated, liveKey, ...(innings ? [innings] : [])],
+    queryKey: ["hot-rows-live", what, stamp, generated, liveKey],
     enabled: !!scope && liveLines.length > 0 && fixtures.isSuccess && !!stats.data?.matchesReady && !androidDay,
     staleTime: LIVE_TTL_MS,
     gcTime: 5 * 60_000,
     queryFn: async () => {
       return scoreHotRows({
         store: stats.data?.store, rz: stats.data?.rz, loadStore,
-        lines: liveLines, fixtures: fixtures.data!, scope: scope!, seed: null, innings, names: stats.data?.names ?? null,
+        lines: liveLines, fixtures: fixtures.data!, scope: scope!, seed: null, names: stats.data?.names ?? null,
       });
     },
   });
@@ -106,8 +105,8 @@ function livePhaseSig(doc: any): string {
 }
 
 /** The rows ready to show: edge worked out, the live feed's word on each, and where a line stands so far. Ordered: matches in play, higher hit rate, higher edge. */
-export function useHotView(scope?: HotScope, phase?: HomePhase, doc?: any, innings?: "first" | "second") {
-  const hot = useHotRows(scope, doc, innings);
+export function useHotView(scope?: HotScope, phase?: HomePhase, doc?: any) {
+  const hot = useHotRows(scope, doc);
   const live = useLive({ defer: true });
   const identity = useQuery({ ...storeQuery, enabled: false }).data?.identity;
   const phaseSig = useMemo(() => livePhaseSig(live.data), [live.data]);

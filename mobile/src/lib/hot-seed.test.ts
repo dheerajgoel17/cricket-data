@@ -32,14 +32,3 @@ test("a line the file does not cover, or whose main line has moved, goes to the 
   expect(rows).toEqual([]);
   expect(loadStore).not.toHaveBeenCalled();
 });
-
-test.each(["first", "second"] as const)("fixture batting innings %s rescores history even when a seed exists", async (innings) => {
-  const l = line();
-  const loadStore = jest.fn(async () => ({ store: { P: { id: [] }, shardOf: () => 0, shard: async () => {} }, rz: {} }));
-  const rows = await scoreHotRows({
-    loadStore, lines: [l], fixtures: [], scope: { teams: ["Alpha", "Beta"], archive: true }, now: NOW,
-    seed: { [lineKey(l)]: rec() }, innings,
-  });
-  expect(loadStore).toHaveBeenCalledTimes(1);
-  expect(rows).toEqual([]);
-});

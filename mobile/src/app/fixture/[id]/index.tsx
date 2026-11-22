@@ -74,14 +74,14 @@ export default function FixturePage() {
   const scope = useMemo(() => (f && f.fmt !== "FC" && tab === "props" ? { teams: [f.a, f.b] as [string, string], archive: archived } : undefined), [f, tab, archived]);
   const [filters, setFilters] = useState<Screener>(DEFAULTS);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const { rows, isLoading, scoring, error, soFarOf, outOf, matchOf } = useHotView(scope, undefined, archived ? doc : undefined, filters.inns === "all" ? undefined : filters.inns);
+  const { rows, isLoading, scoring, error, soFarOf, outOf, matchOf } = useHotView(scope, undefined, archived ? doc : undefined);
   // this match: the same two sides, a Test on any of its days, not the series' next game
   const here = useMemo(() => (f ? rows.filter((r) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: f.a, b: f.b, start: f.start, fmt: f.fmt })) : []), [rows, f]);
   const statKeys = useMemo(() => [...new Set(here.map((r) => r.stat))], [here]);
   const stat = statKeys.includes(filters.stat) ? filters.stat : "all";
   const choices = useMemo(() => ({
-    days: [], matches: [], teams: options(here, "team"), formats: options(here, "fmt"),
-    comps: options(here, "comp"), winLabel: WIN_LABEL,
+    days: [], matches: [], teams: options(here, "team"), formats: [],
+    comps: [], winLabel: WIN_LABEL,
   }), [here]);
   const active = activeFilters(filters);
   const shown = useMemo(() => {
@@ -177,7 +177,7 @@ export default function FixturePage() {
                     <View style={styles.pad}><EmptyState title="Could not score lines" body="Go back and try again." /></View>
                   ) : shown.length ? (
                     <View>
-                      {shown.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.start}${r.inn}${r.quotes?.some((q: any) => q.live) ? "L" : ""}`} r={r} i={i} soFar={soFarOf(r)} out={r.out} bars={filters.bars} />)}
+                      {shown.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.start}${r.inn}${r.quotes?.some((q: any) => q.live) ? "L" : ""}`} r={r} i={i} soFar={soFarOf(r)} out={r.out} />)}
                       {scoring ? <Working label="Scoring more lines…" /> : null}
                     </View>
                   ) : scoring ? (
@@ -225,7 +225,7 @@ export default function FixturePage() {
           <PageHeader title={f ? `${f.a} v ${f.b}` : "Match"} subtitle={f ? seriesName(f) : undefined} right={f ? <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={icon.md} color={color.foreground} /></RoundButton> : undefined} />
         </BlurBar>
       </View>
-      {tab === "props" ? <ScreenerFilters open={filtersOpen} onOpenChange={setFiltersOpen} state={filters} onApply={setFilters} choices={choices} /> : null}
+      {tab === "props" ? <ScreenerFilters fixture open={filtersOpen} onOpenChange={setFiltersOpen} state={filters} onApply={setFilters} choices={choices} /> : null}
       <TabFade withTabBar={false} />
     </PageAtmosphere>
   );
