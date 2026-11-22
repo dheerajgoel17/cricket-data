@@ -14,20 +14,10 @@
   "start_utc": "2026-11-23T08:00:00Z",
   "alerted_at": "2026-11-20T12:32:37.516453+00:00"
  },
- "female|Adelaide Strikers Women|Brisbane Heat Women|2026-11-22|batter_fours||Grace Harris under 2.5|2.5|under": {
-  "edge": 0.0679,
-  "start_utc": "2026-11-22T04:40:00Z",
-  "alerted_at": "2026-11-20T22:35:47.451801+00:00"
- },
  "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-22|batter_fours||Sophie Molineux under 1.5|1.5|under": {
   "edge": 0.0542,
   "start_utc": "2026-11-22T08:10:00Z",
   "alerted_at": "2026-11-20T23:35:47.816988+00:00"
- },
- "female|Adelaide Strikers Women|Brisbane Heat Women|2026-11-22|batter_fours||Laura Wolvaardt under 3.5|3.5|under": {
-  "edge": 0.0572,
-  "start_utc": "2026-11-22T04:40:00Z",
-  "alerted_at": "2026-11-21T00:36:33.522642+00:00"
  },
  "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-22|batter_fours||Hayley Matthews over 2.5|2.5|over": {
   "edge": 0.0623,
