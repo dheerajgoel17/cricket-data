@@ -14,16 +14,6 @@
   "start_utc": "2026-11-23T08:00:00Z",
   "alerted_at": "2026-11-20T12:32:37.516453+00:00"
  },
- "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-22|batter_fours||Sophie Molineux under 1.5|1.5|under": {
-  "edge": 0.0542,
-  "start_utc": "2026-11-22T08:10:00Z",
-  "alerted_at": "2026-11-20T23:35:47.816988+00:00"
- },
- "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-22|batter_fours||Hayley Matthews over 2.5|2.5|over": {
-  "edge": 0.0623,
-  "start_utc": "2026-11-22T08:10:00Z",
-  "alerted_at": "2026-11-21T08:35:37.890233+00:00"
- },
  "male|Abu Dhabi Knight Riders|Dubai Capitals|2026-11-22|batter_fours||Sediqullah Atal under 1.5|1.5|under": {
   "edge": 0.0971,
   "start_utc": "2026-11-22T14:30:00Z",
