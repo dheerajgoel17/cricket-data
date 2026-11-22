@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-22 14:00 IST
+# Cricket value bets - 2026-11-22 14:05 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -6,15 +6,15 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **moviodds_bet365**: ok, 1231 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
 - **smarkets**: ok, 362 prices
+- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
 - **feedl**: ok, 497 prices, 14 events
-- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=safari270)
 - **feedk**: ok, 158 prices, 4 events
 - **feede**: ok, 346 prices, 13 events
-- **feedf**: ok, 332 prices, 10 events
 - **feedh**: ok, 877 prices, 34 events
-- **feedj**: ok, 667 prices, 13 events
+- **feedf**: ok, 332 prices, 13 events
+- **feedj**: ok, 607 prices, 12 events
 
-Matches starting in next 168h: **20**, markets priced: **288**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **20**, markets priced: **285**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -25,4 +25,4 @@ Matches starting in next 168h: **20**, markets priced: **288**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), Garden Route Badgers (W) (female), Lions (W) (female), Lokseva Academy (male), MID West Rhinos (male), Roma Gladiators (male), Rome Gladiators (male), Sunny 11 Pratishtan (male), Western Province (W) (female)
 
-Runtime 151.2s. Snapshot: `odds_20261122T083033Z.jsonl.gz`
+Runtime 112.1s. Snapshot: `odds_20261122T083550Z.jsonl.gz`
