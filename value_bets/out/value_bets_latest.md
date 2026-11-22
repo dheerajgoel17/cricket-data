@@ -1,41 +1,34 @@
-# Cricket value bets - 2026-11-21 13:00 IST
+# Cricket value bets - 2026-11-22 09:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1953 prices
-- **smarkets**: ok, 547 prices
-- **feedl**: ok, 658 prices, 30 events
-- **feedk**: ok, 213 prices, 7 events
-- **feedg**: ok, 24 prices, 4 events
+- **moviodds_bet365**: ok, 1909 prices
+- **smarkets**: ok, 475 prices
 - **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
-- **feedj**: ok, 616 prices, 7 events
-- **feedh**: ok, 1613 prices, 85 events
-- **feede**: ok, 890 prices, 36 events
-- **feedf**: ok, 884 prices, 28 events
+- **feedl**: ok, 615 prices, 28 events
+- **feedk**: ok, 215 prices, 6 events
+- **feedg**: ok, 48 prices, 7 events
+- **feedh**: ok, 1572 prices, 62 events
+- **feede**: ok, 756 prices, 32 events
+- **feedj**: ok, 1179 prices, 24 events
+- **feedf**: ok, 854 prices, 26 events
 
-Matches starting in next 168h: **47**, markets priced: **524**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **46**, markets priced: **531**, value bets: **2** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
-| 11-21 13:45 IST | Australia vs England | Batsman Match Runs | J Fraser-McGurk under 20.5 | 1.83 @ moviodds_bet365 | 1.74 | 0.6269 | 5.5% | 1.65% | medium |
-| 11-23 13:30 IST | South Africa vs Bangladesh | Bowler Milestones | Hasan Mahmud 5+ yes | 4.00 @ moviodds_bet365 | 3.21 | 0.3807 | 24.8% | 2.00% | low |
-| 11-23 13:30 IST | South Africa vs Bangladesh | Bowler Milestones | Mehidy Hasan Miraz 5+ yes | 4.00 @ moviodds_bet365 | 3.47 | 0.3275 | 15.2% | 1.27% | low |
-| 11-23 13:30 IST | South Africa vs Bangladesh | Bowler Total Match Wickets | Hasan Mahmud over 3.5 | 2.38 @ moviodds_bet365 | 2.21 | 0.5279 | 7.7% | 1.39% | low |
+| 11-22 13:40 IST | Melbourne Stars vs Melbourne Renegades | M13710 batter_fours | Hayley Matthews over 2.5 | 1.98 @ feedj_d | 1.86 | 0.5365 | 6.2% | 1.59% | medium |
+| 11-22 20:00 IST | Dubai Capitals vs Abu Dhabi Knight Riders | M13710 batter_fours | Sediqullah Atal under 1.5 | 1.98 @ feedj_d | 1.80 | 0.6202 | 9.7% | 2.00% | medium |
 
 ### Why / notes per bet
-- **Australia vs England / Batsman Match Runs / J Fraser-McGurk under 20.5** - why: Model 63% vs market 53% for under 20.5 runs; form 19.7 runs/inn recency-weighted T20 (n_eff 32.7; last 5: 0, 42, 19, 17, 8), bats in 95% of games played; at Melbourne Cricket Ground, Melbourne: 5 inns avg 7.0; vs England: 1 inns avg 50.0; context adj: team H2H context -3%; weather: high humidity 89%. Notes: 2 market source(s) for fair price; model 0.627 vs market 0.533; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting
-- **South Africa vs Bangladesh / Bowler Milestones / Hasan Mahmud 5+ yes** - why: Model 38% vs market 26% for 5+ wkts; form 4.0 wkts/spell recency-weighted MULTI (n_eff 15.3; last 5: 4, 6, 2, 6, 7), bowls in 94% of games, 27.5 overs/spell; vs South Africa: 3 spells avg 2.3; context adj: opposition strength -1%, venue environment +6%; weather: rain chance up to 80%, cloud cover 70%. Notes: 1 market source(s) for fair price; model 0.381 vs market 0.256; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 3.5 (de-vigged 0.392); price via unofficial Book A mirror - confirm on Book A before betting; RAIN RISK: up to 80% rain chance, 14.7 mm forecast during the match - shortened match or void props possible
-- **South Africa vs Bangladesh / Bowler Milestones / Mehidy Hasan Miraz 5+ yes** - why: Model 33% vs market 26% for 5+ wkts; form 3.5 wkts/spell recency-weighted MULTI (n_eff 16.3; last 5: 3, 4, 2, 4, 1), bowls in 94% of games, 36.7 overs/spell; vs South Africa: 6 spells avg 2.3; context adj: opposition strength -1%, venue environment +6%; weather: rain chance up to 80%, cloud cover 70%. Notes: 1 market source(s) for fair price; model 0.327 vs market 0.256; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on moviodds_bet365 O/U 3.5 (de-vigged 0.392); price via unofficial Book A mirror - confirm on Book A before betting; RAIN RISK: up to 80% rain chance, 14.7 mm forecast during the match - shortened match or void props possible
-- **South Africa vs Bangladesh / Bowler Total Match Wickets / Hasan Mahmud over 3.5** - why: Model 53% vs market 39% for over 3.5 wkts; form 4.0 wkts/spell recency-weighted MULTI (n_eff 15.3; last 5: 4, 6, 2, 6, 7), bowls in 94% of games, 27.5 overs/spell; vs South Africa: 3 spells avg 2.3; context adj: opposition strength -1%, venue environment +6%; weather: rain chance up to 80%, cloud cover 70%. Notes: 1 market source(s) for fair price; model 0.528 vs market 0.392; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting; RAIN RISK: up to 80% rain chance, 14.7 mm forecast during the match - shortened match or void props possible
+- **Melbourne Stars vs Melbourne Renegades / M13710 batter_fours / Hayley Matthews over 2.5** - why: Model 54% vs market 54% for over 2.5 fours; form 3.7 fours/inn recency-weighted T20 (n_eff 82.3; last 5: 3, 0, 0, 10, 8), bats in 99% of games played; at Junction Oval, Melbourne: 17 inns avg 3.4; context adj: venue environment +11%, team H2H context +5%; weather: rain chance up to 80%. Notes: 2 market source(s) for fair price; model 0.536 vs market 0.537; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 80% rain chance, 0.7 mm forecast during the match - shortened match or void props possible
+- **Dubai Capitals vs Abu Dhabi Knight Riders / M13710 batter_fours / Sediqullah Atal under 1.5** - why: Model 62% vs market 50% for under 1.5 fours; form 1.2 fours/inn recency-weighted T20 (n_eff 28.5; last 5: 2, 2, 0, 0, 2), bats in 98% of games played; at Dubai International Cricket Stadium, Dubai: 8 inns avg 1.0; vs Abu Dhabi Knight Riders: 1 inns avg 0.0; context adj: at this venue -3%, team H2H context +10%. Notes: 2 market source(s) for fair price; model 0.620 vs market 0.500; assumes bet void if player doesn't bat/bowl - check book rules
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
-- 11-21 20:00 IST Desert Vipers vs MI Emirates / Batter Milestones / F Zaman 50+ yes @ 6.50 (moviodds_bet365): edge 31.1%, model 0.1741, market 0.2242
-- 11-21 20:00 IST Desert Vipers vs MI Emirates / Batsman to Score a Fifty in the Match / F Zaman 50+ yes @ 6.50 (moviodds_bet365): edge 31.7%, model 0.1741, market 0.2259
-- 11-22 10:10 IST Brisbane Heat vs Adelaide Strikers / M13711 batter_sixes / Orla Prendergast over 0.5 @ 5.60 (feedj_d): edge 32.4%, model 0.2941, market 0.1892
-- 11-22 10:10 IST Brisbane Heat (W) vs Adelaide Strikers (W) / Batsman Total Match Sixes / ME Bouchier over 0.5 @ 5.50 (moviodds_bet365): edge 53.8%, model 0.2838, market 0.2763
-- 11-23 13:30 IST South Africa vs Bangladesh / Top Bowler - Bangladesh / Taijul Islam @ 5.30 (feedh_d): edge 33.5%, model 0.3063, market 0.2227
+- 11-22 10:10 IST Brisbane Heat vs Adelaide Strikers / M13711 batter_sixes / Orla Prendergast over 0.5 @ 5.60 (feedj_d): edge 51.1%, model 0.294, market 0.25
+- 11-22 10:10 IST Brisbane Heat (W) vs Adelaide Strikers (W) / Batsman Total Match Sixes / ME Bouchier over 0.5 @ 5.50 (moviodds_bet365): edge 53.8%, model 0.2837, market 0.2763
 
-Unmatched team names (add to mappings/teams.csv): Dolphins (W) (female), Dolphins (female), Elite Cricket Academy (male), Garden Route Badgers (W) (female), Lions (W) (female), Muscat Thunders (W) (female), OCA Strikers (W) (female), Omr Checker (male), Venice Livewire (male), Western Province (W) (female), Western Province (female)
+Unmatched team names (add to mappings/teams.csv): Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), Dolphins (female), Garden Route Badgers (W) (female), Garden Route Badgers (female), Lions (W) (female), Lions (female), Lokseva Academy (male), MID West Rhinos (male), Roma Gladiators (male), SW Districts (male), South Western Districts (male), Sunny 11 Pratishtan (male), Western Province (W) (female), Western Province (female)
 
-Runtime 274.7s. Snapshot: `odds_20261121T073037Z.jsonl.gz`
+Runtime 264.3s. Snapshot: `odds_20261122T033036Z.jsonl.gz`

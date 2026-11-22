@@ -247,7 +247,7 @@ Full `App.tsx` route checklist:
 | `/leagues`, `/league/:id` | Aligned | Boards + markets |
 | `/props`, `/fancy` | Aligned | Screener lists |
 | `/player/:id` | Aligned | Bleed tables + EmptyState |
-| `/teams`, `/team/:id` | Aligned | Directory bleed; team markets ResultView |
+| `/teams`, `/team/:id` | Aligned | Directory bleed; detail uses EntityHero, sticky format pills, section tabs, GridTable and the shared FixtureCard |
 | `/venue/:id` | Aligned | Ground |
 | `/competitions` | Aligned | Markets list; EmptyState; GOVERNED |
 | `/pair` | Aligned | ResultView host (not Ask); EmptyState idle; GOVERNED |

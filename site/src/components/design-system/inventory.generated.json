@@ -2721,14 +2721,17 @@
       "site/src/components/app/entity-hero.tsx",
       "site/src/components/app/hero-wash.tsx",
       "site/src/components/app/pill-tabs.tsx",
+      "site/src/components/app/pill-group.tsx",
       "site/src/components/app/grid.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/star.tsx",
       "site/src/components/app/page.tsx",
+      "site/src/components/app/player-name.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/result.tsx",
       "site/src/pages/Home.tsx",
       "site/src/components/app/skeletons.tsx",
+      "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/tournament-stats.tsx"
     ]
   },
