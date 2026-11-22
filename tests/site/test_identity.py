@@ -207,7 +207,7 @@ def test_haryana_ankit_kumar_links_to_his_profile_among_namesakes():
     assert review == []
 
 
-def test_verified_priced_player_links_replace_conflicting_photo_matches():
+def test_verified_player_links_replace_conflicting_photo_matches():
     from pathlib import Path
 
     overrides = I.load_overrides(Path(__file__).resolve().parents[2] / "data")
@@ -216,6 +216,12 @@ def test_verified_priced_player_links_replace_conflicting_photo_matches():
         ("5d69930d", "8IL", "daniel smith", "8IL", "daniel smith", "35205dfc"),
         ("dd572696", "AAU", "haider ali", "17L", "haider ali", "dd572696"),
         ("8e554b6b", "CMY", "abdul samad", "CMY", "abdul samad", "8e514b4c"),
+        ("1c914163", "33", "yuvraj singh", "8HX", "yuvraj yogender singh", "1c914163"),
+        ("c3d1402f", "32", "rp singh", "A18", "raghuvendra pratap singh", "c3d1402f"),
+        ("b0eaaac6", "1DR", "ali khan", "LO8", "ali shamsher khan", "b0eaaac6"),
+        ("ad427b5c", "1DE", "lalit yadav", "8DH", "lalit manoharsingh yadav", "ad427b5c"),
+        ("33ffc3dd", "DU", "r sanjay yadav", "5IT", "ramsingh sonu yadav", "33ffc3dd"),
+        ("ae6746e0", "1U6", "khurram khan", "XG", "khurram nawaz khan", "ae6746e0"),
     ]
     for pid, sid, name, conflicting_sid, conflicting_name, conflicting_pid in cases:
         sitemap = list({sid: name, conflicting_sid: conflicting_name}.items())
