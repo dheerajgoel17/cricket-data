@@ -3,6 +3,7 @@ import { lazy, Suspense, useMemo } from "react";
 import { liveForFixture } from "@cricket/engine/live.js";
 import { countPhases, phaseOf, pickHomePhase } from "@/lib/home-phase";
 import { setTitle } from "@/lib/title";
+import { firstHomeRail } from "@/lib/data";
 import { useQ } from "@/components/app/forms";
 import { HomePhaseBar } from "@/components/app/home-phase-bar";
 import { fixtureState } from "@/hooks/useEngine";
@@ -30,7 +31,7 @@ export function HomePage() {
       <h1 className="sr-only">Cricket fixtures</h1>
       <HomePhaseBar value={phase} counts={counts} onChange={(p) => setQ({ view: p })} />
       <div className="flex flex-col gap-section pt-stack">
-        {ready ? <FixtureRail fx={shown} /> : <RailSkeleton />}
+        {ready ? <FixtureRail fx={shown} /> : firstHomeRail && !q.view ? <section aria-label="Matches" dangerouslySetInnerHTML={{ __html: firstHomeRail }} /> : <RailSkeleton />}
         <Suspense fallback={<HomePropsSkeleton />}><HotHome phase={phase} /></Suspense>
       </div>
     </div>

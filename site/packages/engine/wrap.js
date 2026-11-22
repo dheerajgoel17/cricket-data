@@ -62,10 +62,21 @@ export async function wire(obj, secret) {
   return s ? wrap(obj, s) : obj;
 }
 
-export async function unwrap(doc, secret) {
+export async function unwrap(doc, secret, digest) {
   if (!isWrapped(doc) || !secret) return doc;
-  const key = await sha256(te.encode(secret));
+  const key = digest ? digest(te.encode(secret)) : await sha256(te.encode(secret));
   const iv = b64(doc.iv), ct = b64(doc.ct);
+  if (digest) {
+    // A worker can hash locally without one browser crypto task for each 32-byte block.
+    const block = blockAt(key, iv, 0);
+    const counter = new DataView(block.buffer, block.length - 4);
+    for (let i = 0, offset = 0; offset < ct.length; i++, offset += 32) {
+      counter.setUint32(0, i);
+      const hash = digest(block);
+      for (let j = 0; j < 32 && offset + j < ct.length; j++) ct[offset + j] ^= hash[j];
+    }
+    return JSON.parse(new TextDecoder().decode(ct));
+  }
   const ks = await stream(key, iv, ct.length);
   const raw = new Uint8Array(ct.length);
   for (let i = 0; i < ct.length; i++) raw[i] = ct[i] ^ ks[i];

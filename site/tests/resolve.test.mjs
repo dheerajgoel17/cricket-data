@@ -46,3 +46,13 @@ test("a given name and a short surname prefix beat a popular Shah", async () => 
   assert.equal(rz.venues("sharjah", 3)[0].name, "Sharjah Cricket Stadium, Sharjah");
   assert.equal(rz.venues("eden park", 3)[0].name, "Eden Park, Auckland");
 });
+
+test("the word index preserves full-scan rankings for aliases, prefixes, initials and typos", async () => {
+  const store = await load();
+  const indexed = new Resolver(store);
+  const fullScan = new Resolver(store);
+  fullScan._wordCandidates = () => fullScan.info.map((_, i) => i);
+  for (const query of ["Chamari Ath", "AC J", "R Athapaththu", "Jayngani", "Athapaththu Athapaththu", "No Match"]) {
+    assert.deepEqual(indexed.players(query), fullScan.players(query), query);
+  }
+});

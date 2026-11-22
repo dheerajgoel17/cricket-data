@@ -36,3 +36,17 @@ test("a failed index does not leave matches.json as an unhandled rejection", asy
   await assert.rejects(() => createStore({ fetchJson }), /no data origin/);
   await new Promise((r) => setImmediate(r));
 });
+
+test("lazy match history starts only when needed and is shared by concurrent readers", async () => {
+  let reads = 0;
+  const store = await createStore({ deferMatches: true, lazyMatches: true, fetchJson: async (path) => {
+    if (path === "index.json") return index;
+    if (path === "matches.json") { reads++; return { id: ["m1"] }; }
+    return {};
+  } });
+  assert.equal(reads, 0);
+  assert.equal(store.n, 0);
+  await Promise.all([store.ready, store.ready]);
+  assert.equal(reads, 1);
+  assert.equal(store.n, 1);
+});

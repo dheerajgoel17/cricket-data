@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { createStore } from "@cricket/engine/store.js";
 import { Resolver } from "@cricket/engine/resolve.js";
 import { identityIndex } from "@cricket/engine/identity.js";
@@ -9,7 +9,7 @@ import { AppSkeleton } from "@/components/app/skeletons";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Data { store: any; rz: any; photos: Photos; identity: ReturnType<typeof identityIndex>; /** full names by player id (from the source's listing); empty until the data build has made them */ names: Record<string, string>; /** false until matches.json has joined the store; the home rail does not wait for it */ matchesReady: boolean }
-const Ctx = createContext<Data | null>(null);
+const Ctx = createContext<(Data & { loadHistory: () => Promise<void> }) | null>(null);
 
 export async function loadJson(url: string) {
   try {
@@ -24,31 +24,52 @@ async function loadIdentity(base: string) {
   return identityIndex(await loadJson(`${base}identity.json`));
 }
 
-async function boot() {
-  const k = await gateKey();
-  setWrapKey(k);
-  const extras = Promise.all([
+function lazyResolver(store: Awaited<ReturnType<typeof createStore>>) {
+  let resolver: Resolver | undefined;
+  return new Proxy({} as Resolver, {
+    get(_target, key) {
+      const target = resolver ??= new Resolver(store);
+      const value = Reflect.get(target, key);
+      return typeof value === "function" ? value.bind(target) : value;
+    },
+  });
+}
+
+const firstHome = typeof document !== "undefined" ? document.getElementById("home-start")?.innerHTML : undefined;
+
+export const firstHomeRail = typeof document !== "undefined" ? document.getElementById("home-start-rail")?.innerHTML : undefined;
+
+function loadExtras() {
+  return Promise.all([
     loadJson("/data/photos.json").then((p) => (p || {}) as Photos),
     loadIdentity("/data/"),
     loadJson("/data/names.json").then((n) => (n && typeof n === "object" ? n : {}) as Record<string, string>),
   ]);
+}
+
+async function boot(isHome: boolean) {
+  const k = await gateKey();
+  setWrapKey(k);
+  const fetchJson = async (path: string) => {
+    const response = await fetch(dataUrl(`/data/${path}`), { credentials: "same-origin", priority: path === "matches.json" ? "low" : "auto" });
+    if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
+    return readJson(response);
+  };
+  const fixtures = isHome ? fetchJson("fixtures.json").catch(() => null) : undefined;
   const store = await createStore({
     deferMatches: true,
-    fetchJson: async (path: string) => {
-      const response = await fetch(dataUrl(`/data/${path}`), { credentials: "same-origin", priority: path === "matches.json" ? "low" : "auto" });
-      if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
-      return readJson(response);
-    },
+    lazyMatches: true,
+    fetchJson: async (path: string) => (path === "fixtures.json" ? await fixtures : null) ?? fetchJson(path),
   });
   if (!store?.P?.id?.length) throw new Error("index.json: empty");
-  const data: Data = { store, rz: new Resolver(store), photos: {}, identity: identityIndex(null), names: {}, matchesReady: false };
-  return { data, extras };
+  const data: Data = { store, rz: lazyResolver(store), photos: {}, identity: identityIndex(null), names: {}, matchesReady: false };
+  return data;
 }
 
 const retryable = (e: unknown) => /HTTP 403|empty|Unexpected token/.test(String((e as Error)?.message || e));
 
 /** Loads the generated data files once (matches, players index, photos map, identity table) and shares the engine objects with every page. */
-export function DataProvider({ children }: { children: ReactNode }) {
+export function DataProvider({ children, eagerHistory = false }: { children: ReactNode; eagerHistory?: boolean }) {
   const [data, setData] = useState<Data | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
@@ -59,22 +80,34 @@ export function DataProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         let out: Awaited<ReturnType<typeof boot>>;
-        try { out = await boot(); }
+        const isHome = !eagerHistory && location.pathname === "/";
+        try { out = await boot(isHome); }
         catch (e) {
           if (!retryable(e)) throw e;
           await new Promise((r) => setTimeout(r, 80)); // the gate cookie is sometimes not on the next request yet
-          out = await boot();
+          out = await boot(isHome);
         }
-        if (live) setData(out.data);
-        void out.extras.then(([photos, identity, names]) => {
-          if (live) setData((d) => (d && d.store === out.data.store ? { ...d, photos, identity, names } : d));
+        if (!live) return;
+        setData(out);
+        // Let the first fixture response reach the rail before the larger optional player files.
+        if (isHome) await out.store.loadFixtures();
+        if (!live) return;
+        void loadExtras().then(([photos, identity, names]) => {
+          if (live) setData((d) => (d && d.store === out.store ? { ...d, photos, identity, names } : d));
         });
-        out.data.store.ready.then(() => { if (live) setData((d) => (d && d.store === out.data.store ? { ...d, matchesReady: true } : d)); })
-          .catch((e: unknown) => { if (live) setError((e as Error).message); });
       } catch (e) { if (live) setError((e as Error).message); }
     })();
     return () => { live = false; };
-  }, [tick]);
+  }, [tick, eagerHistory]);
+  const store = data?.store;
+  const loadHistory = useCallback(async () => {
+    if (!store) return;
+    await store.ready;
+    setData((d) => d && d.store === store && !d.matchesReady ? { ...d, matchesReady: true } : d);
+  }, [store]);
+  useEffect(() => {
+    if (eagerHistory) void loadHistory().catch((e: Error) => setError(e.message));
+  }, [eagerHistory, loadHistory]);
   if (error) {
     const local = typeof location !== "undefined" && /localhost|127\.0\.0\.1/.test(location.hostname);
     return (
@@ -85,11 +118,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
       </div>
     );
   }
-  if (!data) return <AppSkeleton />;
-  return <Ctx.Provider value={data}>{children}</Ctx.Provider>;
+  if (!data) return firstHome && !eagerHistory ? <div dangerouslySetInnerHTML={{ __html: firstHome }} /> : <AppSkeleton />;
+  return <Ctx.Provider value={{ ...data, loadHistory }}>{children}</Ctx.Provider>;
 }
 
-export function useData(): Data {
+export function useData() {
   const d = useContext(Ctx);
   if (!d) throw new Error("useData outside DataProvider");
   return d;

@@ -5,7 +5,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { booksOf, groupByChip, historyRecord, isLiveLine, lineKey, scoreLine } from "../packages/engine/hot-rows.js";
-import { keepMsFor } from "../packages/engine/lines.js";
+import { fixtureBooks, keepMsFor } from "../packages/engine/lines.js";
+import { collectOverview, fancyInputs } from "../packages/engine/fancy-edge.js";
 import { Resolver } from "../packages/engine/resolve.js";
 import { createStore } from "../packages/engine/store.js";
 
@@ -18,7 +19,7 @@ export function wantedLines(lines, now) {
 }
 
 /** The published document for the built data in `dataDir` and the book lines file `linesPath`. `now` is the clock (ms), so a run can be replayed. */
-export async function buildDoc({ dataDir, linesPath, now = Date.now() }) {
+export async function buildDoc({ dataDir, linesPath, now = Date.now(), fancyOut }) {
   const read = async (p) => JSON.parse(await readFile(p, "utf8"));
   const store = await createStore({ fetchJson: (p) => read(join(dataDir, p)) });
   const [doc, fixtures, meta, namesFile] = await Promise.all([
@@ -26,6 +27,28 @@ export async function buildDoc({ dataDir, linesPath, now = Date.now() }) {
     read(join(dataDir, "names.json")).catch(() => ({})),
   ]);
   if (!fixtures.length) throw new Error("no fixtures in the built data");
+  if (fancyOut) {
+    const home = await read(join(dataDir, "lines.json"));
+    const cards = {};
+    for (const f of fixtures) {
+      const startMs = f.start.length > 10 ? Date.parse(f.start) : NaN;
+      if (!f.id || f.noProps || !Number.isFinite(startMs) || startMs < now - keepMsFor(f.fmt) || startMs > now + 11 * 864e5 || !fixtureBooks(home, f).fancy) continue;
+      const { ms, ground, teams } = fancyInputs(store, f);
+      const rows = collectOverview({ store, doc: home, fxInfo: { a: f.a, b: f.b, fmt: f.fmt, startMs }, ms, ground, teams });
+      cards[f.id] = { ms, ground: ground || [], rows };
+    }
+    // A fresh quote can use the exact same historical sample without downloading the full archive.
+    const indices = [...new Set(Object.values(cards).flatMap(({ ms, ground }) => [...ms, ...ground]))].sort((a, b) => a - b);
+    const compactIndex = new Map(indices.map((match, index) => [match, index]));
+    const matches = Object.fromEntries(Object.entries(store.M).map(([key, values]) => [
+      key, Array.isArray(values) && values.length === store.n ? indices.map((m) => values[m]) : values,
+    ]));
+    for (const card of Object.values(cards)) {
+      card.ms = card.ms.map((m) => compactIndex.get(m));
+      card.ground = card.ground.map((m) => compactIndex.get(m));
+    }
+    await writeFile(fancyOut, JSON.stringify({ v: 2, build: meta.built_at, lines_generated_at_utc: home.generated_at_utc, cards, matches }), "utf8");
+  }
   const names = namesFile && typeof namesFile === "object" ? namesFile : {};
   const rz = new Resolver(store);
   const year = String(new Date(now).getUTCFullYear());
@@ -57,7 +80,7 @@ async function main() {
   const now = arg("now") ? Date.parse(arg("now")) : Date.now();
   if (!Number.isFinite(now)) throw new Error("--now is not a date");
   const t0 = Date.now();
-  const doc = await buildDoc({ dataDir, linesPath, now });
+  const doc = await buildDoc({ dataDir, linesPath, now, fancyOut: arg("fancy-out") });
   const text = JSON.stringify(doc);
   await writeFile(out, text, "utf8");
   console.log(`hot rows: ${doc.scored} of ${doc.lines} priced lines scored (${doc.skipped} skipped), ${(text.length / 1024).toFixed(0)} KB, ${((Date.now() - t0) / 1000).toFixed(1)} s -> ${out}`);

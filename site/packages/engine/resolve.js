@@ -45,6 +45,7 @@ export class Resolver {
     this.bySurname = new Map();
     this.info = [];
     this.fuzzyKeys = null;
+    this.byWordStart = null;
     this._cnt = null;
   }
 
@@ -132,6 +133,24 @@ export class Resolver {
     return sc;
   }
 
+  /** Only names sharing the rarest query word's prefix can satisfy the word-start match. */
+  _wordCandidates(toks) {
+    if (!this.byWordStart) {
+      const aliases = this.s.index.aliases || {};
+      this.byWordStart = new Map();
+      for (let i = 0; i < this.info.length; i++) {
+        const words = [this.info[i].full, ...(aliases[i] || []).map(norm)].join(" ").split(" ");
+        const keys = new Set(words.filter(Boolean).map((w) => w.slice(0, 2)));
+        for (const key of keys) {
+          const entries = this.byWordStart.get(key);
+          if (entries) entries.push(i);
+          else this.byWordStart.set(key, [i]);
+        }
+      }
+    }
+    return toks.map((word) => this.byWordStart.get(word.slice(0, 2)) || []).reduce((best, list) => list.length < best.length ? list : best);
+  }
+
   /**
    * Rank players for a free-text name. opts: { gender (0|1), team (team idx), fmt }
    * Returns [{idx, name, score, team, last}] best first.
@@ -175,7 +194,7 @@ export class Resolver {
     }
     // given-name and in-order word starts ("abhishek", "abhishek sha") so a first name is enough
     const aliases = this.s.index.aliases || {};
-    for (let i = 0; i < this.info.length; i++) {
+    for (const i of this._wordCandidates(toks)) {
       const bags = [this.info[i].full, ...(aliases[i] || []).map(norm)];
       let best = 0;
       for (const nm of bags) {

@@ -66,8 +66,8 @@ type HistorySeed = { v: number; build: string; generated_at_utc: string; rows: R
  * year's, vs today's opponent, and the model's edge on the better side (`modelSide`, `engine/props-view.js`): the hit rate of the window shown pulled toward the market's no-vig chance, for the over and for the under.
  * Only those lines are scored (each costs a player file), the files come several at a time, and the rows are in `data` as they finish (`scoring` says more are coming).
  */
-export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all", phase?: HomePhase, live?: any) {
-  const { store, rz, matchesReady, names } = useData();
+export function useHotRows(archive?: any, teams?: [string, string], day = 0, inns: "all" | "first" | "second" = "all", phase?: HomePhase, live?: any, preferSeeds = false) {
+  const { store, rz, matchesReady, names, loadHistory } = useData();
   const qc = useQueryClient();
   const lines = useLinesLive();
   const fixtures = useFixtures(); // each match's ground, for the venue window
@@ -79,6 +79,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
     queryFn: async () => await loadJson("/data/hot-rows.json") as HistorySeed | null,
   });
   const doc = { data: archive ?? lines.data }; // `archive`: the book doc with an archived match added, for that match's own page
+  const seedDoc = canSeed && seed.data?.v === 1 && seed.data.build === store.meta.built_at ? seed.data : null;
   const today = new Date().toDateString();
   const scope = JSON.stringify([today, inns, teams ?? day, !!archive, phase]);
   const scopedLines = useMemo(() => {
@@ -89,7 +90,7 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   const scopeKey = ["hot-props", scope] as const;
   // books generation only — live_sig must not rebuild history; quotes/live rows are patched after (see merge below).
   // Do not put fixtures.isLoading in the key: flipping true→false used to open a new cache entry and flash HomePropsSkeleton on remount.
-  const key = [...scopeKey, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null, canSeed ? seed.data?.generated_at_utc : null, phaseKey];
+  const key = [...scopeKey, doc.data?.generated_at_utc, archive ? doc.data?.lines?.length : null, canSeed ? seed.data?.generated_at_utc : null, phaseKey, preferSeeds];
   const liveLines = useMemo(() => archive ? [] : hotLines(scopedLines.filter(isLiveLine), teams ? { teams, archive: false } : { day }, Date.now()), [archive, scopedLines, teams, day]);
   const liveKey = useMemo(() => liveThresholdKey(liveLines), [liveLines]);
   const rows = useQuery({
@@ -146,7 +147,6 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         published = Date.now();
         qc.setQueryData(key, [...out]);
       };
-      const seedDoc = canSeed && seed.data?.v === 1 && seed.data.build === store.meta.built_at ? seed.data : null;
       const history = seedDoc?.rows;
       const byChip = history ? groupByChip(todays.lines) : null;
       const todo = [];
@@ -156,9 +156,9 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
         const fixture = (fixtures.data || []).find((f: any) => sameFixture({ match: r.match, start_utc: r.start, fmt: l.fmt }, f));
         out.push({ ...r, day: hotDay(r.start, l.fmt, now), gender: fixture?.gender === "female" ? 1 : fixture?.gender === "male" ? 0 : null } as Row);
       }
-      if (!todo.length) return out;
+      if (!todo.length || (preferSeeds && seedDoc)) return out;
       publish();
-      await store.ready;
+      await (loadHistory?.() ?? store.ready);
       const groups = prioritizeHotGroups(byShard(todo, (pid) => store.P.id.indexOf(pid), (i) => store.shardOf(i)), now);
       const scoreGroup = async (g: { shard: number; lines: any[] }) => {
         await store.shard(g.shard).catch(() => {}); // a file that does not load costs its own rows (the plan answers "not ok" for them), not the page
@@ -171,12 +171,13 @@ export function useHotRows(archive?: any, teams?: [string, string], day = 0, inn
   });
   const liveExtra = useQuery({
     queryKey: ["hot-props-live", scope, doc.data?.generated_at_utc, liveKey],
-    enabled: liveLines.length > 0 && !fixtures.isLoading && matchesReady !== false,
+    enabled: liveLines.length > 0 && !fixtures.isLoading && (!preferSeeds || !seedDoc) && (matchesReady !== false || !!phase),
     staleTime: LIVE_TTL_MS,
     gcTime: 5 * 60_000,
     queryFn: async (): Promise<Row[]> => {
 
       const now = Date.now(), year = String(new Date().getFullYear());
+      await (loadHistory?.() ?? store.ready);
       const byChip = groupByChip(liveLines);
       const out: Row[] = [];
       for (const [, l] of new Map(liveLines.map((l: any) => [lineKey(l), l]))) {
