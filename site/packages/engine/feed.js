@@ -11,25 +11,31 @@ export const CARD_BUDGET_MS = 700;
 
 /**
  * `base()` is the source's address (throws when it is not configured); `getJson` / `getText` / `getHtml` fetch a URL (and throw on a bad status); `loadIdentity()` gives the
- * player-identity index (a function, because where the table lives differs by runtime). Returns `snapshot()`: the body of /api/live, cached for LIVE_TTL_MS, one read in flight at a time.
+ * player-identity index (a function, because where the table lives differs by runtime). Returns `snapshot()`: the body of /api/live, cached for ttlMs, one read in flight at a time.
  */
-export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now = () => Date.now(), booksUrl = BOOKS_URL, scheduleUrl = SCHEDULE_URL, cardBudgetMs = CARD_BUDGET_MS }) {
+export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now = () => Date.now(), booksUrl = BOOKS_URL, scheduleUrl = SCHEDULE_URL, cardBudgetMs = CARD_BUDGET_MS, ttlMs = LIVE_TTL_MS }) {
   let inflight = null;
   const finals = new Map(); // match page URL -> { t, pages }
   let memo = { t: 0, body: null, books: null };
 
+  let discovery;
+
   async function snapshot() {
     const t0 = now();
-    if (memo.body && t0 - memo.t < LIVE_TTL_MS) return memo.body;
+    if (memo.body && t0 - memo.t < ttlMs) return memo.body;
     if (inflight) return inflight;
     inflight = (async () => {
-      const [booksDoc, homeHtml, schedule, ours, idn] = await Promise.all([
-        getJson(booksUrl).catch(() => ({})),
-        getHtml(`${base()}/`).catch(() => ""),
-        getHtml(`${base()}/schedule`),
-        getText(scheduleUrl).catch(() => ""),
-        loadIdentity(),
-      ]);
+      if (!discovery || t0 - discovery.t >= LIVE_TTL_MS) {
+        const inputs = await Promise.all([
+          getJson(booksUrl).catch(() => ({})),
+          getHtml(`${base()}/`).catch(() => ""),
+          getHtml(`${base()}/schedule`),
+          getText(scheduleUrl).catch(() => ""),
+          loadIdentity(),
+        ]);
+        discovery = { t: now(), inputs };
+      }
+      const [booksDoc, homeHtml, schedule, ours, idn] = discovery.inputs;
       const books = bookFixtures(booksDoc), listed = pricedLive(mergeSchedule(parseSchedule(homeHtml, base()), parseSchedule(schedule, base())), books);
       const gaps = unlistedRows(listed, books, parseFixtureCsv(ours), base());
       const rows = [...listed, ...gaps];
@@ -58,7 +64,7 @@ export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now 
         const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card, priorById.get(String(m.id))) : m;
         return { ...pub, lines: settleLines(pub, booksDoc.lines, idn) };
       });
-      const body = { asOf: new Date().toISOString(), source: "live", delaySec: LIVE_TTL_MS / 1000, linked: idn.size, matches };
+      const body = { asOf: new Date().toISOString(), source: "live", delaySec: ttlMs / 1000, linked: idn.size, matches };
       memo = { t: now(), body, books: booksDoc };
       return body;
     })().finally(() => { inflight = null; });

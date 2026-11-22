@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { queryOptions, type QueryClient } from "@tanstack/react-query";
-import { LIVE_TTL_MS } from "@cricket/engine/live.js";
+import { LIVE_SCORE_TTL_MS, LIVE_TTL_MS, liveScorePollMs } from "@cricket/engine/live.js";
 import { loadInplay, loadLines, loadLive, loadRail, loadState } from "@/lib/feeds";
 import { readLive } from "@/lib/live-cache";
 
@@ -9,8 +9,8 @@ const FEED_GC_MS = 60 * 60_000;
 // The three feeds the home page reads, defined once so the hooks and the start-up prefetch share a cache entry.
 export const linesQuery = queryOptions({ queryKey: ["lines"], queryFn: loadLines, staleTime: 10 * 60_000, gcTime: FEED_GC_MS });
 export const railQuery = queryOptions({ queryKey: ["rail"], queryFn: loadRail, staleTime: 10 * 60_000, gcTime: FEED_GC_MS });
-/** Polls /api/live every ~15 s. The function caches the same interval; this just refreshes the page. Starts from the last body kept on the device (`live-cache.ts`), which counts as stale, so the fresh one is asked for at once. */
-export const liveQuery = queryOptions({ queryKey: ["live-scores"], queryFn: loadLive, refetchInterval: LIVE_TTL_MS, staleTime: LIVE_TTL_MS, gcTime: FEED_GC_MS, placeholderData: (p: any) => p,
+/** Polls /api/live every ~3 s during live play and ~15 s otherwise. Starts from the last body kept on the device (`live-cache.ts`), which counts as stale, so the fresh one is asked for at once. */
+export const liveQuery = queryOptions({ queryKey: ["live-scores"], queryFn: loadLive, refetchInterval: (query) => liveScorePollMs(query.state.data), staleTime: LIVE_SCORE_TTL_MS, gcTime: FEED_GC_MS, placeholderData: (p: any) => p,
   initialData: () => readLive()?.body, initialDataUpdatedAt: () => readLive()?.t });
 
 /** Polls /api/inplay every ~15 s (the function caches the same interval). Used only while a priced match is on, see `useInplayLines`. */

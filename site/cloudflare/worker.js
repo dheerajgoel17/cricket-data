@@ -1,3 +1,4 @@
+import { LIVE_SCORE_TTL_MS } from "@cricket/engine/live.js";
 import gate from "../api/gate.js";
 import adsAdmin from "../api/ads-admin.js";
 import geo from "../api/geo.js";
@@ -9,7 +10,7 @@ import middleware, { CRAWLER, crawlerSharePath } from "../middleware.js";
 import { media } from "./cards.js";
 export { Cards } from "./cards.js";
 
-const ttl = new Map([["/api/live", 15], ["/api/inplay", 15], ["/api/state", 10]]);
+const ttl = new Map([["/api/live", LIVE_SCORE_TTL_MS / 1000], ["/api/inplay", 15], ["/api/state", 10]]);
 const routes = new Map([
   ["/api/gate", gate],
   ["/api/geo", geo],
@@ -91,7 +92,7 @@ async function snapshot(path, request, env, ctx) {
   const cached = await cache?.match(url.href);
   if (cached) return cached;
   const response = await env.SNAPSHOTS.getByName(path).fetch(url.href);
-  if (!response.ok || !cache) return response;
+  if (!response.ok || !cache || response.headers.get("Cache-Control") === "no-store") return response;
   const headers = new Headers(response.headers);
   headers.set("Cache-Control", `public, max-age=${ttl.get(path)}`);
   const out = new Response(response.body, { status: response.status, headers });
