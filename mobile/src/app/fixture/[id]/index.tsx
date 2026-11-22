@@ -188,7 +188,7 @@ export default function FixturePage() {
                   )}
                 </>
               ) : tab === "fancy" ? (
-                <View style={[styles.pad, { paddingTop: space.stack }]}><MatchFancy key={`${f.id}`} fx={f} teams={known} fmt={fmt} doc={doc} mode="list" /></View>
+                <View style={[styles.pad, { paddingTop: 0 }]}><MatchFancy key={`${f.id}`} fx={f} teams={known} fmt={fmt} doc={doc} mode="list" /></View>
               ) : (
                 <View style={[styles.pad, { gap: space.stack, paddingTop: space.stack }]}>
                   <GridFilters stat={gStat} line={gLine} games={games} hit={tab === "trends" ? hit : undefined} onStat={setGStat} onLine={setGLine} onGames={setGames} onHit={setHit} />
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   },
   pad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   bleed: { marginHorizontal: -space.gutter },
-  toolbar: { flexDirection: "row", alignItems: "center", paddingHorizontal: space.gutter, paddingBottom: space.snug, gap: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  toolbar: { flexDirection: "row", alignItems: "center", paddingHorizontal: space.gutter, paddingVertical: space.snug, gap: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
   chipFlex: { flex: 1, minWidth: 0 },
   activeRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingBottom: space.snug },
   clearAll: { ...t.calloutLabel, color: color.primary },

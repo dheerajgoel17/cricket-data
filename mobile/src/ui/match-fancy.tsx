@@ -237,7 +237,6 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       ) : null}
       {mode === "list" && (overview.length > 0 || liveScored.length > 0) ? (
         <View style={{ gap: space.snug }}>
-          <Text style={styles.h2}>Bookmaker lines</Text>
           {liveMatch?.status === "live" ? <Text style={styles.note}>So far this match, delayed up to about 20 seconds. Not used for settlement.</Text> : null}
           <View style={styles.bleed}>
             {overview.map((r: any, i: number) => (
@@ -402,14 +401,13 @@ const styles = StyleSheet.create({
     gap: space.snug,
     marginHorizontal: -space.gutter,
     paddingHorizontal: space.gutter,
-    paddingBottom: space.snug,
+    paddingVertical: space.snug,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: color.hairline,
   },
   chipFlex: { flex: 1, minWidth: 0 },
   activeRow: { gap: space.snug, paddingVertical: space.tight },
   clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
-  h2: { ...type.heading, color: color.foreground },
   h3: { ...t.bodyLabel, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
   bleed: { marginHorizontal: -space.gutter },

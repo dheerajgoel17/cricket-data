@@ -52,14 +52,15 @@ export function FilterSheet({ visible, onClose, onClear, onApply, children }: {
 }
 
 export function FilterSection({ label, children }: { label: string; children: ReactNode }) {
-  return <><Text style={styles.filterSection}>{label}</Text>{children}</>;
+  return <View style={styles.filterSection}><Text style={styles.filterLabel}>{label}</Text>{children}</View>;
 }
 
 const styles = StyleSheet.create({
-  filterHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
+  filterHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   filterTitle: { ...type.heading, color: color.foreground },
-  filterSection: { ...t.bodyLabel, color: color.foreground, marginTop: space.snug },
-  filterFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
+  filterSection: { gap: space.tight },
+  filterLabel: { ...t.bodyLabel, color: color.foreground },
+  filterFoot: { flexDirection: "row", gap: space.snug, marginTop: space.tight },
   backdrop: { ...StyleSheet.absoluteFill, backgroundColor: color.scrim },
   grabber: { alignSelf: "center", width: 40, height: 5, borderRadius: 3, backgroundColor: tint.white(0.25), marginBottom: space.stack },
   panel: { position: "absolute", left: 0, right: 0, bottom: 0, backgroundColor: color.background, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, paddingHorizontal: space.gutter, paddingTop: space.stack, gap: space.snug },
