@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-22 — Mobile fixture prop filters
+- **Path:** `mobile/src/app/fixture/[id]/index.tsx`, `mobile/src/ui/screener-filters.tsx`
+- **Change:** Fixture Props reuses the Filters button, active chips and screener sheet. The Day section is omitted when no days are supplied.
+- **Callers:** Mobile Fixture Props and Player props
+
 ### 2026-11-21 — Directory and statistics pages
 - **Path:** `site/src/components/app/forms.tsx`, `site/src/components/app/result.tsx`, and the generated design inventory
 - **Change:** Reuses one search input and clear action across the site directories. Empty directories use EmptyState. Shared analytics results use the same hairline heading and table rhythm as fixture and player stats. Venue detail uses the same upcoming fixture card as Home and Team detail.

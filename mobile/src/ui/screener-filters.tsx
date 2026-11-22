@@ -50,9 +50,9 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }:
           </Press>
         </View>
         <ScrollView style={styles.body} contentContainerStyle={{ paddingBottom: space.stack }} showsVerticalScrollIndicator={false}>
-          <Accordion title="Day" value={draft.day !== DEFAULTS.day ? dayName(draft.day) : undefined} defaultOpen>
+          {choices.days.length ? <Accordion title="Day" value={draft.day !== DEFAULTS.day ? dayName(draft.day) : undefined} defaultOpen>
             <View style={styles.wrap}>{choices.days.map(([id, label]) => chip(draft.day === id, label, () => set({ day: id })))}</View>
-          </Accordion>
+          </Accordion> : null}
           {choices.matches.length > 0 ? (
             <Accordion title="Match" value={draft.match !== "all" ? matchName(draft.match) : undefined}>
               <View style={styles.wrap}>
