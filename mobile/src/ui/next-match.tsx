@@ -63,19 +63,21 @@ export function whenLabel(iso: string) {
 export function NextMatchCard({ next, line, side, book, statLabel, standing, out }: {
   next: NextInfo; line: number; side: string; book?: any; statLabel: string; fmt?: string; standing?: Standing | null; out?: boolean; entries?: any[];
 }) {
-  const ground = next.ground.split(",")[0];
   const upcoming = !next.phase || next.phase === "upcoming";
   const when = upcoming ? whenLabel(next.start) : "";
   const sideLetter = side === "over" ? "O" : "U";
   const body = (
     <>
       <View style={styles.teams}>
-        {next.opp ? <Text style={styles.opp}>vs</Text> : null}
-        {next.opp ? <TeamBadge name={next.opp} size={32} /> : null}
-        <Text style={[styles.opp, { flex: 1 }]} numberOfLines={1}>{next.opp ? abbr(next.opp) : next.match}{when ? <Text style={styles.statLabel}> on {when}</Text> : null}</Text>
-        {out ? <Text style={styles.notIn}>Not in XI</Text> : null}
-        {!upcoming ? <MatchStatus phase={next.phase!} /> : null}
-        {next.id ? <Ionicons name="chevron-forward" size={icon.sm} color={color["muted-foreground"]} /> : null}
+        {next.opp ? <TeamBadge name={next.opp} size={icon.lg} /> : null}
+        <Text style={styles.opp} numberOfLines={1}>
+          {next.opp ? <><Text style={styles.vs}>vs </Text>{abbr(next.opp)}</> : next.match}
+        </Text>
+        <View style={styles.matchMeta}>
+          {out ? <Text style={styles.notIn}>Not in XI</Text> : null}
+          {upcoming ? (when ? <Text style={styles.when} numberOfLines={1}>{when}</Text> : null) : <MatchStatus phase={next.phase!} />}
+          {next.id ? <Ionicons name="chevron-forward" size={icon.sm} color={color["muted-foreground"]} /> : null}
+        </View>
       </View>
       {book && standing != null ? (
         <View style={styles.lineRow}>
@@ -140,18 +142,17 @@ export function NextFilters({ next, filters, onChange }: { next: NextInfo; filte
 }
 
 const styles = StyleSheet.create({
-  card: { ...surface.card, borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, paddingHorizontal: space.stack, paddingVertical: space.snug, gap: space.snug },
+  card: { ...surface.card, borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, paddingHorizontal: space.gutter, paddingVertical: space.snug, gap: space.tight },
   headRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   cap: { ...type.footnote, color: color["muted-foreground"], ...cap },
   when: { ...d.footnote, color: color["muted-foreground"] },
-  teams: { flexDirection: "row", alignItems: "center", gap: space.snug, flexWrap: "wrap" },
-  pair: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.snug },
-  side: { flex: 1, flexDirection: "row", alignItems: "center", gap: space.tight },
+  teams: { flexDirection: "row", alignItems: "center", gap: space.tight },
+  matchMeta: { flexShrink: 1, flexDirection: "row", alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap", gap: space.tight },
   vs: { ...type.footnote, color: color["muted-foreground"] },
-  opp: { ...t.bodyLabel, color: color.foreground, flexShrink: 1 },
+  opp: { ...t.bodyLabel, color: color.foreground, flex: 1, minWidth: 0 },
   notIn: { ...type.caption, color: color["muted-foreground"], borderWidth: StyleSheet.hairlineWidth, borderColor: color.hairline, borderRadius: 999, paddingHorizontal: space.snug, paddingVertical: 1 },
   ground: { ...type.callout, color: color["muted-foreground"] },
-  lineRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
+  lineRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.snug, rowGap: space.tight, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline, paddingTop: space.tight },
   lineText: { ...d.body, color: color.foreground },
   statLabel: { ...type.callout, color: color["muted-foreground"] },
   tiles: { flexDirection: "row", gap: space.snug },

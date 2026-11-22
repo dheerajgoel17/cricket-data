@@ -16,8 +16,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 ---
 
 ### 2026-11-22 — Player profile live tracking spacing
-- **Path:** `mobile/src/app/player/[idx].tsx`
-- **Change:** Use the same section gap above and below the match tracking strip, including when the game sample is empty.
+- **Path:** `mobile/src/app/player/[idx].tsx`, `mobile/src/ui/next-match.tsx`
+- **Change:** Use the same gap around the tracking strip. Group the matchup and status in a compact header, with a hairline above the tracked line and standing.
 - **Callers:** Mobile player profile
 
 ### 2026-11-22 — Chip selection feedback
