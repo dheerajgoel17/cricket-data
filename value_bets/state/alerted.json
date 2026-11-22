@@ -23,5 +23,10 @@
   "edge": 0.0935,
   "start_utc": "2026-11-23T14:30:00Z",
   "alerted_at": "2026-11-22T19:33:26.061246+00:00"
+ },
+ "male|Australia|England|2026-11-24|batter_fours||Tim David under 1.5|1.5|under": {
+  "edge": 0.1846,
+  "start_utc": "2026-11-24T08:15:00Z",
+  "alerted_at": "2026-11-22T23:33:49.745016+00:00"
  }
 }
