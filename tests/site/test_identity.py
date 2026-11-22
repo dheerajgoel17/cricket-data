@@ -190,3 +190,18 @@ def test_the_name_our_own_data_uses_first_decides_when_it_picks_one_source_playe
     # our name picking nobody (initials) still lets the book names decide, as before
     table, review, _, _ = I.build({}, sitemap, {"af": "AM Fernando"}, {"af": priced("AM Fernando", "Asitha Fernando")}, {})
     assert table["s"] == {"af": "S3"}
+
+
+def test_haryana_ankit_kumar_links_to_his_profile_among_namesakes():
+    from pathlib import Path
+
+    pid = "9765545f"
+    overrides = I.load_overrides(Path(__file__).resolve().parents[2] / "data")
+    sitemap = [("26U", "ankit kumar"), ("I1A", "ankit kumar")]
+    books = {pid: priced("Ankit Kumar", "Ankit Rajesh Kumar")}
+    table, review, added, _ = I.build(
+        {pid: "c:I1A"}, sitemap, {pid: "Ankit Kumar"}, books, {pid: overrides[pid]},
+    )
+    assert table["s"][pid] == "26U"
+    assert added[pid] == "26U"
+    assert review == []
