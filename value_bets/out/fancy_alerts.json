@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-22T12:33:41Z",
+ "generated_at_utc": "2026-11-22T13:33:33Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -165,6 +165,29 @@
    "chance": 0.6333,
    "edge": 0.1717,
    "edge_pct": 17.2,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-26-sydney-thunder-women-v-adelaide-strikers-women|match_runouts||0|under",
+   "fixture_id": "2026-11-26-sydney-thunder-women-v-adelaide-strikers-women",
+   "match": "Sydney Thunder Women vs Adelaide Strikers Women",
+   "format": "T20",
+   "series": "WBBL 2026",
+   "start_utc": "2026-11-26T04:40:00Z",
+   "start_ist": "2026-11-26 10:10 IST",
+   "key": "match_runouts",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 0.5,
+   "best_odds": 2.4,
+   "best_source": "bc.game",
+   "hits": 12,
+   "played": 23,
+   "window": 20,
+   "chance": 0.4802,
+   "edge": 0.1524,
+   "edge_pct": 15.2,
    "bat_first": false
   }
  ]
