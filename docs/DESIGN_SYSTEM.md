@@ -190,7 +190,7 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Page header | `PageHeader` | Native chrome (unfilled; sits on `PageAtmosphere`) |
 | Page atmosphere | `ui/page-atmosphere` | Elevated canvas on stack pages + `EntityHeroWash` in scroll hero (web `HeroWash` twin) |
 | Accordion | `ui/accordion` | Twin of filters/splits |
-| Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`) | **Native-exclusive**: the one sheet shell (filters); never a hand-built `Modal` |
+| Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`, `FilterSheet`, `FilterSection`) | **Native-exclusive**: the one sheet shell (filters); never a hand-built `Modal` |
 | Button | `ui/button` (`Button`: primary / secondary, md at the platform touch height, sm at the control height) | Web twin: `components/ui/button.tsx`; never style a `Press` into a button |
 | Search box | `ui/search-field` (`SearchField`) | One box for Search and Competitions |
 | Filters button | `ui/chips` (`FilterButton`: icon, label, active-count badge) | Web twin: `FilterButton` in `components/app/chip.tsx`; one per page, beside the chip row |

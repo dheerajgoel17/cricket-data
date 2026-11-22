@@ -26,8 +26,8 @@ export interface FilterChoices {
 }
 
 /** Props screener filters: draft until Apply (site ScreenerFilters). Modal sheet; named combos sync with the account. */
-export function ScreenerFilters({ open, onOpenChange, state, onApply, choices, fixture = false }: {
-  open: boolean; onOpenChange: (o: boolean) => void; state: Screener; onApply: (s: Screener) => void; choices: FilterChoices; fixture?: boolean;
+export function ScreenerFilters({ open, onOpenChange, state, onApply, choices }: {
+  open: boolean; onOpenChange: (o: boolean) => void; state: Screener; onApply: (s: Screener) => void; choices: FilterChoices;
 }) {
   const insets = useSafeAreaInsets();
   const [draft, setDraft] = useState(state);
@@ -50,9 +50,9 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices, f
           </Press>
         </View>
         <ScrollView style={styles.body} contentContainerStyle={{ paddingBottom: space.stack }} showsVerticalScrollIndicator={false}>
-          {choices.days.length ? <Accordion title="Day" value={draft.day !== DEFAULTS.day ? dayName(draft.day) : undefined} defaultOpen>
+          <Accordion title="Day" value={draft.day !== DEFAULTS.day ? dayName(draft.day) : undefined} defaultOpen>
             <View style={styles.wrap}>{choices.days.map(([id, label]) => chip(draft.day === id, label, () => set({ day: id })))}</View>
-          </Accordion> : null}
+          </Accordion>
           {choices.matches.length > 0 ? (
             <Accordion title="Match" value={draft.match !== "all" ? matchName(draft.match) : undefined}>
               <View style={styles.wrap}>
@@ -61,7 +61,7 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices, f
               </View>
             </Accordion>
           ) : null}
-          {choices.teams.length > (fixture ? 0 : 1) ? (
+          {choices.teams.length > 1 ? (
             <Accordion title="Team" value={draft.team !== "all" ? draft.team : undefined}>
               <View style={styles.wrap}>
                 {chip(draft.team === "all", "Any team", () => set({ team: "all" }))}
@@ -88,41 +88,37 @@ export function ScreenerFilters({ open, onOpenChange, state, onApply, choices, f
           <Accordion title="Hit-rate window" value={draft.win !== DEFAULTS.win || draft.min ? `${WIN_LABEL[draft.win]}${draft.min ? ` · ${draft.min}%+` : ""}` : undefined} defaultOpen>
             <View style={styles.block}>
               <View style={styles.wrap}>{(Object.keys(WIN_LABEL) as Win[]).map((w) => chip(draft.win === w, choices.winLabel[w] ?? WIN_LABEL[w], () => set({ win: w })))}</View>
-              {!fixture ? <>
-                <Text style={styles.hint}>Minimum hit rate in this window. Thin histories are left out, never guessed.</Text>
-                <View style={styles.wrap}>{MIN_STEPS.map((m) => chip(draft.min === m, m ? `${m}%+` : "Any", () => set({ min: m })))}</View>
-              </> : null}
+              <Text style={styles.hint}>Minimum hit rate in this window. Thin histories are left out, never guessed.</Text>
+              <View style={styles.wrap}>{MIN_STEPS.map((m) => chip(draft.min === m, m ? `${m}%+` : "Any", () => set({ min: m })))}</View>
             </View>
           </Accordion>
-          {!fixture ? <Accordion title="Batting innings" value={draft.inns !== "all" ? INNS_LABEL[draft.inns] : undefined}>
+          <Accordion title="Batting innings" value={draft.inns !== "all" ? INNS_LABEL[draft.inns] : undefined}>
             <View style={styles.wrap}>{(Object.keys(INNS_LABEL) as Inns[]).map((i) => chip(draft.inns === i, INNS_LABEL[i], () => set({ inns: i })))}</View>
-          </Accordion> : null}
+          </Accordion>
           <Accordion title="Sort" value={draft.sort !== DEFAULTS.sort ? SORT_LABEL[draft.sort] : undefined}>
             <View style={styles.wrap}>{(Object.keys(SORT_LABEL) as Sort[]).map((s) => chip(draft.sort === s, SORT_LABEL[s], () => set({ sort: s })))}</View>
           </Accordion>
-          {!fixture ? <>
-            <Accordion title="Display" value={draft.value || !draft.bars ? [draft.value && "Edge > 0", !draft.bars && "No charts"].filter(Boolean).join(" · ") : undefined}>
-              <View style={styles.block}>
-                <View style={styles.switchRow}><Text style={styles.switchLabel}>Only positive edge</Text><Switch value={draft.value} onValueChange={(v) => set({ value: v })} trackColor={{ true: color.primary }} /></View>
-                <View style={styles.switchRow}><Text style={styles.switchLabel}>Form charts</Text><Switch value={draft.bars} onValueChange={(v) => set({ bars: v })} trackColor={{ true: color.primary }} /></View>
+          <Accordion title="Display" value={draft.value || !draft.bars ? [draft.value && "Edge > 0", !draft.bars && "No charts"].filter(Boolean).join(" · ") : undefined}>
+            <View style={styles.block}>
+              <View style={styles.switchRow}><Text style={styles.switchLabel}>Only positive edge</Text><Switch value={draft.value} onValueChange={(v) => set({ value: v })} trackColor={{ true: color.primary }} /></View>
+              <View style={styles.switchRow}><Text style={styles.switchLabel}>Form charts</Text><Switch value={draft.bars} onValueChange={(v) => set({ bars: v })} trackColor={{ true: color.primary }} /></View>
+            </View>
+          </Accordion>
+          <Accordion title="Save">
+            <View style={styles.block}>
+              <View style={styles.saveRow}>
+                <TextInput value={name} onChangeText={setName} placeholder="Name this combination" placeholderTextColor={color["muted-foreground"]} style={styles.input} maxLength={40} />
+                <Press accessibilityRole="button" onPress={() => {
+                  if (!screenerQuery(draft)) { setNote("Set a filter first, then save it."); return; }
+                  const n = name.trim() || "My filters";
+                  save(n, screenerQuery(draft));
+                  setName("");
+                  setNote(`Saved as “${n}”.`);
+                }} style={styles.saveBtn}><Text style={styles.saveTxt}>Save</Text></Press>
               </View>
-            </Accordion>
-            <Accordion title="Save">
-              <View style={styles.block}>
-                <View style={styles.saveRow}>
-                  <TextInput value={name} onChangeText={setName} placeholder="Name this combination" placeholderTextColor={color["muted-foreground"]} style={styles.input} maxLength={40} />
-                  <Press accessibilityRole="button" onPress={() => {
-                    if (!screenerQuery(draft)) { setNote("Set a filter first, then save it."); return; }
-                    const n = name.trim() || "My filters";
-                    save(n, screenerQuery(draft));
-                    setName("");
-                    setNote(`Saved as “${n}”.`);
-                  }} style={styles.saveBtn}><Text style={styles.saveTxt}>Save</Text></Press>
-                </View>
-                {note ? <Text style={styles.hint}>{note}</Text> : <Text style={styles.hint}>Saved on this device (and your account when signed in).</Text>}
-              </View>
-            </Accordion>
-          </> : null}
+              {note ? <Text style={styles.hint}>{note}</Text> : <Text style={styles.hint}>Saved on this device (and your account when signed in).</Text>}
+            </View>
+          </Accordion>
         </ScrollView>
         <View style={styles.foot}>
           <Button variant="secondary" flex={1} label="Clear all" onPress={() => setDraft({ ...DEFAULTS })} />

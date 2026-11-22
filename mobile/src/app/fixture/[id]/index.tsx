@@ -12,7 +12,7 @@ import { liveForFixture } from "@cricket/engine/live.js";
 import { fixtureBooks, sameFixture } from "@cricket/engine/lines.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { modelSide } from "@cricket/engine/props-view.js";
-import { DEFAULTS, WIN_LABEL, activeFilters, clearFilter, enoughHistory, narrow, options, order, type Screener } from "@site/lib/screener";
+import { DEFAULTS, SORT_LABEL, WIN_LABEL, activeFilters, clearFilter, enoughHistory, narrow, options, order, type Screener, type Sort, type Win } from "@site/lib/screener";
 import { FORMATS } from "@cricket/engine/util.js";
 import { collectGrid } from "@site/lib/grid";
 import { matchShareText } from "@cricket/engine/share-text.js";
@@ -33,7 +33,7 @@ import { useStore } from "@/lib/use-store";
 import { BlurBar, BlurTargetView, useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { CapsuleTabs } from "@/ui/capsule";
-import { ActiveChip, Chips, FilterButton } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton } from "@/ui/chips";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { GridFilters, GridTable, TrendList } from "@/ui/grid-table";
@@ -45,7 +45,7 @@ import { MatchHeader } from "@/ui/match-header";
 import { enter, Working } from "@/ui/motion";
 import { MatchHeaderSkeleton } from "@/ui/skeletons";
 import { PageHeader, RoundButton } from "@/ui/page-header";
-import { ScreenerFilters } from "@/ui/screener-filters";
+import { FilterSection, FilterSheet } from "@/ui/sheet";
 import { PropRow } from "@/ui/prop-row";
 import { abbr } from "@site/lib/format";
 import { color, font, radius, space, type, rhythm, t, icon } from "@/ui/tokens";
@@ -74,16 +74,14 @@ export default function FixturePage() {
   const scope = useMemo(() => (f && f.fmt !== "FC" && tab === "props" ? { teams: [f.a, f.b] as [string, string], archive: archived } : undefined), [f, tab, archived]);
   const [filters, setFilters] = useState<Screener>(DEFAULTS);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [draft, setDraft] = useState({ win: DEFAULTS.win, sort: DEFAULTS.sort });
   const { rows, isLoading, scoring, error, soFarOf, outOf, matchOf } = useHotView(scope, undefined, archived ? doc : undefined);
   // this match: the same two sides, a Test on any of its days, not the series' next game
   const here = useMemo(() => (f ? rows.filter((r) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: f.a, b: f.b, start: f.start, fmt: f.fmt })) : []), [rows, f]);
   const statKeys = useMemo(() => [...new Set(here.map((r) => r.stat))], [here]);
   const stat = statKeys.includes(filters.stat) ? filters.stat : "all";
-  const choices = useMemo(() => ({
-    days: [], matches: [], teams: options(here, "team"), formats: [],
-    comps: [], winLabel: WIN_LABEL,
-  }), [here]);
-  const active = activeFilters(filters);
+  const propTeams = useMemo(() => options(here, "team"), [here]);
+  const active = activeFilters(filters).filter(({ key }) => key !== "team");
   const shown = useMemo(() => {
     const { win } = filters;
     const scored = here
@@ -160,15 +158,19 @@ export default function FixturePage() {
               ) : tab === "props" ? (
                 <>
                   <View style={styles.toolbar}>
-                    <View style={styles.statTabs}>
-                      <CapsuleTabs label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={(stat) => setFilters((s) => ({ ...s, stat }))} />
+                    <View style={styles.chipFlex}>
+                      {propTeams.length ? <Chips items={[["all", "Match"], ...propTeams.map((team) => [team, abbr(team)] as [string, string])]} value={filters.team} onChange={(team) => setFilters((s) => ({ ...s, team }))} /> : null}
                     </View>
-                    <FilterButton count={active.length} onPress={() => setFiltersOpen(true)} />
+                    <FilterButton label={WIN_LABEL[filters.win]} count={active.length} onPress={() => {
+                      setDraft({ win: filters.win, sort: filters.sort });
+                      setFiltersOpen(true);
+                    }} />
                   </View>
+                  {statKeys.length > 1 ? <CapsuleTabs label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={(stat) => setFilters((s) => ({ ...s, stat }))} /> : null}
                   {active.length ? (
                     <View style={styles.activeRow}>
                       {active.map((filter) => <ActiveChip key={filter.key} label={`${filter.label} ${filter.value}`} onClear={() => setFilters((s) => clearFilter(s, filter.key))} />)}
-                      <Press accessibilityRole="button" onPress={() => setFilters(DEFAULTS)}><Text style={styles.clearAll}>Clear all</Text></Press>
+                      <Press accessibilityRole="button" onPress={() => setFilters((s) => ({ ...s, win: DEFAULTS.win, sort: DEFAULTS.sort }))}><Text style={styles.clearAll}>Clear all</Text></Press>
                     </View>
                   ) : null}
                   {isLoading ? (
@@ -183,7 +185,7 @@ export default function FixturePage() {
                   ) : scoring ? (
                     <Working label="Scoring this match's lines…" />
                   ) : (
-                    <View style={styles.pad}><EmptyState title={active.length ? "No props match these filters" : here.length ? "Not enough history" : "No props yet"} body={active.length ? "Clear a filter to see more props." : here.length ? "Try a different hit-rate window." : "No player props are priced for this match yet."} /></View>
+                    <View style={styles.pad}><EmptyState title={active.length || filters.team !== "all" || stat !== "all" ? "No props match these filters" : here.length ? "Not enough history" : "No props yet"} body={active.length || filters.team !== "all" || stat !== "all" ? "Change a filter to see more props." : here.length ? "Try a different hit-rate window." : "No player props are priced for this match yet."} /></View>
                   )}
                 </>
               ) : tab === "fancy" ? (
@@ -225,7 +227,19 @@ export default function FixturePage() {
           <PageHeader title={f ? `${f.a} v ${f.b}` : "Match"} subtitle={f ? seriesName(f) : undefined} right={f ? <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={icon.md} color={color.foreground} /></RoundButton> : undefined} />
         </BlurBar>
       </View>
-      {tab === "props" ? <ScreenerFilters fixture open={filtersOpen} onOpenChange={setFiltersOpen} state={filters} onApply={setFilters} choices={choices} /> : null}
+      {tab === "props" ? (
+        <FilterSheet visible={filtersOpen} onClose={() => setFiltersOpen(false)}
+          onClear={() => setDraft({ win: DEFAULTS.win, sort: DEFAULTS.sort })}
+          onApply={() => { setFilters((s) => ({ ...s, ...draft })); setFiltersOpen(false); }}
+        >
+          <FilterSection label="Hit-rate window">
+            <ChoiceRow>{(Object.keys(WIN_LABEL) as Win[]).map((win) => <ChoiceChip key={win} label={WIN_LABEL[win]} on={draft.win === win} onPress={() => setDraft((d) => ({ ...d, win }))} />)}</ChoiceRow>
+          </FilterSection>
+          <FilterSection label="Sort">
+            <ChoiceRow>{(Object.keys(SORT_LABEL) as Sort[]).map((sort) => <ChoiceChip key={sort} label={SORT_LABEL[sort]} on={draft.sort === sort} onPress={() => setDraft((d) => ({ ...d, sort }))} />)}</ChoiceRow>
+          </FilterSection>
+        </FilterSheet>
+      ) : null}
       <TabFade withTabBar={false} />
     </PageAtmosphere>
   );
@@ -242,8 +256,8 @@ const styles = StyleSheet.create({
   },
   pad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   bleed: { marginHorizontal: -space.gutter },
-  toolbar: { flexDirection: "row", alignItems: "center", paddingRight: space.gutter },
-  statTabs: { flex: 1 },
+  toolbar: { flexDirection: "row", alignItems: "center", paddingHorizontal: space.gutter, paddingBottom: space.snug, gap: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  chipFlex: { flex: 1, minWidth: 0 },
   activeRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingBottom: space.snug },
   clearAll: { ...t.calloutLabel, color: color.primary },
   sections: { paddingTop: rhythm.top },

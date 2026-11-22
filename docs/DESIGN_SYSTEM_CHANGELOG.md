@@ -16,9 +16,9 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 ---
 
 ### 2026-11-22 — Mobile fixture prop filters
-- **Path:** `mobile/src/app/fixture/[id]/index.tsx`, `mobile/src/ui/screener-filters.tsx`
-- **Change:** Fixture Props reuses the Filters button, active chips and screener sheet. The fixture sheet offers hit-rate window, sort and team.
-- **Callers:** Mobile Fixture Props and Player props
+- **Path:** `mobile/src/app/fixture/[id]/index.tsx`, `mobile/src/ui/sheet.tsx`, `mobile/src/ui/match-fancy.tsx`
+- **Change:** Fixture Props uses team chips beside a hit-rate window button, following Match Fancy. Both use the shared compact filter sheet.
+- **Callers:** Mobile Fixture Props and Match Fancy
 
 ### 2026-11-21 — Directory and statistics pages
 - **Path:** `site/src/components/app/forms.tsx`, `site/src/components/app/result.tsx`, and the generated design inventory
