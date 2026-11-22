@@ -190,3 +190,53 @@ def test_the_name_our_own_data_uses_first_decides_when_it_picks_one_source_playe
     # our name picking nobody (initials) still lets the book names decide, as before
     table, review, _, _ = I.build({}, sitemap, {"af": "AM Fernando"}, {"af": priced("AM Fernando", "Asitha Fernando")}, {})
     assert table["s"] == {"af": "S3"}
+
+
+def test_haryana_ankit_kumar_links_to_his_profile_among_namesakes():
+    from pathlib import Path
+
+    pid = "9765545f"
+    overrides = I.load_overrides(Path(__file__).resolve().parents[2] / "data")
+    sitemap = [("26U", "ankit kumar"), ("I1A", "ankit kumar")]
+    books = {pid: priced("Ankit Kumar", "Ankit Rajesh Kumar")}
+    table, review, added, _ = I.build(
+        {pid: "c:I1A"}, sitemap, {pid: "Ankit Kumar"}, books, {pid: overrides[pid]},
+    )
+    assert table["s"][pid] == "26U"
+    assert added[pid] == "26U"
+    assert review == []
+
+
+def test_verified_player_links_replace_conflicting_photo_matches():
+    from pathlib import Path
+
+    overrides = I.load_overrides(Path(__file__).resolve().parents[2] / "data")
+    cases = [
+        ("e4cdf230", "DG", "anukul roy", "OXJ", "alex roy", "e4cdf230"),
+        ("5d69930d", "8IL", "daniel smith", "8IL", "daniel smith", "35205dfc"),
+        ("dd572696", "AAU", "haider ali", "17L", "haider ali", "dd572696"),
+        ("8e554b6b", "CMY", "abdul samad", "CMY", "abdul samad", "8e514b4c"),
+        ("1c914163", "33", "yuvraj singh", "8HX", "yuvraj yogender singh", "1c914163"),
+        ("c3d1402f", "32", "rp singh", "A18", "raghuvendra pratap singh", "c3d1402f"),
+        ("b0eaaac6", "1DR", "ali khan", "LO8", "ali shamsher khan", "b0eaaac6"),
+        ("ad427b5c", "1DE", "lalit yadav", "8DH", "lalit manoharsingh yadav", "ad427b5c"),
+        ("33ffc3dd", "DU", "r sanjay yadav", "5IT", "ramsingh sonu yadav", "33ffc3dd"),
+        ("ae6746e0", "1U6", "khurram khan", "XG", "khurram nawaz khan", "ae6746e0"),
+        ("007113d7", "AUZ", "hamid shah", "7UJ", "hassnain ali shah", "007113d7"),
+        ("2e171977", "A9", "axar patel", "NGF", "ajaz patel", "2e171977"),
+        ("2e81a32d", "36", "bhuvneshwar kumar", "8YK", "bodhala vinay kumar", "2e81a32d"),
+        ("7a80e2a5", "73H", "hanu viljoen", "AM", "hardus viljoen", "7a80e2a5"),
+        ("9418198b", "EN", "prabhsimran singh", "AN3", "pheiroijam jotin singh", "9418198b"),
+        ("bb351c23", "B8", "moeen ali", "QHG", "mohammad ali", "bb351c23"),
+        ("bb95564b", "13U", "saif hassan", "J6L", "saif ul hassan", "bb95564b"),
+        ("f088b960", "B2", "sarfaraz khan", "GDP", "sayam khan", "f088b960"),
+        ("f0a99c08", "8HX", "yuvraj yogender singh", "8HX", "yuvraj yogender singh", "1c914163"),
+    ]
+    for pid, sid, name, conflicting_sid, conflicting_name, conflicting_pid in cases:
+        sitemap = list({sid: name, conflicting_sid: conflicting_name}.items())
+        table, _, added, _ = I.build(
+            {conflicting_pid: f"c:{conflicting_sid}"}, sitemap, {}, {},
+            {pid: overrides[pid]},
+        )
+        assert table["s"] == {pid: sid}
+        assert added == {pid: sid}
