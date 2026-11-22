@@ -7,6 +7,9 @@ import { useLiveDoc } from "@/hooks/useLive";
 import { useData } from "@/lib/data";
 import { inplayQuery, linesQuery } from "@/lib/queries";
 
+type ResolvedPlayer = { pid: string; name: string; team: string };
+const playerLookups = new WeakMap<object, Map<string, ResolvedPlayer | null>>();
+
 /**
  * The book lines the tables read, with in-play lines folded in only when that market was not priced before the start (`liveMerge`).
  * Pre-match markets keep their rows; their in-play prices stay in the snapshot / log. `/api/inplay` is asked (~15 s) only while a match is on.
@@ -22,13 +25,24 @@ export function useLinesLive() {
   const data = useMemo(() => {
     if (!on || !inplay.data?.matches?.length || !lines.data) return lines.data;
     const teamIdx = (n: string) => (store.teams || []).findIndex((t: any) => teamKey(t.n) === teamKey(n));
+    let lookups = playerLookups.get(rz);
+    if (!lookups) playerLookups.set(rz, lookups = new Map());
+    const lookup = lookups;
     const resolve = (name: string, sides: string[]) => {
+      const key = JSON.stringify([name, sides]);
+      if (lookup.has(key)) return lookup.get(key) ?? null;
+      let resolved: ResolvedPlayer | null = null;
       for (const side of sides) {
         const ti = teamIdx(side);
         const hits = rz.players(name, ti >= 0 ? { team: ti } : {}, 2) as { idx: number; score: number }[];
-        if (hits.length && hits[0].score >= 8) return { pid: store.P.id[hits[0].idx], name: store.P.nm[hits[0].idx], team: side };
+        if (hits.length && hits[0].score >= 8) {
+          resolved = { pid: store.P.id[hits[0].idx], name: store.P.nm[hits[0].idx], team: side };
+          break;
+        }
       }
-      return null;
+      if (lookup.size >= 2048) lookup.clear();
+      lookup.set(key, resolved);
+      return resolved;
     };
     // the live match of two sides, from the 15 s snapshot
     const liveOf = (sides: string[]) => (live.data?.matches || []).find((x: any) => x.status === "live" && sides.every((s) => (x.teams || []).some((t: any) => sameTeam(t.name, s))));
