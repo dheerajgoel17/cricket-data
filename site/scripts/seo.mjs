@@ -6,6 +6,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { BRAND, DEFAULT_DESC, ROUTES, TAGLINE, fullTitle, pageMeta, shareMetas } from "../src/lib/seo.js";
+import { bookFixtures, fixtureInBooks } from "@cricket/engine/live.js";
+import { isFixtureId } from "@cricket/engine/lines.js";
 import { cardPath } from "@cricket/engine/card-path.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -37,7 +39,27 @@ export function bodyHtml(h1, text) {
 
 export function render(template, page) {
   if (!template.includes("<!--seo-head-->") || !template.includes("<!--seo-body-->")) throw new Error("index.html lost its seo markers");
-  return template.replace("<!--seo-head-->", headTags(page)).replace("<!--seo-body-->", bodyHtml(page.h1 || page.title, page.description));
+  return template.replace("<!--seo-head-->", headTags(page)).replace("<!--seo-body-->", () => page.body || bodyHtml(page.h1 || page.title, page.description));
+}
+
+/** Only display information already public on Home. The live rail replaces this snapshot. */
+export function homeSnapshot(fixtures, lines, now = Date.now()) {
+  const books = bookFixtures(lines);
+  const priced = fixtures.filter((f) => isFixtureId(f.id) && !f.noProps && fixtureInBooks(books, f));
+  const live = priced.filter((f) => f.status === "Live" && f.cardScores?.some((s) => s?.display));
+  const upcoming = priced.filter((f) => !["Live", "Started", "Completed"].includes(f.status) && Date.parse(f.start) > now)
+    .sort((a, b) => Date.parse(a.start) - Date.parse(b.start));
+  const rows = (live.length ? live : upcoming).slice(0, 4);
+  if (!rows.length) return "";
+  const cards = rows.map((f) => {
+    const teams = [f.a, f.b].map((name, i) => `<div class="flex min-w-0 items-center gap-snug"><span aria-hidden="true" class="inline-grid size-9 shrink-0 place-items-center text-caption text-muted-foreground">${esc(String(name).split(/\s+/).slice(0, 3).map((word) => word[0]).join(""))}</span><span class="min-w-0 flex-1 truncate text-body font-emphasis">${esc(name)}</span><span class="text-footnote tabular-nums">${esc(f.cardScores?.[i]?.display)}</span></div>`).join("");
+    const status = f.status === "Live" ? "Live" : "Upcoming";
+    const start = new Date(f.start);
+    const detail = status === "Live" ? "Live score" : `<time datetime="${esc(f.start)}">${esc(start.toUTCString().replace(/:00 GMT$/, " UTC"))}</time>`;
+    return `<div role="listitem" class="w-(--fixture-card) shrink-0 snap-start"><a href="/fixture/${esc(f.id)}" class="flex min-h-48 flex-col gap-snug rounded-2xl bg-card p-inset ring-1 ring-inset ring-hairline"><span class="text-footnote font-label text-muted-foreground">${status} · ${esc(f.fmt)}${f.gender === "female" ? " · W" : ""}</span>${teams}<div class="mt-auto flex min-w-0 items-center justify-between gap-snug pt-tight"><div class="grid min-w-0"><span class="truncate text-footnote font-label">${detail}</span><span class="truncate text-caption text-muted-foreground">${esc(f.venue)}</span></div><span class="text-footnote font-label text-primary">Props</span></div></a></div>`;
+  }).join("");
+  const label = live.length ? "In play" : "Pre-match";
+  return `<div id="home-start"><header class="flex h-(--header-h) items-center border-b border-hairline px-gutter"><a class="text-title font-emphasis" href="/">Fancy.cash</a></header><main class="mx-auto w-full max-w-(--content-max) px-gutter pb-section"><h1 class="sr-only">Cricket fixtures</h1><div class="flex h-12 items-center border-b border-hairline text-callout font-label">${label}</div><section id="home-start-rail" aria-label="Matches" class="pt-stack"><div role="list" aria-label="Match cards" class="-mx-gutter flex snap-x snap-mandatory gap-snug overflow-x-auto px-gutter [scrollbar-width:none]">${cards}</div></section></main></div><script>if(location.pathname!=="/"||new URLSearchParams(location.search).has("view")||location.hash.startsWith("#/"))document.getElementById("home-start").remove()</script>`;
 }
 
 const crumbs = (site, items) => ({ "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: items.map(([name, path], i) => ({ "@type": "ListItem", position: i + 1, name, item: `${site}${path}` })) });
@@ -118,6 +140,9 @@ export function build(dist, site = siteOf(dist), secret = process.env.DATA_WRAP_
   };
   const sm = existsSync(join(dist, "sitemap.xml")) ? [...readFileSync(join(dist, "sitemap.xml"), "utf8").matchAll(/<loc>[^<]*?(\/[^<]*)<\/loc>/g)].map((x) => x[1]) : [];
   const list = pages({ site, index: read("data/index.json", {}), fixtures: read("data/fixtures.json", []), sitemap: sm.map((p) => p.replace(/^https?:\/\/[^/]+/, "")) });
+  if (process.env.VITE_SITE_HOST === "cloudflare") {
+    list[0][1].body = homeSnapshot(read("data/fixtures.json", []), read("data/lines.json", null));
+  }
   for (const [path, page] of list) {
     const file = path ? join(dist, `${path}.html`) : join(dist, "index.html");
     mkdirSync(dirname(file), { recursive: true });

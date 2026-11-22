@@ -35,26 +35,35 @@ function lazyResolver(store: Awaited<ReturnType<typeof createStore>>) {
   });
 }
 
-async function boot() {
-  const k = await gateKey();
-  setWrapKey(k);
-  const extras = Promise.all([
+const firstHome = typeof document !== "undefined" ? document.getElementById("home-start")?.innerHTML : undefined;
+
+export const firstHomeRail = typeof document !== "undefined" ? document.getElementById("home-start-rail")?.innerHTML : undefined;
+
+function loadExtras() {
+  return Promise.all([
     loadJson("/data/photos.json").then((p) => (p || {}) as Photos),
     loadIdentity("/data/"),
     loadJson("/data/names.json").then((n) => (n && typeof n === "object" ? n : {}) as Record<string, string>),
   ]);
+}
+
+async function boot(isHome: boolean) {
+  const k = await gateKey();
+  setWrapKey(k);
+  const fetchJson = async (path: string) => {
+    const response = await fetch(dataUrl(`/data/${path}`), { credentials: "same-origin", priority: path === "matches.json" ? "low" : "auto" });
+    if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
+    return readJson(response);
+  };
+  const fixtures = isHome ? fetchJson("fixtures.json").catch(() => null) : undefined;
   const store = await createStore({
     deferMatches: true,
     lazyMatches: true,
-    fetchJson: async (path: string) => {
-      const response = await fetch(dataUrl(`/data/${path}`), { credentials: "same-origin", priority: path === "matches.json" ? "low" : "auto" });
-      if (!response.ok) throw new Error(`${path}: HTTP ${response.status}`);
-      return readJson(response);
-    },
+    fetchJson: async (path: string) => (path === "fixtures.json" ? await fixtures : null) ?? fetchJson(path),
   });
   if (!store?.P?.id?.length) throw new Error("index.json: empty");
   const data: Data = { store, rz: lazyResolver(store), photos: {}, identity: identityIndex(null), names: {}, matchesReady: false };
-  return { data, extras };
+  return data;
 }
 
 const retryable = (e: unknown) => /HTTP 403|empty|Unexpected token/.test(String((e as Error)?.message || e));
@@ -71,20 +80,22 @@ export function DataProvider({ children, eagerHistory = false }: { children: Rea
     (async () => {
       try {
         let out: Awaited<ReturnType<typeof boot>>;
-        try { out = await boot(); }
+        const isHome = !eagerHistory && location.pathname === "/";
+        try { out = await boot(isHome); }
         catch (e) {
           if (!retryable(e)) throw e;
           await new Promise((r) => setTimeout(r, 80)); // the gate cookie is sometimes not on the next request yet
-          out = await boot();
+          out = await boot(isHome);
         }
-        if (live) setData(out.data);
-        void out.extras.then(([photos, identity, names]) => {
-          if (live) setData((d) => (d && d.store === out.data.store ? { ...d, photos, identity, names } : d));
+        if (!live) return;
+        setData(out);
+        void loadExtras().then(([photos, identity, names]) => {
+          if (live) setData((d) => (d && d.store === out.store ? { ...d, photos, identity, names } : d));
         });
       } catch (e) { if (live) setError((e as Error).message); }
     })();
     return () => { live = false; };
-  }, [tick]);
+  }, [tick, eagerHistory]);
   const store = data?.store;
   const loadHistory = useCallback(async () => {
     if (!store) return;
@@ -104,7 +115,7 @@ export function DataProvider({ children, eagerHistory = false }: { children: Rea
       </div>
     );
   }
-  if (!data) return <AppSkeleton />;
+  if (!data) return firstHome && !eagerHistory ? <div dangerouslySetInnerHTML={{ __html: firstHome }} /> : <AppSkeleton />;
   return <Ctx.Provider value={{ ...data, loadHistory }}>{children}</Ctx.Provider>;
 }
 
