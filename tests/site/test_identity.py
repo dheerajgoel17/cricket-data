@@ -222,6 +222,15 @@ def test_verified_player_links_replace_conflicting_photo_matches():
         ("ad427b5c", "1DE", "lalit yadav", "8DH", "lalit manoharsingh yadav", "ad427b5c"),
         ("33ffc3dd", "DU", "r sanjay yadav", "5IT", "ramsingh sonu yadav", "33ffc3dd"),
         ("ae6746e0", "1U6", "khurram khan", "XG", "khurram nawaz khan", "ae6746e0"),
+        ("007113d7", "AUZ", "hamid shah", "7UJ", "hassnain ali shah", "007113d7"),
+        ("2e171977", "A9", "axar patel", "NGF", "ajaz patel", "2e171977"),
+        ("2e81a32d", "36", "bhuvneshwar kumar", "8YK", "bodhala vinay kumar", "2e81a32d"),
+        ("7a80e2a5", "73H", "hanu viljoen", "AM", "hardus viljoen", "7a80e2a5"),
+        ("9418198b", "EN", "prabhsimran singh", "AN3", "pheiroijam jotin singh", "9418198b"),
+        ("bb351c23", "B8", "moeen ali", "QHG", "mohammad ali", "bb351c23"),
+        ("bb95564b", "13U", "saif hassan", "J6L", "saif ul hassan", "bb95564b"),
+        ("f088b960", "B2", "sarfaraz khan", "GDP", "sayam khan", "f088b960"),
+        ("f0a99c08", "8HX", "yuvraj yogender singh", "8HX", "yuvraj yogender singh", "1c914163"),
     ]
     for pid, sid, name, conflicting_sid, conflicting_name, conflicting_pid in cases:
         sitemap = list({sid: name, conflicting_sid: conflicting_name}.items())
