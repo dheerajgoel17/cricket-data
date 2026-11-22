@@ -46,7 +46,7 @@ import { pushRecentPlayer } from "@/lib/saved";
 import { PropStar, StarButton } from "@/ui/star";
 import { TeamBadge } from "@/ui/team-badge";
 import { EntityHeroWash, PageAtmosphere, useEntityAccent } from "@/ui/page-atmosphere";
-import { color, control, font, radius, space, type, fs, tint, t, d, dStrong, w, state, icon } from "@/ui/tokens";
+import { color, control, font, radius, rhythm, space, type, fs, tint, t, d, dStrong, w, state, icon } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
 import { WindowPills } from "@/ui/window-pills";
 
@@ -230,7 +230,7 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
 
   if (!entries.length || !cur) {
     return (
-      <View style={[styles.pad, { gap: space.stack, paddingTop: space.snug }]}>
+      <View style={[styles.pad, styles.profileBody]}>
         {!book ? <Unpriced label={label} /> : null}
         {next ? <NextMatchCard next={next} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} /> : null}
         {next ? <MatchupRates next={next} entries={entries} line={line} side={side} /> : null}
@@ -244,13 +244,13 @@ function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePla
   }
 
   return (
-    <View style={{ gap: space.stack }}>
+    <View style={styles.profileBody}>
       {next ? (
         <View style={styles.pad}>
           <NextMatchCard next={next} line={line} side={side} book={next.priced ? book : null} statLabel={label} fmt={fmt} standing={standing} out={out} />
         </View>
       ) : null}
-      <Animated.View entering={enter(0)} style={[styles.pad, styles.metricsBand]}>
+      <Animated.View entering={enter(0)} style={styles.pad}>
         <View style={styles.metricGrid}>
           <Metric compact k={`${cur.label} avg`}><View style={styles.countRow}>{arrow(cur.mean == null ? null : cur.mean > line)}{cur.mean == null ? <Text style={styles.metricNum}>–</Text> : <CountUp value={cur.mean} digits={2} style={styles.metricNum} />}</View></Metric>
           <Metric compact k={book ? "Line" : "Research line"}>{`${sideLetter} ${line}`}</Metric>
@@ -456,11 +456,7 @@ const styles = StyleSheet.create({
   link: { color: color.primary, ...w.label },
   teamLine: { alignItems: "flex-start", gap: 2 },
   logoCrop: { width: 58, height: 58, overflow: "hidden", alignItems: "center", justifyContent: "center" },
-  metricsBand: {
-    gap: space.snug,
-    paddingTop: space.snug,
-    paddingBottom: space.snug,
-  },
+  profileBody: { gap: rhythm.between, paddingTop: rhythm.between },
   metricGrid: { flexDirection: "row", flexWrap: "wrap", rowGap: space.snug + 2 },
   countRow: { flexDirection: "row", alignItems: "center" },
   metricNum: { fontSize: fs.metric + 2, lineHeight: 24, letterSpacing: -0.44, ...w.data, color: color.foreground, fontVariant: ["tabular-nums"] },

@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-22 — Player profile live tracking spacing
+- **Path:** `mobile/src/app/player/[idx].tsx`
+- **Change:** Use the same section gap above and below the match tracking strip, including when the game sample is empty.
+- **Callers:** Mobile player profile
+
 ### 2026-11-22 — Chip selection feedback
 - **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/capsule.tsx`, `mobile/src/ui/match-chip.tsx`
 - **Change:** Chip rails clip at the scroll viewport edge. Selection colors use short transitions and update instantly with Reduce Motion.
