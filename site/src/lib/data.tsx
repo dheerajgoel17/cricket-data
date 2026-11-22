@@ -89,6 +89,9 @@ export function DataProvider({ children, eagerHistory = false }: { children: Rea
         }
         if (!live) return;
         setData(out);
+        // Let the first fixture response reach the rail before the larger optional player files.
+        if (isHome) await out.store.loadFixtures();
+        if (!live) return;
         void loadExtras().then(([photos, identity, names]) => {
           if (live) setData((d) => (d && d.store === out.store ? { ...d, photos, identity, names } : d));
         });

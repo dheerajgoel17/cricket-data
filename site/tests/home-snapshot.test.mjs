@@ -18,3 +18,12 @@ test("a past or unpriced fixture cannot appear as an upcoming card", () => {
   assert.equal(homeSnapshot([fixture], null, now), "");
   assert.equal(homeSnapshot([{ ...fixture, status: "Live" }], lines, now), "");
 });
+
+test("browser worker hashing decodes the existing wire format", async () => {
+  const { sha256 } = await import("@noble/hashes/sha256");
+  const { wrap, unwrap } = await import("@cricket/engine/wrap.js");
+  const value = { fixtures: Array.from({ length: 130 }, (_, i) => ({ id: i, name: "São Paulo" })) };
+  const secret = "test key";
+  const wire = await wrap(value, secret, new Uint8Array(16));
+  assert.deepEqual(await unwrap(wire, secret, sha256), value);
+});
