@@ -72,6 +72,14 @@ export function ChoiceRow({ children }: { children: ReactNode }) {
   return <View style={styles.choiceRow}>{children}</View>;
 }
 
+/** Full-width filter chrome. Use flush chips so the bar owns the padding. */
+export const filterBar = StyleSheet.create({
+  row: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  chips: { flex: 1, minWidth: 0 },
+  active: { alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
+  clear: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
+});
+
 const styles = StyleSheet.create({
   flushRow: { gap: space.tight },
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },

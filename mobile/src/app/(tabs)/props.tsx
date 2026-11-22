@@ -15,7 +15,8 @@ import { MAX_ROWS } from "@/lib/hot";
 import { useHotView } from "@/lib/use-hot";
 import { AppHeader } from "@/ui/brand";
 import { STATS } from "@cricket/engine/rules.js";
-import { Chips, ActiveChip, FilterButton } from "@/ui/chips";
+import { Chips, ActiveChip, FilterButton, filterBar } from "@/ui/chips";
+import { HScroll } from "@/ui/h-scroll";
 import { MatchChips } from "@/ui/match-chip";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
@@ -86,17 +87,17 @@ function PlayerProps() {
     <View>
       <Chips items={days} value={sc.day} onChange={(day) => setSc((s) => ({ ...s, day, match: "all" }))} />
       {matchChips.length ? <MatchChips all items={matchChips} tags={matchTags} value={pick} onChange={(match) => setSc((s) => ({ ...s, match }))} /> : null}
-      <View style={styles.toolbar}>
-        <View style={{ flex: 1 }}><Chips items={statTabs} value={statTabs.some(([k]) => k === sc.stat) ? sc.stat : "all"} onChange={(stat) => setSc((s) => ({ ...s, stat }))} /></View>
-        <FilterButton count={active.length} onPress={() => setFiltersOpen(true)} style={styles.filterGap} />
+      <View style={filterBar.row}>
+        <View style={filterBar.chips}><Chips flush items={statTabs} value={statTabs.some(([k]) => k === sc.stat) ? sc.stat : "all"} onChange={(stat) => setSc((s) => ({ ...s, stat }))} /></View>
+        <FilterButton count={active.length} onPress={() => setFiltersOpen(true)} />
       </View>
       {active.length ? (
-        <View style={styles.activeRow}>
+        <HScroll contentContainerStyle={filterBar.active} accessibilityLabel="Active filters">
           {active.map((f) => (
             <ActiveChip key={f.key} label={`${f.label} ${f.value}`} onClear={() => setSc((s) => clearFilter(s, f.key))} />
           ))}
-          <Press accessibilityRole="button" onPress={() => setSc({ ...DEFAULTS })}><Text style={styles.clearAll}>Clear all</Text></Press>
-        </View>
+          <Press accessibilityRole="button" onPress={() => setSc({ ...DEFAULTS })}><Text style={filterBar.clear}>Clear all</Text></Press>
+        </HScroll>
       ) : null}
     </View>
   );
@@ -152,10 +153,6 @@ function useHotViewWithRefetch(day: number) {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   emptyPad: { paddingVertical: space.stack, paddingHorizontal: space.gutter },
-  toolbar: { flexDirection: "row", alignItems: "center", gap: space.tight, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
-  filterGap: { marginRight: space.gutter },
-  activeRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", gap: space.tight, paddingHorizontal: space.gutter, paddingBottom: space.snug },
-  clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug },
   link: { ...t.calloutLabel, color: color.primary },
 });
 

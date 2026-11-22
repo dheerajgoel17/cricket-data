@@ -1,22 +1,18 @@
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Button } from "@/ui/button";
 import { HScroll } from "@/ui/h-scroll";
-import { Sheet } from "@/ui/sheet";
+import { FilterSection, FilterSheet } from "@/ui/sheet";
 import { useEffect, useState } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
-import { RoundButton } from "@/ui/round-button";
 import { Text } from "@/ui/text";
-import { Ionicons } from "@expo/vector-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { STATS } from "@cricket/engine/rules.js";
 import { heatStep } from "@site/lib/heat";
 import { odds, pc, shortDate } from "@site/lib/format";
 import type { Grid } from "@site/lib/grid";
 import { useStore } from "@/lib/use-store";
 import { playerLabel } from "@/lib/player-label";
-import { ActiveChip, ChoiceChip, ChoiceRow, FilterButton } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, FilterButton, filterBar } from "@/ui/chips";
 import { CapsuleTabs } from "@/ui/capsule";
 import { EmptyState } from "@/ui/empty-state";
 import { Bleed } from "@/ui/bleed";
@@ -24,7 +20,7 @@ import { LineStepper } from "@/ui/line-stepper";
 import { MiniBars } from "@/ui/mini-bars";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
-import { cap, color, control, font, num, numLg, radius, space, type, tint, fs, surface, t, d, state, icon } from "@/ui/tokens";
+import { cap, color, num, numLg, radius, space, type, tint, fs, surface, t, d, state } from "@/ui/tokens";
 
 export const STAT_ITEMS: [string, string][] = Object.entries(STATS).map(([k, v]: any) => [k, v.label as string]);
 export const GAMES = [5, 10, 15, 20, 30];
@@ -40,7 +36,6 @@ const HEAT = {
 
 /** Stat chips + Filters button (Props / Fancy pattern) for Grid and Custom line. Line, games window and (on Custom line) the hit-rate floor sit in a sheet. */
 export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, onHit }: { stat: string; line: number; games: number; hit?: number; onStat: (s: string) => void; onLine: (l: number) => void; onGames: (n: number) => void; onHit?: (h: number) => void }) {
-  const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
   const [draftLine, setDraftLine] = useState(line);
   const [draftGames, setDraftGames] = useState(games);
@@ -50,39 +45,34 @@ export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, o
   const activeN = (line !== DEFAULT_LINE ? 1 : 0) + (games !== DEFAULT_GAMES ? 1 : 0) + (withHit && hit !== DEFAULT_HIT ? 1 : 0);
   const apply = () => { onLine(draftLine); onGames(draftGames); if (withHit) onHit!(draftHit); setOpen(false); };
   return (
-    <View style={styles.filters}>
-      <View style={styles.filterRow}>
-        <View style={styles.chipFlex}><CapsuleTabs label="Stat" items={STAT_ITEMS.map(([k, l]) => [k, l, false] as [string, string, boolean])} value={stat} onChange={onStat} /></View>
+    <View style={styles.filterBleed}>
+      <View style={filterBar.row}>
+        <View style={filterBar.chips}><CapsuleTabs flush label="Stat" items={STAT_ITEMS.map(([k, l]) => [k, l, false] as [string, string, boolean])} value={stat} onChange={onStat} /></View>
         <FilterButton label={`L${games}`} count={activeN} onPress={() => setOpen(true)} />
       </View>
       {activeN > 0 ? (
-        <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
+        <HScroll contentContainerStyle={filterBar.active} accessibilityLabel="Active filters">
           {line !== DEFAULT_LINE ? <ActiveChip label={`Line O ${line}`} onClear={() => onLine(DEFAULT_LINE)} /> : null}
           {games !== DEFAULT_GAMES ? <ActiveChip label={`Window L${games}`} onClear={() => onGames(DEFAULT_GAMES)} /> : null}
           {withHit && hit !== DEFAULT_HIT ? <ActiveChip label={`Hit ${HITS.find(([v]) => v === hit)?.[1] ?? hit}`} onClear={() => onHit!(DEFAULT_HIT)} /> : null}
-          <Press scale={1} onPress={() => { onLine(DEFAULT_LINE); onGames(DEFAULT_GAMES); if (withHit) onHit!(DEFAULT_HIT); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
+          <Press scale={1} onPress={() => { onLine(DEFAULT_LINE); onGames(DEFAULT_GAMES); if (withHit) onHit!(DEFAULT_HIT); }} accessibilityRole="button"><Text style={filterBar.clear}>Clear all</Text></Press>
         </HScroll>
       ) : null}
-      <Sheet visible={open} onClose={() => setOpen(false)} label="Close filters">
-          <View style={styles.sheetHead}>
-            <Text style={styles.sheetTitle}>Filters</Text>
-            <RoundButton label="Close" onPress={() => setOpen(false)}><Ionicons name="close" size={icon.md} color={color.foreground} /></RoundButton>
-          </View>
-          <Text style={styles.sheetSec}>Custom line</Text>
+      <FilterSheet visible={open} onClose={() => setOpen(false)} onApply={apply}
+        onClear={() => { setDraftLine(DEFAULT_LINE); setDraftGames(DEFAULT_GAMES); setDraftHit(DEFAULT_HIT); }}
+      >
+        <FilterSection label="Custom line">
           <LineStepper value={draftLine} label="O" min={0} onStep={(d) => setDraftLine(Math.max(0, Math.round((draftLine + d) * 2) / 2))} />
-          <Text style={styles.sheetSec}>Hit-rate window</Text>
+        </FilterSection>
+        <FilterSection label="Hit-rate window">
           <ChoiceRow>{GAMES.map((n) => <ChoiceChip key={n} label={`L${n}`} on={draftGames === n} onPress={() => setDraftGames(n)} />)}</ChoiceRow>
-          {withHit ? (
-            <>
-              <Text style={styles.sheetSec}>Minimum hit rate</Text>
-              <ChoiceRow>{HITS.map(([v, l]) => <ChoiceChip key={v} label={l} on={draftHit === v} onPress={() => setDraftHit(v)} />)}</ChoiceRow>
-            </>
-          ) : null}
-          <View style={styles.sheetFoot}>
-            <Button variant="secondary" flex={1} label="Clear" onPress={() => { setDraftLine(DEFAULT_LINE); setDraftGames(DEFAULT_GAMES); setDraftHit(DEFAULT_HIT); }} />
-            <Button flex={2} label="Apply" onPress={apply} />
-          </View>
-      </Sheet>
+        </FilterSection>
+        {withHit ? (
+          <FilterSection label="Minimum hit rate">
+            <ChoiceRow>{HITS.map(([v, l]) => <ChoiceChip key={v} label={l} on={draftHit === v} onPress={() => setDraftHit(v)} />)}</ChoiceRow>
+          </FilterSection>
+        ) : null}
+      </FilterSheet>
     </View>
   );
 }
@@ -182,15 +172,7 @@ export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; tea
 }
 
 const styles = StyleSheet.create({
-  filters: { gap: space.snug },
-  filterRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
-  chipFlex: { flex: 1, minWidth: 0, marginHorizontal: -space.gutter },
-  activeRow: { gap: space.snug, paddingVertical: space.tight },
-  clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
-  sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
-  sheetTitle: { ...type.heading, color: color.foreground },
-  sheetSec: { ...t.bodyLabel, color: color.foreground, marginTop: space.snug },
-  sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
+  filterBleed: { marginHorizontal: -space.gutter },
   table: { flexDirection: "row", ...surface.card, overflow: "hidden" },
   cell: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline, paddingHorizontal: space.tight },
   rowStart: { height: ROW_H, flexDirection: "row", alignItems: "center" },

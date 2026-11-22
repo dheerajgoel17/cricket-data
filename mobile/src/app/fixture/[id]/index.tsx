@@ -33,7 +33,7 @@ import { useStore } from "@/lib/use-store";
 import { BlurBar, BlurTargetView, useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { CapsuleTabs } from "@/ui/capsule";
-import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, filterBar } from "@/ui/chips";
 import { HScroll } from "@/ui/h-scroll";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
@@ -158,8 +158,8 @@ export default function FixturePage() {
                 <View style={styles.pad}><EmptyState title="No props for first-class" body="First-class cricket is not part of the stats here, so there are no player props for this match." /></View>
               ) : tab === "props" ? (
                 <>
-                  <View style={styles.toolbar}>
-                    <View style={styles.chipFlex}>
+                  <View style={filterBar.row}>
+                    <View style={filterBar.chips}>
                       <CapsuleTabs flush label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={(stat) => setFilters((s) => ({ ...s, stat }))} />
                     </View>
                     <FilterButton label={WIN_LABEL[filters.win]} count={active.length} onPress={() => {
@@ -168,9 +168,9 @@ export default function FixturePage() {
                     }} />
                   </View>
                   {active.length ? (
-                    <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
+                    <HScroll contentContainerStyle={filterBar.active} accessibilityLabel="Active filters">
                       {active.map((filter) => <ActiveChip key={filter.key} label={`${filter.label} ${filter.value}`} onClear={() => setFilters((s) => clearFilter(s, filter.key))} />)}
-                      <Press accessibilityRole="button" onPress={() => setFilters((s) => ({ ...s, win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team }))}><Text style={styles.clearAll}>Clear all</Text></Press>
+                      <Press accessibilityRole="button" onPress={() => setFilters((s) => ({ ...s, win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team }))}><Text style={filterBar.clear}>Clear all</Text></Press>
                     </HScroll>
                   ) : null}
                   {isLoading ? (
@@ -264,10 +264,6 @@ const styles = StyleSheet.create({
   },
   pad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   bleed: { marginHorizontal: -space.gutter },
-  toolbar: { flexDirection: "row", alignItems: "center", paddingHorizontal: space.gutter, paddingVertical: space.snug, gap: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
-  chipFlex: { flex: 1, minWidth: 0 },
-  activeRow: { alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
-  clearAll: { ...t.calloutLabel, color: color.primary },
   sections: { paddingTop: rhythm.top },
   gridHead: { flexDirection: "row", alignItems: "center", gap: space.tight },
   gridTitle: { ...t.bodyLabel, color: color.foreground },

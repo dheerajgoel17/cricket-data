@@ -29,7 +29,7 @@ import { liveQuery } from "@/lib/queries";
 import { liveMatchFor } from "@/lib/rail";
 import { BookBadge } from "@/ui/book-badge";
 import { ChartBars } from "@/ui/charts";
-import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, filterBar } from "@/ui/chips";
 import { Bleed } from "@/ui/bleed";
 import { EmptyState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
@@ -198,17 +198,17 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
   return (
     <View style={mode === "detail" ? styles.root : undefined}>
-      <View style={styles.filterRow}>
+      <View style={[filterBar.row, styles.bleed]}>
         {scopes.length > 1 ? (
-          <View style={styles.chipFlex}><Chips flush items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
-        ) : <View style={styles.chipFlex} />}
+          <View style={filterBar.chips}><Chips flush items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
+        ) : <View style={filterBar.chips} />}
         <FilterButton label={`L${win}`} count={activeN} onPress={() => setFiltersOpen(true)} />
       </View>
       {activeN > 0 ? (
-        <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
+        <HScroll style={styles.bleed} contentContainerStyle={filterBar.active} accessibilityLabel="Active filters">
           {win !== 10 ? <ActiveChip label={`Window L${win}`} onClear={() => { setWin(10); setMl(undefined); }} /> : null}
           {here ? <ActiveChip label={`At ${venueName}`} onClear={() => { setHere(false); setMl(undefined); }} /> : null}
-          <Press onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
+          <Press onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={filterBar.clear}>Clear all</Text></Press>
         </HScroll>
       ) : null}
       <FilterSheet
@@ -389,20 +389,6 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
 
 const styles = StyleSheet.create({
   root: { gap: rhythm.between },
-  /** Edge-to-edge hairline under scope + L10 (site MatchFancy list twin). */
-  filterRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space.snug,
-    marginHorizontal: -space.gutter,
-    paddingHorizontal: space.gutter,
-    paddingVertical: space.snug,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: color.hairline,
-  },
-  chipFlex: { flex: 1, minWidth: 0 },
-  activeRow: { gap: space.snug, paddingVertical: space.snug },
-  clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
   h3: { ...t.bodyLabel, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
   bleed: { marginHorizontal: -space.gutter },

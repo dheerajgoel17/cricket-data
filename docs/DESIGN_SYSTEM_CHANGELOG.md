@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-22 — Mobile filter and list spacing
+- **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/grid-table.tsx`, `mobile/src/ui/hot-home.tsx`
+- **Change:** Share filter bar padding and active-chip spacing across screens. Grid and Custom line use the compact filter sheet. Home's mixed market list gives each row one divider.
+- **Callers:** Home, Player props, Fixture Props, Match Fancy, Grid and Custom line
+
 ### 2026-11-22 — Mobile fixture prop filters
 - **Path:** `mobile/src/app/fixture/[id]/index.tsx`, `mobile/src/ui/sheet.tsx`, `mobile/src/ui/match-fancy.tsx`
 - **Change:** Fixture Props uses a hit-rate window button beside the prop-type chips. It uses the same compact sheet as Match Fancy, with window, sort and team choices. Both filter rows use even vertical padding, and the sheet uses consistent spacing between sections. Match Fancy starts its market list directly below the filters and uses a single hairline between rows.
