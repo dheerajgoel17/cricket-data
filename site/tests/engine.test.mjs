@@ -176,6 +176,10 @@ test("venueIndices finds a ground under every spelling the data holds, and nothi
   assert.deepEqual(venueIndices(store, "Sharjah Cricket Stadium, Sharjah"), [0, 1, 2]);
   assert.deepEqual(venueIndices(store, "Dubai International Cricket Stadium, Dubai"), [3]);
   assert.deepEqual(venueIndices(store, "Nowhere Ground"), []);
+  const gc = { venues: ["Metricon Stadium, Carrara", "Heritage Bank Stadium, Carrara", "People First Stadium, Carrara", "Sharjah Oval"] };
+  assert.deepEqual(venueIndices(gc, "Carrara Oval, Gold Coast, Queensland"), [0, 1, 2]);
+  const uk = { venues: ["The Oval", "Lord's", "Edgbaston", "Shere Bangla National Stadium, Mirpur", "St Lawrence Ground, Canterbury"] };
+  for (const [name, i] of [["Kennington Oval, London", 0], ["Lord's Cricket Ground, London", 1], ["Edgbaston Cricket Ground, Birmingham", 2], ["Sher-e-Bangla National Stadium, Mirpur, Dhaka", 3], ["St Lawrence Ground Canterbury, Kent", 4]]) assert.deepEqual(venueIndices(uk, name), [i], name);
   assert.deepEqual(venueIndices(store, ""), []);
   assert.deepEqual(venueIndices(store, undefined), []);
 });

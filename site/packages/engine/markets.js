@@ -142,6 +142,19 @@ const VENUE_ALIASES = new Map([
   ["feroz shah kotla ground", "arun jaitley stadium"],
   ["motera stadium", "narendra modi stadium"],
   ["chinnaswamy stadium", "m chinnaswamy stadium"],
+  ["carrara oval", "metricon stadium"],
+  ["carrara stadium", "metricon stadium"],
+  ["heritage bank stadium", "metricon stadium"],
+  ["people first stadium", "metricon stadium"],
+  ["kennington oval", "the oval"],
+  ["lord s cricket ground", "lord s"],
+  ["edgbaston cricket ground", "edgbaston"],
+  ["sher e bangla national stadium", "shere bangla national stadium"],
+  ["st lawrence ground canterbury", "st lawrence ground"],
+  ["cricket academy", "icc academy"],
+  ["high performance center oval", "high performance oval"],
+  ["al amerat cricket ground ministry turf 1", "al amerat cricket ground oman cricket ministry turf 1"],
+  ["al amerat cricket ground ministry turf 2", "al amerat cricket ground oman cricket ministry turf 2"],
 ]);
 
 /** Compare venue names without the city suffix and account for known renames. */
