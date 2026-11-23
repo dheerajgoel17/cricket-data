@@ -28,5 +28,20 @@
   "edge": 0.1846,
   "start_utc": "2026-11-24T08:15:00Z",
   "alerted_at": "2026-11-22T23:33:49.745016+00:00"
+ },
+ "male|Australia|England|2026-11-24|batter_sixes||Tom Banton under 0.5|0.5|under": {
+  "edge": 0.1108,
+  "start_utc": "2026-11-24T08:15:00Z",
+  "alerted_at": "2026-11-23T01:37:40.052308+00:00"
+ },
+ "male|Australia|England|2026-11-24|batter_fours||Mitchell Marsh under 2.5|2.5|under": {
+  "edge": 0.087,
+  "start_utc": "2026-11-24T08:15:00Z",
+  "alerted_at": "2026-11-23T01:37:40.052308+00:00"
+ },
+ "male|Australia|England|2026-11-24|batter_fours||Harry Brook under 2.5|2.5|under": {
+  "edge": 0.0586,
+  "start_utc": "2026-11-24T08:15:00Z",
+  "alerted_at": "2026-11-23T01:37:40.052308+00:00"
  }
 }
