@@ -1,4 +1,69 @@
 {
- "generated_at_ist": "2026-11-24 02:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-24 03:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|Gulf Giants|MI Emirates|2026-11-24",
+   "match": "Gulf Giants vs MI Emirates",
+   "start_utc": "2026-11-24T14:30:00Z",
+   "start_ist": "2026-11-24 20:00 IST",
+   "format": "T20",
+   "gender": "male",
+   "market_type": "batter_fours",
+   "market": "G9182 batter_fours",
+   "team_scope": "",
+   "selection": "Nicholas Pooran under 1.5",
+   "player_matched_as": "Nicholas Pooran",
+   "player_id": "3241e3fd",
+   "player_team": "MI Emirates",
+   "stat": "fours",
+   "inn": 0,
+   "line": 1.5,
+   "side": "under",
+   "best_odds": 2.1,
+   "best_source": "feedi_d",
+   "effective_odds_after_commission": 2.1,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0761,
+   "implied_prob": 0.4762,
+   "fair_odds": 1.995,
+   "fair_prob": 0.5012,
+   "model_prob": 0.5473,
+   "market_prob": 0.4634,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0524,
+   "edge_pct": 5.24,
+   "kelly_quarter_stake_pct": 1.19,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 55% vs market 46% for under 1.5 fours; form 1.9 fours/inn recency-weighted T20 (n_eff 119.8; last 5: 3, 0, 2, 2, 3), bats in 97% of games played; at Dubai International Cricket Stadium, Dubai: 26 inns avg 1.8; vs Gulf Giants: 8 inns avg 2.9; context adj: at this venue -1%, team H2H context -4%",
+   "notes": "2 market source(s) for fair price; model 0.547 vs market 0.463; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 119.8,
+    "expected": 2.03,
+    "nb_alpha": 0.958,
+    "p_bats_or_bowls": 0.967,
+    "venue_matched": "dubai international cricket stadium",
+    "context_terms": [
+     "p_bat",
+     "env_fours",
+     "ven_fours",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 71,
+    "cloud_pct": 0,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "415fc4aecf16b0e2",
+   "alert_key": "male|Gulf Giants|MI Emirates|2026-11-24|batter_fours||Nicholas Pooran under 1.5|1.5|under",
+   "alerted_at_ist": "2026-11-24 03:05 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }

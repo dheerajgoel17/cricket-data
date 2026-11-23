@@ -48,5 +48,10 @@
   "edge": 0.1047,
   "start_utc": "2026-11-24T14:30:00Z",
   "alerted_at": "2026-11-23T15:15:45.350837+00:00"
+ },
+ "male|Gulf Giants|MI Emirates|2026-11-24|batter_fours||Nicholas Pooran under 1.5|1.5|under": {
+  "edge": 0.0524,
+  "start_utc": "2026-11-24T14:30:00Z",
+  "alerted_at": "2026-11-23T21:35:29.153452+00:00"
  }
 }
