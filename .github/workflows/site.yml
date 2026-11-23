@@ -1,11 +1,11 @@
 name: Site
 
-# Rebuilds the stats site's data hourly (Base ball-by-ball + provisional matches) and deploys it to Vercel (Hobby, free).
+# Rebuilds the stats site's data hourly (Base ball-by-ball + provisional matches) and deploys it to the Cloudflare Worker (repository variable SITE_HOST=cloudflare; Vercel production deploys only when it is unset).
 # Runs after "Daily update" finishes, daily as a fallback, on demand, and on PRs that touch the site (build + tests, plus a Vercel *preview*
 # deployment whose URL is commented on the PR; only PRs from this repository get one, because fork PRs cannot read the secrets).
 # Secrets (repository settings, never printed): VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID, DATA_WRAP_KEY, VITE_GA_MEASUREMENT_ID, SUPABASE_ANON_KEY.
 # Without the Vercel trio the job still builds and tests, then skips the deploy. GEMINI_API_KEY is a *Vercel*
-# project environment variable, not a GitHub secret: see docs/SITE.md.
+# project environment variable (retired with /api/ask), not a GitHub secret: see docs/SITE.md.
 on:
   workflow_run:
     workflows: ["Daily update"]
