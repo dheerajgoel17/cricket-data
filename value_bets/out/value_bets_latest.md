@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-23 20:40 IST
+# Cricket value bets - 2026-11-23 21:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
 - **moviodds_bet365**: ok, 1499 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
-- **smarkets**: ok, 486 prices
+- **smarkets**: ok, 467 prices
 - **feedk**: ok, 220 prices, 5 events
 - **feedl**: ok, 542 prices, 27 events
 - **feede**: ok, 694 prices, 30 events
-- **feedf**: ok, 448 prices, 15 events
 - **feedh**: ok, 1480 prices, 48 events
-- **feedj**: ok, 734 prices, 16 events
-- **feedi**: ok, 2096 prices, 36 events
+- **feedf**: ok, 448 prices, 15 events
+- **feedj**: ok, 758 prices, 17 events
+- **feedi**: ok, 2098 prices, 38 events
 
-Matches starting in next 168h: **46**, markets priced: **471**, value bets: **6** (new alerts: 1). Min edge 5%.
+Matches starting in next 168h: **46**, markets priced: **471**, value bets: **6** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -39,4 +39,4 @@ Matches starting in next 168h: **46**, markets priced: **471**, value bets: **6*
 
 Unmatched team names (add to mappings/teams.csv): Central Zone (W) (female), East Zone (W) (female), Lokseva Academy (male), North East Zone (W) (female), North Zone (W) (female), Omr Checker (male), Pondicherry (male), South Australia Redbacks (male), South Zone (W) (female), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tasmanian Tigers (male), West Zone (W) (female)
 
-Runtime 288.1s. Snapshot: `odds_20261123T151059Z.jsonl.gz`
+Runtime 308.9s. Snapshot: `odds_20261123T153039Z.jsonl.gz`
