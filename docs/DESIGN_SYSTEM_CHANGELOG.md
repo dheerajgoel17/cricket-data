@@ -511,3 +511,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Change:** the separate Toss winner section is gone. The toss is two rows (one per side) in the existing fancy list, last in the Match scope: same crest / label / meta / hit-rate / ground columns, `FormChips` (W / L) in the chart slot, no edge, nothing to open. The "vs opponent" and "at ground" toss records sit in the sub line (phone) and the ground column (dense). No new component or variant.
 - **Callers:** `FancyLines` (compact and dense), `OverviewRow`, Match Fancy list (site and app)
 
+### 2026-11-23 — Toss row text: tooltip when cut off (site), two lines (app)
+- **Path:** `site/src/components/app/fancy-lines.tsx`, `mobile/src/ui/fancy-row.tsx`
+- **Change:** the toss row's record line, book name and ground column truncate on the site; each is the existing `Tooltip` (shadcn) and shows the full text on hover / focus only when it is really clipped (`TruncTip`). On the app, where there is no hover, the record line wraps to two lines instead of truncating. No new component or variant.
+- **Callers:** toss rows in `FancyLines` (compact and dense) and `OverviewRow`
+

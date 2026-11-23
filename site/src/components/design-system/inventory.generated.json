@@ -1385,7 +1385,8 @@
       "site/src/components/app/mini-bars.tsx",
       "site/src/components/app/recent-form.tsx",
       "site/src/components/app/result-stamp.tsx",
-      "site/src/components/app/tick.tsx"
+      "site/src/components/app/tick.tsx",
+      "site/src/components/ui/tooltip.tsx"
     ]
   },
   {
