@@ -38,5 +38,10 @@
   "edge": 0.0899,
   "start_utc": "2026-11-26T08:10:00Z",
   "alerted_at": "2026-11-23T07:36:31.275782+00:00"
+ },
+ "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_runs||Ellyse Perry under 32.5|32.5|under": {
+  "edge": 0.0841,
+  "start_utc": "2026-11-26T08:10:00Z",
+  "alerted_at": "2026-11-23T09:32:30.102779+00:00"
  }
 }

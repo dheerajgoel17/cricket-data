@@ -1,4 +1,67 @@
 {
- "generated_at_ist": "2026-11-23 14:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-23 15:00 IST",
+ "alerts": [
+  {
+   "event_key": "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26",
+   "match": "Sydney Sixers vs Melbourne Stars",
+   "start_utc": "2026-11-26T08:10:00Z",
+   "start_ist": "2026-11-26 13:40 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_runs",
+   "market": "M13700 batter_runs",
+   "team_scope": "",
+   "selection": "Ellyse Perry under 32.5",
+   "player_matched_as": "Ellyse Perry",
+   "player_id": "be150fc8",
+   "player_team": "Sydney Sixers Women",
+   "stat": "runs",
+   "inn": 0,
+   "line": 32.5,
+   "side": "under",
+   "best_odds": 1.82,
+   "best_source": "feedj_d",
+   "effective_odds_after_commission": 1.82,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0989,
+   "implied_prob": 0.5495,
+   "fair_odds": 1.679,
+   "fair_prob": 0.5957,
+   "model_prob": 0.6679,
+   "market_prob": 0.5366,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0841,
+   "edge_pct": 8.41,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 67% vs market 54% for under 32.5 runs; form 31.2 runs/inn recency-weighted T20 (n_eff 77.4; last 5: 9, 45, 3, 30, 59), bats in 96% of games played; at North Sydney Oval: 40 inns avg 37.5; vs Melbourne Stars Women: 1 inns avg 84.0",
+   "notes": "2 market source(s) for fair price; model 0.668 vs market 0.537; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 77.4,
+    "expected": 30.28,
+    "nb_alpha": 1.213,
+    "p_bats_or_bowls": 0.955,
+    "venue_matched": "north sydney oval",
+    "context_terms": [
+     "p_bat",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": null,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": null,
+    "cloud_pct": null,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "1e20a8395c9b1a3f",
+   "alert_key": "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_runs||Ellyse Perry under 32.5|32.5|under",
+   "alerted_at_ist": "2026-11-23 15:02 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
