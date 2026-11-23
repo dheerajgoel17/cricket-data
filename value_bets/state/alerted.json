@@ -30,18 +30,28 @@
   "alerted_at": "2026-11-22T23:33:49.745016+00:00"
  },
  "male|Australia|England|2026-11-24|batter_sixes||Tom Banton under 0.5|0.5|under": {
-  "edge": 0.1108,
+  "edge": 0.1506,
   "start_utc": "2026-11-24T08:15:00Z",
-  "alerted_at": "2026-11-23T01:37:40.052308+00:00"
+  "alerted_at": "2026-11-23T07:36:31.275782+00:00"
  },
  "male|Australia|England|2026-11-24|batter_fours||Mitchell Marsh under 2.5|2.5|under": {
-  "edge": 0.087,
+  "edge": 0.1214,
   "start_utc": "2026-11-24T08:15:00Z",
-  "alerted_at": "2026-11-23T01:37:40.052308+00:00"
+  "alerted_at": "2026-11-23T07:36:31.275782+00:00"
  },
  "male|Australia|England|2026-11-24|batter_fours||Harry Brook under 2.5|2.5|under": {
   "edge": 0.0586,
   "start_utc": "2026-11-24T08:15:00Z",
   "alerted_at": "2026-11-23T01:37:40.052308+00:00"
+ },
+ "male|Australia|England|2026-11-24|batter_fours||Philip Salt under 2.5|2.5|under": {
+  "edge": 0.0517,
+  "start_utc": "2026-11-24T08:15:00Z",
+  "alerted_at": "2026-11-23T07:36:31.275782+00:00"
+ },
+ "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_milestone||Meg Lanning 50+ no|49.5|under": {
+  "edge": 0.0899,
+  "start_utc": "2026-11-26T08:10:00Z",
+  "alerted_at": "2026-11-23T07:36:31.275782+00:00"
  }
 }
