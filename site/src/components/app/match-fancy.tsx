@@ -47,7 +47,7 @@ import { Crumbs } from "./page";
 import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
-import { TossWinner, tossFor } from "./toss-winner";
+import { TossWinner, tossFor, tossRecordFor } from "./toss-winner";
 
 export { FancyLines, OverviewRow } from "./fancy-lines";
 
@@ -314,7 +314,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
       <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
         onApply={({ win: w, here: h }) => set({ mw: w === 10 ? "" : String(w), mv: h ? "1" : "" })} />
 
-      {mode === "list" && scope < 0 && !doc.isLoading && <TossWinner market={tossFor(doc.data, fxInfo)} />}
+      {mode === "list" && scope < 0 && !doc.isLoading && <TossWinner market={tossFor(doc.data, fxInfo)} records={[fx.a, fx.b].map((n) => { const t = teams.find(([name]) => name === n); return t ? tossRecordFor(store, t[1], { fmt: fmtIdx, gender }) : null; })} />}
       {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
           {mode === "list" && scope >= 0 && overview.length === 0 && liveList.length === 0 && (

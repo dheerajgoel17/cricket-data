@@ -500,3 +500,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `site/public/books/books.json`, `site/packages/engine/books.js`, `site/src/lib/books.ts`, `site/src/components/app/book-badge.tsx`, `mobile/src/ui/book-badge.tsx`, `site/src/main.tsx`, `mobile/src/app/_layout.tsx`, `site/api/og.js`
 - **Change:** the list of books (stem, display name, logo file) is `public/books/books.json`, fetched once at start (`loadBookManifest`) and merged into the engine's table; `BookBadge` (site and app) subscribes and re-draws when it arrives. The table in `books.js` is only the offline / first-launch fallback. Adding a book = its logo file + one entry in `books.json` (a node test checks the file list and the manifest agree). Added bc.game.
 - **Callers:** every `BookBadge` (site and app), the share card (`api/og.js`)
+
+### 2026-11-23 — Toss winner rows show each side's toss record
+- **Path:** `site/src/components/app/toss-winner.tsx`, `mobile/src/ui/toss-winner.tsx`, `site/src/components/app/match-fancy.tsx`, `mobile/src/ui/match-fancy.tsx`
+- **Change:** under each side's name the row adds one line of the existing description style, "Won 6 of last 10 tosses · chose bat 4", from `tossRecord` (engine). No new component or variant; hidden when the build carries no toss data or the side has none on record.
+- **Callers:** Match Fancy, Match scope (site and app)
