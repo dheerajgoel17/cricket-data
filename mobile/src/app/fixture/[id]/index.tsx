@@ -68,7 +68,7 @@ export default function FixturePage() {
   const { fx: f, doc, archived, isLoading: fxLoading } = useFixtureBooks(id);
   const item: RailItem | null = f ? { fixture: f, state: fixtureState(f, liveForFixture(live.data, f)?.status, now), live: liveMatchFor(live.data, doc, f), noProps: false } : null;
   const books = useMemo(() => (f ? fixtureBooks(doc, f) : { props: false, fancy: false }), [doc, f]);
-  const tabs = useMemo(() => ([["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Custom line"]] as [string, string][]).filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy : true)), [books]);
+  const tabs = useMemo(() => ([["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Custom line"]] as [string, string][]).filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy || (!!f && f.status !== "Completed") : true)), [books, f]);
   const [tabAsked, setTab] = useState<string | undefined>(tabParam);
   useEffect(() => { setTab(tabParam); }, [id, tabParam]);
   const tab = tabs.some(([k]) => k === tabAsked) ? tabAsked! : tabs[0][0];

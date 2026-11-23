@@ -5,9 +5,10 @@ Accounts and where things live (names only, never paste secrets in chat, issues 
 | thing | where | notes |
 |---|---|---|
 | Code + CI | GitHub `dheerajgoel17/cricket-data` | default branch `main`; PRs; squash merges |
-| Website | Vercel Hobby, project `cricket-props-hub` | root dir `site/`; linked via `site/.vercel` (gitignored) |
+| Website | **Cloudflare Worker** `cricket-props-fallback` on the public domain (route `fancy.cash/*`; repository variable `SITE_HOST=cloudflare`; config `site/cloudflare/`) | published by `site.yml` on every run on `main`; runtime secrets are the Worker's, set by the deploy step (`DATA_WRAP_KEY`, `LIVE_SOURCE_BASE`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`, `CARD_API_KEY`) |
+| Website (previews, rollback) | Vercel Hobby, project `cricket-props-hub` | root dir `site/`; linked via `site/.vercel` (gitignored). PR previews still deploy here; the production deploy step is skipped while `SITE_HOST=cloudflare`. Its project env only matters for a rollback |
 | Image/id store | Supabase project `cricket-props-hub` (ref `fgqcuvtpguuoxgwcgqyw`, Mumbai) | free plan; tables + `avatars` bucket |
-| LLM parser | xAI Grok (`XAI_API_KEY`) or Gemini free tier (`GEMINI_API_KEY`) | env vars in **Vercel** project settings |
+| LLM parser | retired: there is no `/api/ask` any more (`site/api/` has no `ask.js`) | the `XAI_*`, `GEMINI_*` and `ASK_*` rows below are history; nothing reads them |
 
 ## Secrets and variables
 | name | kind | where set | used by |
@@ -82,7 +83,7 @@ Job times, what is shown, and Test innings 0/1/2 rules: [SITE.md — Cadence and
 ## Routine tasks
 **Rotate the xAI key**: console.x.ai -> API Keys -> create new, delete old; then `cd site && printf '%s' "$NEW" | npx vercel env add XAI_API_KEY production --sensitive --yes` (or the dashboard), then redeploy (`npx vercel deploy --prod --yes`).
 **Change the LLM model**: set `XAI_MODEL` (names from `GET https://api.x.ai/v1/models`) and redeploy.
-**Deploy manually**: build data (see PROJECT_GUIDE section 7) then `cd site && npx vercel deploy --prod --yes && rm -f .env.local`.
+**Deploy manually**: Actions -> Site -> Run workflow on `main` (publishes the Cloudflare Worker). Rollback to Vercel: build data (see PROJECT_GUIDE section 7), then `cd site && npx vercel deploy --prod --yes && rm -f .env.local`, clear `SITE_HOST` and remove the Worker route (see "Cloudflare website fallback").
 **Force a site refresh now**: Actions -> Site -> Run workflow (optionally `sync_limit`).
 **First image backfill**: run Site with `sync_limit=6000` once; afterwards hourly runs only add new ids.
 **Add a column/table in Supabase**: add a migration file in `supabase/migrations/` and apply it (Supabase MCP `apply_migration` or SQL editor); keep RLS on. Public-read tables stay public; user Saved tables (`profiles`, `saved_items`, `saved_combos` in `20261103_user_saved.sql`) use `auth.uid()` RLS only.
@@ -126,6 +127,8 @@ The Site workflow can publish the same guarded data build to a separate Cloudfla
 The three live feeds share short-lived prepared responses in SQLite-backed Durable Objects. Worker requests, Durable Object requests and Browser Run count toward their respective free limits. Check all three during a busy match. Cloudflare serves crawler metadata and renders JPEG share cards and PNG posters from the same cricket fields as the Node renderer, with Cloudflare-specific artwork. Repeated images use edge and Durable Object caches. If Browser Run is unavailable, the public card URL redirects to the standard share image and the poster API gives a temporary error. The bot endpoint requires the repository secret `CARD_API_KEY`; the ad-admin endpoint uses the existing Supabase service key and requires an authorized Supabase session.
 
 A manual run on a branch publishes a separate Cloudflare preview. Only main publishes the Worker serving the public domain. Versioned JavaScript, CSS and fonts have a one-year browser cache via `site/public/_headers`. The web uses the build's pre-scored player history when available, then falls back to on-device scoring for uncovered rows. Expo stays on the public site address and retains its existing OTA publishing workflow.
+
+**Gaps on Cloudflare (checked 2026-11-23).** Vercel Web Analytics and Speed Insights are off (`VITE_SITE_HOST=cloudflare`; Google Analytics still loads when `VITE_GA_MEASUREMENT_ID` is set). `/api/card` answers 503 until the repository secret `CARD_API_KEY` exists. Everything else under `site/api/` is routed by `site/cloudflare/worker.js`. Hosted data is read through the Worker's own assets, so `SHARE_DATA_BASE`, `IDENTITY_URL` and the `VERCEL_*` variables are not needed there.
 
 The production fallback uses the exact-host Worker route `fancy.cash/*` and keeps the original DNS record in place. Remove that Worker route to return traffic to the original host if it is healthy. The `www` alias has a separate redirect Worker so it can redirect visitors even when Vercel is paused. Deploy the redirect with `npx --yes wrangler@4.166.0 deploy --config site/cloudflare/www-redirect.wrangler.jsonc` using an account with Workers Routes access.
 

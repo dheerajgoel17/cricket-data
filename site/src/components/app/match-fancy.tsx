@@ -47,6 +47,7 @@ import { Crumbs } from "./page";
 import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
+import { tossRows as tossRowsOf } from "@cricket/engine/toss.js";
 
 export { FancyLines, OverviewRow } from "./fancy-lines";
 
@@ -108,7 +109,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, fmt: fx.fmt, startMs: fixtureStart(fx).getTime() }), [fx]);
   const booked = (k: string, teamName: string | null, inn = 0) => k !== "top_batter" && fancyLines(doc.data, fxInfo, k, teamName, inn).length > 0;
   const anyBooked = (list: [string, string][], teamName: string | null) => list.some(([k]) => FANCY_INNS.some((inn) => booked(k, teamName, inn)));
-  const scopes = [["-1", "Match", MATCH_KEYS.some(([k]) => booked(k, null))] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS, name)] as const)].filter(([, , on]) => on);
+  const scopes = [["-1", "Match", true] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS, name)] as const)].filter(([, , on]) => on);
   const wantSc = q.sc === "" || q.sc == null ? "-1" : q.sc;
   const scope = scopes.some(([v]) => v === wantSc) ? Number(wantSc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
@@ -164,6 +165,8 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // the toss is the last market of the Match list: a price (a book's, else 1.95) and each side's toss record, with no edge to rank it by
+  const listRows = useMemo(() => (mode === "list" && scope < 0 && !doc.isLoading ? [...overview, ...(tossRowsOf as any)(store, doc.data, fxInfo, { teams, fmt: fmtIdx, gender, venue: venueIdx })] : overview), [mode, scope, doc.isLoading, doc.data, overview, store, fxInfo, teams, fmtIdx, gender, venueIdx]);
   const book = useMemo(() => byLine(bookedNow), [bookedNow]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
   const bookMain = useMemo(() => mainBookLine(book), [book]);
@@ -315,12 +318,12 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
 
       {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
-          {mode === "list" && overview.length === 0 && liveList.length === 0 && (
+          {mode === "list" && scope >= 0 && overview.length === 0 && liveList.length === 0 && (
             <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />)}
-          {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
+          {mode === "list" && (listRows.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
               <FancyLines
-                rows={overview}
+                rows={listRows}
                 density="auto"
                 onOpen={(r) => open(r)}
                 standingOf={(r) => r.standing}

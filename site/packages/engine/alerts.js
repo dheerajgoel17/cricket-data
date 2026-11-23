@@ -4,7 +4,7 @@
 import { cardPath } from "./card-path.js";
 import { fancyStanding, lineBelongs } from "./live.js";
 import { bookName } from "./lines.js";
-import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, oversLabel, oversN } from "./markets.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, baseKey, oversLabel, oversN } from "./markets.js";
 import { STATS } from "./rules.js";
 import { stateRow } from "./state.js";
 import { HIGH_ODDS } from "./tape.js";
@@ -33,7 +33,7 @@ function bestOver(books) {
 /** A fancy market in words: "Match sixes", "Australia first 6 overs runs", "India team fours (1st innings)". */
 export function fancyWords(f) {
   const n = oversN(f.key);
-  const label = n ? `${oversLabel(n).replace(/^(\d+) overs$/, "first $1 overs")} runs` : (MATCH_MARKETS[f.key] || TEAM_TOTAL_MARKETS[f.key])?.label || String(f.key).replace(/_/g, " ");
+  const label = n ? `${oversLabel(n).replace(/^(\d+) overs$/, "first $1 overs")} runs` : (MATCH_MARKETS[baseKey(f.key)] || TEAM_TOTAL_MARKETS[baseKey(f.key)])?.label || String(baseKey(f.key)).replace(/_/g, " ");
   const named = f.team ? (/^Team /.test(label) ? `${f.team} ${label.slice(5).toLowerCase()}` : `${f.team} ${label.toLowerCase()}`) : label;
   return `${named}${f.inn ? ` (${INN[f.inn] || `innings ${f.inn}`})` : ""}`;
 }

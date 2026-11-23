@@ -545,6 +545,7 @@
       "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/collapsible.tsx",
       "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/recent-form.tsx",
       "mobile/src/ui/result-stamp.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/live-bits.tsx",
@@ -1391,8 +1392,10 @@
       "site/src/components/app/badges.tsx",
       "site/src/components/app/live-spot.tsx",
       "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/recent-form.tsx",
       "site/src/components/app/result-stamp.tsx",
-      "site/src/components/app/tick.tsx"
+      "site/src/components/app/tick.tsx",
+      "site/src/components/ui/tooltip.tsx"
     ]
   },
   {

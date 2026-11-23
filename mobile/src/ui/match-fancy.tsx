@@ -37,6 +37,7 @@ import { LiveMarketRow } from "@/ui/live-market-row";
 import { TeamSpot } from "@/ui/live-spot";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { LineStepper } from "@/ui/line-stepper";
+import { tossRows as tossRowsOf } from "@cricket/engine/toss.js";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
@@ -74,7 +75,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
   const booked = (k: string, teamName: string | null, inn = 0) => k !== "top_batter" && fancyLines(doc, fxInfo, k, teamName, inn).length > 0;
   const anyBooked = (list: [string, string][], teamName: string | null) => list.some(([k]) => (FANCY_INNS as number[]).some((inn) => booked(k, teamName, inn)));
-  const scopes = [["-1", "Match", (MATCH_KEYS as [string, string][]).some(([k]) => booked(k, null))] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS as [string, string][], name)] as const)].filter(([, , on]) => on);
+  const scopes = [["-1", "Match", true] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS as [string, string][], name)] as const)].filter(([, , on]) => on);
   const scope = scopes.some(([v]) => v === sc) ? Number(sc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
   const keysFor = (scNum: number) => {
@@ -106,6 +107,8 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc, ms, fxInfo, team, scope, hist, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
+  // the toss is the last market of the Match list: a price (a book's, else 1.95) and each side's toss record, with no edge to rank it by
+  const listRows = useMemo(() => (mode === "list" && scope < 0 && hist ? [...overview, ...(tossRowsOf as any)(store, doc, fxInfo, { teams, fmt: fmtIdx, gender, venue: venueIdx })] : overview), [mode, scope, hist, overview, store, doc, fxInfo, teams, fmtIdx, gender, venueIdx]);
 
   const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc, { a: fx.a, b: fx.b }) : []), [doc, fx.a, fx.b, mode]);
   // same Edge + L10 as scored fancy: overs tape vs the live OU line
@@ -232,18 +235,18 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
     <>
-      {mode === "list" && overview.length === 0 && liveScored.length === 0 ? (
+      {mode === "list" && scope >= 0 && listRows.length === 0 && liveScored.length === 0 ? (
         <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />
       ) : null}
-      {mode === "list" && (overview.length > 0 || liveScored.length > 0) ? (
+      {mode === "list" && (listRows.length > 0 || liveScored.length > 0) ? (
         <View style={styles.bleed}>
-          {overview.map((r: any, i: number) => (
+          {listRows.map((r: any, i: number) => (
             <Reflow key={r.id || fancyFm(r.key, r.inn || 0)}>
               <OverviewRow separated={i > 0} r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
             </Reflow>
           ))}
           {liveScored.map(({ m, r }, i) => (
-            <LiveMarketRow key={`live-${i}-${m.market}`} m={m} scored={r} separated={overview.length > 0 || i > 0} />
+            <LiveMarketRow key={`live-${i}-${m.market}`} m={m} scored={r} separated={listRows.length > 0 || i > 0} />
           ))}
         </View>
       ) : null}

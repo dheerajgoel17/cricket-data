@@ -146,7 +146,7 @@ export function FixturePage() {
   const line = q.line !== undefined && q.line !== "" ? Number(q.line) : 0.5;
   const games = [5, 10, 15, 20, 30].includes(Number(q.n)) ? Number(q.n) : 10;
   const hasForm = !!fx && recentForms(store, [[fx.a, fx.a_ix], [fx.b, fx.b_ix]], fmt).some((f) => f.games.length);
-  const tabs = TABS.filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy : k === "form" ? hasForm : k === "ground" ? fixtureHasGround(store, fx?.venue) : true));
+  const tabs = TABS.filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy || (!!fx && fx.status !== "Completed") : k === "form" ? hasForm : k === "ground" ? fixtureHasGround(store, fx?.venue) : true));
   const wanted = q.tab === "markets" ? "fancy" : q.tab; // old links used ?tab=markets
   const tab = tabs.some(([k]) => k === wanted) ? wanted : tabs[0][0];
   const hit = HITS.some(([v]) => String(v) === q.hit) ? q.hit : "0.6";

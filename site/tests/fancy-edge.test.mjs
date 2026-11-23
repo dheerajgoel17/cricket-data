@@ -80,10 +80,20 @@ test("the other side wins when the history is over; a market the books do not li
 
 test("a line that voids when the side bowls first is scored on the matches it batted first only", () => {
   const store = synthetic({ fi: (m) => (m < 8 ? 1 : 0) }), { ms, ground } = fancyInputs(store, fixture()), fxInfo = { a: "Alpha", b: "Beta", fmt: "T20", startMs: Date.parse(START) };
-  const r = marketRow({ store, doc: doc(row("team_total_runs", 160.5, 1.9, { team: "Alpha", bat_first: true })), fxInfo, ms, scope: 0, teamName: "Alpha", key: "team_total_runs", ground });
+  const r = marketRow({ store, doc: doc(row("team_total_runs", 160.5, 1.9, { team: "Alpha", bat_first: true })), fxInfo, ms, scope: 0, teamName: "Alpha", key: "team_total_runs_bf", ground });
   assert.equal(r.batFirst, true);
   assert.deepEqual([r.hits, r.played], [12, 12]); // matches 8-19, all under 160.5
   near(r.edge, (12 + 10 * (20 / 39)) / 22 * 1.9 - 1); // 0.4791
+});
+
+test("a team's Runs line that stands either way and the same line that voids if it bowls first are two markets", () => {
+  const store = synthetic({ fi: (m) => (m < 8 ? 1 : 0) }), { ms, ground } = fancyInputs(store, fixture()), fxInfo = { a: "Alpha", b: "Beta", fmt: "T20", startMs: Date.parse(START) };
+  const d = doc(row("team_total_runs", 160.5, 1.9, { team: "Alpha", source: "Dafabet" }), row("team_total_runs", 170.5, 1.9, { team: "Alpha", bat_first: true, source: "Fancy" }));
+  const at = (key) => marketRow({ store, doc: d, fxInfo, ms, scope: 0, teamName: "Alpha", key, ground });
+  const plain = at("team_total_runs"), bf = at("team_total_runs_bf");
+  assert.deepEqual([plain.batFirst, plain.line, plain.played], [false, 160.5, 20]); // every match, whoever batted first
+  assert.deepEqual([bf.batFirst, bf.line, bf.played], [true, 170.5, 12]); // only the matches it batted first
+  assert.deepEqual(fancyOverview({ store, doc: d, fxInfo, ms, teams: [["Alpha", 0], ["Beta", 1]], ground }).filter((r) => r.scope === 0).map((r) => r.key).sort(), ["team_total_runs", "team_total_runs_bf"]);
 });
 
 test("fancyOverview ranks every market of both sides, best edge first", () => {

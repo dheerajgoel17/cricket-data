@@ -434,3 +434,12 @@ def test_the_pipeline_scopes_a_tests_lines_by_the_innings_the_book_wrote_else_th
     rows = [{**base, "inn_hint": 2}, {**base, "inn_hint": None}, {**base, "inn_hint": 1}, {**base, "fmt": "T20", "inn_hint": 2}]
     scope_multiday_rows(rows)
     assert [r.get("inn") for r in rows] == [2, 1, 1, None]  # a limited-overs match never takes the hint
+
+
+def test_toss_winner_is_a_fancy_pair_and_the_combos_are_not():
+    mk = [named("Who Will Win The Toss?", [("New Zealand", 1.92), ("India", 1.88)], 30),
+          named("Which team wins the coin toss and the match", [("New Zealand", 3.05), ("India", 3.5)], 31)]
+    _, fx, cat, _ = feedh.parse_event(event(mk), "feedh_d", STAMP)
+    assert [(x["key"], x["team"], x["over"]) for x in fx] == [("toss_winner", "New Zealand", 1.92), ("toss_winner", "India", 1.88)]
+    assert {c["mapped"] for c in cat if c["name"] == "Who Will Win The Toss?"} == {"toss_winner"}
+    assert {c["mapped"] for c in cat if "and the match" in c["name"]} == {None}

@@ -127,3 +127,48 @@ describe("OverviewRow wrapper", () => {
     expect(screen.queryByText("Live")).toBeNull();
   });
 });
+
+describe("toss rows", () => {
+  const toss: any = {
+    id: "toss_winner:Australia", key: "toss_winner", scope: -1, inn: 0, label: "Toss winner", team: "Australia", kind: "toss", static: true, line: null, side: "over",
+    over: 1.95, under: null, overBook: null, default: true, edge: null, last: [], form: ["W", "L", "W", "W", "L", "W"], hits: 4, played: 6,
+    vsOpp: { n: 5, won: 3, opp: "England" }, atGround: { n: 3, won: 2 },
+  };
+
+  it("draws the W / L form instead of bars, the opponent and ground records, no edge, and opens nothing", () => {
+    const onOpen = vi.fn();
+    const { container } = render(
+      <MemoryRouter>
+        <FancyLines rows={[toss]} density="compact" onOpen={onOpen} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("Toss winner")).toBeTruthy();
+    expect(screen.getByText("vs England 3 of 5 · At ground 2 of 3")).toBeTruthy();
+    expect(screen.getByText("Default price")).toBeTruthy();
+    expect(screen.getByRole("img", { name: /Recent results, oldest first: Lost, Won, Won, Lost, Won/ })).toBeTruthy(); // the last five of six
+    expect(container.textContent).not.toContain("Edge");
+    expect(container.querySelector("button")).toBeNull();
+  });
+
+  it("the dense table shows all the tosses, the toss wins as the hit rate, and an empty edge cell", () => {
+    render(
+      <MemoryRouter>
+        <FancyLines rows={[toss]} density="dense" onOpen={() => {}} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("img", { name: /Recent results, oldest first: Won, Lost, Won, Won, Lost, Won/ })).toBeTruthy();
+    expect(screen.getByText("67%")).toBeTruthy();
+    expect(screen.getByText("Ground · 2 of 3")).toBeTruthy();
+  });
+});
+
+describe("toss rows: cut-off text", () => {
+  it("a clipped record line is wrapped in a tooltip trigger carrying the full text", () => {
+    const toss: any = { id: "toss_winner:A", key: "toss_winner", scope: -1, inn: 0, label: "Toss winner", team: "Australia", kind: "toss", static: true, line: null, side: "over", over: 1.95, under: null, overBook: null, default: true, edge: null, last: [], form: ["W"], hits: 1, played: 1, vsOpp: { n: 5, won: 3, opp: "England" }, atGround: null };
+    const { container } = render(<MemoryRouter><FancyLines rows={[toss]} density="compact" onOpen={() => {}} /></MemoryRouter>);
+    const line = screen.getByText("vs England 3 of 5");
+    expect(line.getAttribute("data-slot")).toBe("tooltip-trigger");
+    expect(line.className).toContain("truncate");
+    expect(container.querySelector("button")).toBeNull();
+  });
+});

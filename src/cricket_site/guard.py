@@ -222,6 +222,20 @@ def engine_editions(site: Path) -> list[dict] | None:
 
 
 # ------------------------------------------------------------------ d: void summary markets
+def check_toss(M: dict) -> Check:
+    """The toss columns (`tw` the winner's team index, `td` 1 bat / 0 field) name one of the match's own sides, and a decision never stands without a winner. Absent in an older build: skipped."""
+    c = Check("toss", "A match's toss winner is one of its two sides", HARD)
+    tw, td = M.get("tw"), M.get("td")
+    if tw is None or td is None:
+        c.skipped = "the build has no toss columns"
+        return c
+    for k in range(len(M["id"])):
+        c.checked += 1
+        if tw[k] not in (-1, M["a"][k], M["b"][k]) or (tw[k] == -1) != (td[k] == -1) or td[k] not in (-1, 0, 1):
+            c.problems.append(f"{M['id'][k]}: toss winner {tw[k]} / decision {td[k]} for sides {M['a'][k]} v {M['b'][k]}")
+    return c
+
+
 def _sched_balls(fmt: int, overs: int) -> int:
     default = BALLS[fmt]
     per = default // INN_LEN[fmt]
@@ -430,7 +444,7 @@ def run(site: Path, data: Path, live: dict | None = None, now: float | None = No
     meta = _read(site / "meta.json", {})
     checks = [*check_live_evidence(fixtures, live), check_keep_window(fixtures, lines, now), check_lines_fresh(lines, now), check_book_sides(lines)]
     checks.append(check_bat_first(M, engine_editions(site) if editions == "run" else editions))
-    checks += [check_complete_not_void(M), check_void_share(M, today)]
+    checks += [check_complete_not_void(M), check_void_share(M, today), check_toss(M)]
     docs = [d for f in sorted((data / "provisional").glob("*.json")) if (d := _read(f))]
     checks.append(check_scraped_totals(docs, ball_totals(data, {d.get("match_id", "") for d in docs}) if (data / "balls").is_dir() else None))
     checks += [check_duplicate_fixtures(fixtures), check_unlinked(_read(site / "identity_review.json", []), meta.get("identity_linked"))]

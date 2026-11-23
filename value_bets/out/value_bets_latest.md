@@ -1,30 +1,38 @@
-# Cricket value bets - 2026-11-22 12:00 IST
+# Cricket value bets - 2026-11-23 19:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1532 prices
+- **moviodds_bet365**: ok, 1858 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
-- **smarkets**: ok, 505 prices
-- **feedl**: ok, 575 prices, 20 events
-- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
-- **feedk**: ok, 183 prices, 5 events
-- **feede**: ok, 536 prices, 24 events
-- **feedj**: ok, 594 prices, 11 events
-- **feedh**: ok, 1340 prices, 47 events
-- **feedf**: ok, 626 prices, 19 events
+- **smarkets**: ok, 460 prices
+- **feedk**: ok, 172 prices, 5 events
+- **feedl**: ok, 652 prices, 28 events
+- **feedj**: ok, 607 prices, 8 events
+- **feede**: ok, 702 prices, 28 events
+- **feedh**: ok, 1539 prices, 46 events
+- **feedf**: ok, 528 prices, 16 events
+- **feedi**: ok, 1956 prices, 36 events
 
-Matches starting in next 168h: **35**, markets priced: **393**, value bets: **2** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **43**, markets priced: **498**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
-| 11-22 13:40 IST | Melbourne Stars vs Melbourne Renegades | M13710 batter_fours | Hayley Matthews over 2.5 | 1.98 @ feedj_d | 1.86 | 0.5365 | 6.2% | 1.59% | medium |
-| 11-22 20:00 IST | Dubai Capitals vs Abu Dhabi Knight Riders | M13710 batter_fours | Sediqullah Atal under 1.5 | 1.98 @ feedj_d | 1.80 | 0.6202 | 9.7% | 2.00% | medium |
+| 11-24 13:45 IST | Australia vs England | G9181 batter_sixes | Tom Banton under 0.5 | 2.30 @ feedi_d | 2.01 | 0.5185 | 14.5% | 2.00% | medium |
+| 11-24 13:45 IST | Australia vs England | G9182 batter_fours | Mitchell Marsh under 2.5 | 2.00 @ feedi_d | 1.85 | 0.5902 | 8.1% | 2.00% | medium |
+| 11-24 13:45 IST | Australia vs England | G9182 batter_fours | Harry Brook under 2.5 | 1.80 @ feedi_d | 1.70 | 0.6522 | 6.0% | 1.86% | medium |
+| 11-26 13:40 IST | Sydney Sixers vs Melbourne Stars | M13700 batter_runs | Ellyse Perry under 32.5 | 1.82 @ feedj_d | 1.68 | 0.6679 | 8.4% | 2.00% | medium |
 
 ### Why / notes per bet
-- **Melbourne Stars vs Melbourne Renegades / M13710 batter_fours / Hayley Matthews over 2.5** - why: Model 54% vs market 54% for over 2.5 fours; form 3.7 fours/inn recency-weighted T20 (n_eff 82.3; last 5: 3, 0, 0, 10, 8), bats in 99% of games played; at Junction Oval, Melbourne: 17 inns avg 3.4; context adj: venue environment +11%, team H2H context +5%; weather: rain chance up to 80%. Notes: 2 market source(s) for fair price; model 0.536 vs market 0.537; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 80% rain chance, 0.7 mm forecast during the match - shortened match or void props possible
-- **Dubai Capitals vs Abu Dhabi Knight Riders / M13710 batter_fours / Sediqullah Atal under 1.5** - why: Model 62% vs market 50% for under 1.5 fours; form 1.2 fours/inn recency-weighted T20 (n_eff 28.5; last 5: 2, 2, 0, 0, 2), bats in 98% of games played; at Dubai International Cricket Stadium, Dubai: 8 inns avg 1.0; vs Abu Dhabi Knight Riders: 1 inns avg 0.0; context adj: at this venue -3%, team H2H context +10%. Notes: 2 market source(s) for fair price; model 0.620 vs market 0.500; assumes bet void if player doesn't bat/bowl - check book rules
+- **Australia vs England / G9181 batter_sixes / Tom Banton under 0.5** - why: Model 52% vs market 48% for under 0.5 sixes; form 1.0 sixes/inn recency-weighted T20 (n_eff 74.1; last 5: 1, 4, 0, 1, 1), bats in 92% of games played; venue unknown/unmatched (venue terms neutral); vs Australia: 4 inns avg 0.2; weather: high humidity 76%. Notes: 2 market source(s) for fair price; model 0.519 vs market 0.481; assumes bet void if player doesn't bat/bowl - check book rules
+- **Australia vs England / G9182 batter_fours / Mitchell Marsh under 2.5** - why: Model 59% vs market 50% for under 2.5 fours; form 3.3 fours/inn recency-weighted T20 (n_eff 61.2; last 5: 3, 1, 5, 5, 5), bats in 96% of games played; venue unknown/unmatched (venue terms neutral); vs England: 7 inns avg 1.9; context adj: team H2H context -3%; weather: high humidity 76%. Notes: 2 market source(s) for fair price; model 0.590 vs market 0.500; assumes bet void if player doesn't bat/bowl - check book rules
+- **Australia vs England / G9182 batter_fours / Harry Brook under 2.5** - why: Model 65% vs market 54% for under 2.5 fours; form 2.6 fours/inn recency-weighted T20 (n_eff 51.7; last 5: 4, 3, 1, 10, 7), bats in 92% of games played; venue unknown/unmatched (venue terms neutral); vs Australia: 4 inns avg 2.0; context adj: team H2H context -1%; weather: high humidity 76%. Notes: 2 market source(s) for fair price; model 0.652 vs market 0.537; assumes bet void if player doesn't bat/bowl - check book rules
+- **Sydney Sixers vs Melbourne Stars / M13700 batter_runs / Ellyse Perry under 32.5** - why: Model 67% vs market 54% for under 32.5 runs; form 31.2 runs/inn recency-weighted T20 (n_eff 77.4; last 5: 9, 45, 3, 30, 59), bats in 96% of games played; at North Sydney Oval: 40 inns avg 37.5; vs Melbourne Stars Women: 1 inns avg 84.0. Notes: 2 market source(s) for fair price; model 0.668 vs market 0.537; assumes bet void if player doesn't bat/bowl - check book rules
 
-Unmatched team names (add to mappings/teams.csv): Diasqua Little Sai Wan Cricket Club (male), Dolphins (W) (female), Dolphins (female), Garden Route Badgers (W) (female), Garden Route Badgers (female), Lions (W) (female), Lions (female), Lokseva Academy (male), MID West Rhinos (male), Roma Gladiators (male), Rome Gladiators (male), SW Districts (male), South Western Districts (male), Sunny 11 Pratishtan (male), Western Province (W) (female), Western Province (female)
+### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
+- 11-26 13:40 IST Sydney Sixers vs Melbourne Stars / M13704 top_bowler_team / Carly Leeson @ 15.00 (feedj_d): edge 48.0%, model 0.0768, market 0.1105
+- 11-27 03:30 IST New Zealand vs India / G2808 / Tom Latham @ 14.50 (feedi_d): edge 30.7%, model 0.126, market 0.0708
 
-Runtime 187.0s. Snapshot: `odds_20261122T063033Z.jsonl.gz`
+Unmatched team names (add to mappings/teams.csv): Lokseva Academy (male), North East Zone (W) (female), Omr Checker (male), Pondicherry (male), South Australia Redbacks (male), South Zone (W) (female), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), Tasmanian Tigers (male)
+
+Runtime 328.1s. Snapshot: `odds_20261123T133033Z.jsonl.gz`

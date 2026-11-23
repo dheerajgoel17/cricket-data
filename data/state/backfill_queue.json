@@ -1,5 +1,5 @@
 {
- "afghanistan_enumerated_at": "2026-11-21T11:16:34",
+ "afghanistan_enumerated_at": "2026-11-23T13:08:15",
  "already_in_cricsheet": [
   {
    "canonical_id": "1290881",
@@ -19782,6 +19782,38 @@
    "checked_at": "2026-11-20T11:50:29",
    "key": "2026-11-19-Afghanistan-Australia",
    "reason": "date 2027-10-18 != 2026-11-19; sitemap date 2026-11-19 != page date 2027-10-18; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14P4"
+   ],
+   "checked_at": "2026-11-23T13:08:17",
+   "key": "2026-11-22-Afghanistan-Pakistan",
+   "reason": "date 2027-10-08 != 2026-11-22; sitemap date 2026-11-22 != page date 2027-10-08; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14PA"
+   ],
+   "checked_at": "2026-11-23T13:08:24",
+   "key": "2026-11-22-Afghanistan-Zimbabwe",
+   "reason": "date 2027-10-11 != 2026-11-22; sitemap date 2026-11-22 != page date 2027-10-11; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14PF"
+   ],
+   "checked_at": "2026-11-23T13:08:32",
+   "key": "2026-11-22-Afghanistan-India",
+   "reason": "date 2027-10-14 != 2026-11-22; sitemap date 2026-11-22 != page date 2027-10-14; match status is 'Upcoming', not finished"
+  },
+  {
+   "checked": [
+    "14PM"
+   ],
+   "checked_at": "2026-11-23T13:08:40",
+   "key": "2026-11-22-Afghanistan-Australia",
+   "reason": "date 2027-10-18 != 2026-11-22; sitemap date 2026-11-22 != page date 2027-10-18; match status is 'Upcoming', not finished"
   }
  ],
  "pending": []

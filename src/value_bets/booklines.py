@@ -265,6 +265,9 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
             elif kind == "lines":
                 by[k] = merge_books(by[k], y)
         out[kind] = sorted(by.values(), key=order)
+    # an event row summarises the match's lines: once a started match has none left (a finished Test the books still list, its lines let go) the row is a leftover with no format to say how long to keep it
+    have = {x.get("match") for k in ("lines", "fancy") for x in out.get(k) or []}
+    out["events"] = [e for e in out.get("events") or [] if e.get("match") in have or not ((st := parse_ts(e.get("start_utc"))) and st <= now)]
     return public(out)
 
 

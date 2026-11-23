@@ -152,7 +152,8 @@ test("fancyFor matches the fixture by team names and time, whole-match or team-t
   assert.deepEqual(fancyFor(doc, fx, "team_total_sixes", "India"), []);
   assert.deepEqual(fancyFor({}, fx, "match_runs"), []);
   const sess = { ...f({ key: "overs_6", scope: "team", team: "New Zealand", line: 42.5, bat_first: true }) };
-  assert.equal(fancyFor({ fancy: [sess] }, fx, "overs_6", "New Zealand")[0].bat_first, true);
+  assert.equal(fancyFor({ fancy: [sess] }, fx, "overs_6_bf", "New Zealand")[0].bat_first, true);
+  assert.deepEqual(fancyFor({ fancy: [sess] }, fx, "overs_6", "New Zealand"), [], "a bat-first line is not in the plain market");
   assert.equal(fancyFor({ fancy: [f({ key: "team_total_sixes", scope: "team", team: "New Zealand", line: 9.5 })] }, fx, "team_total_sixes", "New Zealand")[0].bat_first, false);
 });
 

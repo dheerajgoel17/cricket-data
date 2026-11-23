@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-23 — Toss winner row
+- **Path:** `site/src/components/app/toss-winner.tsx`, `mobile/src/ui/toss-winner.tsx`
+- **Change:** Match Fancy's Match scope lists the toss-winner market (two sides, decimal prices, default 1.95 flagged in the heading) with the existing Item rows, TeamBadge and tokens; no new variant. The Match Fancy tab shows on any unfinished fixture.
+- **Callers:** Match Fancy list (web and app)
+
 ### 2026-11-22 — Player profile live tracking spacing
 - **Path:** `mobile/src/app/player/[idx].tsx`, `mobile/src/ui/next-match.tsx`
 - **Change:** Use the same gap around the tracking strip. Group the matchup and status in a compact header, with a hairline above the tracked line and standing.
@@ -515,3 +520,18 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `site/public/books/books.json`, `site/packages/engine/books.js`, `site/src/lib/books.ts`, `site/src/components/app/book-badge.tsx`, `mobile/src/ui/book-badge.tsx`, `site/src/main.tsx`, `mobile/src/app/_layout.tsx`, `site/api/og.js`
 - **Change:** the list of books (stem, display name, logo file) is `public/books/books.json`, fetched once at start (`loadBookManifest`) and merged into the engine's table; `BookBadge` (site and app) subscribes and re-draws when it arrives. The table in `books.js` is only the offline / first-launch fallback. Adding a book = its logo file + one entry in `books.json` (a node test checks the file list and the manifest agree). Added bc.game.
 - **Callers:** every `BookBadge` (site and app), the share card (`api/og.js`)
+
+### 2026-11-23 — Toss winner rows show each side's toss record
+- **Path:** `site/src/components/app/toss-winner.tsx`, `mobile/src/ui/toss-winner.tsx`, `site/src/components/app/match-fancy.tsx`, `mobile/src/ui/match-fancy.tsx`
+- **Change:** under each side's name the row adds one line of the existing description style, "Won 6 of last 10 tosses · chose bat 4", from `tossRecord` (engine). No new component or variant; hidden when the build carries no toss data or the side has none on record.
+- **Callers:** Match Fancy, Match scope (site and app)
+
+### 2026-11-23 — Toss winner rebuilt as ordinary fancy rows (W / L form, no edge)
+- **Path:** `site/src/components/app/fancy-lines.tsx`, `mobile/src/ui/fancy-row.tsx`, `site/src/components/app/match-fancy.tsx`, `mobile/src/ui/match-fancy.tsx`; removed `site/src/components/app/toss-winner.tsx`, `mobile/src/ui/toss-winner.tsx`
+- **Change:** the separate Toss winner section is gone. The toss is two rows (one per side) in the existing fancy list, last in the Match scope: same crest / label / meta / hit-rate / ground columns, `FormChips` (W / L) in the chart slot, no edge, nothing to open. The "vs opponent" and "at ground" toss records sit in the sub line (phone) and the ground column (dense). No new component or variant.
+- **Callers:** `FancyLines` (compact and dense), `OverviewRow`, Match Fancy list (site and app)
+
+### 2026-11-23 — Toss row text: tooltip when cut off (site), two lines (app)
+- **Path:** `site/src/components/app/fancy-lines.tsx`, `mobile/src/ui/fancy-row.tsx`
+- **Change:** the toss row's record line, book name and ground column truncate on the site; each is the existing `Tooltip` (shadcn) and shows the full text on hover / focus only when it is really clipped (`TruncTip`). On the app, where there is no hover, the record line wraps to two lines instead of truncating. No new component or variant.
+- **Callers:** toss rows in `FancyLines` (compact and dense) and `OverviewRow`

@@ -31,6 +31,7 @@ from collections import Counter
 from cricket_data.hosts import host
 
 from .. import config
+from .. import fancy as fancy_mod
 from ..util import decimal_ok, http_json, iso, parse_ts
 from .base import Pace, gender_hint, multi_day, row
 from .feedf import person
@@ -414,6 +415,15 @@ def parse_event(ev: dict, src: str, fetched_at: str) -> tuple[list[dict], list[d
                 catalogue.append(_cat(common, name, player, None, None, round(p, 3), None, mt))
                 rows.append(row(**{k: v for k, v in common.items() if k != "fmt"}, market_type=mt, market_raw=name, group_key=gk,
                                 selection=player, player=player, back=round(p, 3)))
+            continue
+        if fancy_mod.is_toss_name(name):
+            named = _named(m)
+            tw = fancy_mod.toss_fancy(home, away, named, match=common["match"], start_utc=start, fmt=fmt, competition=competition, source=src)
+            fancy.extend(tw)
+            for n, p in named:
+                catalogue.append(_cat(common, name, n, None, None, round(p, 3), None, fancy_mod.TOSS_KEY if tw else None))
+            if not named:
+                left[name] += 1
             continue
         got = _ou(m)
         if got:

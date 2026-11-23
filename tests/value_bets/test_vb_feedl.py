@@ -50,3 +50,9 @@ def test_settings_ok(monkeypatch):
     monkeypatch.setenv("FEEDL_NAME", "SwarmDemo")
     assert feedl.settings()["SITE"] == 1
     assert feedl.published() == {"feedl": "SwarmDemo"}
+
+
+def test_toss_winner_pair():
+    rows, fancy, cat, left = feedl.parse_markets([mkt("To Win the Toss", "TossWinner", [("Australia", 1.9, None), ("England", 1.9, None)])], COMMON)
+    assert [(f["key"], f["team"], f["over"]) for f in fancy] == [("toss_winner", "Australia", 1.9), ("toss_winner", "England", 1.9)]
+    assert not rows and "To Win the Toss" not in left

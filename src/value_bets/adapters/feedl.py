@@ -21,6 +21,7 @@ import time
 from collections import Counter
 
 from .. import config
+from .. import fancy as fancy_mod
 from ..util import decimal_ok, iso, parse_ts
 from .base import gender_hint, multi_day, row
 from .feedi import SKIP_COMP, WOMEN, _fmt, flip
@@ -219,6 +220,16 @@ def parse_markets(markets: list[dict], common: dict) -> tuple[list[dict], list[d
             for n, p in named:
                 cat.append(_cat(common, name, n, team, None, p, None, mt))
                 rows.append(row(**base, market_type=mt, market_raw=name, group_key=gk, selection=n, player=n, team=team, back=p))
+            continue
+
+        if fancy_mod.is_toss_name(name):
+            named = _named(events)
+            tw = fancy_mod.toss_fancy(home, away, named, match=common["match"], start_utc=start, fmt=fmt, competition=competition, source=src)
+            fancy.extend(tw)
+            for n, p in named:
+                cat.append(_cat(common, name, n, None, None, p, None, fancy_mod.TOSS_KEY if tw else None))
+            if not named:
+                left[name] += 1
             continue
 
         ou = _ou_events(events)

@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
+import { bookName } from "@cricket/engine/lines.js";
 import { edgeTag } from "@cricket/engine/props-view.js";
 import { BookBadge } from "./book-badge";
 import { TeamBadge } from "./badges";
 import { InPlayBadge } from "./live-spot";
 import { MiniBars, MiniBarsSlot, SCAN_ROW_GRID, ScanEdge } from "./mini-bars";
+import { FormChips } from "./recent-form";
 import { ResultStamp, sideStamp } from "./result-stamp";
 import { Tick, type Standing } from "./tick";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -67,10 +70,38 @@ export function FancyLineMeta({ r, standing }: { r: any; standing?: Standing | n
   );
 }
 
+/** The toss rows (`kind: "toss"`, engine `tossRows`): a price and who it is from, then the side's toss record against this opponent and at this ground. */
+const isToss = (r: any) => r?.kind === "toss";
+const wonOf = (x: { won: number; n: number }) => `${x.won} of ${x.n}`;
+export const tossSub = (r: any) => [r.vsOpp ? `vs ${r.vsOpp.opp} ${wonOf(r.vsOpp)}` : "", r.atGround ? `At ground ${wonOf(r.atGround)}` : ""].filter(Boolean).join(" · ");
+
+/** A line of text that truncates; hovering or focusing it shows the full text, and only when it really is cut off. */
+function TruncTip({ text, className }: { text: string; className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip open={open} onOpenChange={(o) => setOpen(o && !!ref.current && ref.current.scrollWidth > ref.current.clientWidth)}>
+        <TooltipTrigger asChild><span ref={ref} className={cn("truncate", className)}>{text}</span></TooltipTrigger>
+        <TooltipContent>{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function TossMeta({ r }: { r: any }) {
+  return (
+    <span className="flex min-w-0 items-center gap-x-tight text-callout font-sans font-emphasis leading-snug text-foreground">
+      <span className="shrink-0 font-condensed tabular-nums">{odds(r.over)}</span>
+      <TruncTip text={r.default ? "Default price" : bookName(r.overBook)} className="min-w-0 font-copy text-muted-foreground" />
+    </span>
+  );
+}
+
 export function FancyHitRate({ r }: { r: any }) {
   if (!r.played) return <span className="text-muted-foreground">–</span>;
   const p = r.hits / r.played;
-  const tone = p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground";
+  const tone = isToss(r) ? "text-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground";
   return (
     <span className={cn("font-condensed text-body font-label tabular-nums", tone)}>
       {Math.round(p * 100)}%<span className="font-copy text-muted-foreground"> · {r.played}</span>
@@ -79,6 +110,7 @@ export function FancyHitRate({ r }: { r: any }) {
 }
 
 export function FancyGround({ r }: { r: any }) {
+  if (isToss(r)) return r.vsOpp || r.atGround ? <span className="grid min-w-0 text-caption text-muted-foreground">{r.vsOpp ? <TruncTip text={`vs ${r.vsOpp.opp} · ${wonOf(r.vsOpp)}`} /> : null}{r.atGround ? <TruncTip text={`Ground · ${wonOf(r.atGround)}`} /> : null}</span> : null;
   const at = r.at;
   if (!at?.n) return null;
   const side = at.side === "under" ? "Under" : "Over";
@@ -90,7 +122,8 @@ export function CompactFancyItem({ r, onOpen, active, sub, standing, inset }: {
   r: any; onOpen?: () => void; active?: boolean; sub?: string; standing?: Standing | null; inset?: boolean;
 }) {
   const mark = standing ?? r.standing;
-  const voided = mark?.state === "void";
+  const toss = isToss(r);
+  const voided = !toss && mark?.state === "void";
   const className = cn(SCAN_ROW_GRID, inset && "px-0", "text-left", onOpen && "transition-colors active:bg-card", active && "bg-card");
   const body = (
     <>
@@ -102,11 +135,13 @@ export function CompactFancyItem({ r, onOpen, active, sub, standing, inset }: {
           <span className="min-w-0 truncate text-body font-emphasis leading-snug">{r.label}</span>
           {r.live ? <InPlayBadge /> : null}
         </span>
-        {sub ? <span className="truncate text-footnote text-muted-foreground">{sub}</span> : null}
-        {!voided ? <FancyLineMeta r={r} standing={mark} /> : null}
+        {toss && !sub && tossSub(r) ? <TruncTip text={tossSub(r)} className="text-footnote text-muted-foreground" /> : sub ? <span className="truncate text-footnote text-muted-foreground">{sub}</span> : null}
+        {toss ? <TossMeta r={r} /> : !voided ? <FancyLineMeta r={r} standing={mark} /> : null}
       </span>
-      {voided ? <span className="w-11 shrink-0" aria-hidden /> : <ScanEdge edge={r.edge} />}
-      {voided ? (
+      {voided || toss ? <span className="w-11 shrink-0" aria-hidden /> : <ScanEdge edge={r.edge} />}
+      {toss ? (
+        r.form?.length ? <FormChips compact results={r.form.slice(-5)} /> : <MiniBarsSlot><span className="text-caption text-muted-foreground">–</span></MiniBarsSlot>
+      ) : voided ? (
         <MiniBarsSlot>
           <span className="rounded border border-dashed border-amber/60 px-hair text-caption text-amber">VOID</span>
         </MiniBarsSlot>
@@ -136,7 +171,7 @@ function CompactFancyList({ rows, onOpen, standingOf, activeOf, subOf, afterRow,
     <ul className={bleed ? "-mx-gutter" : undefined}>
       {rows.map((r) => (
         <li key={rowKey(r)} className="border-t border-hairline first:border-t-0">
-          <CompactFancyItem r={r} onOpen={() => onOpen(r)} active={activeOf?.(r)} sub={subOf?.(r)} standing={standingOf?.(r) ?? r.standing} inset={flush} />
+          <CompactFancyItem r={r} onOpen={r.static ? undefined : () => onOpen(r)} active={activeOf?.(r)} sub={subOf?.(r)} standing={standingOf?.(r) ?? r.standing} inset={flush} />
           {afterRow?.(r)}
         </li>
       ))}
@@ -174,7 +209,7 @@ function DenseFancyTable({ rows, onOpen, standingOf, afterRow }: {
             const voided = mark?.state === "void";
             const edgeTone = r.edge == null ? "text-muted-foreground" : r.edge > 0 ? "text-primary" : "text-miss";
             return (
-              <tr key={rowKey(r)} className="cursor-pointer border-b border-hairline last:border-b-0 hover:bg-surface-hover" onClick={() => onOpen(r)}>
+              <tr key={rowKey(r)} className={cn("border-b border-hairline last:border-b-0", !r.static && "cursor-pointer hover:bg-surface-hover")} onClick={r.static ? undefined : () => onOpen(r)}>
                 <td className={TD_START}>
                   <span className="flex min-w-0 items-start gap-snug">
                     {r.team
@@ -185,13 +220,15 @@ function DenseFancyTable({ rows, onOpen, standingOf, afterRow }: {
                         <span className="min-w-0 truncate">{r.label}</span>
                         {r.live ? <InPlayBadge /> : null}
                       </span>
-                      {!voided ? <FancyLineMeta r={r} standing={mark} /> : null}
+                      {isToss(r) ? <TossMeta r={r} /> : !voided ? <FancyLineMeta r={r} standing={mark} /> : null}
                       {afterRow?.(r)}
                     </span>
                   </span>
                 </td>
                 <td className={TD_MID}>
-                  {voided ? (
+                  {isToss(r) ? (
+                    r.form?.length ? <FormChips compact results={r.form} /> : <span className="text-muted-foreground">–</span>
+                  ) : voided ? (
                     <MiniBarsSlot>
                       <span className="rounded border border-dashed border-amber/60 px-hair text-caption text-amber">VOID</span>
                     </MiniBarsSlot>
@@ -206,7 +243,7 @@ function DenseFancyTable({ rows, onOpen, standingOf, afterRow }: {
                 <td className={TD_MID}><FancyHitRate r={r} /></td>
                 <td className={TD_MID}><FancyGround r={r} /></td>
                 <td className={cn(TD_END, "text-right font-condensed text-title font-emphasis tabular-nums", edgeTone)}>
-                  {r.edge == null ? "–" : (
+                  {isToss(r) ? null : r.edge == null ? "–" : (
                     <>
                       <span>{`${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(1)}`}</span>
                       <span className="block label-cap text-caption font-label text-muted-foreground">{edgeTag(r.edge, r.side)}</span>
