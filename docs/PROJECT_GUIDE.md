@@ -9,7 +9,7 @@ Two products in one repo, both **100% free to run**:
 1. **The dataset** (`src/cricket_data`, `data/`): 21k+ cricket matches since 2001 (men's and women's) from Base ball-by-ball, stored as monthly
    gzipped CSVs, plus **provisional** matches scraped from Source A to cover the days before Base publishes. A `cricket-data` CLI queries and maintains it.
    An hourly **value-bets** pipeline (`src/value_bets`) prices player props against free odds sources.
-2. **The site** ("Cricket Props Hub", `site/`, `src/cricket_site`): a StatsHub-style player-props and stats website on Vercel Hobby. Hit rates over any line, DNP-aware form
+2. **The site** ("Cricket Props Hub", `site/`, `src/cricket_site`): a StatsHub-style player-props and stats website on a Cloudflare Worker (Vercel Hobby for PR previews and rollback). Hit rates over any line, DNP-aware form
    charts, fair decimal odds, partnerships, team/venue/competition markets, player trends, a Prop Hunter (value bets), live scores with player so-far vs booked lines
    (~3 s during live play; the server settles each priced line, see 5.4c), and an ask-anything box (an LLM turns the question into a structured query; **all numbers come from the data**).
 
@@ -232,7 +232,7 @@ See [EDGE_CASES.md](EDGE_CASES.md) for the full table of settlement edge cases (
 * Cache key `site-dl6-<date>` in `site.yml`: bump the prefix when the format of cached downloads (e.g. `photos.json`) changes.
 * macOS `sed -i` needs `''`; prefer Python for scripted edits.
 * Vercel: `outputDirectory: public`; the SPA rewrite destination must be `/` (with `cleanUrls`, `/index.html` did not work). `.vercelignore` excludes tests/scripts.
-* The Vite dev server has the SPA fallback built in, and serves `/api/ask` and `/api/live` with the same handlers Vercel runs (`vite.config.ts`).
+* The Vite dev server has the SPA fallback built in, and serves the `site/api` handlers (`/api/live`, `/api/inplay`, …) with the same code the Worker and Vercel run (`vite.config.ts`).
 
 ### 5.11 Published hot rows (`site/packages/engine/hot-rows.js`, `site/scripts/hot-rows.mjs`, `hot-rows.json`)
 **What.** The history half of every Hot props row (`HISTORY_FIELDS`: his player index and name, the line, the model's prior, the opponent and ground, the L5 / L10 / season / head-to-head / ground rates, the last ten bars, the settled value) for every priced pre-match line, built with the data and published beside it. A phone that reads it skips the player files (about 20 MB) and the scoring pass (6 to 7 s of JS on a phone) on a cold start; a line the file does not cover is scored on the phone as before.
