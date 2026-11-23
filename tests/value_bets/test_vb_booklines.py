@@ -455,3 +455,13 @@ def test_a_test_filed_as_an_odi_in_the_previous_pull_does_not_carry_the_odi_line
     prev["lines"].append({**prev["lines"][0], "fmt": "ODI", "player": "Q"})
     out = carry_started(doc(("India vs NZ", "2026-10-27T07:00:00Z", "Test")), prev, NOW)
     assert [(x["fmt"], x["player"]) for x in out["lines"]] == [("Test", "P")]
+
+
+def test_an_event_row_of_a_started_match_with_no_lines_left_is_not_kept():
+    """Regression (23 Nov 2026): a finished Test the books still list kept its event row after its lines were let go; with no line to say it was a Test the data guard saw a 5-day-old limited-overs match and stopped the deploy."""
+    book = {"generated_at_utc": "t", "lines": [], "fancy": [], "events": [
+        {"match": "South Africa vs Bangladesh", "start_utc": "2026-10-22T08:00:00Z", "markets": ["batter_runs"], "sources": ["bet365"], "n": 206},  # started, no lines left
+        {"match": "India vs NZ", "start_utc": "2026-10-28T07:00:00Z", "markets": ["batter_runs"], "sources": ["bet365"], "n": 4},  # upcoming: stays
+    ]}
+    prev = {"generated_at_utc": "t", "lines": [], "fancy": [], "events": []}
+    assert [e["match"] for e in carry_started(book, prev, NOW)["events"]] == ["India vs NZ"]
