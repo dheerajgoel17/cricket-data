@@ -1,16 +1,16 @@
-import { useEffect } from "react";
 import { useChoice } from "@/lib/use-choice";
 import { HScroll } from "@/ui/h-scroll";
-import { Platform, ScrollView, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import { chipFillTransition, chipTextTransition } from "@/ui/chips";
 import { Press } from "@/ui/press";
 import { AnimatedText, Text } from "@/ui/text";
-import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useReducedMotion } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { abbr } from "@site/lib/format";
 import { dayLabel, localTime } from "@/lib/format";
 import { fixtureStart } from "@/lib/rail";
 import { TeamBadge } from "@/ui/team-badge";
-import { color, control, font, radius, space, tint, type, duration, t } from "@/ui/tokens";
+import { color, control, radius, space, tint, type, t } from "@/ui/tokens";
 
 type Fx = { id: string; a: string; b: string; fmt?: string; start?: string };
 
@@ -44,6 +44,7 @@ const SUB_ON = tint.hex(color["primary-foreground"], 0.7);
 
 export function MatchChips({ items, value: valueProp, onChange: onChangeProp, tags, all }: { items: Fx[]; value: string; onChange: (id: string) => void; tags?: Record<string, Tag>; /** Lead with an "All" chip whose id is `all` (the Player props match filter). */ all?: boolean }) {
   const [value, onChange] = useChoice(valueProp, onChangeProp);
+  const calm = useReducedMotion();
   return (
     <HScroll
       contentContainerStyle={styles.row}
@@ -52,37 +53,34 @@ export function MatchChips({ items, value: valueProp, onChange: onChangeProp, ta
       removeClippedSubviews={Platform.OS === "android"}
       overScrollMode={Platform.OS === "android" ? "never" : undefined}
     >
-      {all ? <AllChip on={value === "all"} onPress={() => { if (value !== "all") { void tick(); onChange("all"); } }} /> : null}
+      {all ? <AllChip calm={calm} on={value === "all"} onPress={() => { if (value !== "all") { void tick(); onChange("all"); } }} /> : null}
       {items.map((f) => (
-        <MatchChip key={f.id} f={f} tag={tags?.[f.id]} on={f.id === value} onPress={() => { if (f.id !== value) { void tick(); onChange(f.id); } }} />
+        <MatchChip key={f.id} calm={calm} f={f} tag={tags?.[f.id]} on={f.id === value} onPress={() => { if (f.id !== value) { void tick(); onChange(f.id); } }} />
       ))}
     </HScroll>
   );
 }
 
-function AllChip({ on, onPress }: { on: boolean; onPress: () => void }) {
+function AllChip({ on, onPress, calm }: { on: boolean; onPress: () => void; calm: boolean }) {
   return (
-    <Press accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel="All matches" onPress={onPress} scale={0.97} style={[styles.chip, styles.allChip, { backgroundColor: on ? color.primary : color.card }]}>
-      <Text style={[styles.allText, { color: on ? color["primary-foreground"] : color.foreground }]}>All</Text>
+    <Press accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel="All matches" onPress={onPress}>
+      <Animated.View style={[styles.chip, styles.allChip, { backgroundColor: on ? color.primary : color.card }, !calm && chipFillTransition]}>
+        <AnimatedText style={[styles.allText, { color: on ? color["primary-foreground"] : color.foreground }, !calm && chipTextTransition]}>All</AnimatedText>
+      </Animated.View>
     </Press>
   );
 }
 
-function MatchChip({ f, on, onPress, tag }: { f: Fx; on: boolean; onPress: () => void; tag?: Tag }) {
-  const p = useSharedValue(on ? 1 : 0);
-  useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: duration.fast }); }, [on, p]);
-  const box = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [color.card, color.primary]) }));
-  const title = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color.foreground, color["primary-foreground"]]) }));
-  const sub = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], SUB_ON]) }));
+function MatchChip({ f, on, onPress, tag, calm }: { f: Fx; on: boolean; onPress: () => void; tag?: Tag; calm: boolean }) {
   return (
     <Press accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={`${f.a} v ${f.b}${tag ? `, ${tag.text}` : ""}`} onPress={onPress} scale={0.97}>
-      <Animated.View style={[styles.chip, box]}>
+      <Animated.View style={[styles.chip, { backgroundColor: on ? color.primary : color.card }, !calm && chipFillTransition]}>
         <Crests a={f.a} b={f.b} />
         <View style={styles.text}>
-          <AnimatedText style={[styles.title, title]} numberOfLines={1}>{abbr(f.a)} v {abbr(f.b)}</AnimatedText>
+          <AnimatedText style={[styles.title, { color: on ? color["primary-foreground"] : color.foreground }, !calm && chipTextTransition]} numberOfLines={1}>{abbr(f.a)} v {abbr(f.b)}</AnimatedText>
           {tag
             ? <View style={[styles.tag, tag.session ? styles.tagSession : styles.tagLive]}><Text style={[styles.tagText, { color: tag.session ? color.foreground : on ? color["primary-foreground"] : color.destructive }]} numberOfLines={1}>{tag.text}</Text></View>
-            : <AnimatedText style={[styles.sub, sub]} numberOfLines={1}>{subOf(f)}</AnimatedText>}
+            : <AnimatedText style={[styles.sub, { color: on ? SUB_ON : color["muted-foreground"] }, !calm && chipTextTransition]} numberOfLines={1}>{subOf(f)}</AnimatedText>}
         </View>
       </Animated.View>
     </Press>

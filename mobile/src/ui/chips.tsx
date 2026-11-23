@@ -1,37 +1,37 @@
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { useChoice } from "@/lib/use-choice";
 import { HScroll } from "@/ui/h-scroll";
-import { ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
+import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 import { Press } from "@/ui/press";
-import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useReducedMotion } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { AnimatedText, Text } from "@/ui/text";
 import { color, control, radius, space, type, font, tint, duration, t, d, state, icon } from "@/ui/tokens";
 
 /** The site's series chips: one row that scrolls sideways, the chosen one filled with the accent colour (the fill fades between chips); each carries how many matches it holds. */
-export function Chips({ items, value: valueProp, onChange: onChangeProp }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void }) {
+export function Chips({ items, value: valueProp, onChange: onChangeProp, flush }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void; flush?: boolean }) {
   const [value, onChange] = useChoice(valueProp, onChangeProp);
+  const calm = useReducedMotion();
   return (
-    <HScroll contentContainerStyle={styles.row} accessibilityRole="tablist">
+    <HScroll contentContainerStyle={flush ? styles.flushRow : styles.row} accessibilityRole="tablist">
       {items.map(([id, label, count, muted]) => (
-        <Chip key={id} label={label} count={count} muted={muted} on={id === value} onPress={() => { if (id !== value) { void Haptics.selectionAsync(); onChange(id); } }} />
+        <Chip key={id} calm={calm} label={label} count={count} muted={muted} on={id === value} onPress={() => { if (id !== value) { void Haptics.selectionAsync(); onChange(id); } }} />
       ))}
     </HScroll>
   );
 }
 
-function Chip({ label, count, on, muted, onPress }: { label: string; count?: number | string; on: boolean; muted?: boolean; onPress: () => void }) {
-  const p = useSharedValue(on ? 1 : 0);
-  useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: duration.fast }); }, [on, p]);
-  const box = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [color.card, color.primary]) }));
-  const text = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color.foreground, color["primary-foreground"]]) }));
-  const countColor = useAnimatedStyle(() => ({ color: interpolateColor(p.value, [0, 1], [color["muted-foreground"], color["primary-foreground"]]) }));
+export const chipFillTransition = { transitionProperty: "backgroundColor", transitionDuration: duration.fast, transitionTimingFunction: "ease-out" } as const;
+export const chipTextTransition = { ...chipFillTransition, transitionProperty: "color" } as const;
+
+function Chip({ label, count, on, muted, onPress, calm }: { calm: boolean; label: string; count?: number | string; on: boolean; muted?: boolean; onPress: () => void }) {
+  const ink = on ? color["primary-foreground"] : color.foreground;
   return (
     <Press accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={onPress}>
-      <Animated.View style={[styles.chip, box, muted && !on && state.dim]}>
-        <AnimatedText style={[styles.label, text]}>{label}</AnimatedText>
-        {count != null ? <AnimatedText style={[styles.count, countColor]}>{count}</AnimatedText> : null}
+      <Animated.View style={[styles.chip, { backgroundColor: on ? color.primary : color.card }, !calm && chipFillTransition, muted && !on && state.dim]}>
+        <AnimatedText style={[styles.label, { color: ink }, !calm && chipTextTransition]}>{label}</AnimatedText>
+        {count != null ? <AnimatedText style={[styles.count, { color: on ? ink : color["muted-foreground"] }, !calm && chipTextTransition]}>{count}</AnimatedText> : null}
       </Animated.View>
     </Press>
   );
@@ -72,7 +72,16 @@ export function ChoiceRow({ children }: { children: ReactNode }) {
   return <View style={styles.choiceRow}>{children}</View>;
 }
 
+/** Full-width filter chrome. Use flush chips so the bar owns the padding. */
+export const filterBar = StyleSheet.create({
+  row: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
+  chips: { flex: 1, minWidth: 0 },
+  active: { alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
+  clear: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
+});
+
 const styles = StyleSheet.create({
+  flushRow: { gap: space.tight },
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },
   label: { ...t.calloutLabel },

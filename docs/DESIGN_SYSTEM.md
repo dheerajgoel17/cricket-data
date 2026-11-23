@@ -190,10 +190,10 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Page header | `PageHeader` | Native chrome (unfilled; sits on `PageAtmosphere`) |
 | Page atmosphere | `ui/page-atmosphere` | Elevated canvas on stack pages + `EntityHeroWash` in scroll hero (web `HeroWash` twin) |
 | Accordion | `ui/accordion` | Twin of filters/splits |
-| Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`) | **Native-exclusive**: the one sheet shell (filters); never a hand-built `Modal` |
+| Bottom sheet | `ui/sheet` (`Sheet`, `SheetBackdrop`, `Grabber`, `FilterSheet`, `FilterSection`) | **Native-exclusive**: the one sheet shell (filters); never a hand-built `Modal` |
 | Button | `ui/button` (`Button`: primary / secondary, md at the platform touch height, sm at the control height) | Web twin: `components/ui/button.tsx`; never style a `Press` into a button |
 | Search box | `ui/search-field` (`SearchField`) | One box for Search and Competitions |
-| Filters button | `ui/chips` (`FilterButton`: icon, label, active-count badge) | Web twin: `FilterButton` in `components/app/chip.tsx`; one per page, beside the chip row |
+| Filters button | `ui/chips` (`FilterButton`: icon, label, active-count badge) | Web twin: `FilterButton` in `components/app/chip.tsx`; one per page, beside the chip row. Fixture Props, Match Fancy, Player props and Grid use the shared `filterBar` styles with flush chips |
 | Choice latency | `lib/use-choice` (`useChoice`) | Every chip, tab and segmented control highlights in the tap's own frame and runs the real change as a transition |
 | List reflow | `ui/motion` (`Reflow`) | Short lists whose order or membership changes (Saved, market overview): rows glide, a removed row fades. Web twin: `ReflowGroup` / `ReflowItem`. Not for virtualized lists |
 | Round icon button | `ui/round-button` (`RoundButton`) | Native chrome: back, search, account, share, close; web twin is the header icon button |

@@ -36,11 +36,7 @@ export function HotHome({ phase }: { phase: HomePhase }) {
           <View>
             {items.map((item, i) => item.kind === "player"
               ? <PropRow key={item.key} r={item.r} i={i} soFar={soFarOf(item.r)} out={outOf(item.r)} />
-              : (
-                <View key={item.key} style={i > 0 ? styles.sep : undefined}>
-                  <OverviewRow r={item.r} onOpen={() => push(openFancy(item))} />
-                </View>
-              ))}
+              : <OverviewRow key={item.key} separated={i > 0} r={item.r} onOpen={() => push(openFancy(item))} />)}
           </View>
           {scoring ? <Working label="Scoring more lines…" /> : null}
         </View>
@@ -67,6 +63,5 @@ const styles = StyleSheet.create({
   wrap: { gap: rhythm.between, paddingTop: rhythm.top },
   pad: { paddingHorizontal: space.gutter },
   body: { gap: rhythm.between },
-  sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   headTitle: { ...type.heading, color: color.foreground },
 });

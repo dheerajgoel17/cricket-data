@@ -3,7 +3,7 @@ import { fancyMarketPath, push } from "@/lib/nav";
 import { Button } from "@/ui/button";
 import { Reflow } from "@/ui/motion";
 import { HScroll } from "@/ui/h-scroll";
-import { Sheet } from "@/ui/sheet";
+import { FilterSection, FilterSheet } from "@/ui/sheet";
 import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
@@ -29,7 +29,7 @@ import { liveQuery } from "@/lib/queries";
 import { liveMatchFor } from "@/lib/rail";
 import { BookBadge } from "@/ui/book-badge";
 import { ChartBars } from "@/ui/charts";
-import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, filterBar } from "@/ui/chips";
 import { Bleed } from "@/ui/bleed";
 import { EmptyState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
@@ -200,41 +200,38 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
   if (!store || !matchesReady) return <Working label="Loading…" shape="rows" />;
 
   return (
-    <View style={styles.root}>
-      <View style={styles.filterRow}>
+    <View style={mode === "detail" ? styles.root : undefined}>
+      <View style={[filterBar.row, styles.bleed]}>
         {scopes.length > 1 ? (
-          <View style={styles.chipFlex}><Chips items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
-        ) : <View style={styles.chipFlex} />}
+          <View style={filterBar.chips}><Chips flush items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
+        ) : <View style={filterBar.chips} />}
         <FilterButton label={`L${win}`} count={activeN} onPress={() => setFiltersOpen(true)} />
       </View>
       {activeN > 0 ? (
-        <HScroll contentContainerStyle={styles.activeRow} accessibilityLabel="Active filters">
+        <HScroll style={styles.bleed} contentContainerStyle={filterBar.active} accessibilityLabel="Active filters">
           {win !== 10 ? <ActiveChip label={`Window L${win}`} onClear={() => { setWin(10); setMl(undefined); }} /> : null}
           {here ? <ActiveChip label={`At ${venueName}`} onClear={() => { setHere(false); setMl(undefined); }} /> : null}
-          <Press onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={styles.clearAll}>Clear all</Text></Press>
+          <Press onPress={() => { setWin(10); setHere(false); setMl(undefined); }} accessibilityRole="button"><Text style={filterBar.clear}>Clear all</Text></Press>
         </HScroll>
       ) : null}
-      <Sheet visible={filtersOpen} onClose={() => setFiltersOpen(false)} label="Close filters">
-          <View style={styles.sheetHead}>
-            <Text style={styles.h2}>Filters</Text>
-            <RoundButton label="Close" onPress={() => setFiltersOpen(false)}><Ionicons name="close" size={icon.md} color={color.foreground} /></RoundButton>
-          </View>
-          <Text style={styles.sheetSec}>Hit-rate window</Text>
+      <FilterSheet
+        visible={filtersOpen}
+        onClose={() => setFiltersOpen(false)}
+        onClear={() => { setDraftWin(10); setDraftHere(false); }}
+        onApply={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }}
+      >
+        <FilterSection label="Hit-rate window">
           <ChoiceRow>{WINDOWS.map((n) => <ChoiceChip key={n} label={`L${n}`} on={draftWin === n} onPress={() => setDraftWin(n)} />)}</ChoiceRow>
-          {venueIdx.length > 0 ? (
-            <>
-              <Text style={styles.sheetSec}>Matches from</Text>
-              <ChoiceRow>
-                <ChoiceChip label="Teams' form" on={!draftHere} onPress={() => setDraftHere(false)} />
-                <ChoiceChip label={`At ${venueName}`} on={draftHere} onPress={() => setDraftHere(true)} />
-              </ChoiceRow>
-            </>
-          ) : null}
-          <View style={styles.sheetFoot}>
-            <Button variant="secondary" flex={1} label="Clear" onPress={() => { setDraftWin(10); setDraftHere(false); }} />
-            <Button flex={2} label="Apply" onPress={() => { setWin(draftWin); setHere(draftHere); setMl(undefined); setFiltersOpen(false); }} />
-          </View>
-      </Sheet>
+        </FilterSection>
+        {venueIdx.length > 0 ? (
+          <FilterSection label="Matches from">
+            <ChoiceRow>
+              <ChoiceChip label="Teams' form" on={!draftHere} onPress={() => setDraftHere(false)} />
+              <ChoiceChip label={`At ${venueName}`} on={draftHere} onPress={() => setDraftHere(true)} />
+            </ChoiceRow>
+          </FilterSection>
+        ) : null}
+      </FilterSheet>
 
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
     <>
@@ -242,21 +239,15 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
         <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />
       ) : null}
       {mode === "list" && (listRows.length > 0 || liveScored.length > 0) ? (
-        <View style={{ gap: space.snug }}>
-          <Text style={styles.h2}>Bookmaker lines</Text>
-          {liveMatch?.status === "live" ? <Text style={styles.note}>So far this match, delayed up to about 20 seconds. Not used for settlement.</Text> : null}
-          <View style={styles.bleed}>
-            {listRows.map((r: any, i: number) => (
-              <Reflow key={r.id || fancyFm(r.key, r.inn || 0)} style={i > 0 && styles.sep}>
-                <OverviewRow r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
-              </Reflow>
-            ))}
-            {liveScored.map(({ m, r }, i) => (
-              <View key={`live-${i}-${m.market}`} style={(listRows.length > 0 || i > 0) && styles.sep}>
-                <LiveMarketRow m={m} scored={r} />
-              </View>
-            ))}
-          </View>
+        <View style={styles.bleed}>
+          {listRows.map((r: any, i: number) => (
+            <Reflow key={r.id || fancyFm(r.key, r.inn || 0)}>
+              <OverviewRow separated={i > 0} r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
+            </Reflow>
+          ))}
+          {liveScored.map(({ m, r }, i) => (
+            <LiveMarketRow key={`live-${i}-${m.market}`} m={m} scored={r} separated={listRows.length > 0 || i > 0} />
+          ))}
         </View>
       ) : null}
 
@@ -401,28 +392,9 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
 
 const styles = StyleSheet.create({
   root: { gap: rhythm.between },
-  /** Edge-to-edge hairline under scope + L10 (site MatchFancy list twin). */
-  filterRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: space.snug,
-    marginHorizontal: -space.gutter,
-    paddingHorizontal: space.gutter,
-    paddingBottom: space.snug,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: color.hairline,
-  },
-  chipFlex: { flex: 1, minWidth: 0 },
-  activeRow: { gap: space.snug, paddingVertical: space.tight },
-  clearAll: { ...t.calloutLabel, color: color["muted-foreground"], paddingHorizontal: space.snug, lineHeight: control },
-  sheetHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: space.tight },
-  sheetSec: { ...t.bodyLabel, color: color.foreground, marginTop: space.snug },
-  sheetFoot: { flexDirection: "row", gap: space.snug, marginTop: space.stack },
-  h2: { ...type.heading, color: color.foreground },
   h3: { ...t.bodyLabel, color: color.foreground },
   note: { ...type.footnote, color: color["muted-foreground"] },
   bleed: { marginHorizontal: -space.gutter },
-  sep: { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: color.hairline },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.snug },
   live: { ...type.callout, color: color.primary },
   stats: { flexDirection: "row", alignItems: "flex-end", gap: space.group },

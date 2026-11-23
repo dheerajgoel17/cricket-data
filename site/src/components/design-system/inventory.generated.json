@@ -74,6 +74,7 @@
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/brand.tsx",
       "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/match-chip.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/info-button.tsx",
@@ -171,6 +172,7 @@
       "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/capsule.tsx",
       "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/info-button.tsx",
       "mobile/src/ui/grid-table.tsx",
@@ -181,6 +183,7 @@
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/skeletons.tsx",
       "mobile/src/ui/page-header.tsx",
+      "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/prop-row.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]
@@ -440,6 +443,7 @@
     ],
     "dependencies": [
       "mobile/src/ui/h-scroll.tsx",
+      "mobile/src/ui/chips.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
@@ -579,11 +583,9 @@
       "TrendList"
     ],
     "dependencies": [
-      "mobile/src/ui/button.tsx",
       "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/sheet.tsx",
       "mobile/src/ui/press.tsx",
-      "mobile/src/ui/round-button.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/chips.tsx",
       "mobile/src/ui/capsule.tsx",
@@ -796,6 +798,7 @@
     ],
     "dependencies": [
       "mobile/src/ui/h-scroll.tsx",
+      "mobile/src/ui/chips.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/team-badge.tsx"
@@ -1047,11 +1050,17 @@
     "platform": "native",
     "route": false,
     "exports": [
+      "FilterSection",
+      "FilterSheet",
       "Grabber",
       "Sheet",
       "SheetBackdrop"
     ],
-    "dependencies": []
+    "dependencies": [
+      "mobile/src/ui/button.tsx",
+      "mobile/src/ui/round-button.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
   },
   {
     "path": "mobile/src/ui/side-book.tsx",

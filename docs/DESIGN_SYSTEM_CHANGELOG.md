@@ -20,6 +20,26 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Change:** Match Fancy's Match scope lists the toss-winner market (two sides, decimal prices, default 1.95 flagged in the heading) with the existing Item rows, TeamBadge and tokens; no new variant. The Match Fancy tab shows on any unfinished fixture.
 - **Callers:** Match Fancy list (web and app)
 
+### 2026-11-22 — Player profile live tracking spacing
+- **Path:** `mobile/src/app/player/[idx].tsx`, `mobile/src/ui/next-match.tsx`
+- **Change:** Use the same gap around the tracking strip. Group the matchup and status in a compact header, with a hairline above the tracked line and standing.
+- **Callers:** Mobile player profile
+
+### 2026-11-22 — Chip selection feedback
+- **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/capsule.tsx`, `mobile/src/ui/match-chip.tsx`
+- **Change:** Chip rails clip at the scroll viewport edge. Selection colors use short transitions and update instantly with Reduce Motion.
+- **Callers:** Mobile chip rails, capsule tabs and match chips
+
+### 2026-11-22 — Mobile filter and list spacing
+- **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/grid-table.tsx`, `mobile/src/ui/hot-home.tsx`
+- **Change:** Share filter bar padding and active-chip spacing across screens. Grid and Custom line use the compact filter sheet. Home's mixed market list gives each row one divider.
+- **Callers:** Home, Player props, Fixture Props, Match Fancy, Grid and Custom line
+
+### 2026-11-22 — Mobile fixture prop filters
+- **Path:** `mobile/src/app/fixture/[id]/index.tsx`, `mobile/src/ui/sheet.tsx`, `mobile/src/ui/match-fancy.tsx`
+- **Change:** Fixture Props uses a hit-rate window button beside the prop-type chips. It uses the same compact sheet as Match Fancy, with window, sort and team choices. Both filter rows use even vertical padding, and the sheet uses consistent spacing between sections. Match Fancy starts its market list directly below the filters and uses a single hairline between rows.
+- **Callers:** Mobile Fixture Props and Match Fancy
+
 ### 2026-11-21 — Directory and statistics pages
 - **Path:** `site/src/components/app/forms.tsx`, `site/src/components/app/result.tsx`, and the generated design inventory
 - **Change:** Reuses one search input and clear action across the site directories. Empty directories use EmptyState. Shared analytics results use the same hairline heading and table rhythm as fixture and player stats. Venue detail uses the same upcoming fixture card as Home and Team detail.
@@ -515,4 +535,3 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `site/src/components/app/fancy-lines.tsx`, `mobile/src/ui/fancy-row.tsx`
 - **Change:** the toss row's record line, book name and ground column truncate on the site; each is the existing `Tooltip` (shadcn) and shows the full text on hover / focus only when it is really clipped (`TruncTip`). On the app, where there is no hover, the record line wraps to two lines instead of truncating. No new component or variant.
 - **Callers:** toss rows in `FancyLines` (compact and dense) and `OverviewRow`
-

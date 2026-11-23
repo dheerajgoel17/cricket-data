@@ -11,6 +11,8 @@ import { useQuery } from "@tanstack/react-query";
 import { liveForFixture } from "@cricket/engine/live.js";
 import { fixtureBooks, sameFixture } from "@cricket/engine/lines.js";
 import { STATS } from "@cricket/engine/rules.js";
+import { modelSide } from "@cricket/engine/props-view.js";
+import { DEFAULTS, SORT_LABEL, WIN_LABEL, activeFilters, clearFilter, enoughHistory, narrow, options, order, type Screener, type Sort, type Win } from "@site/lib/screener";
 import { FORMATS } from "@cricket/engine/util.js";
 import { collectGrid } from "@site/lib/grid";
 import { matchShareText } from "@cricket/engine/share-text.js";
@@ -31,7 +33,8 @@ import { useStore } from "@/lib/use-store";
 import { BlurBar, BlurTargetView, useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { CapsuleTabs } from "@/ui/capsule";
-import { Chips } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, filterBar } from "@/ui/chips";
+import { HScroll } from "@/ui/h-scroll";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { GridFilters, GridTable, TrendList } from "@/ui/grid-table";
@@ -43,10 +46,13 @@ import { MatchHeader } from "@/ui/match-header";
 import { enter, Working } from "@/ui/motion";
 import { MatchHeaderSkeleton } from "@/ui/skeletons";
 import { PageHeader, RoundButton } from "@/ui/page-header";
+import { FilterSection, FilterSheet } from "@/ui/sheet";
 import { PropRow } from "@/ui/prop-row";
 import { abbr } from "@site/lib/format";
 import { color, font, radius, space, type, rhythm, t, icon } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
+
+const NEED = { l5: 3, l10: 5, season: 5, h2h: 3, ven: 3 };
 
 /** A match, as on the site's phone page: the match flat on the page (state, sides, kick-off with a live countdown or the score, the pair at the crease, ball by ball, the scorecard), then the page's sections as chips (Props / Match Fancy / Grid / Custom line) with the open one's stat chips and rows under them. */
 export default function FixturePage() {
@@ -67,12 +73,23 @@ export default function FixturePage() {
   useEffect(() => { setTab(tabParam); }, [id, tabParam]);
   const tab = tabs.some(([k]) => k === tabAsked) ? tabAsked! : tabs[0][0];
   const scope = useMemo(() => (f && f.fmt !== "FC" && tab === "props" ? { teams: [f.a, f.b] as [string, string], archive: archived } : undefined), [f, tab, archived]);
-  const { rows, isLoading, scoring, error, soFarOf, outOf } = useHotView(scope, undefined, archived ? doc : undefined);
+  const [filters, setFilters] = useState<Screener>(DEFAULTS);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [draft, setDraft] = useState({ win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team });
+  const { rows, isLoading, scoring, error, soFarOf, outOf, matchOf } = useHotView(scope, undefined, archived ? doc : undefined);
   // this match: the same two sides, a Test on any of its days, not the series' next game
   const here = useMemo(() => (f ? rows.filter((r) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: f.a, b: f.b, start: f.start, fmt: f.fmt })) : []), [rows, f]);
-  const [stat, setStat] = useState("all");
   const statKeys = useMemo(() => [...new Set(here.map((r) => r.stat))], [here]);
-  const shown = useMemo(() => (stat === "all" || !statKeys.includes(stat) ? here : here.filter((r) => r.stat === stat)).slice(0, MAX_ROWS), [here, stat, statKeys]);
+  const stat = statKeys.includes(filters.stat) ? filters.stat : "all";
+  const propTeams = useMemo(() => options(here, "team"), [here]);
+  const active = activeFilters(filters);
+  const shown = useMemo(() => {
+    const { win } = filters;
+    const scored = here
+      .filter((r) => (stat === "all" || r.stat === stat) && enoughHistory(r, win, NEED[win]))
+      .map((r) => ({ ...r, ...modelSide(r[win], r.prior, r.over, r.under), live: matchOf(r)?.status === "live", out: outOf(r) }));
+    return order(narrow(scored, filters), filters).slice(0, MAX_ROWS);
+  }, [here, stat, filters, matchOf, outOf]);
 
   const stats = useStore();
   const store: any = stats.data?.store;
@@ -141,24 +158,38 @@ export default function FixturePage() {
                 <View style={styles.pad}><EmptyState title="No props for first-class" body="First-class cricket is not part of the stats here, so there are no player props for this match." /></View>
               ) : tab === "props" ? (
                 <>
-                  {statKeys.length > 1 ? <CapsuleTabs label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={setStat} /> : null}
+                  <View style={filterBar.row}>
+                    <View style={filterBar.chips}>
+                      <CapsuleTabs flush label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={(stat) => setFilters((s) => ({ ...s, stat }))} />
+                    </View>
+                    <FilterButton label={WIN_LABEL[filters.win]} count={active.length} onPress={() => {
+                      setDraft({ win: filters.win, sort: filters.sort, team: filters.team });
+                      setFiltersOpen(true);
+                    }} />
+                  </View>
+                  {active.length ? (
+                    <HScroll contentContainerStyle={filterBar.active} accessibilityLabel="Active filters">
+                      {active.map((filter) => <ActiveChip key={filter.key} label={`${filter.label} ${filter.value}`} onClear={() => setFilters((s) => clearFilter(s, filter.key))} />)}
+                      <Press accessibilityRole="button" onPress={() => setFilters((s) => ({ ...s, win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team }))}><Text style={filterBar.clear}>Clear all</Text></Press>
+                    </HScroll>
+                  ) : null}
                   {isLoading ? (
                     <Working label="Scoring this match's lines…" rows={4} />
                   ) : error && !here.length ? (
                     <View style={styles.pad}><EmptyState title="Could not score lines" body="Go back and try again." /></View>
                   ) : shown.length ? (
                     <View>
-                      {shown.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.start}${r.inn}${r.quotes?.some((q: any) => q.live) ? "L" : ""}`} r={r} i={i} soFar={soFarOf(r)} out={outOf(r)} />)}
+                      {shown.map((r, i) => <PropRow key={`${r.idx}${r.stat}${r.start}${r.inn}${r.quotes?.some((q: any) => q.live) ? "L" : ""}`} r={r} i={i} soFar={soFarOf(r)} out={r.out} />)}
                       {scoring ? <Working label="Scoring more lines…" /> : null}
                     </View>
                   ) : scoring ? (
                     <Working label="Scoring this match's lines…" />
                   ) : (
-                    <View style={styles.pad}><EmptyState title="No props yet" body="No player props are priced for this match yet." /></View>
+                    <View style={styles.pad}><EmptyState title={active.length || stat !== "all" ? "No props match these filters" : here.length ? "Not enough history" : "No props yet"} body={active.length || stat !== "all" ? "Change a filter to see more props." : here.length ? "Try a different hit-rate window." : "No player props are priced for this match yet."} /></View>
                   )}
                 </>
               ) : tab === "fancy" ? (
-                <View style={[styles.pad, { paddingTop: space.stack }]}><MatchFancy key={`${f.id}`} fx={f} teams={known} fmt={fmt} doc={doc} mode="list" /></View>
+                <View style={[styles.pad, { paddingTop: 0 }]}><MatchFancy key={`${f.id}`} fx={f} teams={known} fmt={fmt} doc={doc} mode="list" /></View>
               ) : (
                 <View style={[styles.pad, { gap: space.stack, paddingTop: space.stack }]}>
                   <GridFilters stat={gStat} line={gLine} games={games} hit={tab === "trends" ? hit : undefined} onStat={setGStat} onLine={setGLine} onGames={setGames} onHit={setHit} />
@@ -196,6 +227,27 @@ export default function FixturePage() {
           <PageHeader title={f ? `${f.a} v ${f.b}` : "Match"} subtitle={f ? seriesName(f) : undefined} right={f ? <RoundButton label="Share" onPress={share}><Ionicons name="share-outline" size={icon.md} color={color.foreground} /></RoundButton> : undefined} />
         </BlurBar>
       </View>
+      {tab === "props" ? (
+        <FilterSheet visible={filtersOpen} onClose={() => setFiltersOpen(false)}
+          onClear={() => setDraft({ win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team })}
+          onApply={() => { setFilters((s) => ({ ...s, ...draft })); setFiltersOpen(false); }}
+        >
+          <FilterSection label="Hit-rate window">
+            <ChoiceRow>{(Object.keys(WIN_LABEL) as Win[]).map((win) => <ChoiceChip key={win} label={WIN_LABEL[win]} on={draft.win === win} onPress={() => setDraft((d) => ({ ...d, win }))} />)}</ChoiceRow>
+          </FilterSection>
+          <FilterSection label="Sort">
+            <ChoiceRow>{(Object.keys(SORT_LABEL) as Sort[]).map((sort) => <ChoiceChip key={sort} label={SORT_LABEL[sort]} on={draft.sort === sort} onPress={() => setDraft((d) => ({ ...d, sort }))} />)}</ChoiceRow>
+          </FilterSection>
+          {propTeams.length ? (
+            <FilterSection label="Team">
+              <ChoiceRow>
+                <ChoiceChip label="Any team" on={draft.team === "all"} onPress={() => setDraft((d) => ({ ...d, team: "all" }))} />
+                {propTeams.map((team) => <ChoiceChip key={team} label={team} on={draft.team === team} onPress={() => setDraft((d) => ({ ...d, team }))} />)}
+              </ChoiceRow>
+            </FilterSection>
+          ) : null}
+        </FilterSheet>
+      ) : null}
       <TabFade withTabBar={false} />
     </PageAtmosphere>
   );
