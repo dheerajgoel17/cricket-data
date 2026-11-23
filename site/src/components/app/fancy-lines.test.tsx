@@ -161,3 +161,14 @@ describe("toss rows", () => {
     expect(screen.getByText("Ground · 2 of 3")).toBeTruthy();
   });
 });
+
+describe("toss rows: cut-off text", () => {
+  it("a clipped record line is wrapped in a tooltip trigger carrying the full text", () => {
+    const toss: any = { id: "toss_winner:A", key: "toss_winner", scope: -1, inn: 0, label: "Toss winner", team: "Australia", kind: "toss", static: true, line: null, side: "over", over: 1.95, under: null, overBook: null, default: true, edge: null, last: [], form: ["W"], hits: 1, played: 1, vsOpp: { n: 5, won: 3, opp: "England" }, atGround: null };
+    const { container } = render(<MemoryRouter><FancyLines rows={[toss]} density="compact" onOpen={() => {}} /></MemoryRouter>);
+    const line = screen.getByText("vs England 3 of 5");
+    expect(line.getAttribute("data-slot")).toBe("tooltip-trigger");
+    expect(line.className).toContain("truncate");
+    expect(container.querySelector("button")).toBeNull();
+  });
+});

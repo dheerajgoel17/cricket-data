@@ -68,7 +68,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset }: 
             <Text style={styles.label} numberOfLines={1}>{r.label}</Text>
             {r.live ? <InPlayBadge /> : null}
           </View>
-          {subText ? <Text style={styles.sub} numberOfLines={1}>{subText}</Text> : null}
+          {subText ? <Text style={styles.sub} numberOfLines={toss ? 2 : 1}>{subText}</Text> : null}
           {toss ? (
             <View style={styles.priceRow}>
               <Text style={styles.priceLine} numberOfLines={1}>{odds(r.over)}<Text style={styles.odds}>{` ${r.default ? "Default price" : bookName(r.overBook)}`}</Text></Text>

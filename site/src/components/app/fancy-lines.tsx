@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ChartBarIcon } from "@heroicons/react/24/outline";
 import { bookName } from "@cricket/engine/lines.js";
 import { edgeTag } from "@cricket/engine/props-view.js";
@@ -10,6 +10,7 @@ import { MiniBars, MiniBarsSlot, SCAN_ROW_GRID, ScanEdge } from "./mini-bars";
 import { FormChips } from "./recent-form";
 import { ResultStamp, sideStamp } from "./result-stamp";
 import { Tick, type Standing } from "./tick";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { odds } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -74,11 +75,25 @@ const isToss = (r: any) => r?.kind === "toss";
 const wonOf = (x: { won: number; n: number }) => `${x.won} of ${x.n}`;
 export const tossSub = (r: any) => [r.vsOpp ? `vs ${r.vsOpp.opp} ${wonOf(r.vsOpp)}` : "", r.atGround ? `At ground ${wonOf(r.atGround)}` : ""].filter(Boolean).join(" · ");
 
+/** A line of text that truncates; hovering or focusing it shows the full text, and only when it really is cut off. */
+function TruncTip({ text, className }: { text: string; className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <TooltipProvider delayDuration={200}>
+      <Tooltip open={open} onOpenChange={(o) => setOpen(o && !!ref.current && ref.current.scrollWidth > ref.current.clientWidth)}>
+        <TooltipTrigger asChild><span ref={ref} className={cn("truncate", className)}>{text}</span></TooltipTrigger>
+        <TooltipContent>{text}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 function TossMeta({ r }: { r: any }) {
   return (
     <span className="flex min-w-0 items-center gap-x-tight text-callout font-sans font-emphasis leading-snug text-foreground">
       <span className="shrink-0 font-condensed tabular-nums">{odds(r.over)}</span>
-      <span className="min-w-0 truncate font-copy text-muted-foreground">{r.default ? "Default price" : bookName(r.overBook)}</span>
+      <TruncTip text={r.default ? "Default price" : bookName(r.overBook)} className="min-w-0 font-copy text-muted-foreground" />
     </span>
   );
 }
@@ -95,7 +110,7 @@ export function FancyHitRate({ r }: { r: any }) {
 }
 
 export function FancyGround({ r }: { r: any }) {
-  if (isToss(r)) return r.vsOpp || r.atGround ? <span className="grid text-caption text-muted-foreground">{r.vsOpp ? <span className="truncate">{`vs ${r.vsOpp.opp} · ${wonOf(r.vsOpp)}`}</span> : null}{r.atGround ? <span className="truncate">{`Ground · ${wonOf(r.atGround)}`}</span> : null}</span> : null;
+  if (isToss(r)) return r.vsOpp || r.atGround ? <span className="grid min-w-0 text-caption text-muted-foreground">{r.vsOpp ? <TruncTip text={`vs ${r.vsOpp.opp} · ${wonOf(r.vsOpp)}`} /> : null}{r.atGround ? <TruncTip text={`Ground · ${wonOf(r.atGround)}`} /> : null}</span> : null;
   const at = r.at;
   if (!at?.n) return null;
   const side = at.side === "under" ? "Under" : "Over";
@@ -120,7 +135,7 @@ export function CompactFancyItem({ r, onOpen, active, sub, standing, inset }: {
           <span className="min-w-0 truncate text-body font-emphasis leading-snug">{r.label}</span>
           {r.live ? <InPlayBadge /> : null}
         </span>
-        {(sub ?? (toss ? tossSub(r) : "")) ? <span className="truncate text-footnote text-muted-foreground">{sub ?? tossSub(r)}</span> : null}
+        {toss && !sub && tossSub(r) ? <TruncTip text={tossSub(r)} className="text-footnote text-muted-foreground" /> : sub ? <span className="truncate text-footnote text-muted-foreground">{sub}</span> : null}
         {toss ? <TossMeta r={r} /> : !voided ? <FancyLineMeta r={r} standing={mark} /> : null}
       </span>
       {voided || toss ? <span className="w-11 shrink-0" aria-hidden /> : <ScanEdge edge={r.edge} />}
