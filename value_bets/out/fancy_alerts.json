@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-23T05:38:09Z",
+ "generated_at_utc": "2026-11-23T06:33:31Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -110,15 +110,15 @@
    "team": null,
    "inn": 0,
    "side": "under",
-   "line": 37.5,
+   "line": 36.5,
    "best_odds": 1.8,
-   "best_source": "Dafabet",
-   "hits": 30,
+   "best_source": "bet365",
+   "hits": 29,
    "played": 40,
    "window": 20,
-   "chance": 0.703,
-   "edge": 0.2653,
-   "edge_pct": 26.5,
+   "chance": 0.6829,
+   "edge": 0.2293,
+   "edge_pct": 22.9,
    "bat_first": false
   },
   {
