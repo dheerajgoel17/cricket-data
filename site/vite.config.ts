@@ -35,6 +35,7 @@ function dataVersion(): Plugin {
     apply: "build",
     buildStart() { manifest = dataManifest(path.resolve(import.meta.dirname, "public/data")); },
     transformIndexHtml: { order: "post", handler: (html) => html.replace("</head>", `${headScript(manifest)}</head>`) },
+    generateBundle() { this.emitFile({ type: "asset", fileName: "data-manifest.json", source: JSON.stringify(manifest) }); }, // the Cloudflare Worker checks a ?v= URL against it (cloudflare/worker.js)
   };
 }
 
