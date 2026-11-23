@@ -1,3 +1,4 @@
+from value_bets import fancy
 from value_bets.fancy import _fmt, match_fancy
 
 
@@ -43,3 +44,21 @@ def test_fmt_from_the_books_league_so_a_t20_cannot_price_a_test():
                             q("Total Match Runs", label="Under", handicap="320.5", odds_dec=1.83)]}]}
     out = match_fancy(raw)
     assert out[0]["fmt"] == "T20" and out[0]["competition"] == "T20 Internationals"
+
+
+def test_toss_names_are_the_plain_market_only():
+    for ok in ("Who Will Win The Toss?", "To Win the Toss", "Who will win the toss? (Toss is Boss)", "Toss Winner"):
+        assert fancy.is_toss_name(ok), ok
+    for no in ("Which team wins the coin toss and the match", "Tosscast", "India To Win The Toss & India To Win The Match",
+               "Toss winner and decision", "Toss decision", None, ""):
+        assert not fancy.is_toss_name(no), no
+
+
+def test_toss_fancy_needs_both_sides_and_keeps_the_books_prices():
+    kw = dict(match="Wellington vs Canterbury", start_utc="2026-10-30T21:00:00Z", fmt=None, competition=None, source="bk")
+    rows = fancy.toss_fancy("Wellington", "Canterbury", [("canterbury", 1.92), ("Wellington", 1.88)], **kw)
+    assert [(r["team"], r["over"], r["line"], r["key"], r["scope"]) for r in rows] == [("Wellington", 1.88, 0, "toss_winner", "team"), ("Canterbury", 1.92, 0, "toss_winner", "team")]
+    assert all("under" not in r for r in rows)
+    assert fancy.toss_fancy("Wellington", "Canterbury", [("Canterbury", 1.92)], **kw) == []  # one side is not a market
+    assert fancy.toss_fancy("Wellington", "Canterbury", [("Canterbury", 1.92), ("Otago", 1.9)], **kw) == []
+    assert fancy.toss_fancy("Wellington", "Canterbury", [("Canterbury", 1.0), ("Wellington", 1.9)], **kw) == []

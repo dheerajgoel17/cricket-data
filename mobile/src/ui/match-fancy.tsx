@@ -37,6 +37,7 @@ import { LiveMarketRow } from "@/ui/live-market-row";
 import { TeamSpot } from "@/ui/live-spot";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { LineStepper } from "@/ui/line-stepper";
+import { TossWinner, tossFor } from "@/ui/toss-winner";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
@@ -74,7 +75,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
 
   const booked = (k: string, teamName: string | null, inn = 0) => k !== "top_batter" && fancyLines(doc, fxInfo, k, teamName, inn).length > 0;
   const anyBooked = (list: [string, string][], teamName: string | null) => list.some(([k]) => (FANCY_INNS as number[]).some((inn) => booked(k, teamName, inn)));
-  const scopes = [["-1", "Match", (MATCH_KEYS as [string, string][]).some(([k]) => booked(k, null))] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS as [string, string][], name)] as const)].filter(([, , on]) => on);
+  const scopes = [["-1", "Match", true] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS as [string, string][], name)] as const)].filter(([, , on]) => on);
   const scope = scopes.some(([v]) => v === sc) ? Number(sc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
   const keysFor = (scNum: number) => {
@@ -233,9 +234,10 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
           </View>
       </Sheet>
 
+      {mode === "list" && scope < 0 ? <TossWinner market={tossFor(doc, fxInfo)} /> : null}
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
     <>
-      {mode === "list" && overview.length === 0 && liveScored.length === 0 ? (
+      {mode === "list" && scope >= 0 && overview.length === 0 && liveScored.length === 0 ? (
         <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />
       ) : null}
       {mode === "list" && (overview.length > 0 || liveScored.length > 0) ? (

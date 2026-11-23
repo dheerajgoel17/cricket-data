@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-23 — Toss winner row
+- **Path:** `site/src/components/app/toss-winner.tsx`, `mobile/src/ui/toss-winner.tsx`
+- **Change:** Match Fancy's Match scope lists the toss-winner market (two sides, decimal prices, default 1.95 flagged in the heading) with the existing Item rows, TeamBadge and tokens; no new variant. The Match Fancy tab shows on any unfinished fixture.
+- **Callers:** Match Fancy list (web and app)
+
 ### 2026-11-21 — Directory and statistics pages
 - **Path:** `site/src/components/app/forms.tsx`, `site/src/components/app/result.tsx`, and the generated design inventory
 - **Change:** Reuses one search input and clear action across the site directories. Empty directories use EmptyState. Shared analytics results use the same hairline heading and table rhythm as fixture and player stats. Venue detail uses the same upcoming fixture card as Home and Team detail.

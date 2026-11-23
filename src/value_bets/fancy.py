@@ -50,6 +50,38 @@ def scope_test_session_fancy(fancy: list[dict] | None) -> tuple[list[dict], int]
     return out, n
 
 
+# Toss winner: a two-way market on the sides, not an over/under. One fancy row per side (scope "team", ``team`` the side, ``line`` 0, ``over`` the side's decimal price, no ``under``),
+# so the archive, the stale-line hold, the name map and the guard handle it like any other fancy line. The site reads both rows of a source as one market (engine ``toss.js``);
+# a match no book lists shows both sides at the default there, never here. A coin flip carries no history edge, so nothing scores it.
+TOSS_KEY = "toss_winner"
+TOSS_NAME = re.compile(r"^\s*(?:who\s+(?:will\s+)?wins?\s+(?:the\s+)?(?:coin\s+)?toss|to\s+win\s+(?:the\s+)?(?:coin\s+)?toss|toss\s+winner)\b", re.I)
+TOSS_COMBO = re.compile(r"&|\band\b|match|tosscast|decision|elect|bat|field", re.I)
+
+
+def is_toss_name(name: str | None) -> bool:
+    """A plain "who wins the toss" market name; "toss and match", "Tosscast", the toss decision and any combo are not."""
+    n = (name or "").strip()
+    return bool(TOSS_NAME.match(n)) and not TOSS_COMBO.search(re.sub(r"\(.*?\)", "", n))
+
+
+def _side_key(n: str | None) -> str:
+    return re.sub(r"[^a-z0-9]+", " ", (n or "").lower()).strip()
+
+
+def toss_fancy(home: str, away: str, named: list[tuple[str, float]], *, match: str, start_utc, fmt, competition, source: str) -> list[dict]:
+    """The two toss-winner rows of one book's market, from its named outcomes ``[(side, decimal price)]``, or [] unless both sides are priced."""
+    sides = {_side_key(home): home, _side_key(away): away}
+    px: dict[str, float] = {}
+    for n, p in named:
+        s = sides.get(_side_key(n))
+        if s and p and p > 1:
+            px[s] = round(float(p), 3)
+    if len(px) != 2 or home == away:
+        return []
+    return [{"match": match, "home": home, "away": away, "start_utc": start_utc, "fmt": fmt, "competition": competition, "key": TOSS_KEY, "scope": "team",
+             "team": s, "line": 0, "over": px[s], "source": source, "kind": "bookmaker"} for s in (home, away)]
+
+
 def _fmt(m: dict) -> str | None:
     """Format from the book's own league name. T10 is not T20; 60-over is not ODI; a T20 in a Test series cannot price the Test."""
     t = f"{m.get('league') or ''} {m.get('home') or ''} {m.get('away') or ''}".lower()
