@@ -61,7 +61,11 @@ export const TEAM_TOTAL_MARKETS = {
 
 /** Session / first-N-overs keys the books quote (`overs_6`, `overs_10`, …). `first_over` is the match's opening over. */
 export const OVERS_KEY = /^overs_(\d+)$/;
-export const oversN = (key) => (key === "first_over" ? 1 : +(OVERS_KEY.exec(key) || [])[1] || 0);
+/** A side line that only stands if that side bats first (the book voids it once the side bowls first) is its own market: the key plus this suffix (`team_total_runs_bf`), never mixed with the same line that stands either way. */
+export const BF_SUFFIX = "_bf";
+export const isBf = (key) => String(key || "").endsWith(BF_SUFFIX);
+export const baseKey = (key) => (isBf(key) ? String(key).slice(0, -BF_SUFFIX.length) : key);
+export const oversN = (key) => { const k = baseKey(key); return k === "first_over" ? 1 : +(OVERS_KEY.exec(k) || [])[1] || 0; };
 export const oversLabel = (n) => (n === 1 ? "1st over" : `${n} overs`);
 
 /**

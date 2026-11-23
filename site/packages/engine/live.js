@@ -1195,13 +1195,14 @@ function sessionSoFar(inn, n) {
 
 function oversNof(key) {
   if (key === "first_over") return 1;
-  const m = /^overs_(\d+)$/.exec(key || "");
+  const m = /^overs_(\d+)(?:_bf)?$/.exec(key || "");
   return m ? +m[1] : 0;
 }
 
 /** So-far for a fancy market. `inn` 1 or 2 is that side's own first or second innings (a Test); 0 sums every innings they have batted. */
 export function liveMarket(match, key, team, inn = 0) {
   if (!match) return null;
+  key = String(key).replace(/_bf$/, ""); // a bat-first line is the same count as the plain one
   const all = match.innings || [];
   const src = team ? all.filter((i) => teamKey(i.team) === teamKey(team)) : all;
   const rows = inn > 0 ? src.slice(inn - 1, inn) : src;
@@ -1291,7 +1292,7 @@ function battingFirst(match) {
  */
 export function fancyStanding(match, row) {
   if (!match || !row?.key) return null;
-  const batFirst = !!(row.batFirst ?? row.bat_first);
+  const batFirst = !!(row.batFirst ?? row.bat_first) || /_bf$/.test(row.key);
   if (batFirst && row.team && !(row.inn > 0)) {
     const first = battingFirst(match);
     if (first && teamKey(first) !== teamKey(row.team)) return { v: null, state: "void", verdict: null };
