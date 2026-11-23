@@ -1,4 +1,61 @@
 {
- "generated_at_ist": "2026-11-23 19:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-23 20:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|Maharashtra|Tripura|2026-11-24",
+   "match": "Maharashtra vs Tripura",
+   "start_utc": "2026-11-24T05:30:00Z",
+   "start_ist": "2026-11-24 11:00 IST",
+   "format": "T20",
+   "gender": "male",
+   "market_type": "batter_milestone",
+   "market": "Ruturaj Gaikwad To Score 50",
+   "team_scope": "",
+   "selection": "Ruturaj Gaikwad 50+ no",
+   "player_matched_as": "Ruturaj Gaikwad",
+   "player_id": "45a43fe2",
+   "player_team": "Maharashtra",
+   "stat": "runs",
+   "inn": 0,
+   "line": 49.5,
+   "side": "under",
+   "best_odds": 1.4,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 1.4,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0779,
+   "implied_prob": 0.7143,
+   "fair_odds": 1.316,
+   "fair_prob": 0.7599,
+   "model_prob": 0.8366,
+   "market_prob": 0.6971,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0638,
+   "edge_pct": 6.38,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 3,
+   "confidence": "medium",
+   "why": "Model 84% vs market 70% for 50+ runs; form 31.2 runs/inn recency-weighted T20 (n_eff 29.1; last 5: 16, 15, 13, 42, 6), bats in 95% of games played; at Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh: 1 inns avg 1.0; vs Tripura: 1 inns avg 13.0; context adj: team H2H context -3%",
+   "notes": "3 market source(s) for fair price; model 0.837 vs market 0.697; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "model_detail": {
+    "n_eff": 29.1,
+    "expected": 27.31,
+    "nb_alpha": 1.213,
+    "p_bats_or_bowls": 0.951,
+    "venue_matched": "maharaja yadavindra singh international cricket stadium",
+    "context_terms": [
+     "p_bat",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null,
+   "alert_id": "c650305f190463be",
+   "alert_key": "male|Maharashtra|Tripura|2026-11-24|batter_milestone||Ruturaj Gaikwad 50+ no|49.5|under",
+   "alerted_at_ist": "2026-11-23 20:06 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
