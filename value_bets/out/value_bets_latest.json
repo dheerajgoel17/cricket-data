@@ -1,73 +1,73 @@
 {
- "generated_at_utc": "2026-11-23T21:30:31Z",
- "generated_at_ist": "2026-11-24 03:00 IST",
- "runtime_secs": 299.3,
+ "generated_at_utc": "2026-11-23T22:30:41Z",
+ "generated_at_ist": "2026-11-24 04:00 IST",
+ "runtime_secs": 390.0,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-23",
-  "commit": "7754bc5f66"
+  "commit": "ceefec03c0"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1771,
-   "secs": 0.3
+   "rows": 1960,
+   "secs": 1.7
   },
   "feedg": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}",
-   "secs": 2.0
+   "secs": 1.7
   },
   "smarkets": {
    "status": "ok",
    "rows": 489,
-   "secs": 2.8
+   "secs": 2.5
   },
   "feedk": {
    "status": "ok",
    "rows": 230,
-   "secs": 16.5,
+   "secs": 15.4,
    "events": 6
   },
   "feedl": {
    "status": "ok",
-   "rows": 612,
-   "secs": 21.0,
+   "rows": 634,
+   "secs": 20.5,
    "events": 37
   },
   "feedf": {
    "status": "ok",
    "rows": 448,
-   "secs": 85.1,
+   "secs": 89.5,
    "events": 15
-  },
-  "feedj": {
-   "status": "ok",
-   "rows": 436,
-   "secs": 85.6,
-   "events": 11
-  },
-  "feede": {
-   "status": "ok",
-   "rows": 762,
-   "secs": 93.1,
-   "events": 35
   },
   "feedh": {
    "status": "ok",
    "rows": 1875,
-   "secs": 97.1,
+   "secs": 90.5,
    "events": 74
+  },
+  "feede": {
+   "status": "ok",
+   "rows": 762,
+   "secs": 92.1,
+   "events": 35
+  },
+  "feedj": {
+   "status": "ok",
+   "rows": 758,
+   "secs": 105.4,
+   "events": 19
   },
   "feedi": {
    "status": "ok",
-   "rows": 2225,
-   "secs": 180.0,
+   "rows": 2450,
+   "secs": 180.7,
    "stopped": "time budget",
-   "events": 38
+   "events": 43
   }
  },
- "snapshot": "odds_20261123T213031Z.jsonl.gz",
+ "snapshot": "odds_20261123T223041Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -150,109 +150,109 @@
  },
  "stats": {
   "events_in_window": 53,
-  "rows_in_window": 8678,
-  "selections_with_model": 3203,
-  "selections_with_market_fair": 4395,
-  "markets_in_window": 569,
+  "rows_in_window": 9436,
+  "selections_with_model": 3452,
+  "selections_with_market_fair": 4748,
+  "markets_in_window": 608,
   "value_bets": 6,
   "dropped_by_filter": {
-   "odds_range": 131,
-   "model_market_gap": 1736,
-   "loose_name_match": 6,
+   "odds_range": 152,
+   "model_market_gap": 1853,
+   "loose_name_match": 7,
    "policy_min_edge": 4,
-   "small_sample": 10,
-   "policy_max_odds": 3,
-   "model_only_no_market": 233,
-   "model_disagrees": 4,
+   "policy_max_odds": 6,
+   "model_only_no_market": 252,
+   "model_disagrees": 7,
    "liquidity": 1,
    "market_disabled": 4,
-   "top_wide_book": 4,
-   "suspect_edge": 1,
+   "top_wide_book": 5,
+   "suspect_edge": 3,
+   "small_sample": 18,
    "rarely_selected": 3,
    "top_thin_market": 1
   },
-  "suspect_edges": 1,
+  "suspect_edges": 3,
   "innings_milestones_unmodelled": 170,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 617,
-    "mean_model_p": 0.049,
-    "mean_market_p": 0.07,
-    "mean_logit_diff_model_minus_market": 0.019,
-    "mean_abs_logit_diff": 0.857,
-    "corr": 0.725
+    "n_prices": 655,
+    "mean_model_p": 0.05,
+    "mean_market_p": 0.069,
+    "mean_logit_diff_model_minus_market": 0.029,
+    "mean_abs_logit_diff": 0.846,
+    "corr": 0.734
    },
    "top_bowler_team": {
-    "n_prices": 408,
-    "mean_model_p": 0.11,
-    "mean_market_p": 0.109,
-    "mean_logit_diff_model_minus_market": -0.012,
-    "mean_abs_logit_diff": 0.372,
-    "corr": 0.594
+    "n_prices": 462,
+    "mean_model_p": 0.114,
+    "mean_market_p": 0.108,
+    "mean_logit_diff_model_minus_market": 0.024,
+    "mean_abs_logit_diff": 0.392,
+    "corr": 0.568
    },
    "batter_runs": {
-    "n_prices": 1114,
+    "n_prices": 1220,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
     "mean_abs_logit_diff": 0.605,
-    "corr": 0.099
+    "corr": 0.094
    },
    "batter_sixes": {
-    "n_prices": 174,
+    "n_prices": 212,
     "mean_model_p": 0.5,
-    "mean_market_p": 0.502,
-    "mean_logit_diff_model_minus_market": -0.009,
-    "mean_abs_logit_diff": 0.332,
-    "corr": 0.896
+    "mean_market_p": 0.501,
+    "mean_logit_diff_model_minus_market": -0.007,
+    "mean_abs_logit_diff": 0.377,
+    "corr": 0.826
    },
    "batter_fours": {
-    "n_prices": 172,
+    "n_prices": 212,
     "mean_model_p": 0.499,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": -0.006,
-    "mean_abs_logit_diff": 0.308,
-    "corr": 0.483
+    "mean_logit_diff_model_minus_market": -0.005,
+    "mean_abs_logit_diff": 0.347,
+    "corr": 0.399
    },
    "bowler_wickets": {
-    "n_prices": 108,
+    "n_prices": 136,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.309,
-    "corr": 0.949
+    "mean_abs_logit_diff": 0.343,
+    "corr": 0.914
    },
    "batter_milestone": {
-    "n_prices": 1211,
-    "mean_model_p": 0.444,
-    "mean_market_p": 0.461,
-    "mean_logit_diff_model_minus_market": -0.147,
-    "mean_abs_logit_diff": 0.835,
-    "corr": 0.976
+    "n_prices": 1353,
+    "mean_model_p": 0.45,
+    "mean_market_p": 0.468,
+    "mean_logit_diff_model_minus_market": -0.145,
+    "mean_abs_logit_diff": 0.837,
+    "corr": 0.974
    },
    "bowler_milestone": {
-    "n_prices": 119,
-    "mean_model_p": 0.193,
-    "mean_market_p": 0.215,
-    "mean_logit_diff_model_minus_market": -0.253,
-    "mean_abs_logit_diff": 0.406,
-    "corr": 0.984
+    "n_prices": 159,
+    "mean_model_p": 0.275,
+    "mean_market_p": 0.314,
+    "mean_logit_diff_model_minus_market": -0.303,
+    "mean_abs_logit_diff": 0.417,
+    "corr": 0.981
    },
    "top_batter_match": {
     "n_prices": 824,
-    "mean_model_p": 0.019,
+    "mean_model_p": 0.018,
     "mean_market_p": 0.03,
-    "mean_logit_diff_model_minus_market": -0.163,
-    "mean_abs_logit_diff": 1.044,
-    "corr": 0.507
+    "mean_logit_diff_model_minus_market": -0.164,
+    "mean_abs_logit_diff": 1.04,
+    "corr": 0.51
    },
    "top_bowler_match": {
-    "n_prices": 632,
-    "mean_model_p": 0.031,
-    "mean_market_p": 0.036,
-    "mean_logit_diff_model_minus_market": -0.006,
-    "mean_abs_logit_diff": 1.579,
-    "corr": 0.163
+    "n_prices": 648,
+    "mean_model_p": 0.033,
+    "mean_market_p": 0.038,
+    "mean_logit_diff_model_minus_market": -0.015,
+    "mean_abs_logit_diff": 1.544,
+    "corr": 0.174
    }
   }
  },
@@ -411,6 +411,7 @@
     "feede_lb",
     "feedf_p",
     "feedh_d",
+    "feedi_d",
     "smarkets"
    ]
   },
@@ -427,6 +428,7 @@
     "feede_lb",
     "feedf_p",
     "feedh_d",
+    "feedi_d",
     "feedj_d",
     "feedl",
     "smarkets"
@@ -463,6 +465,7 @@
     "feede_lb",
     "feedf_p",
     "feedh_d",
+    "feedi_d",
     "feedj_d",
     "smarkets"
    ]
@@ -566,6 +569,7 @@
     "feede_lb",
     "feedf_p",
     "feedh_d",
+    "feedj_d",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -644,6 +648,7 @@
     "feedf_p",
     "feedh_d",
     "feedi_d",
+    "feedj_d",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -661,6 +666,7 @@
     "feede_lb",
     "feedf_p",
     "feedh_d",
+    "feedj_d",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -692,6 +698,7 @@
     "feede_lb",
     "feedf_p",
     "feedh_d",
+    "feedj_d",
     "smarkets"
    ]
   },
@@ -752,6 +759,7 @@
     "feedf_p",
     "feedh_d",
     "feedi_d",
+    "feedj_d",
     "feedk_leoal",
     "feedl",
     "moviodds_bet365",
@@ -889,6 +897,7 @@
    "sources": [
     "feede_lb",
     "feedi_d",
+    "feedj_d",
     "feedk_leoal",
     "moviodds_bet365",
     "smarkets"
@@ -1066,18 +1075,18 @@
    "back_liquidity": null,
    "overround": 0.0779,
    "implied_prob": 0.7143,
-   "fair_odds": 1.316,
-   "fair_prob": 0.7599,
+   "fair_odds": 1.325,
+   "fair_prob": 0.7549,
    "model_prob": 0.8366,
-   "market_prob": 0.6971,
+   "market_prob": 0.688,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0638,
-   "edge_pct": 6.38,
+   "edge": 0.0568,
+   "edge_pct": 5.68,
    "kelly_quarter_stake_pct": 2.0,
-   "n_sources": 3,
+   "n_sources": 4,
    "confidence": "medium",
-   "why": "Model 84% vs market 70% for 50+ runs; form 31.2 runs/inn recency-weighted T20 (n_eff 29.1; last 5: 16, 15, 13, 42, 6), bats in 95% of games played; at Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh: 1 inns avg 1.0; vs Tripura: 1 inns avg 13.0; context adj: team H2H context -3%",
-   "notes": "3 market source(s) for fair price; model 0.837 vs market 0.697; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "why": "Model 84% vs market 69% for 50+ runs; form 31.2 runs/inn recency-weighted T20 (n_eff 29.1; last 5: 16, 15, 13, 42, 6), bats in 95% of games played; at Maharaja Yadavindra Singh International Cricket Stadium, Mullanpur, New Chandigarh: 1 inns avg 1.0; vs Tripura: 1 inns avg 13.0; context adj: team H2H context -3%",
+   "notes": "4 market source(s) for fair price; model 0.837 vs market 0.688; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
    "model_detail": {
     "n_eff": 29.1,
     "expected": 27.31,
@@ -1274,47 +1283,45 @@
    "start_ist": "2026-11-24 20:00 IST",
    "format": "T20",
    "gender": "male",
-   "market_type": "batter_fours",
-   "market": "G9182 batter_fours",
+   "market_type": "batter_sixes",
+   "market": "G9181 batter_sixes",
    "team_scope": "",
-   "selection": "Nicholas Pooran under 1.5",
-   "player_matched_as": "Nicholas Pooran",
-   "player_id": "3241e3fd",
+   "selection": "Kusal Perera under 0.5",
+   "player_matched_as": "Kusal Perera",
+   "player_id": "f21043a5",
    "player_team": "MI Emirates",
-   "stat": "fours",
+   "stat": "sixes",
    "inn": 0,
-   "line": 1.5,
+   "line": 0.5,
    "side": "under",
-   "best_odds": 2.1,
+   "best_odds": 2.2,
    "best_source": "feedi_d",
-   "effective_odds_after_commission": 2.1,
+   "effective_odds_after_commission": 2.2,
    "lay_odds": null,
    "back_liquidity": null,
-   "overround": 0.0761,
-   "implied_prob": 0.4762,
-   "fair_odds": 1.995,
-   "fair_prob": 0.5012,
-   "model_prob": 0.5473,
-   "market_prob": 0.4634,
+   "overround": 0.0737,
+   "implied_prob": 0.4545,
+   "fair_odds": 1.991,
+   "fair_prob": 0.5021,
+   "model_prob": 0.576,
+   "market_prob": 0.4417,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.0524,
-   "edge_pct": 5.24,
-   "kelly_quarter_stake_pct": 1.19,
+   "edge": 0.1047,
+   "edge_pct": 10.47,
+   "kelly_quarter_stake_pct": 2.0,
    "n_sources": 2,
    "confidence": "medium",
-   "why": "Model 55% vs market 46% for under 1.5 fours; form 1.9 fours/inn recency-weighted T20 (n_eff 119.8; last 5: 3, 0, 2, 2, 3), bats in 97% of games played; at Dubai International Cricket Stadium, Dubai: 26 inns avg 1.8; vs Gulf Giants: 8 inns avg 2.9; context adj: at this venue -1%, team H2H context -4%",
-   "notes": "2 market source(s) for fair price; model 0.547 vs market 0.463; assumes bet void if player doesn't bat/bowl - check book rules",
+   "why": "Model 58% vs market 44% for under 0.5 sixes; form 0.7 sixes/inn recency-weighted T20 (n_eff 51.3; last 5: 2, 0, 0, 1, 0), bats in 92% of games played; at Dubai International Cricket Stadium, Dubai: 12 inns avg 0.4; vs Gulf Giants: 4 inns avg 0.0; context adj: venue environment -3%",
+   "notes": "2 market source(s) for fair price; model 0.576 vs market 0.442; assumes bet void if player doesn't bat/bowl - check book rules",
    "model_detail": {
-    "n_eff": 119.8,
-    "expected": 2.03,
-    "nb_alpha": 0.958,
-    "p_bats_or_bowls": 0.967,
+    "n_eff": 51.3,
+    "expected": 0.87,
+    "nb_alpha": 1.536,
+    "p_bats_or_bowls": 0.924,
     "venue_matched": "dubai international cricket stadium",
     "context_terms": [
-     "p_bat",
-     "env_fours",
-     "ven_fours",
-     "h2h_runs"
+     "env_sixes",
+     "p_bat"
     ]
    },
    "rain_risk": false,
@@ -1399,6 +1406,36 @@
    "edge_pct": 48.05,
    "fair_basis": "blend 0.35 model + 0.65 market",
    "market_fair_from": null
+  },
+  {
+   "match": "Dubai Capitals vs Desert Vipers",
+   "start_ist": "2026-11-25 20:00 IST",
+   "market_type": "top_batter_match",
+   "market": "G2808",
+   "selection": "Babar Azam",
+   "odds": 8.5,
+   "source": "feedi_d",
+   "fair_prob": 0.1558,
+   "model_prob": null,
+   "market_prob": 0.1558,
+   "edge_pct": 32.41,
+   "fair_basis": "market consensus only (no model)",
+   "market_fair_from": null
+  },
+  {
+   "match": "Dubai Capitals vs Desert Vipers",
+   "start_ist": "2026-11-25 20:00 IST",
+   "market_type": "top_bowler_match",
+   "market": "G1007",
+   "selection": "Shadab Khan",
+   "odds": 13.0,
+   "source": "feedi_d",
+   "fair_prob": 0.1043,
+   "model_prob": null,
+   "market_prob": 0.1043,
+   "edge_pct": 35.57,
+   "fair_basis": "market consensus only (no model)",
+   "market_fair_from": null
   }
  ],
  "unmatched_teams": [
@@ -1418,6 +1455,7 @@
  ],
  "unmatched_players_in_window": [
   "A Ahmad",
+  "A Ahmadzai",
   "A Athanaze",
   "A Harrison",
   "AGC Vimukthi",
@@ -1436,9 +1474,11 @@
   "Alex Falao",
   "Ali Aqil,Ahsan",
   "Alick Athanaze",
+  "Altamish Ashraf",
   "Aluth Gedara Chethana Vimukthi",
   "Alvin Chiradza",
   "Alzarri Joseph",
+  "Aman Rao",
   "Aman Rao Perala",
   "Amith Sathvik V P",
   "Amith Sathvik Virumandi Prabhakaran",
@@ -1469,6 +1509,7 @@
   "B Berry",
   "B Leishman",
   "B Sachin",
+  "B Tahir",
   "Babar Azam",
   "Balasubramaniam Sachin",
   "Banton",
@@ -1514,6 +1555,7 @@
   "Danish Malewar",
   "Danveer Ajay Singh",
   "DanveerAjay Singh",
+  "Darwish Rasooli",
   "Dasun Shanaka",
   "David Moody",
   "Davis Murwendo",
@@ -1552,6 +1594,7 @@
   "Grace Parsons",
   "Gudakesh Motie",
   "Gurbaz",
+  "H Tector",
   "HMD Samarawickrama",
   "HR Cooper",
   "HTRY Thornton",
@@ -1571,6 +1614,7 @@
   "Henry Hunt",
   "Henry Thornton",
   "Hitesh Walunj",
+  "I Ahmed",
   "I Khan",
   "I Mir",
   "I Noble",
@@ -1609,14 +1653,7 @@
   "K Nuthyangana",
   "K Pelle",
   "Karim Janat",
-  "Kartik Chadha",
-  "Kartik Sharma",
-  "Kate Pelle",
-  "Katene Clarke",
-  "Kaushani Nuthyangana",
-  "Kaushini Nuthyangana",
-  "Kavisha Dilhari",
-  "Kawalpreet Singh"
+  "Kartik Chadha"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1741,32 +1778,33 @@
   }
  },
  "log": [
-  "[03:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[03:00 IST] history: 24225 matches, last 2026-11-23, players 437151",
-  "[03:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1771, 'secs': 0.3}",
-  "[03:03 IST] source feedg: {'status': 'error', 'reason': 'HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}', 'secs': 2.0}",
-  "[03:03 IST] source smarkets: {'status': 'ok', 'rows': 489, 'secs': 2.8}",
-  "[03:03 IST] source feedk: {'status': 'ok', 'rows': 230, 'secs': 16.5, 'events': 6}",
-  "[03:03 IST] source feedl: {'status': 'ok', 'rows': 612, 'secs': 21.0, 'events': 37}",
-  "[03:03 IST] source feedf: {'status': 'ok', 'rows': 448, 'secs': 85.1, 'events': 15}",
-  "[03:03 IST] source feedj: {'status': 'ok', 'rows': 436, 'secs': 85.6, 'events': 11}",
-  "[03:03 IST] source feede: {'status': 'ok', 'rows': 762, 'secs': 93.1, 'events': 35}",
-  "[03:03 IST] source feedh: {'status': 'ok', 'rows': 1875, 'secs': 97.1, 'events': 74}",
-  "[03:03 IST] source feedi: {'status': 'ok', 'rows': 2225, 'secs': 180.0, 'stopped': 'time budget', 'events': 38}",
-  "[03:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[03:03 IST] 87 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[03:03 IST] 238 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[03:03 IST] 170 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[03:03 IST] name map: India A vs United Arab Emirates VI -> India A vs United Arab Emirates (2026-11-24T06:00:00Z)",
-  "[03:03 IST] name map: Zimbabwe XI vs Ireland A -> Zimbabwe A vs Ireland A (2026-11-25T07:30:00Z)",
-  "[03:03 IST] name map: Jammu & Kashmir vs Railways -> Jammu and Kashmir vs Railways (2026-11-24T07:30:00Z)",
-  "[03:03 IST] name map: Bihar vs Haryana CA -> Bihar vs Haryana (2026-11-24T10:30:00Z)",
-  "[03:03 IST] name map: Jharkhand CT vs Baroda -> Jharkhand vs Baroda (2026-11-24T10:30:00Z)",
-  "[03:03 IST] held back 22 player and 38 fancy lines first priced after their match started (not pre-match prices)",
-  "[03:03 IST] book lines: 592 player lines from 8 source(s)",
-  "[03:03 IST] 166 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[03:05 IST] weather: forecasts for 20 events, 0 failed",
-  "[03:05 IST] prop model: 1735 prop selections modelled, 449 milestone ladder prices anchored to O/U",
-  "[03:05 IST] ledger upsert model: {'upserted': 6, 'skipped_settled': 0}"
+  "[04:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[04:00 IST] history: 24225 matches, last 2026-11-23, players 437151",
+  "[04:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1960, 'secs': 1.7}",
+  "[04:03 IST] source feedg: {'status': 'error', 'reason': 'HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}', 'secs': 1.7}",
+  "[04:03 IST] source smarkets: {'status': 'ok', 'rows': 489, 'secs': 2.5}",
+  "[04:03 IST] source feedk: {'status': 'ok', 'rows': 230, 'secs': 15.4, 'events': 6}",
+  "[04:03 IST] source feedl: {'status': 'ok', 'rows': 634, 'secs': 20.5, 'events': 37}",
+  "[04:03 IST] source feedf: {'status': 'ok', 'rows': 448, 'secs': 89.5, 'events': 15}",
+  "[04:03 IST] source feedh: {'status': 'ok', 'rows': 1875, 'secs': 90.5, 'events': 74}",
+  "[04:03 IST] source feede: {'status': 'ok', 'rows': 762, 'secs': 92.1, 'events': 35}",
+  "[04:03 IST] source feedj: {'status': 'ok', 'rows': 758, 'secs': 105.4, 'events': 19}",
+  "[04:03 IST] source feedi: {'status': 'ok', 'rows': 2450, 'secs': 180.7, 'stopped': 'time budget', 'events': 43}",
+  "[04:04 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[04:04 IST] 98 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[04:04 IST] 238 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[04:04 IST] 170 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[04:04 IST] name map: India A vs United Arab Emirates VI -> India A vs United Arab Emirates (2026-11-24T06:00:00Z)",
+  "[04:04 IST] name map: Pakistan A vs Nepal VI -> Pakistan A vs Nepal (2026-11-24T10:00:00Z)",
+  "[04:04 IST] name map: Zimbabwe XI vs Ireland A -> Zimbabwe A vs Ireland A (2026-11-25T07:30:00Z)",
+  "[04:04 IST] name map: Jammu & Kashmir vs Railways -> Jammu and Kashmir vs Railways (2026-11-24T07:30:00Z)",
+  "[04:04 IST] name map: Bihar vs Haryana CA -> Bihar vs Haryana (2026-11-24T10:30:00Z)",
+  "[04:04 IST] name map: Jharkhand CT vs Baroda -> Jharkhand vs Baroda (2026-11-24T10:30:00Z)",
+  "[04:04 IST] held back 8 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[04:04 IST] book lines: 663 player lines from 8 source(s)",
+  "[04:04 IST] 166 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[04:07 IST] weather: forecasts for 20 events, 0 failed",
+  "[04:07 IST] prop model: 1971 prop selections modelled, 529 milestone ladder prices anchored to O/U",
+  "[04:07 IST] ledger upsert model: {'upserted': 6, 'skipped_settled': 0}"
  ]
 }
