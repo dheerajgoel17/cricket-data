@@ -284,8 +284,9 @@ export function fixtureBooks(doc, fixture) {
  * Returns [{ line, over, under, source, bat_first }] sorted by line. `bat_first` is a fancy side run line that voids if that side bowls first (premium fours / sixes are not tagged).
  */
 export function fancyFor(doc, fixture, key, team = null, inn = 0, live = null) {
+  const bf = key.endsWith("_bf"), base = bf ? key.slice(0, -3) : key; // `team_total_runs_bf`: only the lines that void when the side bowls first; the plain key: only those that stand either way
   return (doc?.fancy || []).filter((l) => {
-    if (l.key !== key || lineScope(l) !== inn || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
+    if (l.key !== base || !!l.bat_first !== bf || lineScope(l) !== inn || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
     if (live !== null && !!l.live !== live) return false; // true: only the live lines, false: only the pre-match ones, null: both
     return sameFixture(l, fixture, doc);
   }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source, bat_first: !!l.bat_first, ...(l.live ? { live: true, ...(l.opened != null ? { opened: l.opened } : {}) } : {}) })).sort((x, y) => x.line - y.line);

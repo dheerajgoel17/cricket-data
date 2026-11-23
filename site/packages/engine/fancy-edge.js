@@ -2,7 +2,7 @@
 // the pre-match edges worth announcing (site/scripts/fancy-alerts.mjs). Every number is the history of the two sides over a line the books list, through `sideEdge` (stats.js).
 import { fancyByLine, fancyFor, fancyHeadline, fixtureBooks, lineProb } from "./lines.js";
 import { parseLiveOu } from "./inplay-lines.js";
-import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, marketReport, oversLabel, oversN, selectMatches, teamOversReport, teamTotalReport, venueIndices } from "./markets.js";
+import { MATCH_MARKETS, TEAM_TOTAL_MARKETS, baseKey, isBf, marketReport, oversLabel, oversN, selectMatches, teamOversReport, teamTotalReport, venueIndices } from "./markets.js";
 import { shrunkProb, sideEdge } from "./stats.js";
 import { FORMATS } from "./util.js";
 import { teamKey } from "./live.js";
@@ -11,9 +11,12 @@ import { teamKey } from "./live.js";
 export const MATCH_KEYS = [["match_runs", "Total runs"], ["first_innings_runs", "1st innings"], ["first_over", "1st over"], ["overs_5", "5 overs"], ["overs_6", "6 overs"], ["overs_10", "10 overs"], ["overs_15", "15 overs"],
   ["match_sixes", "Sixes"], ["match_fours", "Fours"], ["match_boundaries", "Boundaries"], ["match_wickets", "Wickets"], ["match_50s", "50s"], ["match_30s", "30s"],
   ["match_extras", "Extras"], ["match_runouts", "Run outs"], ["match_ducks", "Ducks"], ["highest_over", "Highest runs in an over"], ["max_wickets", "Most wickets"], ["top_score", "Top score"], ["top_batter", "Top batter"]];
-export const TEAM_KEYS = [["team_total_runs", "Runs"], ["overs_1", "1st over"], ["overs_5", "5 overs"], ["overs_6", "6 overs"], ["overs_10", "10 overs"], ["overs_15", "15 overs"],
+const BF_KEYS = new Set(["team_total_runs", "overs_1", "overs_5", "overs_6", "overs_10", "overs_15", "team_total_sixes", "team_total_fours"]);
+/** Each side line a book can tag "void if the side bowls first" has a market of its own beside the plain one (`<key>_bf`, shown with the BAT_FIRST_TAG). */
+const withBf = (list) => list.flatMap(([k, lab]) => (BF_KEYS.has(k) ? [[k, lab], [`${k}_bf`, lab]] : [[k, lab]]));
+export const TEAM_KEYS = withBf([["team_total_runs", "Runs"], ["overs_1", "1st over"], ["overs_5", "5 overs"], ["overs_6", "6 overs"], ["overs_10", "10 overs"], ["overs_15", "15 overs"],
   ["team_total_sixes", "Sixes"], ["team_total_fours", "Fours"], ["team_total_boundaries", "Boundaries"], ["team_total_wickets", "Wickets lost"],
-  ["team_total_extras", "Extras"], ["team_total_runouts", "Run outs"], ["team_total_ducks", "Ducks"], ["team_total_highest_over", "Highest runs in an over"], ["top_batter", "Top batter"]];
+  ["team_total_extras", "Extras"], ["team_total_runouts", "Run outs"], ["team_total_ducks", "Ducks"], ["team_total_highest_over", "Highest runs in an over"], ["top_batter", "Top batter"]]);
 export const FANCY_INNS = [0, 1, 2]; // 0 = the whole match (or the side's match total); 1 / 2 = that side's own 1st / 2nd innings (a Test)
 /** Each side's last matches a market is scored on, and the last matches at the ground. */
 export const WINDOW = 20, GROUND_WINDOW = 10;
@@ -25,9 +28,9 @@ export const ALERT = { MIN_EDGE: 0.15, MAX_EDGE: 0.6, MIN_GAMES: 15, PER_MATCH: 
 
 /** A market scored over matches `ms` at `line`: `scope` -1 is the whole match, a team index that side's total (a session of overs, or one innings with `inn`). */
 export function scoreMarket(store, ms, scope, k, line, inn = 0) {
-  const n = oversN(k);
+  const n = oversN(k), b = baseKey(k);
   if (n && scope >= 0) return teamOversReport(store, ms, scope, n, line, inn);
-  return scope < 0 ? marketReport(store, ms, k, line) : teamTotalReport(store, ms, scope, k, line, inn);
+  return scope < 0 ? marketReport(store, ms, b, line) : teamTotalReport(store, ms, scope, b, line, inn);
 }
 /** True when every book line of a team's match total is one that voids if that side bowls first: then only the matches where it batted first count. */
 export const batFirstBooked = (entries, inn, scope) => inn === 0 && scope >= 0 && entries.length > 0 && entries.every((e) => e.bat_first);
@@ -44,7 +47,7 @@ export function marketRow({ store, doc, fxInfo, ms, scope, teamName, key: k, gro
   // the first line both sides are priced on; else (an exchange quotes Yes and No on lines a gap apart) the first over line and the first under line, each on its own
   const { over: lo, under: lu } = fancyHeadline(all), b = lo ?? lu;
   if (!b) return null;
-  const batFirst = batFirstBooked(booked, inn, scope);
+  const batFirst = isBf(k) ? inn === 0 && scope >= 0 && booked.length > 0 : batFirstBooked(booked, inn, scope);
   const sample = batFirst ? firstInnsMs(store, ms, scope) : ms;
   const groundSample = batFirst && ground ? firstInnsMs(store, ground, scope) : ground;
   const run = (line) => scoreMarket(store, sample, scope, k, line, inn);
@@ -178,7 +181,7 @@ export function fancySample(store, { fmt, gender, teams, scope, lastN, venue }) 
 /** The tag on a team line that is only valid if that side bats first (the book voids it once the side is bowling first). */
 export const BAT_FIRST_TAG = "If bats first";
 /** Side session / innings-runs keys: never "complete match" on a Test (pre-match unscoped ⇒ 1st; in-play-only ⇒ live card's innings). */
-const TEST_SESSION_KEY = /^(team_total_runs|overs_\d+)$/;
+const TEST_SESSION_KEY = /^(team_total_runs|overs_\d+)(_bf)?$/;
 /** A line's innings tag (same short forms as `scopeTag`: CMM / 1st INN / 2nd INN). The first-innings score market is its own innings and needs no tag. CMM is only for whole-match markets — not a side session. */
 export const innTag = (inn, test = false, key = "") => (inn === 1 ? "1st INN" : inn === 2 ? "2nd INN" : test && key && !TEST_SESSION_KEY.test(key) && key !== "first_innings_runs" ? "CMM" : "");
 const abbr = (n) => { const w = String(n || "").replace(/\(W\)/i, "").trim().split(/\s+/).filter(Boolean); return (w.length > 1 ? w.map((x) => x[0]).join("") : (w[0] || "?")).slice(0, 3).toUpperCase(); };

@@ -144,3 +144,12 @@ def test_detect_fmt_reads_50_over_competition_names_before_falling_back_to_the_l
     for name in ("Zimbabwe Pro50 Championship", "Pro 50 Championship", "Ford Trophy", "Vijay Hazare Trophy", "Bangladesh 50-over League"):
         assert detect_fmt([name], False, None, "T20") == ("ODI", "name")
     assert detect_fmt(["Some Unknown Cup"], False, None, "T20") == ("T20", "last-meeting")  # no name to go on: the last meeting still decides
+
+
+def test_detect_fmt_test_is_a_word_not_a_substring_of_a_market_name():
+    """Regression (23 Nov 2026, SL v PAK women): a market called "Fastest 50" made a T20 a Test, so every player line sat under the wrong format and the match showed no book odds."""
+    from value_bets.pipeline import detect_fmt
+    texts = ["t20-emerging-nations-trophy-women", "Sri Lanka (W) vs Pakistan (W)", "Fastest 50 in the match", "Latest score", "Contest"]
+    assert detect_fmt(texts, False, None, None) == ("T20", "name")
+    assert detect_fmt(["Sri Lanka v Pakistan - 1st Test"], False, None, None) == ("MULTI", "name")
+    assert detect_fmt(["Sheffield Shield"], False, None, None) == ("MULTI", "name")

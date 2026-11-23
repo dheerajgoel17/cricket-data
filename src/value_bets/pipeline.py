@@ -290,7 +290,8 @@ def detect_fmt(texts, has_draw, fixture_fmt, last_meeting_fmt):
     if has_draw:
         return "MULTI", "draw-market"
     t = " ".join(x for x in texts if x).lower()
-    if "test" in t or "first class" in t or "shield" in t or "trophy-grade" in t or "ranji" in t:
+    # whole words only: the texts include every market name, and "Fastest 50" / "Latest" / "Contest" must not make a T20 a Test
+    if re.search(r"\btests?\b|\bfirst[ -]class\b|\bshield\b|trophy-grade|\branji\b", t):
         return "MULTI", "name"
     if "t20" in t or "t10" in t or "the hundred" in t or "twenty20" in t or "bash" in t or "premier league" in t:
         return "T20", "name"
