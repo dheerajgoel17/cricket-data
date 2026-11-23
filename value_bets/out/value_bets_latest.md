@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-23 08:00 IST
+# Cricket value bets - 2026-11-23 09:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1463 prices
-- **smarkets**: ok, 429 prices
+- **moviodds_bet365**: ok, 1558 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
-- **feedl**: ok, 744 prices, 16 events
-- **feedk**: ok, 110 prices, 3 events
+- **smarkets**: ok, 429 prices
+- **feedl**: ok, 719 prices, 16 events
+- **feedk**: ok, 142 prices, 4 events
 - **feede**: ok, 424 prices, 16 events
-- **feedj**: ok, 835 prices, 12 events
+- **feedj**: ok, 920 prices, 13 events
 - **feedh**: ok, 1468 prices, 35 events
-- **feedf**: ok, 348 prices, 17 events
-- **feedi**: ok, 1917 prices, 27 events
+- **feedf**: ok, 368 prices, 17 events
+- **feedi**: ok, 1894 prices, 27 events
 
-Matches starting in next 168h: **26**, markets priced: **463**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **26**, markets priced: **482**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -34,4 +34,4 @@ Matches starting in next 168h: **26**, markets priced: **463**, value bets: **4*
 
 Unmatched team names (add to mappings/teams.csv): South Australia Redbacks (male)
 
-Runtime 142.8s. Snapshot: `odds_20261123T023044Z.jsonl.gz`
+Runtime 197.8s. Snapshot: `odds_20261123T033038Z.jsonl.gz`
