@@ -47,6 +47,7 @@ import { Crumbs } from "./page";
 import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
+import { TossWinner, tossFor } from "./toss-winner";
 
 export { FancyLines, OverviewRow } from "./fancy-lines";
 
@@ -108,7 +109,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
   const fxInfo = useMemo(() => ({ a: fx.a, b: fx.b, fmt: fx.fmt, startMs: fixtureStart(fx).getTime() }), [fx]);
   const booked = (k: string, teamName: string | null, inn = 0) => k !== "top_batter" && fancyLines(doc.data, fxInfo, k, teamName, inn).length > 0;
   const anyBooked = (list: [string, string][], teamName: string | null) => list.some(([k]) => FANCY_INNS.some((inn) => booked(k, teamName, inn)));
-  const scopes = [["-1", "Match", MATCH_KEYS.some(([k]) => booked(k, null))] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS, name)] as const)].filter(([, , on]) => on);
+  const scopes = [["-1", "Match", true] as const, ...teams.map(([name, i]) => [String(i), name, anyBooked(TEAM_KEYS, name)] as const)].filter(([, , on]) => on);
   const wantSc = q.sc === "" || q.sc == null ? "-1" : q.sc;
   const scope = scopes.some(([v]) => v === wantSc) ? Number(wantSc) : scopes.length ? Number(scopes[0][0]) : -1;
   const team = teams.find(([, i]) => i === scope);
@@ -313,9 +314,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
       <FancyFilters open={filtersOpen} onOpenChange={setFiltersOpen} win={win} here={here} venueName={venueName} hasVenue={venueIdx.length > 0}
         onApply={({ win: w, here: h }) => set({ mw: w === 10 ? "" : String(w), mv: h ? "1" : "" })} />
 
+      {mode === "list" && scope < 0 && !doc.isLoading && <TossWinner market={tossFor(doc.data, fxInfo)} />}
       {doc.isLoading ? <FancySkeleton /> : !ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
         <>
-          {mode === "list" && overview.length === 0 && liveList.length === 0 && (
+          {mode === "list" && scope >= 0 && overview.length === 0 && liveList.length === 0 && (
             <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />)}
           {mode === "list" && (overview.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
