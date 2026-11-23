@@ -37,7 +37,7 @@ import { LiveMarketRow } from "@/ui/live-market-row";
 import { TeamSpot } from "@/ui/live-spot";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { LineStepper } from "@/ui/line-stepper";
-import { TossWinner, tossFor } from "@/ui/toss-winner";
+import { TossWinner, tossFor, tossRecordFor } from "@/ui/toss-winner";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
@@ -234,7 +234,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
           </View>
       </Sheet>
 
-      {mode === "list" && scope < 0 ? <TossWinner market={tossFor(doc, fxInfo)} /> : null}
+      {mode === "list" && scope < 0 ? <TossWinner market={tossFor(doc, fxInfo)} records={hist ? [fx.a, fx.b].map((n) => { const t = teams.find(([name]) => name === n); return t ? tossRecordFor(store, t[1], { fmt: fmtIdx, gender }) : null; }) : undefined} /> : null}
       {!ms.length ? <EmptyState title="Not enough history" body={`No ${fmt} matches to base these markets on yet.`} /> : (
     <>
       {mode === "list" && scope >= 0 && overview.length === 0 && liveScored.length === 0 ? (

@@ -41,7 +41,7 @@ _ZIP: zipfile.ZipFile | None = None
 
 def _compact(m: dict) -> dict:
     out = {k: m[k] for k in ("id", "date", "fmt", "gender", "intl", "event", "venue", "city", "teams", "winner",
-                              "res", "overs", "bpo", "days", "dls", "first", "q", "mc", "ts", "ho", "mw")}
+                              "res", "overs", "bpo", "days", "dls", "first", "q", "mc", "ts", "ho", "mw", "toss_winner", "toss_decision")}
     out["pv"] = 0
     out["inn"] = [pack_inn(i) for i in m["innings"]]
     out["ov"] = [i.get("ov") or [] for i in m["innings"]]
@@ -160,6 +160,7 @@ def load_provisional(data_dir: Path, canonical: list[dict], name_pid: dict[str, 
              "event": d.get("event", ""), "venue": d.get("venue", ""), "city": "",
              "teams": [d["team_a"], d["team_b"]], "winner": d.get("winner", ""),
              "res": 0 if d.get("winner") else 2, "overs": 0, "bpo": 6, "days": 1, "first": "", "q": -1,
+             "toss_winner": (d.get("toss_winner") or "").strip(), "toss_decision": (d.get("toss_decision") or "").strip().lower(),
              "mc": 0, "ts": 0, "ho": 0, "mw": 0, "dls": int(_dls_margin(d)), "pv": 1, "inn": [], "ov": [], "bat": [], "bowl": [], "fld": [], "parts": [], "aliases": [], "xi": [], "xq": 0}
         registry: dict[str, str] = {}
         for p in d.get("players", []):
@@ -231,6 +232,14 @@ def _batting_first(d: dict) -> str:
     if "bat" in dec:
         return tw
     return b if _norm_team(tw) == _norm_team(a) else a
+
+
+def _toss(m: dict, ix: tuple) -> tuple[int, int]:
+    """(`tw`, `td`) of a match: the team index that won the toss (one of the two sides, -1 when the toss is not recorded or names neither) and what it chose (1 bat, 0 field, -1 unknown)."""
+    tw = _norm_team(m.get("toss_winner") or "")
+    won = next((ix[k] for k, t in enumerate(m["teams"]) if tw and _norm_team(t) == tw), -1)
+    dec = (m.get("toss_decision") or "").lower()
+    return won, (1 if "bat" in dec else 0 if "field" in dec or "bowl" in dec else -1) if won >= 0 else -1
 
 
 def _inn_from_totals(m: dict, d: dict, fmt: int, stat: dict) -> None:
@@ -382,7 +391,7 @@ def infer_hosts(matches: list[dict], geo: dict[str, str | None]) -> tuple[list[s
     return hosts, venue_host, per_match
 
 
-MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "mw", "xq", "dls")
+MATCH_KEYS = ("id", "d", "f", "g", "i", "e", "v", "a", "b", "w", "r", "o", "dy", "h", "fi", "pv", "q", "ho", "mc", "ts", "mw", "xq", "dls", "tw", "td")
 BAT_KEYS = ("p", "m", "i", "t", "q", "o", "r", "b", "f", "s", "k", "tb", "mt")
 # progression shard (`pp/NN.json`, read only by the live rows of the tables): one row per batting innings of 10+ balls, with the runs after 10 / 20 / 30 / 50 / 75 / 100 / 150 balls faced (null if he was out or not there yet)
 PROG_KEYS = ("p", "m", "i", "b", "r", "x1", "x2", "x3", "x4", "x5", "x6", "x7")
@@ -433,6 +442,8 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
             if m["winner"]:
                 m["winner"] = canon_name.get((_norm_team(m["winner"]), m["gender"]), _strip_women(m["winner"]))
             fix = _team_fixer(canon_name, m["gender"])
+            if m.get("toss_winner"):
+                m["toss_winner"] = fix(m["toss_winner"])
             if m["first"]:  # deliveries carry Source A's spelling of the teams: use Base's, as for `teams` and `winner`
                 m["first"] = fix(m["first"])
             m["inn"] = [[fix(i[0]), fix(i[1]), *i[2:]] for i in m["inn"]]
@@ -471,10 +482,11 @@ def assemble(canonical: list[dict], provisional: list[dict], geo: dict | None = 
         v = venue_ix[m["venue"] or "?"]
         w = team_ix[(m["winner"], g)] if m["winner"] and (m["winner"], g) in team_ix else -1
         fi = team_ix[(m["first"], g)] if m["first"] else -1
+        tw, td = _toss(m, (a, b))
         hn = host_of_match.get(m["id"]) or venue_host.get((m["venue"] or "?", m["intl"]))
         hs = -2 if hn is None else -1 if hn == "-" else host_ix[hn]  # -1 neutral ground, -2 host unknown
         _push(cols, MATCH_KEYS, (_public_id(m["id"]), m["date"], m["fmt"], g, m["intl"], event_ix[m["event"] or ""], v, a, b, w, m["res"],
-                                 m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"], m.get("mw", 0), m["xq"], m.get("dls", 0)))
+                                 m["overs"], m["days"], hs, fi, m["pv"], m["q"], m["ho"], m["mc"], m["ts"], m.get("mw", 0), m["xq"], m.get("dls", 0), tw, td))
         m["_ix"] = mi
         m["_tix"] = (a, b)
 

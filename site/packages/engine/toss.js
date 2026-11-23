@@ -24,3 +24,19 @@ export function tossMarket(doc, fx) {
   });
   return { default: false, sides, books };
 }
+
+/**
+ * A side's toss record over its last `lastN` matches in a format (`tw` / `td` of matches.json; a match whose toss is not recorded is not counted):
+ * `{ n, won, bat }` = tosses on record, tosses won, and wins where it chose to bat. Null when the build carries no toss columns. History only: it says how the side's tosses went, not what the next one will be.
+ */
+export function tossRecord(store, team, { fmt, gender = 0, lastN = 10 } = {}) {
+  const M = store?.M;
+  if (!M?.tw || team == null || team < 0) return null;
+  const hit = [];
+  for (let m = 0; m < store.n; m++) {
+    if (M.f[m] !== fmt || M.g[m] !== gender || (M.a[m] !== team && M.b[m] !== team) || M.tw[m] < 0) continue;
+    hit.push(m);
+  }
+  const last = hit.slice(-lastN);
+  return { n: last.length, won: last.filter((m) => M.tw[m] === team).length, bat: last.filter((m) => M.tw[m] === team && M.td[m] === 1).length };
+}
