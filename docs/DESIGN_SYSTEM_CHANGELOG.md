@@ -505,3 +505,9 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `site/src/components/app/toss-winner.tsx`, `mobile/src/ui/toss-winner.tsx`, `site/src/components/app/match-fancy.tsx`, `mobile/src/ui/match-fancy.tsx`
 - **Change:** under each side's name the row adds one line of the existing description style, "Won 6 of last 10 tosses · chose bat 4", from `tossRecord` (engine). No new component or variant; hidden when the build carries no toss data or the side has none on record.
 - **Callers:** Match Fancy, Match scope (site and app)
+
+### 2026-11-23 — Toss winner rebuilt as ordinary fancy rows (W / L form, no edge)
+- **Path:** `site/src/components/app/fancy-lines.tsx`, `mobile/src/ui/fancy-row.tsx`, `site/src/components/app/match-fancy.tsx`, `mobile/src/ui/match-fancy.tsx`; removed `site/src/components/app/toss-winner.tsx`, `mobile/src/ui/toss-winner.tsx`
+- **Change:** the separate Toss winner section is gone. The toss is two rows (one per side) in the existing fancy list, last in the Match scope: same crest / label / meta / hit-rate / ground columns, `FormChips` (W / L) in the chart slot, no edge, nothing to open. The "vs opponent" and "at ground" toss records sit in the sub line (phone) and the ground column (dense). No new component or variant.
+- **Callers:** `FancyLines` (compact and dense), `OverviewRow`, Match Fancy list (site and app)
+

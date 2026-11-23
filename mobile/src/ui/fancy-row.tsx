@@ -5,9 +5,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { odds } from "@site/lib/format";
+import { bookName } from "@cricket/engine/lines.js";
 import { BookBadge } from "@/ui/book-badge";
 import { Collapsible, TurnChevron } from "@/ui/collapsible";
 import { MiniBars } from "@/ui/mini-bars";
+import { FormChips } from "@/ui/recent-form";
 import { ResultStamp, sideStamp } from "@/ui/result-stamp";
 import { TeamBadge } from "@/ui/team-badge";
 import { InPlayBadge } from "@/ui/live-bits";
@@ -36,6 +38,10 @@ export function BookList({ books, shown }: { books: { source: string; over: numb
   );
 }
 
+/** Toss rows (`kind: "toss"`, engine `tossRows`): the side's record against this opponent and at this ground, as the site's `tossSub`. */
+const wonOf = (x: { won: number; n: number }) => `${x.won} of ${x.n}`;
+export const tossSub = (r: any) => [r.vsOpp ? `vs ${r.vsOpp.opp} ${wonOf(r.vsOpp)}` : "", r.atGround ? `At ground ${wonOf(r.atGround)}` : ""].filter(Boolean).join(" · ");
+
 /**
  * Scan list row (site OverviewRow / PropLines-compact twin): crest · label · one priced side · Edge · MiniBars.
  * `inset`: pad with card inset (Fancy MatchCard) instead of page gutter (full-bleed lists).
@@ -49,9 +55,11 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset }: 
   const stamp = sideStamp(r.side, mark?.verdict ?? null);
   const edgeColor = r.edge == null ? color["muted-foreground"] : r.edge > 0 ? color.primary : color.miss;
   const padX = inset ? space.inset : space.gutter;
+  const toss = r.kind === "toss";
+  const subText = sub ?? (toss ? tossSub(r) : undefined);
   return (
     <View style={[styles.row, active && styles.active]}>
-      <Press onPress={onOpen} disabled={!onOpen} accessibilityRole="button" accessibilityLabel={`Open ${r.label}`} style={[styles.main, { paddingHorizontal: padX }]}>
+      <Press onPress={onOpen} disabled={!onOpen || !!r.static} accessibilityRole="button" accessibilityLabel={`Open ${r.label}`} style={[styles.main, { paddingHorizontal: padX }]}>
         {r.team
           ? <TeamBadge name={r.team} size={control} />
           : <View style={styles.icon} accessibilityElementsHidden><Ionicons name="stats-chart-outline" size={icon.md} color={color["muted-foreground"]} /></View>}
@@ -60,8 +68,12 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset }: 
             <Text style={styles.label} numberOfLines={1}>{r.label}</Text>
             {r.live ? <InPlayBadge /> : null}
           </View>
-          {sub ? <Text style={styles.sub} numberOfLines={1}>{sub}</Text> : null}
-          {mark?.state !== "void" ? (
+          {subText ? <Text style={styles.sub} numberOfLines={1}>{subText}</Text> : null}
+          {toss ? (
+            <View style={styles.priceRow}>
+              <Text style={styles.priceLine} numberOfLines={1}>{odds(r.over)}<Text style={styles.odds}>{` ${r.default ? "Default price" : bookName(r.overBook)}`}</Text></Text>
+            </View>
+          ) : mark?.state !== "void" ? (
             <View style={styles.priceRow}>
               <Text style={styles.priceLine} numberOfLines={1}>
                 <Text style={{ color: under ? color.miss : color.primary }}>{lean}</Text>
@@ -74,13 +86,15 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset }: 
             </View>
           ) : null}
         </View>
-        {mark?.state === "void" ? <View style={styles.edge} /> : (
+        {toss || mark?.state === "void" ? <View style={styles.edge} /> : (
           <View style={styles.edge}>
             <Text style={styles.edgeLabel}>Edge</Text>
             <Text style={[styles.edgeValue, { color: edgeColor }]}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}`}</Text>
           </View>
         )}
-        {mark?.state === "void" ? (
+        {toss ? (
+          r.form?.length ? <FormChips compact results={r.form.slice(-5)} /> : <View style={styles.statusSlot}><Text style={styles.sub}>–</Text></View>
+        ) : mark?.state === "void" ? (
           <View style={styles.statusSlot}><Text style={styles.voidMark}>VOID</Text></View>
         ) : (
           <MiniBars last={r.last} line={r.line} width={72} />

@@ -541,6 +541,7 @@
       "mobile/src/ui/book-badge.tsx",
       "mobile/src/ui/collapsible.tsx",
       "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/recent-form.tsx",
       "mobile/src/ui/result-stamp.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/live-bits.tsx",
@@ -824,7 +825,6 @@
       "mobile/src/ui/live-market-row.tsx",
       "mobile/src/ui/live-spot.tsx",
       "mobile/src/ui/line-stepper.tsx",
-      "mobile/src/ui/toss-winner.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/player-avatar.tsx",
       "mobile/src/ui/tick.tsx"
@@ -1173,18 +1173,6 @@
     ]
   },
   {
-    "path": "mobile/src/ui/toss-winner.tsx",
-    "platform": "native",
-    "route": false,
-    "exports": [
-      "TossWinner"
-    ],
-    "dependencies": [
-      "mobile/src/ui/text.tsx",
-      "mobile/src/ui/team-badge.tsx"
-    ]
-  },
-  {
     "path": "mobile/src/ui/tournament-stats.tsx",
     "platform": "native",
     "route": false,
@@ -1395,6 +1383,7 @@
       "site/src/components/app/badges.tsx",
       "site/src/components/app/live-spot.tsx",
       "site/src/components/app/mini-bars.tsx",
+      "site/src/components/app/recent-form.tsx",
       "site/src/components/app/result-stamp.tsx",
       "site/src/components/app/tick.tsx"
     ]
@@ -1721,8 +1710,7 @@
       "site/src/components/app/page.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/pill-group.tsx",
-      "site/src/components/app/skeletons.tsx",
-      "site/src/components/app/toss-winner.tsx"
+      "site/src/components/app/skeletons.tsx"
     ]
   },
   {
@@ -2042,18 +2030,6 @@
       "TrendArrow"
     ],
     "dependencies": []
-  },
-  {
-    "path": "site/src/components/app/toss-winner.tsx",
-    "platform": "web",
-    "route": false,
-    "exports": [
-      "TossWinner"
-    ],
-    "dependencies": [
-      "site/src/components/ui/item.tsx",
-      "site/src/components/app/badges.tsx"
-    ]
   },
   {
     "path": "site/src/components/app/tournament-stats.tsx",
