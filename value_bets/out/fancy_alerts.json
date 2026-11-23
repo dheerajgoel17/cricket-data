@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-23T16:36:06Z",
+ "generated_at_utc": "2026-11-23T17:34:16Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -287,7 +287,7 @@
    "fixture_id": "2026-11-24-australia-v-england",
    "match": "Australia vs England",
    "format": "T20",
-   "series": "ENG vs AUS 2026",
+   "series": "England tour of Australia 2026",
    "start_utc": "2026-11-24T08:15:00Z",
    "start_ist": "2026-11-24 13:45 IST",
    "key": "team_total_runs",
