@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-23T01:38:37Z",
+ "generated_at_utc": "2026-11-23T02:33:58Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -257,6 +257,29 @@
    "chance": 0.6779,
    "edge": 0.1862,
    "edge_pct": 18.6,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-23-zimbabwe-women-v-scotland-women|top_score||0|over",
+   "fixture_id": "2026-11-23-zimbabwe-women-v-scotland-women",
+   "match": "Zimbabwe Women vs Scotland Women",
+   "format": "T20",
+   "series": "Women's Emerging Nations Trophy 2026",
+   "start_utc": "2026-11-23T09:15:00Z",
+   "start_ist": "2026-11-23 14:45 IST",
+   "key": "top_score",
+   "team": null,
+   "inn": 0,
+   "side": "over",
+   "line": 53.5,
+   "best_odds": 1.85,
+   "best_source": "bc.game",
+   "hits": 27,
+   "played": 40,
+   "window": 20,
+   "chance": 0.64,
+   "edge": 0.184,
+   "edge_pct": 18.4,
    "bat_first": false
   },
   {
