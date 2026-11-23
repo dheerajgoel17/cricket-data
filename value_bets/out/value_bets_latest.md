@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-23 10:00 IST
+# Cricket value bets - 2026-11-23 11:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1702 prices
+- **moviodds_bet365**: ok, 1863 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
-- **smarkets**: ok, 403 prices
+- **smarkets**: ok, 399 prices
 - **feedl**: ok, 702 prices, 16 events
 - **feedk**: ok, 174 prices, 5 events
-- **feede**: ok, 420 prices, 17 events
-- **feedj**: ok, 858 prices, 12 events
-- **feedh**: ok, 1356 prices, 35 events
-- **feedf**: ok, 316 prices, 16 events
-- **feedi**: ok, 1879 prices, 27 events
+- **feede**: ok, 420 prices, 16 events
+- **feedj**: ok, 834 prices, 11 events
+- **feedh**: ok, 1289 prices, 32 events
+- **feedf**: ok, 312 prices, 16 events
+- **feedi**: ok, 1842 prices, 23 events
 
-Matches starting in next 168h: **26**, markets priced: **471**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **25**, markets priced: **482**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -30,8 +30,8 @@ Matches starting in next 168h: **26**, markets priced: **471**, value bets: **4*
 - **Australia vs England / G9182 batter_fours / Harry Brook under 2.5** - why: Model 65% vs market 54% for under 2.5 fours; form 2.6 fours/inn recency-weighted T20 (n_eff 51.7; last 5: 4, 3, 1, 10, 7), bats in 92% of games played; venue unknown/unmatched (venue terms neutral); vs Australia: 4 inns avg 2.0; context adj: team H2H context -1%. Notes: 3 market source(s) for fair price; model 0.652 vs market 0.536; assumes bet void if player doesn't bat/bowl - check book rules
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
-- 11-26 13:40 IST Sydney Sixers vs Melbourne Stars / M13704 top_bowler_team / Carly Leeson @ 15.00 (feedj_d): edge 48.6%, model 0.078, market 0.1105
+- 11-26 13:40 IST Sydney Sixers vs Melbourne Stars / M13704 top_bowler_team / Carly Leeson @ 15.00 (feedj_d): edge 48.7%, model 0.0782, market 0.1105
 
 Unmatched team names (add to mappings/teams.csv): South Australia Redbacks (male)
 
-Runtime 241.7s. Snapshot: `odds_20261123T043035Z.jsonl.gz`
+Runtime 400.9s. Snapshot: `odds_20261123T053035Z.jsonl.gz`
