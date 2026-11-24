@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-25 04:00 IST
+# Cricket value bets - 2026-11-25 04:42 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2425 prices
+- **moviodds_bet365**: ok, 2413 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
 - **smarkets**: ok, 449 prices
 - **feedk**: ok, 256 prices, 7 events
-- **feedl**: ok, 603 prices, 36 events
+- **feedl**: ok, 652 prices, 36 events
 - **feedf**: ok, 208 prices, 4 events
 - **feedj**: ok, 650 prices, 8 events
 - **feede**: ok, 608 prices, 35 events
 - **feedh**: ok, 2111 prices, 91 events
-- **feedi**: ok, 1815 prices, 33 events, stopped time budget
+- **feedi**: ok, 1863 prices, 38 events, stopped time budget
 
-Matches starting in next 168h: **57**, markets priced: **616**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **57**, markets priced: **618**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -36,4 +36,4 @@ Matches starting in next 168h: **57**, markets priced: **616**, value bets: **4*
 
 Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), Central Zone (Women) (female), Central Zone (male), East Zone (W) (female), East Zone (Women) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), Ghubra Giants (W) (female), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Majees Titan (male), Multan Region (male), Muscat Shaheens (W) (female), Muscat Thunders (W) (female), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (Women) (female), North East Zone (male), North Zone (W) (female), North Zone (Women) (female), North Zone (male), Oca Invincibles (W) (female), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (Women) (female), South Zone (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (Women) (female), West Zone (male), Yalla Shabab Giants (male)
 
-Runtime 269.4s. Snapshot: `odds_20261124T223039Z.jsonl.gz`
+Runtime 261.4s. Snapshot: `odds_20261124T231247Z.jsonl.gz`
