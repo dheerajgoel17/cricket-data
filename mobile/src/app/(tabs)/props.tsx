@@ -42,7 +42,7 @@ function PlayerProps() {
   const [sc, setSc] = useState<Screener>({ ...DEFAULTS });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
-  const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, matchOf, refetch } = useHotViewWithRefetch(Number(sc.day));
+  const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, matchOf, refetch } = useHotViewWithRefetch(Number(sc.day), sc.inns === "all" ? undefined : sc.inns);
   // a score tick gives `outOf` a new identity every 3 s while a match is on; rows keep their identity unless their own `live` / `out` changed, so the memos below and each PropRow stay put
   const stabilize = useMemo(() => makeStabilizer<any, { live: boolean; out: boolean }>(), []);
   const dayRows = useMemo(() => stabilize(raw, (r) => ({ live: !!r.quotes?.some((q: any) => q.live), out: outOf(r) })), [raw, outOf, stabilize]);
@@ -143,8 +143,8 @@ function PlayerProps() {
   );
 }
 
-function useHotViewWithRefetch(day: number) {
-  const view = useHotView({ day });
+function useHotViewWithRefetch(day: number, innings?: "first" | "second") {
+  const view = useHotView({ day }, undefined, undefined, innings);
   const qc = useQueryClient();
   return {
     ...view,
