@@ -15,7 +15,7 @@ import { DEFAULT_RAIL } from "@site/lib/priority";
 import { fixturesQuery } from "@/lib/queries";
 import { useStore } from "@/lib/use-store";
 import { AppHeader } from "@/ui/brand";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
 import { ChevronRight } from "@/ui/icons";
 import { Working } from "@/ui/motion";
@@ -47,7 +47,7 @@ function Leagues() {
         </Press>
       } />
       <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
-        {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store || !matchesReady ? <Working label="Loading leagues…" fill shape="league" /> : e == null ? <View style={styles.emptyPad}><EmptyState title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." /></View> : (
+        {stats.isError && !matchesReady ? <ErrorState title="Could not load history" onRetry={() => void stats.refetch()} /> : !store || !matchesReady ? <Working label="Loading leagues…" fill shape="league" /> : e == null ? <View style={styles.emptyPad}><EmptyState title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." /></View> : (
           <>
             <HScroll contentContainerStyle={styles.chips}>
               {(featured.some((x) => x.e === e) ? featured : [{ e, name: store.events[e], tag: "" as const }, ...featured]).map((x) => {

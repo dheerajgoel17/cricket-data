@@ -53,6 +53,9 @@ jobs:
       - name: Type-check
         working-directory: mobile
         run: npm run typecheck
+      - name: Lint (errors fail; warnings are the backlog)
+        working-directory: mobile
+        run: npm run lint
       - name: App unit tests
         working-directory: mobile
         run: npm test

@@ -30,7 +30,7 @@ import { CapsuleTabs } from "@/ui/capsule";
 import { Bleed } from "@/ui/bleed";
 import { ChoiceChip, ChoiceRow } from "@/ui/chips";
 import { DataTable, Metric, Pill } from "@/ui/data-table";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { useScreenInsets } from "@/ui/insets";
 import { LineStepper } from "@/ui/line-stepper";
@@ -114,7 +114,7 @@ export default function PlayerPage() {
     <PageAtmosphere>
       <BlurTargetView ref={target} style={styles.root}>
         <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: chromePad, paddingBottom: inset.bottom + space.section }}>
-          {s.storeError ? <View style={styles.pad}><EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /></View> : !s.loadingStore && !s.indexed ? <View style={styles.pad}><EmptyState title="Unknown player" body="This player is not in the stats data." /></View> : (
+          {s.storeError ? <View style={styles.pad}><ErrorState title="Could not load history" onRetry={() => s.refetchStore()} /></View> : !s.loadingStore && !s.indexed ? <View style={styles.pad}><EmptyState title="Unknown player" body="This player is not in the stats data." /></View> : (
             <>
               {/* Hero wash scrolls with identity; negative margin pulls tint under clear sticky chrome at rest. */}
               <EntityHeroWash

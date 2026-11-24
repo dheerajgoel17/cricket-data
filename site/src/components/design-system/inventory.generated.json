@@ -91,10 +91,12 @@
     "platform": "native",
     "route": true,
     "exports": [
+      "ErrorBoundary",
       "RootLayout"
     ],
     "dependencies": [
       "mobile/src/ui/animated-splash.tsx",
+      "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/sign-in-sheet.tsx",
       "mobile/src/ui/web-frame.tsx"
     ]
@@ -524,9 +526,11 @@
     "platform": "native",
     "route": false,
     "exports": [
-      "EmptyState"
+      "EmptyState",
+      "ErrorState"
     ],
     "dependencies": [
+      "mobile/src/ui/button.tsx",
       "mobile/src/ui/icon-badge.tsx",
       "mobile/src/ui/text.tsx"
     ]

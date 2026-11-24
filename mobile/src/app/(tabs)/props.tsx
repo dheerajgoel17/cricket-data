@@ -17,8 +17,9 @@ import { AppHeader } from "@/ui/brand";
 import { STATS } from "@cricket/engine/rules.js";
 import { Chips, ActiveChip, FilterButton, filterBar } from "@/ui/chips";
 import { HScroll } from "@/ui/h-scroll";
+import { makeStabilizer } from "@/lib/stable-rows";
 import { MatchChips } from "@/ui/match-chip";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { useScreenInsets } from "@/ui/insets";
 import { Working } from "@/ui/motion";
@@ -28,6 +29,7 @@ import { ScreenerFilters } from "@/ui/screener-filters";
 import { Text } from "@/ui/text";
 import { color, control, font, radius, space, tint, type, t } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
+import { hitSlopFor } from "@/ui/platform";
 
 const WINS = Object.entries(WIN_LABEL) as [string, string][];
 const NEED: Record<string, number> = { l5: 3, l10: 5, season: 5, h2h: 3, ven: 3 };
@@ -41,7 +43,9 @@ function PlayerProps() {
   const [pulling, setPulling] = useState(false);
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
   const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, matchOf, refetch } = useHotViewWithRefetch(Number(sc.day));
-  const dayRows = useMemo(() => raw.map((r) => ({ ...r, live: r.quotes?.some((q: any) => q.live), out: outOf(r) })), [raw, outOf]);
+  // a score tick gives `outOf` a new identity every 3 s while a match is on; rows keep their identity unless their own `live` / `out` changed, so the memos below and each PropRow stay put
+  const stabilize = useMemo(() => makeStabilizer<any, { live: boolean; out: boolean }>(), []);
+  const dayRows = useMemo(() => stabilize(raw, (r) => ({ live: !!r.quotes?.some((q: any) => q.live), out: outOf(r) })), [raw, outOf, stabilize]);
   const matchChips = useMemo(() => {
     const m = new Map<string, { id: string; a: string; b: string; start: string; fmt: string }>();
     for (const r of dayRows) {
@@ -106,12 +110,13 @@ function PlayerProps() {
       <AppHeader title="Player props" info={<InfoButton topic="player-props" />} />
       <FlashList
         data={isLoading ? [] : (shown as any[])}
-        keyExtractor={(r: any) => `${r.idx}${r.stat}${r.start}${r.inn}${r.quotes?.some((q: any) => q.live) ? "L" : ""}`}
+        extraData={soFarOf}
+        keyExtractor={(r: any) => `${r.idx}${r.stat}${r.start}${r.inn}`}
         renderItem={({ item, index }: { item: any; index: number }) => <PropRow r={item} i={index} soFar={soFarOf(item)} out={outOf(item)} bars={sc.bars} />}
         ListHeaderComponent={header}
         ListEmptyComponent={
           isLoading || (scoring && !shown.length) ? <Working label="Scoring the day's lines…" rows={5} />
-            : error ? <View style={styles.emptyPad}><EmptyState title="Could not score the lines" body="Try again in a moment." /></View>
+            : error ? <View style={styles.emptyPad}><ErrorState title="Could not score the lines" body="Something went wrong scoring today's lines." onRetry={() => void refetch()} /></View>
             : (
               <View style={styles.emptyPad}>
                 <EmptyState
@@ -119,7 +124,7 @@ function PlayerProps() {
                   body={active.length
                     ? "Clear a filter to see the rest of the day's lines."
                     : otherDay ? `${otherDay} lines are priced on other days — pick another chip above.` : "Lines usually land a few hours before the toss."}
-                  action={active.length ? <Press onPress={() => setSc({ ...DEFAULTS })}><Text style={styles.link}>Clear filters</Text></Press> : undefined}
+                  action={active.length ? <Press accessibilityRole="button" accessibilityLabel="Clear filters" hitSlop={hitSlopFor(80, 20)} onPress={() => setSc({ ...DEFAULTS })}><Text style={styles.link}>Clear filters</Text></Press> : undefined}
                 />
               </View>
             )

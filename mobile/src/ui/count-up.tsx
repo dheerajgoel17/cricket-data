@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { TextInput as RNTextInput, type StyleProp, type TextStyle } from "react-native";
-import Animated, { Easing, useAnimatedProps, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedProps, useReducedMotion, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 import { tuned } from "@/ui/text";
 import { FONT_SCALE_MAX } from "@/ui/platform";
+import { easeOutCubic } from "@/ui/curves";
 
 const AnimatedInput = Animated.createAnimatedComponent(RNTextInput);
 const flat = { padding: 0, margin: 0 } as const;
@@ -14,7 +15,7 @@ const flat = { padding: 0, margin: 0 } as const;
 export function CountUp({ value, digits = 0, prefix = "", suffix = "", duration = 700, style }: { value: number; digits?: number; prefix?: string; suffix?: string; duration?: number; style?: StyleProp<TextStyle> }) {
   const calm = useReducedMotion();
   const v = useSharedValue(calm ? value : 0);
-  useEffect(() => { v.value = calm ? value : withTiming(value, { duration, easing: Easing.out(Easing.cubic) }); }, [value, calm, duration, v]);
+  useEffect(() => { v.value = calm ? value : withTiming(value, { duration, easing: easeOutCubic }); }, [value, calm, duration, v]);
   const props = useAnimatedProps(() => {
     const t = `${prefix}${v.value.toFixed(digits)}${suffix}`;
     return { text: t, defaultValue: t } as object;

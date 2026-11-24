@@ -22,6 +22,7 @@ import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { color, font, space, type, radius, rhythm, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
+import { hitSlopFor } from "@/ui/platform";
 
 const GO: [string, string][] = [["Player props", "/props"], ["Fancy lines", "/fancy"], ["Fixtures", "/"], ["Leagues", "/leagues"]];
 
@@ -60,7 +61,7 @@ export default function Search() {
     <PageAtmosphere style={{ paddingTop: inset.top }}>
       <View style={styles.bar}>
         <SearchField style={styles.fieldFlex} value={text} onChangeText={setText} autoFocus placeholder="Search players, teams, matches, grounds" label="Search" />
-        <Press accessibilityRole="button" onPress={goBack} hitSlop={8}><Text style={styles.cancel}>Cancel</Text></Press>
+        <Press accessibilityRole="button" accessibilityLabel="Cancel search" onPress={goBack} hitSlop={hitSlopFor(52, 20)}><Text style={styles.cancel}>Cancel</Text></Press>
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]}>
         {!found ? (

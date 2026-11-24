@@ -31,7 +31,7 @@ import { BookBadge } from "@/ui/book-badge";
 import { ChartBars } from "@/ui/charts";
 import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, filterBar } from "@/ui/chips";
 import { Bleed } from "@/ui/bleed";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
 import { LiveMarketRow } from "@/ui/live-market-row";
 import { TeamSpot } from "@/ui/live-spot";
@@ -196,7 +196,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     void Share.share({ message: text || url, title: `${fx.a} v ${fx.b}` });
   };
 
-  if (stats.isError && !matchesReady) return <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." />;
+  if (stats.isError && !matchesReady) return <ErrorState title="Could not load history" onRetry={() => void stats.refetch()} />;
   if (!store || !matchesReady) return <Working label="Loading…" shape="rows" />;
 
   return (

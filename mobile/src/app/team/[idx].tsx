@@ -14,7 +14,7 @@ import { useStore } from "@/lib/use-store";
 import { useLater } from "@/lib/use-later";
 import { DataTable, Pill } from "@/ui/data-table";
 import { Chips } from "@/ui/chips";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { GridFilters, GridTable } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
 import { Working } from "@/ui/motion";
@@ -68,7 +68,7 @@ export default function Team() {
   return (
     <PageAtmosphere>
       {stats.isError && !matchesReady ? (
-        <View style={{ paddingTop: chromePad }}><EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /></View>
+        <View style={{ paddingTop: chromePad }}><ErrorState title="Could not load history" onRetry={() => void stats.refetch()} /></View>
       ) : !store ? (
         <View style={{ paddingTop: chromePad }}><Working label="Loading…" fill shape="grid" /></View>
       ) : !known ? (

@@ -1,7 +1,7 @@
 import { mark } from "@/lib/perf";
 import { lazyTab } from "@/ui/lazy-tab";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Press } from "@/ui/press";
@@ -82,7 +82,7 @@ function Fancy() {
 }
 
 /** Desktop Fancy panel twin: FixtureCard shell + zoned header / rows / footer. */
-function MatchCard({ f, ms, rows, match }: Card) {
+function MatchCardView({ f, ms, rows, match }: Card) {
   const stumps = /stumps|close of (?:play|day)|end of (?:the )?day/i.test(String(match?.summary || match?.session || ""));
   const now = useNow(stumps ? 1000 : 30_000);
   const model = cardModel({ fixture: f, live: match }, now);
@@ -135,6 +135,9 @@ function MatchCard({ f, ms, rows, match }: Card) {
     </View>
   );
 }
+
+/** A card re-renders only when its fixture, rows or live match changed, not on every list render. */
+const MatchCard = memo(MatchCardView);
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },

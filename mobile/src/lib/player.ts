@@ -73,7 +73,7 @@ export function usePlayerScreen(idx: number, q: PlayerQuery) {
   const next = useMemo(() => nextMatchOf({ store, doc, pid, idx, fmt, team, lastGame, fixtures: fixtures.data || [], live: live.data, prefer }), [store, doc, pid, idx, fmt, team, lastGame, fixtures.data, live.data, prefer]);
   // kit, crest and hero label follow the match side; profile team only when there is no match
   const side = matchSide(next?.team, team);
-  return { ok, indexed, matchesReady, loadingStore: stats.isLoading, storeError: stats.isError, store, idx, pid, name, short, team, side, fmts, fmtVal, fmt, stat, pricedStats, testBat, scope, book, bookDefault, plan, res, next, lines, live, identity: stats.data?.identity };
+  return { ok, indexed, matchesReady, loadingStore: stats.isLoading, storeError: stats.isError, refetchStore: () => void stats.refetch(), store, idx, pid, name, short, team, side, fmts, fmtVal, fmt, stat, pricedStats, testBat, scope, book, bookDefault, plan, res, next, lines, live, identity: stats.data?.identity };
 }
 
 /**

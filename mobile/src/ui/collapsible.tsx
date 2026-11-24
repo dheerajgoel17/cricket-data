@@ -1,11 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated, { Easing, interpolate, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { interpolate, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import { ChevronRight } from "@/ui/icons";
 import { color, duration } from "@/ui/tokens";
+import { easeOutExpo } from "@/ui/curves";
 
 const DURATION = duration.base;
-const EASE = Easing.bezier(0.23, 1, 0.32, 1);
+const EASE = easeOutExpo;
 
 /**
  * Content that opens and closes under a row: its height and fade are animated on the UI thread (the way `Accordion` does for its sections), so "+3 books" slides open instead of jumping.

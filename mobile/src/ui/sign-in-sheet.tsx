@@ -45,7 +45,7 @@ export function SignInSheet() {
   };
 
   return (
-    <Modal visible={signInOpen} animationType="slide" transparent onRequestClose={closeSignIn}>
+    <Modal visible={signInOpen} animationType="slide" transparent statusBarTranslucent navigationBarTranslucent onRequestClose={closeSignIn}>
       <View style={styles.root}>
         <SheetBackdrop onClose={closeSignIn} />
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.sheetWrap} pointerEvents="box-none">
@@ -102,7 +102,7 @@ export function SignInSheet() {
 
                 <Button disabled={busy} label={mode === "in" ? "Sign in with email" : "Create account"} onPress={submit} style={styles.submitGap} />
 
-                <Press onPress={() => { setMode((m) => (m === "in" ? "up" : "in")); setErr(null); }} style={styles.switchRow}>
+                <Press accessibilityRole="button" accessibilityLabel={mode === "in" ? "Create an account" : "Sign in instead"} onPress={() => { setMode((m) => (m === "in" ? "up" : "in")); setErr(null); }} style={styles.switchRow}>
                   <Text style={styles.switchMuted}>
                     {mode === "in" ? "No account? " : "Already have an account? "}
                     <Text style={styles.switchLink}>{mode === "in" ? "Create one free" : "Sign in"}</Text>
