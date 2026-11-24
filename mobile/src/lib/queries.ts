@@ -3,6 +3,7 @@ import { AppState } from "react-native";
 import { focusManager, queryOptions } from "@tanstack/react-query";
 import { LIVE_SCORE_TTL_MS, LIVE_TTL_MS, liveScorePollMs, mergeBoardLive } from "@cricket/engine/live.js";
 import { getJson, peekJson } from "@/lib/net";
+import { withKeptFallback } from "@/lib/kept-fallback";
 import { readLive, saveLive } from "@/lib/storage";
 
 const BOARD_SCORES_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/board_scores.json";
@@ -32,7 +33,13 @@ export const linesQuery = queryOptions({
 /** Role, batting hand and bowling style per player (`lib/profile.ts`); the file is missing until the site has built it once, which only costs the profile line. */
 export const profilesQuery = queryOptions({ queryKey: ["profiles"], queryFn: async (): Promise<any> => { try { return await getJson("/data/profiles.json"); } catch { return null; } }, staleTime: 60 * 60_000 });
 
-export const photosQuery = queryOptions({ queryKey: ["photos"], queryFn: async (): Promise<any> => { try { return await getJson("/data/photos.json"); } catch { return {}; } }, staleTime: 60 * 60_000 });
+// Starts from the copy kept by the last launch (so pictures paint at once, even offline) and never caches a failure as "no photos" for an hour (`withKeptFallback`).
+export const photosQuery = queryOptions({
+  queryKey: ["photos"],
+  queryFn: (): Promise<any> => withKeptFallback(() => getJson("/data/photos.json"), () => peekJson("/data/photos.json", Infinity)),
+  staleTime: 60 * 60_000, retry: 3,
+  initialData: () => peekJson("/data/photos.json", KEPT_MS), initialDataUpdatedAt: 0,
+});
 
 /** Starts from the last body kept on the device (counted as stale, so the fresh one is asked for at once); a failed poll keeps what is on screen. */
 export const liveQuery = queryOptions({

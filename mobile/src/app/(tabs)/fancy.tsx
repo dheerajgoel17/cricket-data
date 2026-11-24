@@ -64,7 +64,7 @@ function Fancy() {
         keyExtractor={(c) => c.f.id || `${c.f.a}${c.f.b}${c.f.start}`}
         renderItem={({ item }) => <MatchCard {...item} />}
         ListHeaderComponent={header}
-        contentContainerStyle={{ paddingHorizontal: space.gutter, paddingTop: space.snug, paddingBottom: inset.bottom + 24 }}
+        contentContainerStyle={{ paddingHorizontal: space.gutter, paddingBottom: inset.bottom + 24 }}
         ListEmptyComponent={
           !ready
             ? (error ? <View style={styles.emptyPad}><ErrorState title="Could not score fancy lines" body="Something went wrong scoring the fancy lines." onRetry={refetch} /></View> : <Working label="Scoring the fancy lines…" shape="fancy" />)

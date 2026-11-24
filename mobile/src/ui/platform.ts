@@ -21,6 +21,9 @@ export function hitSlopFor(w: number, h: number = w) {
   return x || y ? { left: x, right: x, top: y, bottom: y } : undefined;
 }
 
+/** Vertical `hitSlop` that tops a full-width chip (the 36-point control height) up to the platform's minimum target: chips are drawn at the control height, never taller. */
+export const CHIP_SLOP = hitSlopFor(TOUCH, 36);
+
 /** Press feedback numbers shared with the web's `:active` (scale 0.97, 120 ms). */
 export const PRESS = { scale: Number(P["press-scale"]), ms: Number(P["press-ms"]) } as const;
 

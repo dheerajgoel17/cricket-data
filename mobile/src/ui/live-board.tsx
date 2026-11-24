@@ -19,6 +19,9 @@ type Side = [string, number];
 /** Read-only peek — fixture page already runs useStore; do not start a second store load from scorecard links. */
 const useStorePeek = () => useQuery({ ...storeQuery, enabled: false }).data;
 
+/** The batters and the bowler are lines 18 points apart, so their targets grow by half that and no more (they would overlap): a dense strip, not 48. */
+const NAME_SLOP = { top: 8, bottom: 8, left: 6, right: 6 };
+
 /** Initial + surname for the live strip ("D Warner"); particles kept. */
 function shortName(n: string) {
   const p = String(n).trim().split(/\s+/);
@@ -44,7 +47,7 @@ function Who({ name, team, sides, short, strike, style }: { name: string; team?:
   const idx = usePlayerIdx(name, team, sides);
   const text = (short ? shortName(name) : name) + (strike ? "*" : "");
   const t = <Text style={[styles.name, strike && { color: color.primary }, style]} numberOfLines={1}>{text}</Text>;
-  return idx != null ? <Press scale={0.97} onPress={() => push(`/player/${idx}`)} accessibilityRole="link" accessibilityLabel={name}>{t}</Press> : t;
+  return idx != null ? <Press scale={0.97} hitSlop={NAME_SLOP} onPress={() => push(`/player/${idx}`)} accessibilityRole="link" accessibilityLabel={name}>{t}</Press> : t;
 }
 
 const ov = (p: any) => {

@@ -19,6 +19,10 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `mobile/src/components/app-tabs.tsx`
 - **Change:** switching tabs is a short crossfade (`animation: "fade"`, opacity only) instead of an instant swap. Measured on a phone against the old `none`: the same 81 ms worst-1% frames (they are a tab mounting), 7 janky frames in 1,846 against 0 (0.38%). Chips already fade their fill and text on change (`chipFillTransition`), the segmented control and line tabs glide their thumb and underline.
 - **Callers:** the four tabs.
+### 2026-11-24 — Chip touch targets, initials only after the photos load
+- **Path:** `mobile/src/ui/{platform,chips,capsule,match-chip,window-pills,player-avatar,team-badge}.ts(x)`, `mobile/src/app/(tabs)/leagues.tsx`
+- **Change:** found with the phone's accessibility tree: day and year chips are 36 dp tall, match chips 44 dp, the Leagues "All competitions" / "More" links 18 dp, against Android's 48 dp minimum. Chips now carry a vertical `hitSlop` (`CHIP_SLOP`, `MATCH_SLOP`), the links `hitSlopFor`, so the drawing is unchanged and the target is 48. Initials on an avatar, team or league badge appear only once the photos file has loaded (before, they flashed for a moment before the picture arrived). An overlapped pair of crests shows one letter each. Also from the phone: the venue link on the fixture page and the batter / bowler names in the live strip get a larger tap area (the names only +8 dp, because their lines are 18 dp apart), and the fixed-width "EDGE" label stays on one line at fixed size when the phone's text is large (at 1.5x it broke into "EDG" / "E").
+- **Callers:** every chip row, the Leagues header, avatars and badges.
 
 ### 2026-11-24 — ChipsEdge, retry on every failed load, wrapping tag on Match Fancy rows
 - **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/fancy-row.tsx`, `mobile/src/ui/empty-state.tsx`
