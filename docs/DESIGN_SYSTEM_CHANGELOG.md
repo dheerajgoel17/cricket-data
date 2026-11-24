@@ -15,6 +15,10 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-24 — LiquidRefresh (app pull-to-refresh, Cue mobile, converted)
+- **Path:** `mobile/src/ui/liquid-refresh.tsx`, `mobile/src/ui/curves.ts` (`bounce.liquid`), `mobile/src/app/(tabs)/index.tsx`
+- **Change:** Pull-to-refresh on every tab is a drop of liquid that stretches from the top edge, breaks into a ring while it loads and turns into a check (from Cue's mobile "Liquid pull to refresh", converted: colours from `color.*`, type from `type.footnote`, spring in `curves.ts`, dark only, no demo or web handlers). A phone with reduce motion on gets the system control. The ring spins while loading (the no-spinner rule is waived for this one control).
+- **Callers:** every scrolling tab: Home, Player props and Fancy (FlashList, through `useLiquidList` and `renderScrollComponent`) and Leagues. `refresh-contract.test.ts` fails if a tab uses a one-off `RefreshControl`.
 ### 2026-11-24 — Tab switch crossfade
 - **Path:** `mobile/src/components/app-tabs.tsx`
 - **Change:** switching tabs is a short crossfade (`animation: "fade"`, opacity only) instead of an instant swap. Measured on a phone against the old `none`: the same 81 ms worst-1% frames (they are a tab mounting), 7 janky frames in 1,846 against 0 (0.38%). Chips already fade their fill and text on change (`chipFillTransition`), the segmented control and line tabs glide their thumb and underline.

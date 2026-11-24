@@ -1,6 +1,6 @@
 import { memo, Profiler, useEffect, useMemo, useState } from "react";
 import { mark, onRender } from "@/lib/perf";
-import { FlatList, Platform, RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { FlatList, Platform, StyleSheet, useWindowDimensions, View } from "react-native";
 import { layoutWidth } from "@/lib/fit";
 import type { HomePhase } from "@site/lib/home-phase";
 import { EMPTY_PHASE, phaseView, type RailItem } from "@/lib/rail";
@@ -10,6 +10,7 @@ import { useRail } from "@/lib/use-rail";
 import { AppHeader } from "@/ui/brand";
 import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { FixtureCard } from "@/ui/fixture-card";
+import { LiquidScroll } from "@/ui/liquid-refresh";
 import { HotHome, HotHomeSkeleton } from "@/ui/hot-home";
 import { useScreenInsets } from "@/ui/insets";
 import { keptTab } from "@/ui/lazy-tab";
@@ -30,8 +31,7 @@ function Fixtures() {
   mark("render:Fixtures");
   const { ready: railReady, settled, liveKnown, items, error, refetch } = useRail();
   const ready = railReady && settled; // wait for the live feed: which phase opens depends on what is in play
-  const [pulling, setPulling] = useState(false);
-  const pull = () => { setPulling(true); void refetch().finally(() => setPulling(false)); };
+  const pull = () => { void refetch(); };
   const inset = useScreenInsets();
   const width = layoutWidth(useWindowDimensions().width, Platform.OS);
   const [asked, setAsked] = useState<HomePhase>();
@@ -56,11 +56,10 @@ function Fixtures() {
       <AppHeader />
       <PhaseBar value={phase} counts={counts} onChange={setAsked} />
       <View style={styles.propsScroll}>
-      <ScrollView
+      <LiquidScroll
         style={styles.propsScroll}
         contentContainerStyle={{ paddingBottom: inset.bottom + 24 }}
-        refreshControl={<RefreshControl refreshing={pulling} onRefresh={pull} tintColor={color.foreground} colors={[color.primary]} progressBackgroundColor={color.card} />}
-        showsVerticalScrollIndicator={false}
+        onRefresh={refetch}
         removeClippedSubviews={Platform.OS === "android"}
       >
         <View style={{ height: bandH }}>
@@ -108,7 +107,7 @@ function Fixtures() {
           </Profiler>
         </View>
         {ready && propsReady ? <Profiler id="hothome" onRender={onRender}><Appear><HotHome phase={phase} /></Appear></Profiler> : error ? null : <HotHomeSkeleton />}
-      </ScrollView>
+      </LiquidScroll>
       <TabFade />
       </View>
     </View>
