@@ -41,3 +41,9 @@ describe("chip touch targets", () => {
     expect(readFileSync(join(root, "app/(tabs)/leagues.tsx"), "utf8")).not.toMatch(/hitSlop=\{8\}/);
   });
 });
+
+describe("large text", () => {
+  it("the fixed-width EDGE label never wraps into EDG / E when the phone's text is large", () => {
+    for (const rel of ["ui/prop-row.tsx", "ui/fancy-row.tsx"]) expect(readFileSync(join(root, rel), "utf8")).toMatch(/numberOfLines=\{1\} maxFontSizeMultiplier=\{1\}>Edge/);
+  });
+});

@@ -88,7 +88,7 @@ export function OverviewRow({ r, onOpen, active, standing, sub, extra, inset, se
         </View>
         {toss || mark?.state === "void" ? <View style={styles.edge} /> : (
           <View style={styles.edge}>
-            <Text style={styles.edgeLabel}>Edge</Text>
+            <Text style={styles.edgeLabel} numberOfLines={1} maxFontSizeMultiplier={1}>Edge</Text>
             <Text style={[styles.edgeValue, { color: edgeColor }]}>{r.edge == null ? "–" : `${r.edge > 0 ? "+" : ""}${(r.edge * 100).toFixed(0)}`}</Text>
           </View>
         )}
