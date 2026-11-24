@@ -11,7 +11,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useStore } from "@/lib/use-store";
 import { competitions } from "@/lib/league";
 import { useScreenInsets } from "@/ui/insets";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { ListRow } from "@/ui/list";
 import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
@@ -34,7 +34,7 @@ export default function Competitions() {
     <PageAtmosphere style={{ paddingTop: inset.top }}>
       <PageHeader title="Competitions" />
       <SearchField style={styles.field} value={text} onChangeText={setText} placeholder="Search competitions" />
-      {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store || !matchesReady ? <Working label="Loading…" fill shape="comps" /> : (
+      {stats.isError && !matchesReady ? <ErrorState title="Could not load history" onRetry={() => void stats.refetch()} /> : !store || !matchesReady ? <Working label="Loading…" fill shape="comps" /> : (
         <FlashList
           data={rows}
           keyExtractor={([e]) => String(e)}

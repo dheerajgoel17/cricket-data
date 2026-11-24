@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { elevation } from "@/ui/platform";
 import { useChoice } from "@/lib/use-choice";
 import { Pressable, StyleSheet, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Text } from "@/ui/text";
 import { color, font, type, tint, duration, w } from "@/ui/tokens";
@@ -27,7 +27,8 @@ export function Segmented<T extends string>({ items, value: valueProp, onChange:
   const [w, setW] = useState(0);
   const index = Math.max(0, items.findIndex(([id]) => id === value));
   const x = useSharedValue(index);
-  useEffect(() => { x.value = withTiming(index, { duration: duration.base, easing: Easing.out(Easing.cubic) }); }, [index, x]);
+  const calm = useReducedMotion();
+  useEffect(() => { x.value = calm ? index : withTiming(index, { duration: duration.base, easing: Easing.out(Easing.cubic) }); }, [index, x, calm]);
   const seg = w ? (w - 4) / items.length : 0;
   const thumb = useAnimatedStyle(() => ({ transform: [{ translateX: x.value * seg }] }));
   return (

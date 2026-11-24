@@ -3,7 +3,7 @@ import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, { Easing, runOnJS, useAnimatedProps, useAnimatedStyle, useSharedValue, withDelay, withTiming, type SharedValue } from "react-native-reanimated";
+import Animated, { Easing, runOnJS, useAnimatedProps, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming, type SharedValue } from "react-native-reanimated";
 import Svg, { Circle, Defs, Line, Pattern, Rect } from "react-native-svg";
 import { CountUp, ReText } from "@/ui/count-up";
 import { Press } from "@/ui/press";
@@ -23,7 +23,8 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 /** A ring segment that draws itself from nothing to its length on the UI thread. */
 function Arc({ r, start, dash, total, stroke, delay = 0, round }: { r: number; start: number; dash: number; total: number; stroke: string; delay?: number; round?: boolean }) {
   const g = useSharedValue(0);
-  useEffect(() => { g.value = withDelay(delay, withTiming(1, { duration: duration.slow, easing: Easing.out(Easing.cubic) })); }, [g, delay]);
+  const calm = useReducedMotion();
+  useEffect(() => { g.value = calm ? 1 : withDelay(delay, withTiming(1, { duration: duration.slow, easing: Easing.out(Easing.cubic) })); }, [g, delay, calm]);
   const props = useAnimatedProps(() => ({ strokeDasharray: [dash * g.value, total] }));
   return <AnimatedCircle cx={24} cy={24} r={r} fill="none" stroke={stroke} strokeWidth={4} strokeLinecap={round ? "round" : "butt"} animatedProps={props} transform={`rotate(${start} 24 24)`} />;
 }
@@ -150,7 +151,8 @@ export function ChartBars({ entries, line, side, height = 240, onSelect }: { ent
 /** One bar: a flat solid that grows from the floor (staggered), with its value inside; dims while a finger is on another bar. */
 function Bar({ i, pct, tone, text, value, active }: { i: number; pct: number; tone: "hit" | "miss" | "push"; text: string; value: number; active: SharedValue<number> }) {
   const g = useSharedValue(0);
-  useEffect(() => { g.value = withDelay(Math.min(i * 14, 420), withTiming(1, { duration: duration.slow, easing: Easing.out(Easing.cubic) })); }, [g, i]);
+  const calm = useReducedMotion();
+  useEffect(() => { g.value = calm ? 1 : withDelay(Math.min(i * 14, 420), withTiming(1, { duration: duration.slow, easing: Easing.out(Easing.cubic) })); }, [g, i, calm]);
   const style = useAnimatedStyle(() => ({ transform: [{ scaleY: g.value }], opacity: active.value < 0 || active.value === i ? 1 : 0.38 }));
   return (
     <Animated.View style={[styles.bar, { height: `${pct}%`, backgroundColor: TONE[tone] }, style, { transformOrigin: "bottom" } as any]}>

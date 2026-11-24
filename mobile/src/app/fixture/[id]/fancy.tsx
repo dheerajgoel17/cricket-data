@@ -9,7 +9,7 @@ import { useStore } from "@/lib/use-store";
 import { liveQuery } from "@/lib/queries";
 import { fixtureState, liveMatchFor, type RailItem } from "@/lib/rail";
 import { useNow } from "@/lib/use-now";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
 import { MatchFancy } from "@/ui/match-fancy";
 import { MatchHeader } from "@/ui/match-header";
@@ -39,7 +39,7 @@ export default function FancyMarketPage() {
     return (
       <PageAtmosphere style={{ paddingTop: inset.top }}>
         <PageHeader title="Fancy" />
-        {stats.isError ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : <Working label="Loading…" shape="market" />}
+        {stats.isError ? <ErrorState title="Could not load history" onRetry={() => void stats.refetch()} /> : <Working label="Loading…" shape="market" />}
       </PageAtmosphere>
     );
   }

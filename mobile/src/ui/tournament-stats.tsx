@@ -12,7 +12,7 @@ import { abbr } from "@site/lib/format";
 import { useStore } from "@/lib/use-store";
 import { playerLabel } from "@/lib/player-label";
 import { Chips } from "@/ui/chips";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
@@ -40,7 +40,7 @@ export function TournamentStats({ eventIdx, season, onSeason }: { eventIdx: numb
     queryFn: () => { setRead([0, store.nshard]); return editionRows(store, ed.ms, { onProgress: (d: number, n: number) => setRead([d, n]) }); },
   });
   const result = useMemo(() => (ed && rows.data ? tournamentBoards(store, ed, rows.data) : null), [store, ed, rows.data]);
-  if (stats.isError && !matchesReady) return <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." />;
+  if (stats.isError && !matchesReady) return <ErrorState title="Could not load history" onRetry={() => void stats.refetch()} />;
   if (!store || !matchesReady) return <Working label="Loading…" shape="league" />;
   if (!ed) return <EmptyState title="No matches" body="No matches in the data for this competition." />;
   return (

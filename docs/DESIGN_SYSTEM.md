@@ -209,6 +209,7 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 | Job | Web | App |
 | --- | --- | --- |
 | Empty state | `EmptyState` | `mobile/src/ui/empty-state` (compatible) |
+| Failed load with retry | `ErrorState` (app) | `mobile/src/ui/empty-state`: `EmptyState` plus a "Try again" button; web uses the page's own retry |
 | Chips / filters | `Chip` / `PillGroup` / `PillTabs` | `Chips` / `ActiveChip` / `ChoiceChip` / Capsule |
 | Sticky filter band | `StickyFilterBand` (+ flush header) | **Native-designed** — `BlurBar merge` (Player + Fixture); list/header scroll (Props / Fancy); short sticky section only (Ground); no blind web sticky under BlurBar |
 | Fixture scoreboard shell | `-mx-gutter bg-card border-b` | `scoreShell` + flush accordion / live strip — **twin** |

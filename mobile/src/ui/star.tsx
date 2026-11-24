@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { StyleSheet } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/lib/auth";
@@ -11,12 +11,14 @@ import { color, control, duration, state } from "@/ui/tokens";
 /** The star: when it fills it squeezes, pops past full size and settles (UI thread), with a light tap on the way in and a softer one on the way out. */
 function Star({ on, size }: { on: boolean; size: number }) {
   const k = useSharedValue(1);
+  const calm = useReducedMotion();
   const first = useSharedValue(true);
   const pop = useAnimatedStyle(() => ({ transform: [{ scale: k.value }] }));
   useEffect(() => {
     if (first.value) { first.value = false; return; }
+    if (calm) { k.value = 1; return; }
     k.value = on ? withSequence(withTiming(0.7, { duration: duration.instant }), withSpring(1.28, { damping: 6, stiffness: 420 }), withSpring(1, { damping: 12 })) : withSequence(withTiming(0.85, { duration: duration.instant }), withSpring(1, { damping: 12 }));
-  }, [on, k, first]);
+  }, [on, k, first, calm]);
   return <Animated.View style={pop}><Ionicons name={on ? "star" : "star-outline"} size={size} color={on ? color.amber : color.foreground} /></Animated.View>;
 }
 

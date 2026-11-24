@@ -24,7 +24,7 @@ export function Grabber({ style }: { style?: StyleProp<ViewStyle> }) {
 export function Sheet({ visible, onClose, label = "Close", full, style, children }: { visible: boolean; onClose: () => void; label?: string; full?: boolean; style?: StyleProp<ViewStyle>; children: ReactNode }) {
   const insets = useSafeAreaInsets();
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" transparent statusBarTranslucent navigationBarTranslucent onRequestClose={onClose}>
       <SheetBackdrop onClose={onClose} label={label} />
       <View style={[styles.panel, full ? styles.full : styles.bottom, { paddingBottom: Math.max(insets.bottom, space.stack) }, style]} accessibilityViewIsModal>
         {children}

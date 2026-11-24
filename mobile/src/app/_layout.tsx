@@ -1,7 +1,7 @@
 import { Profiler, useEffect, useState } from "react";
 import { checkForUpdate } from "@/lib/ota";
-import { Platform } from "react-native";
-import { DarkTheme, Stack, ThemeProvider } from "expo-router";
+import { Platform, View } from "react-native";
+import { DarkTheme, Stack, ThemeProvider, type ErrorBoundaryProps } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -14,10 +14,12 @@ import { SITE_URL } from "@/lib/config";
 import { loadBookManifest } from "@site/lib/books";
 import { mark, onRender, PROFILE } from "@/lib/perf";
 import { fixturesQuery, hotRowsQuery, linesQuery, liveQuery, photosQuery, watchAppState } from "@/lib/queries";
+import { logError } from "@/lib/error-log";
 import { AnimatedSplash } from "@/ui/animated-splash";
+import { ErrorState } from "@/ui/empty-state";
 import { SignInSheet } from "@/ui/sign-in-sheet";
 import { WebFrame } from "@/ui/web-frame";
-import { color, font } from "@/ui/tokens";
+import { color, font, space } from "@/ui/tokens";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -29,6 +31,19 @@ const theme = {
   ...DarkTheme,
   colors: { ...DarkTheme.colors, background: color.background, card: color.card, border: color.border, primary: color.primary, text: color.foreground },
 };
+
+/**
+ * Expo Router's route error boundary: a screen that throws while rendering shows this (with a retry that re-renders the route) instead of a blank or red screen,
+ * and the error is kept on the device (`lib/error-log.ts`). Every route inherits it from here.
+ */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => { logError("route", error); }, [error]);
+  return (
+    <View style={{ flex: 1, backgroundColor: color.background, justifyContent: "center", padding: space.gutter }}>
+      <ErrorState title="Something went wrong" body="This page hit a problem. Try again, or go back." onRetry={() => void retry()} />
+    </View>
+  );
+}
 
 export default function RootLayout() {
   // Satoshi for UI; Barlow Condensed for scoreboard figures / caps labels.

@@ -9,7 +9,7 @@ import { useStore } from "@/lib/use-store";
 import { useLater } from "@/lib/use-later";
 import { leagueData } from "@/lib/league";
 import { DataTable } from "@/ui/data-table";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
 import { ListRow } from "@/ui/list";
 import { Working } from "@/ui/motion";
@@ -40,7 +40,7 @@ export default function League() {
   return (
     <PageAtmosphere style={{ paddingTop: inset.top }}>
       <PageHeader title={name} subtitle={data ? `${data.ms.length} matches · ${data.seasons[data.seasons.length - 1]}–${data.seasons[0]}` : undefined} />
-      {stats.isError && !matchesReady ? <EmptyState title="Could not load history" body="Check your connection and reopen this page to retry." /> : !store ? <Working label="Loading…" fill shape="league" /> : !matchesReady || (known && !bodyReady) ? <Working label="Loading matches…" fill shape="league" /> : !known || !data ? <EmptyState title="Unknown competition" body="This competition is not in the stats data." /> : (
+      {stats.isError && !matchesReady ? <ErrorState title="Could not load history" onRetry={() => void stats.refetch()} /> : !store ? <Working label="Loading…" fill shape="league" /> : !matchesReady || (known && !bodyReady) ? <Working label="Loading matches…" fill shape="league" /> : !known || !data ? <EmptyState title="Unknown competition" body="This competition is not in the stats data." /> : (
         <ScrollView contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]} showsVerticalScrollIndicator={false}>
           <View style={styles.hero}>
             <LeagueBadge name={name} size={56} />

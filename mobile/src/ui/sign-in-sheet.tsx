@@ -45,7 +45,7 @@ export function SignInSheet() {
   };
 
   return (
-    <Modal visible={signInOpen} animationType="slide" transparent onRequestClose={closeSignIn}>
+    <Modal visible={signInOpen} animationType="slide" transparent statusBarTranslucent navigationBarTranslucent onRequestClose={closeSignIn}>
       <View style={styles.root}>
         <SheetBackdrop onClose={closeSignIn} />
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.sheetWrap} pointerEvents="box-none">
