@@ -568,3 +568,29 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `site/src/components/app/fancy-lines.tsx`, `mobile/src/ui/fancy-row.tsx`
 - **Change:** the toss row's record line, book name and ground column truncate on the site; each is the existing `Tooltip` (shadcn) and shows the full text on hover / focus only when it is really clipped (`TruncTip`). On the app, where there is no hover, the record line wraps to two lines instead of truncating. No new component or variant.
 - **Callers:** toss rows in `FancyLines` (compact and dense) and `OverviewRow`
+
+### 2026-11-24 — Fixture tabs: one two-row control pattern (site)
+- **Path:** `site/src/components/app/hot-props.tsx`, `grid-filters.tsx`, `fixture-ground.tsx`, `recent-form.tsx`, `site/src/pages/OddEven.tsx`
+- **Change:** every fixture tab has the same two levels: the section chips, then one edge-to-edge row of underlined `PillGroup sub` tabs (prop type, stat, format, overs, scope) with the one `FilterButton` at the right and the hairline under it; no extra padding between. Form and Odd / Even lists run edge to edge (hairlines meet the screen edge, copy keeps the gutter). The Odd / Even tab replaces Grid in the tab row. No new variant: `sub` and `FilterButton` already existed.
+- **Callers:** fixture page tabs Props, Match Fancy, Ground, Form, Odd / Even, Custom line (the app's screens follow in a later change)
+
+### 2026-11-24 — PillTabs drawn like PillGroup chips; team page order (site)
+- **Path:** `site/src/components/app/pill-tabs.tsx`, `site/src/pages/Markets.tsx`
+- **Change:** `PillTabs` (team and league section tabs) now draws the same chips as `PillGroup`'s default (primary pill on the selected one, card chips, same height, text size and gap) instead of its own accent pill, so a team or league page reads like the fixture page. On the team page the section chips come first and the format is the underlined `PillGroup sub` row with its hairline under them (it was above the chips).
+- **Callers:** team page, league page, design-system catalogue
+
+### 2026-11-24 — Segmented tab switches become underlined sub-tabs (site)
+- **Path:** `site/src/components/app/tournament-stats.tsx`, `site/src/pages/Simple.tsx`, `site/src/pages/Player.tsx`
+- **Change:** the raised-thumb segmented control (Batting / Bowling / Overall, Teams / Venues, the player's sections) is now the same underlined `PillGroup sub` row with an edge-to-edge hairline as every other second-level tab row. The O / U value toggle on the player page stays segmented: it is a value switch, not tabs.
+- **Callers:** Leagues and league stats, Teams & venues, player page sections
+
+### 2026-11-24 — Two levels: underlined sections, outlined filter chips (site) — supersedes the three entries above
+- **Path:** `site/src/components/app/pill-group.tsx` (new `chips` variant), `pill-tabs.tsx`, `match-fancy.tsx`, `hot-props.tsx`, `grid-filters.tsx`, `fixture-ground.tsx`, `site/src/pages/Fixtures.tsx`, `Markets.tsx`, `OddEven.tsx`
+- **Change:** the first level of every page is one underlined row with a hairline under it (`PillGroup sub`; `PillTabs` is the same look): the fixture tabs, the team and league sections. The second level is small outlined filter chips (`PillGroup chips`: selected = primary outline, no sliding thumb) with the one `FilterButton` at the right: prop type, stat, format, overs, scope and market chips. The filled green pill now only appears where a chip is a real choice on its own (day and match rails, filter sheets). Chosen by the user from four options (underline plus outlined chips).
+- **Callers:** fixture tabs (Props, Match Fancy, Ground, Form, Odd / Even, Custom line), Match Fancy market page, team and league pages (the app follows in a later change)
+
+### 2026-11-24 — Toss moves to its own tab; shared MarkRow / MarkSection (site)
+- **Path:** `site/src/components/app/mark-rows.tsx` (new), `site/src/pages/Toss.tsx` (new), `OddEven.tsx`, `match-fancy.tsx`, `Fixtures.tsx`
+- **Change:** the Toss winner rows are gone from the Match Fancy list and live in a Toss tab built like Odd / Even from the same shared `MarkRow` (title, headline figure, tappable marks) and `MarkSection` (heading over hairline rows). The toss rendering inside `FancyLines` stays for the app's twin until its Toss screen exists.
+- **Callers:** fixture tabs Toss and Odd / Even
+

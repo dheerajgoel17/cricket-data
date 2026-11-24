@@ -62,3 +62,14 @@ test("tossRows: one row per side in the fancy row shape, price from the book or 
   assert.deepEqual([rows[0].vsOpp, rows[0].atGround], [{ n: 3, won: 2, opp: "New Zealand" }, { n: 2, won: 1 }]);
   assert.equal(tossRows({ M: null, n: 0 }, null, { a: "India", b: "New Zealand" }, { teams: [], fmt: 0 })[0].played, 0); // no history: the row still shows its price
 });
+
+import { tossMarks } from "@cricket/engine/toss.js";
+
+test("tossMarks: each toss with who won, what it chose, the opponent and the date, oldest to newest", () => {
+  const M = { f: [0, 0, 0, 0], g: [0, 0, 0, 0], a: [0, 0, 2, 0], b: [1, 1, 0, 1], v: [5, 6, 5, 5], d: ["2026-01-01", "2026-01-05", "2026-01-09", "2026-01-12"], tw: [0, 1, 2, 0], td: [1, 0, 1, -1] };
+  const store = { M, n: 4 };
+  assert.deepEqual(tossMarks(store, 0, { fmt: 0 }).map((x) => [x.won, x.bat, x.vs, x.date]), [[true, true, 1, "2026-01-01"], [false, null, 1, "2026-01-05"], [false, null, 2, "2026-01-09"], [true, null, 1, "2026-01-12"]]);
+  assert.deepEqual(tossMarks(store, 0, { fmt: 0, opp: 1, venue: [5] }).map((x) => x.m), [0, 3]);
+  assert.equal(tossMarks(store, 0, { fmt: 0, lastN: 1 }).length, 1);
+  assert.equal(tossMarks({ M: { f: [], g: [], a: [], b: [] }, n: 0 }, 0, { fmt: 0 }), null);
+});

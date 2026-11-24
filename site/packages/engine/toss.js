@@ -26,11 +26,10 @@ export function tossMarket(doc, fx) {
 }
 
 /**
- * A side's toss record over its last `lastN` matches in a format (`tw` / `td` of matches.json; a match whose toss is not recorded is not counted), optionally against one
- * opponent (`opp`, a team index) or at a ground (`venue`, venue indices): `{ n, won, bat, form }` = tosses on record, tosses won, wins where it chose to bat, and
- * `form`, "W" / "L" per toss, oldest to newest. Null when the build carries no toss columns. History only: it says how the side's tosses went, not what the next one will be.
+ * A side's last tosses in a format, oldest to newest: `{ m, won, bat, vs, date }` (`bat` is true when it won and chose to bat, false when it won and chose to field, null when it lost or the choice is not recorded;
+ * `vs` the other side's index). Only matches whose toss is recorded (`tw` of matches.json); optionally against one opponent (`opp`, a team index) or at a ground (`venue`, venue indices). Null when the build carries no toss columns.
  */
-export function tossRecord(store, team, { fmt, gender = 0, lastN = 10, opp = null, venue = null } = {}) {
+export function tossMarks(store, team, { fmt, gender = 0, lastN = 10, opp = null, venue = null } = {}) {
   const M = store?.M;
   if (!M?.tw || team == null || team < 0) return null;
   const venues = venue == null ? null : Array.isArray(venue) ? venue : [venue];
@@ -39,13 +38,21 @@ export function tossRecord(store, team, { fmt, gender = 0, lastN = 10, opp = nul
     if (M.f[m] !== fmt || M.g[m] !== gender || (M.a[m] !== team && M.b[m] !== team) || M.tw[m] < 0) continue;
     if (opp != null && M.a[m] !== opp && M.b[m] !== opp) continue;
     if (venues && !venues.includes(M.v[m])) continue;
-    hit.push(m);
+    const won = M.tw[m] === team;
+    hit.push({ m, won, bat: won && M.td[m] >= 0 ? M.td[m] === 1 : null, vs: M.a[m] === team ? M.b[m] : M.a[m], date: M.d?.[m] ?? null });
   }
-  const last = hit.slice(-lastN);
-  return {
-    n: last.length, won: last.filter((m) => M.tw[m] === team).length, bat: last.filter((m) => M.tw[m] === team && M.td[m] === 1).length,
-    form: last.map((m) => (M.tw[m] === team ? "W" : "L")),
-  };
+  return lastN > 0 ? hit.slice(-lastN) : hit;
+}
+
+/**
+ * A side's toss record over its last `lastN` matches in a format (`tw` / `td` of matches.json; a match whose toss is not recorded is not counted), optionally against one
+ * opponent (`opp`, a team index) or at a ground (`venue`, venue indices): `{ n, won, bat, form }` = tosses on record, tosses won, wins where it chose to bat, and
+ * `form`, "W" / "L" per toss, oldest to newest. Null when the build carries no toss columns. History only: it says how the side's tosses went, not what the next one will be.
+ */
+export function tossRecord(store, team, opts = {}) {
+  const hit = tossMarks(store, team, opts);
+  if (!hit) return null;
+  return { n: hit.length, won: hit.filter((x) => x.won).length, bat: hit.filter((x) => x.bat === true).length, form: hit.map((x) => (x.won ? "W" : "L")) };
 }
 
 /**

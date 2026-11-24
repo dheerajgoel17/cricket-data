@@ -276,16 +276,12 @@ function GroundFilterBar({ fx, fmt, gender, onFmt, onGender }: {
   const gl = genderFilterLabel(gender);
   return (
     <div className="flex flex-col gap-snug">
-      <div className="flex items-center gap-snug">
-        <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-tight overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" role="toolbar" aria-label="Format filters">
-          {formats.map(([f, n]) => {
-            const count = gender
-              ? fx.filter((x) => (x.fmt || "T20") === f && (x.gender === gender || (!x.gender && gender === "male"))).length
-              : n;
-            if (gender && !count) return null;
-            return <Chip key={f} on={fmt === f} onClick={() => onFmt(f)}>{f}<span className="text-footnote opacity-70">{count}</span></Chip>;
-          })}
-        </div>
+      <div className="-mx-gutter flex items-center gap-snug px-gutter">
+        <PillGroup chips layoutId="ground-format" label="Format" value={fmt} onChange={onFmt} className="min-w-0 flex-1"
+          items={formats.flatMap(([f, n]) => {
+            const count = gender ? fx.filter((x) => (x.fmt || "T20") === f && (x.gender === gender || (!x.gender && gender === "male"))).length : n;
+            return gender && !count ? [] : [[f, <span key={f} className="flex items-center gap-tight">{f}<span className="text-footnote opacity-70">{count}</span></span>] as [string, React.ReactNode]];
+          })} />
         {both ? (
           <FilterButton label={gl} count={(gender ? 1 : 0)} onClick={() => setOpen(true)} />
         ) : null}

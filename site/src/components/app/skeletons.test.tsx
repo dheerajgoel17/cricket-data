@@ -21,7 +21,7 @@ describe("skeleton shapes", () => {
 describe("skeleton routes (every page / subpage)", () => {
   it("lists a shape for each home, fixture, player and markets surface", () => {
     const ids = SKELETON_ROUTES.map((r) => r.id);
-    for (const need of ["home/rail", "home/props", "fixture", "fixture/props", "fixture/grid", "fixture/fancy", "fixture/ground", "player", "props", "markets/team"]) {
+    for (const need of ["home/rail", "home/props", "fixture", "fixture/props", "fixture/fancy", "fixture/ground", "player", "props", "markets/team"]) {
       expect(ids).toContain(need);
     }
   });

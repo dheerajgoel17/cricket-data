@@ -24,7 +24,6 @@ export const SKELETON_ROUTES: readonly SkeletonRoute[] = [
   { id: "fixture", page: "Fixture · header", shape: "match", file: "app/fixture/[id]/index.tsx" },
   { id: "fixture/props", page: "Fixture · Props", shape: "rows", file: "app/fixture/[id]/index.tsx" },
   { id: "fixture/fancy", page: "Fixture · Match Fancy", shape: "rows", file: "ui/match-fancy.tsx" },
-  { id: "fixture/grid", page: "Fixture · Grid", shape: "grid", file: "app/fixture/[id]/index.tsx" },
   { id: "fixture/trends", page: "Fixture · Custom line", shape: "list", file: "app/fixture/[id]/index.tsx" },
   { id: "fixture/fancy-market", page: "Fancy market page", shape: "market", file: "app/fixture/[id]/fancy.tsx" },
   { id: "fixture/ground", page: "Fixture ground", shape: "ground", file: "app/fixture/[id]/ground.tsx" },

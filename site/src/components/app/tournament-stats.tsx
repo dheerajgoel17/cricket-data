@@ -140,8 +140,11 @@ function Lists({ ed, result }: { ed: any; result: any }) {
           {result.leaders.map((l: Leader) => <LeaderCard key={l.id} l={l} test={ed.fmt === "Test"} />)}
         </div>
       )}
-      {groups.length > 1 && <PillGroup segmented layoutId={`stats-${id}`} label="Stats" value={group.id} onChange={(v) => { track("stats_group", { group: v }); setTab(v); }} className="w-full" itemClassName="flex-1"
-        items={groups.map((g: any) => [g.id, g.label] as [string, string])} />}
+      {groups.length > 1 && (
+        <div className="-mx-gutter border-b border-hairline px-gutter">
+          <PillGroup sub layoutId={`stats-${id}`} label="Stats" value={group.id} onChange={(v) => { track("stats_group", { group: v }); setTab(v); }}
+            items={groups.map((g: any) => [g.id, g.label] as [string, string])} />
+        </div>)}
       <AnimatedHeight>
         <div className="grid items-start gap-stack lg:grid-cols-2">
           {group.boards.map((b: Board) => <BoardCard key={b.id} b={b} />)}

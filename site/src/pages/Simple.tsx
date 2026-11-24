@@ -222,7 +222,7 @@ export function TeamsPage() {
   return (
     <div className="flex flex-col gap-stack">
       <PageTitle>Teams &amp; venues</PageTitle>
-      <PillGroup segmented layoutId="tv-tab" label="Directory" value={tab} onChange={(k) => setQ({ tab: k })} items={[["teams", "Teams"], ["venues", "Venues"]]} />
+      <div className="-mx-gutter border-b border-hairline px-gutter"><PillGroup sub layoutId="tv-tab" label="Directory" value={tab} onChange={(k) => setQ({ tab: k })} items={[["teams", "Teams"], ["venues", "Venues"]]} /></div>
       <DirectorySearch label={`Search ${tab}`} value={text} onChange={(value) => { setText(value); setQ({ q: value }); }} />
       {rows.length ? <DataTable bleed columns={[tab === "teams" ? "Team" : "Venue", "Matches"]} rows={rows.map(([n, i, c]) => [<Link key={i} className="text-primary" to={`/${tab === "teams" ? "team" : "venue"}/${i}`}>{n}</Link>, c])} /> :
         <EmptyState compact title={`No ${tab} found`} body="Try a different search." />}

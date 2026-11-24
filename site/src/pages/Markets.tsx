@@ -185,16 +185,14 @@ export function MarketPage({ kind }: { kind: "team" | "venue" }) {
       ) : (
         <EntityHero name={label} sub={ground ? `${ground.total} matches` : "Ground"} meta={[fmtName, ...(ground?.by || [])]} />
       )}
-      {isTeam && (
-        <StickyFilterBand>
-          <div className="border-b border-hairline px-gutter pt-snug">
-            <PillGroup sub layoutId="team-format" label="Format" value={fmtName} onChange={(next) => setQ({ fmt: next })}
-              items={offeredFormats.map((f: string) => [f, f])} />
-          </div>
-        </StickyFilterBand>
-      )}
       <datalist id="dl-teams">{[...new Set<string>(store.teams.map((t: any) => t.n))].map((n) => <option key={n} value={n} />)}</datalist>
       <PillTabs layoutId="mk-tab" scrollable tabs={tabs} value={tab} onChange={(t) => setQ({ tab: t })}>
+        {isTeam && (
+          <div className="-mx-gutter px-gutter">
+            <PillGroup chips layoutId="team-format" label="Format" value={fmtName} onChange={(next) => setQ({ fmt: next })}
+              items={offeredFormats.map((f: string) => [f, f])} />
+          </div>
+        )}
         {isTeam && <TabsContent value="grid" className="flex flex-col gap-stack">
           <LiveForm onValues={(v) => setQ({ gstat: v.gstat, gline: v.gline })}><Field label="Stat"><NativeSelect name="gstat" options={Object.entries(STATS).map(([k, v]: any) => [k, v.label])} defaultValue={gstat} /></Field><Field label="Line"><Input name="gline" type="number" step="0.5" defaultValue={gline} className="w-24" /></Field></LiveForm>
           {grid.data ? <><GridTable g={grid.data} teamIdx={idx} line={gline} /><Muted>{(STATS as any)[gstat].label} over {gline} across this team's last {grid.data.fx.length} {fmtName} fixtures. A dash means the player was not in the XI. VOID means the player was in the XI but did not {(STATS as any)[gstat].side === "bat" ? "bat" : "bowl"}.</Muted></> : grid.isError ? <EmptyState title="Could not load the player grid" body="Try another format or reload the page." /> : <ListSkeleton rows={4} />}
