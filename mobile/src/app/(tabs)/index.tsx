@@ -8,7 +8,7 @@ import { useLater } from "@/lib/use-later";
 import { useNow } from "@/lib/use-now";
 import { useRail } from "@/lib/use-rail";
 import { AppHeader } from "@/ui/brand";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { FixtureCard } from "@/ui/fixture-card";
 import { HotHome, HotHomeSkeleton } from "@/ui/hot-home";
 import { useScreenInsets } from "@/ui/insets";
@@ -66,7 +66,7 @@ function Fixtures() {
         <View style={{ height: bandH }}>
           <Profiler id="rail" onRender={onRender}>
           {!ready ? (
-            error ? <View style={styles.emptyPad}><EmptyState title="Could not load fixtures" body="Pull to retry." /></View> : <RailSkeleton width={cardW} />
+            error ? <View style={styles.emptyPad}><ErrorState title="Could not load fixtures" onRetry={pull} /></View> : <RailSkeleton width={cardW} />
           ) : shown.length === 0 ? (
             <View style={styles.emptyPad}><EmptyState title={EMPTY_PHASE[phase].title} body={EMPTY_PHASE[phase].body} /></View>
           ) : (

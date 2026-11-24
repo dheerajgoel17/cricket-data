@@ -41,14 +41,11 @@ function Chip({ label, count, on, muted, onPress, calm }: { calm: boolean; label
 /** The one "open the filters" button (Props, Fancy, Grid, Home): options icon, a label, and the number of active filters as a badge on the corner (the site's `Filters` button). */
 export function FilterButton({ label = "Filters", count = 0, onPress, style }: { label?: string; count?: number; onPress: () => void; style?: StyleProp<ViewStyle> }) {
   return (
-    <View>
-      <LinearGradient pointerEvents="none" colors={[tint.black(0), color.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.chipFade} />
     <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={`Filters${count ? `, ${count} active` : ""}`} style={[styles.filterBtn, style]}>
       <Ionicons name="options-outline" size={icon.sm} color={color.foreground} />
       <Text style={styles.filterLbl}>{label}</Text>
       {count > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeTxt}>{count}</Text></View> : null}
     </Press>
-    </View>
   );
 }
 
@@ -76,6 +73,16 @@ export function ChoiceRow({ children }: { children: ReactNode }) {
   return <View style={styles.choiceRow}>{children}</View>;
 }
 
+/** The chips beside a Filters button: they scroll sideways and dissolve into the button (a 24 px fade at the right edge) instead of being cut off hard. */
+export function ChipsEdge({ children }: { children: ReactNode }) {
+  return (
+    <View style={filterBar.chips}>
+      {children}
+      <LinearGradient pointerEvents="none" colors={[tint.black(0), color.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.chipFade} />
+    </View>
+  );
+}
+
 /** Full-width filter chrome. Use flush chips so the bar owns the padding. */
 export const filterBar = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
@@ -85,8 +92,7 @@ export const filterBar = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  /** The chips beside the Filters button dissolve into it instead of being cut off hard. */
-  chipFade: { position: "absolute", right: "100%", top: 0, bottom: 0, width: 24 },
+  chipFade: { position: "absolute", right: 0, top: 0, bottom: 0, width: 24 },
   flushRow: { gap: space.tight },
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },

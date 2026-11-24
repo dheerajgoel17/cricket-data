@@ -63,5 +63,5 @@ export function useFancyCards(enabled = true) {
     const match = liveMatchFor(live.data, lines.data, c.f);
     return { ...c, match, rows: c.rows.map((r: any) => ({ ...r, venue: c.f.venue, standing: fancyStanding(match, r) })) };
   })), [enabled, q.data, live.data, lines.data]);
-  return { ready: railReady && !!store && matchesReady && !q.isLoading && !!q.data, cards, error: q.isError || stats.isError };
+  return { ready: railReady && !!store && matchesReady && !q.isLoading && !!q.data, cards, error: q.isError || stats.isError, refetch: () => { void q.refetch(); void stats.refetch(); } };
 }

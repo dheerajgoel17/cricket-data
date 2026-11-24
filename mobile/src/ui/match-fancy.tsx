@@ -29,7 +29,7 @@ import { liveQuery } from "@/lib/queries";
 import { liveMatchFor } from "@/lib/rail";
 import { BookBadge } from "@/ui/book-badge";
 import { ChartBars } from "@/ui/charts";
-import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, filterBar } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, ChipsEdge, filterBar } from "@/ui/chips";
 import { Bleed } from "@/ui/bleed";
 import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
@@ -203,7 +203,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
     <View style={mode === "detail" ? styles.root : undefined}>
       <View style={[filterBar.row, styles.bleed]}>
         {scopes.length > 1 ? (
-          <View style={filterBar.chips}><Chips flush items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></View>
+          <ChipsEdge><Chips flush items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : abbr(label)] as [string, string])} value={String(scope)} onChange={(v) => choose({ sc: v })} /></ChipsEdge>
         ) : <View style={filterBar.chips} />}
         <FilterButton label={`L${win}`} count={activeN} onPress={() => setFiltersOpen(true)} />
       </View>

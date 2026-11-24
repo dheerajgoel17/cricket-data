@@ -33,7 +33,7 @@ import { useStore } from "@/lib/use-store";
 import { BlurBar, BlurTargetView, useChromeScrim, useCollapseOnScroll } from "@/ui/blur-bar";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { CapsuleTabs } from "@/ui/capsule";
-import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, filterBar } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, ChipsEdge, filterBar } from "@/ui/chips";
 import { HScroll } from "@/ui/h-scroll";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
@@ -159,9 +159,9 @@ export default function FixturePage() {
               ) : tab === "props" ? (
                 <>
                   <View style={filterBar.row}>
-                    <View style={filterBar.chips}>
+                    <ChipsEdge>
                       <CapsuleTabs flush label="Stat" items={[["all", "All props"], ...statKeys.map((k) => [k, (STATS as any)[k]?.label ?? k] as [string, string])]} value={stat} onChange={(stat) => setFilters((s) => ({ ...s, stat }))} />
-                    </View>
+                    </ChipsEdge>
                     <FilterButton label={WIN_LABEL[filters.win]} count={active.length} onPress={() => {
                       setDraft({ win: filters.win, sort: filters.sort, team: filters.team });
                       setFiltersOpen(true);

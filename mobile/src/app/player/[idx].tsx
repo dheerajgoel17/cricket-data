@@ -137,7 +137,7 @@ export default function PlayerPage() {
               {loading ? (
                 <View style={{ paddingTop: space.stack }} accessibilityRole="progressbar" accessibilityLabel="Reading his games…"><PlayerSkeleton /></View>
               ) : !res?.ok ? (
-                <View style={styles.pad}><EmptyState title="Could not load games" body={String(res?.error || "Try again in a moment.")} /></View>
+                <View style={styles.pad}><ErrorState title="Could not load games" body={res?.error ? String(res.error) : undefined} onRetry={s.refetchPlan} /></View>
               ) : (
                 <Loaded key={`${s.stat}-${s.fmtVal}-${JSON.stringify(s.plan.filters)}-${s.plan.venue}-${s.book ? 1 : 0}`} s={s} filters={filters} onFilters={patch} onGame={game} />
               )}

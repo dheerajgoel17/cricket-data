@@ -12,7 +12,7 @@ function files(dir: string): string[] {
 
 describe("error-state contract", () => {
   it("no screen tells the person to reopen the page (a failed load has a Try again button)", () => {
-    const bad = files(root).filter((f) => /reopen this page/i.test(readFileSync(f, "utf8")));
+    const bad = files(root).filter((f) => /reopen this page|try again in a moment|pull to retry once/i.test(readFileSync(f, "utf8")));
     expect(bad).toEqual([]);
   });
 

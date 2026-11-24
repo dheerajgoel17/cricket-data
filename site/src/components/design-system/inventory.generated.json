@@ -473,6 +473,7 @@
     "exports": [
       "ActiveChip",
       "Chips",
+      "ChipsEdge",
       "ChoiceChip",
       "ChoiceRow",
       "FilterButton"

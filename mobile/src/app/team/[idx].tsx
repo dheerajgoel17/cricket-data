@@ -91,7 +91,7 @@ export default function Team() {
             <>
               <GridFilters stat={stat} line={line} games={games} onStat={setStat} onLine={setLine} onGames={setGames} />
               {grid.isLoading && !grid.data ? <Working label="Reading the players' games…" shape="grid" /> : !grid.data ? (
-                <EmptyState compact title="Could not load grid" body="Try again in a moment." />
+                <ErrorState compact title="Could not load grid" onRetry={() => void grid.refetch()} />
               ) : (
                 <View style={{ gap: space.snug }}>
                   <GridTable g={grid.data} teamIdx={i} line={line} />
@@ -103,7 +103,7 @@ export default function Team() {
             <>
               <View style={styles.bleed}><Chips items={MARKETS} value={market} onChange={setMarket} /></View>
               {mk.isLoading && !mk.data ? <Working label="Working out the markets…" shape="list" rows={4} /> : !mk.data ? (
-                <EmptyState compact title="Could not load markets" body="Try again in a moment." />
+                <ErrorState compact title="Could not load markets" onRetry={() => void mk.refetch()} />
               ) : !mk.data.ok ? (
                 <EmptyState compact title="Markets unavailable" body={String(mk.data.error || "Try another format.")} />
               ) : (
@@ -123,7 +123,7 @@ export default function Team() {
             </>
           ) : (
             top.isLoading && !top.data ? <Working label="Working out the top batters…" shape="list" rows={4} /> : !top.data ? (
-              <EmptyState compact title="Could not load top batters" body="Try again in a moment." />
+              <ErrorState compact title="Could not load top batters" onRetry={() => void top.refetch()} />
             ) : !top.data.ok ? (
               <EmptyState compact title="Top batters unavailable" body={String(top.data.error || "Try another format.")} />
             ) : (
