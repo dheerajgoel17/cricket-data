@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-24T12:56:18Z",
+ "generated_at_utc": "2026-11-24T13:34:31Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -510,6 +510,29 @@
    "chance": 0.625,
    "edge": 0.1563,
    "edge_pct": 15.6,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-27-australia-v-england|team_total_fours|Australia|0|under",
+   "fixture_id": "2026-11-27-australia-v-england",
+   "match": "Australia vs England",
+   "format": "T20",
+   "series": "ENG vs AUS 2026",
+   "start_utc": "2026-11-27T08:15:00Z",
+   "start_ist": "2026-11-27 13:45 IST",
+   "key": "team_total_fours",
+   "team": "Australia",
+   "inn": 0,
+   "side": "under",
+   "line": 12.5,
+   "best_odds": 1.95,
+   "best_source": "Dafabet",
+   "hits": 13,
+   "played": 20,
+   "window": 20,
+   "chance": 0.5917,
+   "edge": 0.1538,
+   "edge_pct": 15.4,
    "bat_first": false
   },
   {
