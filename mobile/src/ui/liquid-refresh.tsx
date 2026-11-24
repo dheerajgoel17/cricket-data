@@ -6,9 +6,9 @@
 // only so there is no light palette, the demo and the web touch handlers are gone, and a phone with reduce motion on gets the system's plain pull-to-refresh instead.
 //
 //   <LiquidRefresh onRefresh={() => refetch()} contentContainerStyle={{ paddingBottom }}>{rows}</LiquidRefresh>
-import { useRef, useState, type ReactNode } from "react";
-import { RefreshControl, ScrollView, StyleSheet, View, type ViewStyle } from "react-native";
-import Animated, { Easing, cancelAnimation, interpolate, runOnJS, useAnimatedProps, useAnimatedScrollHandler, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSpring, withTiming } from "react-native-reanimated";
+import { forwardRef, useMemo, useRef, useState, type ComponentRef } from "react";
+import { RefreshControl, ScrollView, StyleSheet, View, type NativeScrollEvent, type NativeSyntheticEvent, type ScrollViewProps } from "react-native";
+import Animated, { Easing, cancelAnimation, interpolate, runOnJS, useAnimatedProps, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSpring, withTiming } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Svg, { Circle, Path } from "react-native-svg";
 import * as Haptics from "expo-haptics";
@@ -16,11 +16,10 @@ import { bounce, easeOutCubic } from "@/ui/curves";
 import { AnimatedText } from "@/ui/text";
 import { color, type } from "@/ui/tokens";
 
+type ScrollRef = ComponentRef<typeof ScrollView>;
 type RefreshState = "idle" | "pulling" | "refreshing" | "done";
 
-export type LiquidRefreshProps = {
-  /** The rows; they scroll, and pull down at the top. */
-  children?: ReactNode;
+export type LiquidRefreshProps = ScrollViewProps & {
   /** The drop spins until this settles (a rejected promise leaves the list as it was). */
   onRefresh: () => Promise<unknown> | void;
   /** How far (after the rubber band) to pull before it refreshes. */
@@ -31,37 +30,48 @@ export type LiquidRefreshProps = {
   holdAt?: number;
   /** How long the check shows before the list springs back. */
   doneMs?: number;
-  style?: ViewStyle;
-  contentContainerStyle?: ViewStyle;
-  removeClippedSubviews?: boolean;
 };
 
 const LABELS = { pull: "Pull to refresh", release: "Release to refresh", refreshing: "Refreshing…", done: "Updated just now" };
 const APath = Animated.createAnimatedComponent(Path);
 const ACircle = Animated.createAnimatedComponent(Circle);
 
-export function LiquidRefresh(props: LiquidRefreshProps) {
+/**
+ * A ScrollView with the liquid pull-to-refresh. Use it in place of `ScrollView`, or hand it to a FlashList as `renderScrollComponent` (the list's scroll events are passed through, so
+ * its recycling keeps working). Every scrolling tab uses this one control.
+ */
+export const LiquidScroll = forwardRef<ScrollRef, LiquidRefreshProps>(function LiquidScroll(props, ref) {
   const calm = useReducedMotion();
-  return calm ? <PlainRefresh {...props} /> : <Liquid {...props} />;
-}
+  return calm ? <PlainRefresh {...props} ref={ref} /> : <Liquid {...props} ref={ref} />;
+});
 
 /** Reduce motion: the system control, with the same props. */
-function PlainRefresh({ children, onRefresh, style, contentContainerStyle, removeClippedSubviews }: LiquidRefreshProps) {
+/**
+ * For a FlashList: `const Scroller = useLiquidList(refetch)` then `<FlashList renderScrollComponent={Scroller} … />`. The component is created once (a new one per render would remount the list's
+ * scroll view); the latest `onRefresh` is read when a refresh starts.
+ */
+export function useLiquidList(onRefresh: () => Promise<unknown> | void) {
+  const latest = useRef(onRefresh);
+  latest.current = onRefresh;
+  return useMemo(() => forwardRef<ScrollRef, ScrollViewProps>(function LiquidList(props, ref) {
+    return <LiquidScroll {...props} ref={ref} onRefresh={() => latest.current()} />;
+  }), []);
+}
+
+const PlainRefresh = forwardRef<ScrollRef, LiquidRefreshProps>(function PlainRefresh({ onRefresh, threshold, maxPull, holdAt, doneMs, ...rest }, ref) {
+  void threshold; void maxPull; void holdAt; void doneMs;
   const [busy, setBusy] = useState(false);
   const go = () => { setBusy(true); void Promise.resolve(onRefresh()).catch(() => {}).finally(() => setBusy(false)); };
   return (
     <ScrollView
-      style={[{ flex: 1, backgroundColor: color.background }, style]}
-      contentContainerStyle={contentContainerStyle}
       showsVerticalScrollIndicator={false}
-      removeClippedSubviews={removeClippedSubviews}
-      refreshControl={<RefreshControl refreshing={busy} onRefresh={go} tintColor={color.foreground} colors={[color.primary]} progressBackgroundColor={color.card} />}>
-      {children}
-    </ScrollView>
+      {...rest}
+      ref={ref}
+      refreshControl={<RefreshControl refreshing={busy} onRefresh={go} tintColor={color.foreground} colors={[color.primary]} progressBackgroundColor={color.card} />} />
   );
-}
+});
 
-function Liquid({ children, onRefresh, threshold = 96, maxPull = 170, holdAt = 78, doneMs = 650, style, contentContainerStyle, removeClippedSubviews }: LiquidRefreshProps) {
+const Liquid = forwardRef<ScrollRef, LiquidRefreshProps>(function Liquid({ onRefresh, threshold = 96, maxPull = 170, holdAt = 78, doneMs = 650, style, onScroll: onScrollProp, ...rest }, ref) {
   const [w, setW] = useState(360);
   const [state, setState] = useState<RefreshState>("idle");
   const [label, setLabel] = useState(LABELS.pull);
@@ -70,7 +80,8 @@ function Liquid({ children, onRefresh, threshold = 96, maxPull = 170, holdAt = 7
   // y: how far the list is down; neck: how far the drop's neck reaches (it snaps back up when the drop breaks)
   const y = useSharedValue(0), neck = useSharedValue(0), spin = useSharedValue(0), mark = useSharedValue(0);
   const scrollY = useSharedValue(0), armed = useSharedValue(0), loading = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler((e) => { scrollY.value = e.contentOffset.y; });
+  // a plain handler (not a worklet) so a FlashList's own onScroll keeps receiving every event it recycles rows from
+  const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => { scrollY.value = e.nativeEvent.contentOffset.y; onScrollProp?.(e); };
   const resist = (d: number) => { "worklet"; return maxPull * (1 - Math.exp(-Math.max(0, d) / (maxPull * 1.15))); };
 
   const tick = () => { void Haptics.selectionAsync().catch(() => {}); };
@@ -161,21 +172,19 @@ function Liquid({ children, onRefresh, threshold = 96, maxPull = 170, holdAt = 7
       </View>
       <GestureDetector gesture={Gesture.Simultaneous(pan, Gesture.Native())}>
         <Animated.ScrollView
-          onScroll={onScroll}
-          scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
           bounces={false}
           overScrollMode="never"
-          removeClippedSubviews={removeClippedSubviews}
-          style={[{ flex: 1, backgroundColor: color.background }, listStyle]}
-          contentContainerStyle={contentContainerStyle}
-          accessibilityHint={state === "idle" ? LABELS.pull : label}>
-          {children}
-        </Animated.ScrollView>
+          accessibilityHint={state === "idle" ? LABELS.pull : label}
+          {...rest}
+          ref={ref}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
+          style={[{ flex: 1, backgroundColor: color.background }, listStyle]} />
       </GestureDetector>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   label: { ...type.footnote, position: "absolute", left: 0, top: 0, color: color["muted-foreground"] },

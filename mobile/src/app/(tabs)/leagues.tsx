@@ -4,7 +4,8 @@ import { lazyTab } from "@/ui/lazy-tab";
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { LiquidScroll } from "@/ui/liquid-refresh";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { router } from "expo-router";
@@ -46,7 +47,7 @@ function Leagues() {
           <Text style={styles.allText}>All competitions</Text><ChevronRight color={color["muted-foreground"]} size={icon.sm} />
         </Press>
       } />
-      <ScrollView contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} showsVerticalScrollIndicator={false}>
+      <LiquidScroll contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} onRefresh={() => Promise.all([stats.refetch(), fx.refetch()])}>
         {stats.isError && !matchesReady ? <ErrorState title="Could not load history" onRetry={() => void stats.refetch()} /> : !store || !matchesReady ? <Working label="Loading leagues…" fill shape="league" /> : e == null ? <View style={styles.emptyPad}><EmptyState title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." /></View> : (
           <>
             <HScroll contentContainerStyle={styles.chips}>
@@ -73,7 +74,7 @@ function Leagues() {
             </View>
           </>
         )}
-      </ScrollView>
+      </LiquidScroll>
       <TabFade />
     </View>
   );

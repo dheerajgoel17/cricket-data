@@ -17,8 +17,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ### 2026-11-24 — LiquidRefresh (app pull-to-refresh, Cue mobile, converted)
 - **Path:** `mobile/src/ui/liquid-refresh.tsx`, `mobile/src/ui/curves.ts` (`bounce.liquid`), `mobile/src/app/(tabs)/index.tsx`
-- **Change:** Home's pull-to-refresh is a drop of liquid that stretches from the top edge, breaks into a ring while it loads and turns into a check (from Cue's mobile "Liquid pull to refresh", converted: colours from `color.*`, type from `type.footnote`, spring in `curves.ts`, dark only, no demo or web handlers). A phone with reduce motion on gets the system control. The ring spins while loading (the no-spinner rule is waived for this one control).
-- **Callers:** Home only for now. Other tabs have no pull-to-refresh yet; roll the same component out to every scrolling tab at once, so they stay uniform.
+- **Change:** Pull-to-refresh on every tab is a drop of liquid that stretches from the top edge, breaks into a ring while it loads and turns into a check (from Cue's mobile "Liquid pull to refresh", converted: colours from `color.*`, type from `type.footnote`, spring in `curves.ts`, dark only, no demo or web handlers). A phone with reduce motion on gets the system control. The ring spins while loading (the no-spinner rule is waived for this one control).
+- **Callers:** every scrolling tab: Home, Player props and Fancy (FlashList, through `useLiquidList` and `renderScrollComponent`) and Leagues. `refresh-contract.test.ts` fails if a tab uses a one-off `RefreshControl`.
 
 ### 2026-11-24 — ChipsEdge, retry on every failed load, wrapping tag on Match Fancy rows
 - **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/fancy-row.tsx`, `mobile/src/ui/empty-state.tsx`

@@ -2,7 +2,7 @@ import { mark } from "@/lib/perf";
 import { lazyTab } from "@/ui/lazy-tab";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useMemo, useState } from "react";
-import { Platform, RefreshControl, StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { useQueryClient } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,6 +18,7 @@ import { STATS } from "@cricket/engine/rules.js";
 import { Chips, ActiveChip, FilterButton, ChipsEdge, filterBar } from "@/ui/chips";
 import { HScroll } from "@/ui/h-scroll";
 import { makeStabilizer } from "@/lib/stable-rows";
+import { useLiquidList } from "@/ui/liquid-refresh";
 import { MatchChips } from "@/ui/match-chip";
 import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
@@ -40,7 +41,6 @@ function PlayerProps() {
   const inset = useScreenInsets();
   const [sc, setSc] = useState<Screener>({ ...DEFAULTS });
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [pulling, setPulling] = useState(false);
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
   const { rows: raw, isLoading, scoring, error, otherDay, soFarOf, outOf, matchOf, refetch } = useHotViewWithRefetch(Number(sc.day));
   // a score tick gives `outOf` a new identity every 3 s while a match is on; rows keep their identity unless their own `live` / `out` changed, so the memos below and each PropRow stay put
@@ -85,7 +85,7 @@ function PlayerProps() {
     day: (d) => days.find(([k]) => k === d)?.[1] ?? d,
     match: (id) => choices.matches.find((m) => m.id === id)?.label ?? id,
   }), [sc, pick, days, choices.matches]);
-  const pull = () => { setPulling(true); void refetch().finally(() => setPulling(false)); };
+  const Scroller = useLiquidList(refetch);
   // Filters scroll with the list (ListHeader) — pinning the full chip stack outside FlashList eats the phone viewport.
   const header = (
     <View>
@@ -135,7 +135,7 @@ function PlayerProps() {
         drawDistance={Platform.OS === "android" ? 280 : 480}
         removeClippedSubviews={Platform.OS === "android"}
         maintainVisibleContentPosition={{ disabled: true }}
-        refreshControl={<RefreshControl refreshing={pulling} onRefresh={pull} tintColor={color.foreground} colors={[color.primary]} progressBackgroundColor={color.card} />}
+        renderScrollComponent={Scroller}
       />
       <ScreenerFilters open={filtersOpen} onOpenChange={setFiltersOpen} state={{ ...sc, match: pick }} onApply={setSc} choices={choices} />
       <TabFade />

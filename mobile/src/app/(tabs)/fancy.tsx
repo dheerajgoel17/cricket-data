@@ -2,6 +2,7 @@ import { mark } from "@/lib/perf";
 import { lazyTab } from "@/ui/lazy-tab";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo, useMemo, useState } from "react";
+import { useLiquidList } from "@/ui/liquid-refresh";
 import { Platform, StyleSheet, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { Press } from "@/ui/press";
@@ -35,6 +36,7 @@ function Fancy() {
   mark("render:Fancy");
   const inset = useScreenInsets();
   const { cards, ready, error, refetch } = useFancyCards();
+  const Scroller = useLiquidList(refetch);
   const [day, setDay] = useState("0");
   const [match, setMatch] = useState("all");
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
@@ -60,6 +62,7 @@ function Fancy() {
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <AppHeader title="Fancy" />
       <FlashList
+        renderScrollComponent={Scroller}
         data={ready ? shown : []}
         keyExtractor={(c) => c.f.id || `${c.f.a}${c.f.b}${c.f.start}`}
         renderItem={({ item }) => <MatchCard {...item} />}

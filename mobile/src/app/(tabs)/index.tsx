@@ -10,7 +10,7 @@ import { useRail } from "@/lib/use-rail";
 import { AppHeader } from "@/ui/brand";
 import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { FixtureCard } from "@/ui/fixture-card";
-import { LiquidRefresh } from "@/ui/liquid-refresh";
+import { LiquidScroll } from "@/ui/liquid-refresh";
 import { HotHome, HotHomeSkeleton } from "@/ui/hot-home";
 import { useScreenInsets } from "@/ui/insets";
 import { keptTab } from "@/ui/lazy-tab";
@@ -56,7 +56,7 @@ function Fixtures() {
       <AppHeader />
       <PhaseBar value={phase} counts={counts} onChange={setAsked} />
       <View style={styles.propsScroll}>
-      <LiquidRefresh
+      <LiquidScroll
         style={styles.propsScroll}
         contentContainerStyle={{ paddingBottom: inset.bottom + 24 }}
         onRefresh={refetch}
@@ -107,7 +107,7 @@ function Fixtures() {
           </Profiler>
         </View>
         {ready && propsReady ? <Profiler id="hothome" onRender={onRender}><Appear><HotHome phase={phase} /></Appear></Profiler> : error ? null : <HotHomeSkeleton />}
-      </LiquidRefresh>
+      </LiquidScroll>
       <TabFade />
       </View>
     </View>
