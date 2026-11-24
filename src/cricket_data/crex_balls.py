@@ -396,3 +396,31 @@ def collect(browser, store, targets: list[tuple[str, str, str]], min_balls: int 
 
 
 assert tuple(f.name for f in fields(Ball)) == BALL_FIELDS
+
+
+TRIED = "_tried.json"  # data/balls/_tried.json: {match_id: [attempts, last attempt ISO time]}, so matches that keep failing stop taking every slot of a run
+
+
+def pick_targets(cands: list[tuple[str, str, str]], tried: dict, now, limit: int = 0, retry_after_hours: int = 12, free_tries: int = 2) -> list[tuple[str, str, str]]:
+    """Candidates to scrape this run: a match that failed `free_tries` times waits `retry_after_hours` before the next try; newest dates first, so a failing
+    pile never starves an older match that has not been tried (the run used to take the first `limit` by file name, and the same failing ones took them all)."""
+    from datetime import datetime, timedelta
+
+    def due(mid: str) -> bool:
+        n, last = tried.get(mid, [0, ""])
+        return n < free_tries or not last or now - datetime.fromisoformat(last) >= timedelta(hours=retry_after_hours)
+
+    # untried first, then fewest attempts; within the same attempts the newest date first
+    due_c = sorted((c for c in cands if due(c[0])), key=lambda c: (tried.get(c[0], [0])[0], -int(c[1].replace("-", "") or 0)))
+    return due_c[:limit] if limit else due_c
+
+
+def record_tries(tried: dict, targets: list[tuple[str, str, str]], saved_ids: set[str], now) -> dict:
+    """A scraped match that saved nothing counts one more attempt; a saved one is forgotten."""
+    out = dict(tried)
+    for mid, _, _ in targets:
+        if mid in saved_ids:
+            out.pop(mid, None)
+        else:
+            out[mid] = [out.get(mid, [0, ""])[0] + 1, now.isoformat(timespec="seconds")]
+    return out

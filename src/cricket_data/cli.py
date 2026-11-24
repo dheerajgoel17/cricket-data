@@ -211,7 +211,7 @@ def cmd_crex_balls(a: argparse.Namespace) -> int:
     """Ball-by-ball for Source A matches into data/balls/ (only matches that reconcile with the scorecard)."""
     import json as json_mod
 
-    from .crex_balls import collect
+    from .crex_balls import TRIED, collect, pick_targets, record_tries
     from .crex_browser import CREXBrowser
 
     store = Store(a.data_dir)
@@ -229,7 +229,11 @@ def cmd_crex_balls(a: argparse.Namespace) -> int:
             d = json_mod.loads(f.read_text(encoding="utf-8"))
             if d.get("date", "") >= since and d["match_id"] not in have:
                 targets.append((d["match_id"], d["date"], base + d["match_id"][len("crex-"):]))
-    if a.limit:
+    tried_path = store.root / "balls" / TRIED
+    tried = json_mod.loads(tried_path.read_text(encoding="utf-8")) if tried_path.exists() else {}
+    if a.provisional_days:
+        targets = pick_targets(targets, tried, datetime.utcnow(), a.limit)  # failing matches wait their turn; the rest are newest first
+    elif a.limit:
         targets = targets[: a.limit]
     if any(not d for _, d, _ in targets):
         print("crex-balls: --url needs --date YYYY-MM-DD (the month file the deliveries go into)", file=sys.stderr)
@@ -237,6 +241,11 @@ def cmd_crex_balls(a: argparse.Namespace) -> int:
     print(f"crex-balls: {len(targets)} match(es) to scrape")
     with CREXBrowser(min_interval=a.min_interval) as browser:
         res = collect(browser, store, targets)
+    if a.provisional_days:
+        tried_path.parent.mkdir(parents=True, exist_ok=True)
+        live_ids = {m for m in tried} | {t[0] for t in targets}
+        kept = record_tries(tried, targets, store.balls_match_ids(), datetime.utcnow())
+        tried_path.write_text(json_mod.dumps({k: v for k, v in kept.items() if k in live_ids}, sort_keys=True, indent=0), encoding="utf-8")
     print(f"crex-balls: {res['saved']} saved ({res['healed']} healed), {res['no_feed']} without a feed, {res['rejected']} rejected, "
           f"{res['failed']} failed, {res['warnings']} bowler warning(s)")
     for p in res["problems"]:
