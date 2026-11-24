@@ -1,15 +1,15 @@
 {
- "generated_at_utc": "2026-11-24T16:37:07Z",
- "n": 74,
- "pnl_u": 13.759,
+ "generated_at_utc": "2026-11-24T17:42:48Z",
+ "n": 76,
+ "pnl_u": 16.059,
  "by": {
   "model|?|batter_fours": {
-   "n": 19,
-   "won": 9,
+   "n": 20,
+   "won": 10,
    "lost": 4,
    "push": 0,
    "void": 6,
-   "pnl_u": 4.886
+   "pnl_u": 5.986
   },
   "model|?|batter_runs": {
    "n": 17,
@@ -44,12 +44,12 @@
    "pnl_u": 0.0
   },
   "model|?|batter_sixes": {
-   "n": 6,
-   "won": 2,
+   "n": 7,
+   "won": 3,
    "lost": 4,
    "push": 0,
    "void": 0,
-   "pnl_u": -1.675
+   "pnl_u": -0.475
   }
  }
 }
