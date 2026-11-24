@@ -13,6 +13,7 @@ import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
 import { Tick } from "@/ui/tick";
 import { cap, color, font, num, numLg, space, type, fs, radius, t, w, state, icon } from "@/ui/tokens";
+import { hitSlopFor, TOUCH } from "@/ui/platform";
 
 /** One side: crest · abbr · large score · Over N (mirrored on the right). Twin of web MatchScoreboard SideBlock. */
 function SideBlock({
@@ -100,7 +101,7 @@ export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem;
       ) : null}
 
       {place && onGround ? (
-        <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onGround(); }} accessibilityRole="link" accessibilityLabel={`Ground: ${f.venue}`} style={({ pressed }) => [styles.ground, pressed && state.pressed]}>
+        <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onGround(); }} hitSlop={hitSlopFor(TOUCH, 17)} accessibilityRole="link" accessibilityLabel={`Ground: ${f.venue}`} style={({ pressed }) => [styles.ground, pressed && state.pressed]}>
           <Ionicons name="location-outline" size={icon.sm} color={color["muted-foreground"]} />
           <Text style={styles.meta} numberOfLines={1}>{place}</Text>
           <Ionicons name="chevron-forward" size={icon.sm} color={color["muted-foreground"]} />

@@ -11,17 +11,20 @@ import { dayLabel, localTime } from "@/lib/format";
 import { fixtureStart } from "@/lib/rail";
 import { TeamBadge } from "@/ui/team-badge";
 import { color, control, radius, space, tint, type, t } from "@/ui/tokens";
+import { hitSlopFor, TOUCH } from "@/ui/platform";
 
 type Fx = { id: string; a: string; b: string; fmt?: string; start?: string };
 
 const CREST = 20;
+/** The match chips are 44 points tall; this tops them up to the platform minimum. */
+const MATCH_SLOP = hitSlopFor(TOUCH, 44);
 
 /** One ring, bare crest inside (full logo, no nested badge circle) — same idea as shadcn Avatar + AvatarImage. */
 function Crests({ a, b }: { a: string; b: string }) {
   return (
     <View style={styles.group}>
-      <View style={[styles.ring, { zIndex: 1 }]}><TeamBadge name={a} size={CREST} /></View>
-      <View style={[styles.ring, styles.overlap, { zIndex: 0 }]}><TeamBadge name={b} size={CREST} /></View>
+      <View style={[styles.ring, { zIndex: 1 }]}><TeamBadge name={a} size={CREST} letters={1} /></View>
+      <View style={[styles.ring, styles.overlap, { zIndex: 0 }]}><TeamBadge name={b} size={CREST} letters={1} /></View>
     </View>
   );
 }
@@ -63,7 +66,7 @@ export function MatchChips({ items, value: valueProp, onChange: onChangeProp, ta
 
 function AllChip({ on, onPress, calm }: { on: boolean; onPress: () => void; calm: boolean }) {
   return (
-    <Press accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel="All matches" onPress={onPress}>
+    <Press hitSlop={MATCH_SLOP} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel="All matches" onPress={onPress}>
       <Animated.View style={[styles.chip, styles.allChip, { backgroundColor: on ? color.primary : color.card }, !calm && chipFillTransition]}>
         <AnimatedText style={[styles.allText, { color: on ? color["primary-foreground"] : color.foreground }, !calm && chipTextTransition]}>All</AnimatedText>
       </Animated.View>
@@ -73,7 +76,7 @@ function AllChip({ on, onPress, calm }: { on: boolean; onPress: () => void; calm
 
 function MatchChip({ f, on, onPress, tag, calm }: { f: Fx; on: boolean; onPress: () => void; tag?: Tag; calm: boolean }) {
   return (
-    <Press accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={`${f.a} v ${f.b}${tag ? `, ${tag.text}` : ""}`} onPress={onPress} scale={0.97}>
+    <Press hitSlop={MATCH_SLOP} accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={`${f.a} v ${f.b}${tag ? `, ${tag.text}` : ""}`} onPress={onPress} scale={0.97}>
       <Animated.View style={[styles.chip, { backgroundColor: on ? color.primary : color.card }, !calm && chipFillTransition]}>
         <Crests a={f.a} b={f.b} />
         <View style={styles.text}>
