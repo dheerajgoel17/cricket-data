@@ -39,6 +39,7 @@
       "mobile/src/ui/brand.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/fixture-card.tsx",
+      "mobile/src/ui/liquid-refresh.tsx",
       "mobile/src/ui/hot-home.tsx",
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/motion.tsx",
@@ -721,6 +722,17 @@
     ],
     "dependencies": [
       "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/liquid-refresh.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "LiquidRefresh"
+    ],
+    "dependencies": [
       "mobile/src/ui/text.tsx"
     ]
   },

@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-24 — LiquidRefresh (app pull-to-refresh, Cue mobile, converted)
+- **Path:** `mobile/src/ui/liquid-refresh.tsx`, `mobile/src/ui/curves.ts` (`bounce.liquid`), `mobile/src/app/(tabs)/index.tsx`
+- **Change:** Home's pull-to-refresh is a drop of liquid that stretches from the top edge, breaks into a ring while it loads and turns into a check (from Cue's mobile "Liquid pull to refresh", converted: colours from `color.*`, type from `type.footnote`, spring in `curves.ts`, dark only, no demo or web handlers). A phone with reduce motion on gets the system control. The ring spins while loading (the no-spinner rule is waived for this one control).
+- **Callers:** Home only for now. Other tabs have no pull-to-refresh yet; roll the same component out to every scrolling tab at once, so they stay uniform.
+
 ### 2026-11-24 — ChipsEdge, retry on every failed load, wrapping tag on Match Fancy rows
 - **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/fancy-row.tsx`, `mobile/src/ui/empty-state.tsx`
 - **Change:** `ChipsEdge` wraps the stat chips beside a Filters button and fades them out at the right edge (Props, Grid, Match Fancy, fixture Props) instead of a hard cut. `OverviewRow` lets the "In Play Market" tag drop to its own line rather than truncating the market name ("SA • 25 o..."). The team page (grid, markets, top batters), Grid and Trends, the Fancy tab, the Home rail and the player's games now use `ErrorState` with a Try again button; a test fails on "try again in a moment" copy.

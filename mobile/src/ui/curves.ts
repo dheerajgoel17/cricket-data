@@ -13,4 +13,6 @@ export const bounce = {
   in: { damping: 6, stiffness: 420 },
   settle: { damping: 12 },
   splash: { damping: 9, stiffness: 240, mass: 0.7 },
+  /** The liquid pull-to-refresh: the list holds at the line and springs back. */
+  liquid: { damping: 14, stiffness: 170, mass: 0.9 },
 } as const;
