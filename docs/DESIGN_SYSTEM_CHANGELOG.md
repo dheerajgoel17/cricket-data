@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-24 — Tab switch crossfade
+- **Path:** `mobile/src/components/app-tabs.tsx`
+- **Change:** switching tabs is a short crossfade (`animation: "fade"`, opacity only) instead of an instant swap. Measured on a phone against the old `none`: the same 81 ms worst-1% frames (they are a tab mounting), 7 janky frames in 1,846 against 0 (0.38%). Chips already fade their fill and text on change (`chipFillTransition`), the segmented control and line tabs glide their thumb and underline.
+- **Callers:** the four tabs.
+
 ### 2026-11-24 — ChipsEdge, retry on every failed load, wrapping tag on Match Fancy rows
 - **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/fancy-row.tsx`, `mobile/src/ui/empty-state.tsx`
 - **Change:** `ChipsEdge` wraps the stat chips beside a Filters button and fades them out at the right edge (Props, Grid, Match Fancy, fixture Props) instead of a hard cut. `OverviewRow` lets the "In Play Market" tag drop to its own line rather than truncating the market name ("SA • 25 o..."). The team page (grid, markets, top batters), Grid and Trends, the Fancy tab, the Home rail and the player's games now use `ErrorState` with a Try again button; a test fails on "try again in a moment" copy.
