@@ -30,3 +30,14 @@ describe("accessibility contract", () => {
     for (const rel of ["ui/info-button.tsx", "app/search.tsx"]) expect(readFileSync(join(root, rel), "utf8")).toMatch(/hitSlopFor\(/);
   });
 });
+
+describe("chip touch targets", () => {
+  it("every chip-like control tops its 36-44 point drawing up to the platform minimum (hitSlop)", () => {
+    for (const rel of ["ui/chips.tsx", "ui/capsule.tsx", "ui/window-pills.tsx"]) expect(readFileSync(join(root, rel), "utf8")).toMatch(/hitSlop=\{CHIP_SLOP\}/);
+    expect(readFileSync(join(root, "ui/match-chip.tsx"), "utf8")).toMatch(/hitSlop=\{MATCH_SLOP\}/);
+  });
+
+  it("the Leagues text links are not 18-point targets", () => {
+    expect(readFileSync(join(root, "app/(tabs)/leagues.tsx"), "utf8")).not.toMatch(/hitSlop=\{8\}/);
+  });
+});

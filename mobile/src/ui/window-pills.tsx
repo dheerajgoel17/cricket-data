@@ -5,6 +5,7 @@ import { Text } from "@/ui/text";
 import Animated, { interpolateColor, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { cap, color, font, radius, tint, type, duration, d } from "@/ui/tokens";
+import { CHIP_SLOP } from "@/ui/platform";
 
 export interface WindowItem { n: number; label: string; p: number | null }
 
@@ -28,7 +29,7 @@ function Cell({ w, on, onPress }: { w: WindowItem; on: boolean; onPress: () => v
   useEffect(() => { p.value = withTiming(on ? 1 : 0, { duration: duration.base }); }, [on, p]);
   const fill = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(p.value, [0, 1], [CLEAR, color.secondary]) }));
   return (
-    <Press onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: on }} style={styles.hit}>
+    <Press onPress={onPress} hitSlop={CHIP_SLOP} accessibilityRole="tab" accessibilityState={{ selected: on }} style={styles.hit}>
       <Animated.View style={[styles.cell, fill]}>
         <Text style={styles.label}>{w.label}</Text>
         <Text style={[styles.value, { color: band(w.p) }]}>{w.p == null ? "–" : `${Math.round(w.p * 100)}%`}</Text>
