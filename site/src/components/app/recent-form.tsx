@@ -49,7 +49,7 @@ function FormGames({ games, store }: { games: any[]; store: any }) {
   return (
     <ul>
       {[...games].reverse().map((g) => (
-        <li key={g.m} className="flex items-center gap-snug border-t border-hairline py-snug">
+        <li key={g.m} className="flex items-center gap-snug border-t border-hairline px-gutter py-snug lg:px-0">
           <span className={cn("grid size-7 shrink-0 place-items-center rounded-md text-footnote font-emphasis", CHIP[g.result])}>{g.result}</span>
           <div className="min-w-0 flex-1">
             <div className="truncate text-callout font-label">vs <Link to={`/team/${g.opp}`} className="hover:underline">{store.teamName(g.opp)}</Link></div>
@@ -69,8 +69,8 @@ export function RecentForm({ teams, fmt }: { teams: [string, number][]; fmt: str
   return (
     <div className="grid gap-stack lg:grid-cols-2 lg:items-start" aria-label="Recent form">
       {forms.map(({ name, idx, games }) => (
-        <div key={idx} className="min-w-0">
-          <div className="flex items-center gap-snug py-snug">
+        <div key={idx} className="-mx-gutter min-w-0 lg:mx-0">
+          <div className="flex items-center gap-snug px-gutter py-snug lg:px-0">
             <TeamBadge name={name} size="sm" />
             <span className="min-w-0 flex-1 truncate text-callout font-label">{name}</span>
             {games.length ? <FormChips results={games.map((g) => g.result)} /> : <span className="text-callout text-muted-foreground">No {fmt} results</span>}

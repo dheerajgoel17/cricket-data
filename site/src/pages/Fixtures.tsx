@@ -31,7 +31,9 @@ import { PillGroup } from "@/components/app/pill-group";
 import { GridFilterBar } from "@/components/app/grid-filters";
 import { HotProps } from "@/components/app/hot-props";
 import { MatchFancy } from "@/components/app/match-fancy";
-import { GridTable, TrendCards } from "@/components/app/grid";
+import { TrendCards } from "@/components/app/grid";
+import { OddEven } from "@/pages/OddEven";
+import { Toss } from "@/pages/Toss";
 import { TeamBadge, usePreloadTeams } from "@/components/app/badges";
 import { NO_SCORE } from "@/components/app/fixture-card";
 import { MatchScoreboard } from "@/components/app/match-scoreboard";
@@ -40,7 +42,7 @@ import { RecentForm, recentForms } from "@/components/app/recent-form";
 import { LiveFeed } from "@/components/app/live-feed";
 import { FixtureGroundPanel, FixtureVenue, fixtureHasGround } from "@/components/app/fixture-ground";
 import { AnimatedHeight } from "@/components/app/animated-height";
-import { GridSkeleton, ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
+import { ListSkeleton, MatchHeaderSkeleton, RowsSkeleton } from "@/components/app/skeletons";
 import { Crumbs, DataTable, Muted, PageTitle, Panel, StickyFilterBand } from "@/components/app/page";
 import { EmptyState } from "@/components/app/empty-state";
 import { Input } from "@/components/ui/input";
@@ -51,7 +53,7 @@ const GAMES: [number, string][] = [5, 10, 15, 20, 30].map((n) => [n, `Last ${n}`
 const HITS: [number, string][] = [[0.5, "50%+"], [0.6, "60%+"], [0.7, "70%+"], [0.8, "80%+"]];
 const fmtOf = (f: any) => (FORMATS.includes(f?.fmt) ? f.fmt : "T20");
 
-const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["ground", "Ground"], ["form", "Form"], ["grid", "Grid"], ["trends", "Custom line"]];
+const TABS: [string, string][] = [["props", "Props"], ["fancy", "Match Fancy"], ["ground", "Ground"], ["form", "Form"], ["toss", "Toss"], ["oddeven", "Odd / Even"], ["trends", "Custom line"]];
 
 /** One match header for scheduled, live and completed fixtures. */
 function MatchHeader({ f, match, live }: { f: any; match: any; live: boolean }) {
@@ -152,7 +154,6 @@ export function FixturePage() {
   const hit = HITS.some(([v]) => String(v) === q.hit) ? q.hit : "0.6";
   const teams: [string, number][] = fx ? [[fx.a, fx.a_ix], [fx.b, fx.b_ix]] : [];
   const known = teams.filter(([, i]) => i >= 0);
-  const gridTeam = known.some(([, i]) => String(i) === q.team) ? Number(q.team) : known[0]?.[1];
   const grids = useQuery({ queryKey: ["fx-grids", id, fmt, stat, games], enabled: !!fx && fx.fmt !== "FC", queryFn: async () => Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(store, i, fmt, stat, games) }))) });
   const bodyRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
@@ -167,7 +168,6 @@ export function FixturePage() {
     align();
     setTimeout(align, 420); // the body's height finishes animating after ~300 ms: settle exactly on its top
   };
-  const shown = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
   usePreloadTeams(fx ? [fx.a, fx.b] : []);
   setTitle(fx ? `${fx.a} v ${fx.b}: stats, props and listed lines` : "Match preview, player grid and trends");
   // Soft archive / books fetch: keep header + chrome when fx is already known from the cached schedule (Player → fixture). Full skeleton only on cold first load.
@@ -206,8 +206,10 @@ export function FixturePage() {
       <MatchHeader f={fx} match={match} live={live} />
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
-          <StickyFilterBand className="px-gutter py-tight">
-            <PillGroup layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
+          <StickyFilterBand>
+            <div className="border-b border-hairline px-gutter">
+              <PillGroup sub layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
+            </div>
           </StickyFilterBand>
           <div ref={bodyRef} className="scroll-mt-32">
           <AnimatedHeight>
@@ -216,26 +218,8 @@ export function FixturePage() {
           {tab === "props" && <HotProps teams={[fx.a, fx.b]} start={fx.start} fmt={fx.fmt} archive={archived ? doc : undefined} />}
           {tab === "ground" && <FixtureGroundPanel embedded venue={fx.venue} fixtureId={fx.id} from={{ a: fx.a, b: fx.b, series: fx.series, start: fx.start, status: fx.status, gender: fx.gender, fmt: fx.fmt }} />}
           {tab === "form" && <RecentForm teams={known} fmt={fmt} />}
-          {tab === "grid" && (
-            <>
-              <GridFilterBar stat={stat} line={line} games={games} items={STAT_OPTIONS} setQ={setQ} />
-              <div className="flex min-w-0 flex-col gap-snug">
-                {known.length > 1 && (
-                  <PillGroup layoutId="fx-team" label="Team" value={String(gridTeam)} onChange={(v) => setQ({ team: v })}
-                    items={known.map(([name, i]) => [String(i), <span key={i} className="flex items-center gap-tight"><TeamBadge name={name} size="xs" />{abbr(name)}</span>])} />
-                )}
-                <div className="flex flex-wrap items-center gap-x-stack gap-y-tight text-footnote text-muted-foreground">
-                  <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-primary/60" />clears {line}</span>
-                  <span className="flex items-center gap-tight"><span className="size-2.5 rounded-[3px] bg-destructive/60" />does not</span>
-                  <span className="flex items-center gap-tight"><span className="rounded border border-dashed border-amber/60 px-hair text-caption text-amber">VOID</span>in the XI, did not bat or bowl</span>
-                </div>
-              </div>
-              {grids.isLoading || !shown ? <GridSkeleton /> : (
-                <section className="flex flex-col gap-snug">
-                  <h2 className="flex items-center gap-tight text-body font-emphasis"><TeamBadge name={shown.name} size="xs" />{shown.name}<span className="text-callout font-copy text-muted-foreground">{(STATS as any)[stat].label} over {line}</span></h2>
-                  <GridTable g={shown.g} teamIdx={shown.team} line={line} />
-                </section>)}
-            </>)}
+          {tab === "toss" && <Toss fx={fx} doc={doc.data} q={q} setQ={setQ} />}
+          {tab === "oddeven" && <OddEven embedded fx={fx} q={q} setQ={setQ} />}
           {tab === "trends" && (
             <>
               <GridFilterBar stat={stat} line={line} games={games} hit={hit} items={STAT_OPTIONS} setQ={setQ} />

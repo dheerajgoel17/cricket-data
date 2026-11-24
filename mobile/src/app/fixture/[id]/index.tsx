@@ -37,7 +37,7 @@ import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, ChipsEdge, filt
 import { HScroll } from "@/ui/h-scroll";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
-import { GridFilters, GridTable, TrendList } from "@/ui/grid-table";
+import { GridFilters, TrendList } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
 import { MatchAccordions, ScorecardCard } from "@/ui/live-board";
 import { MatchFancy } from "@/ui/match-fancy";
@@ -68,7 +68,7 @@ export default function FixturePage() {
   const { fx: f, doc, archived, isLoading: fxLoading } = useFixtureBooks(id);
   const item: RailItem | null = f ? { fixture: f, state: fixtureState(f, liveForFixture(live.data, f)?.status, now), live: liveMatchFor(live.data, doc, f), noProps: false } : null;
   const books = useMemo(() => (f ? fixtureBooks(doc, f) : { props: false, fancy: false }), [doc, f]);
-  const tabs = useMemo(() => ([["props", "Props"], ["fancy", "Match Fancy"], ["grid", "Grid"], ["trends", "Custom line"]] as [string, string][]).filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy || (!!f && f.status !== "Completed") : true)), [books, f]);
+  const tabs = useMemo(() => ([["props", "Props"], ["fancy", "Match Fancy"], ["oddeven", "Odd / Even"], ["trends", "Custom line"]] as [string, string][]).filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy || (!!f && f.status !== "Completed") : true)), [books, f]);
   const [tabAsked, setTab] = useState<string | undefined>(tabParam);
   useEffect(() => { setTab(tabParam); }, [id, tabParam]);
   const tab = tabs.some(([k]) => k === tabAsked) ? tabAsked! : tabs[0][0];
@@ -94,16 +94,14 @@ export default function FixturePage() {
   const stats = useStore();
   const store: any = stats.data?.store;
   const matchesReady = stats.matchesReady;
-  const [gStat, setGStat] = useState("sixes"), [gLine, setGLine] = useState(0.5), [games, setGames] = useState(10), [hit, setHit] = useState(0.6), [gTeam, setGTeam] = useState<number>();
+  const [gStat, setGStat] = useState("sixes"), [gLine, setGLine] = useState(0.5), [games, setGames] = useState(10), [hit, setHit] = useState(0.6);
   const fmt = f && FORMATS.includes(f.fmt) ? f.fmt : "T20";
   const teams: [string, number][] = f ? [[f.a, f.a_ix], [f.b, f.b_ix]] : [];
   const known = teams.filter(([, i]) => i >= 0);
-  const gridTeam = known.some(([, i]) => i === gTeam) ? gTeam! : known[0]?.[1];
   const grids = useQuery({
-    queryKey: ["fx-grids", id, fmt, gStat, games], enabled: !!store && matchesReady && !!f && f.fmt !== "FC" && (tab === "grid" || tab === "trends"),
+    queryKey: ["fx-grids", id, fmt, gStat, games], enabled: !!store && matchesReady && !!f && f.fmt !== "FC" && tab === "trends",
     queryFn: async () => Promise.all(known.map(async ([name, i]) => ({ name, team: i, g: await collectGrid(store, i, fmt, gStat, games) }))),
   });
-  const shownGrid = grids.data?.find((x) => x.team === gridTeam) ?? grids.data?.[0];
 
   const target = useRef<ComponentRef<typeof View>>(null);
   const [barH, setBarH] = useState(0);
@@ -192,20 +190,9 @@ export default function FixturePage() {
                 <View style={[styles.pad, { paddingTop: 0 }]}><MatchFancy key={`${f.id}`} fx={f} teams={known} fmt={fmt} doc={doc} mode="list" /></View>
               ) : (
                 <View style={[styles.pad, { gap: space.stack, paddingTop: space.stack }]}>
-                  <GridFilters stat={gStat} line={gLine} games={games} hit={tab === "trends" ? hit : undefined} onStat={setGStat} onLine={setGLine} onGames={setGames} onHit={setHit} />
-                  {tab === "grid" ? (
-                    <>
-                      {known.length > 1 ? <View style={styles.bleed}><Chips items={known.map(([name, i]) => [String(i), abbr(name)] as [string, string])} value={String(gridTeam)} onChange={(v) => setGTeam(Number(v))} /></View> : null}
-                      {!matchesReady || (grids.isLoading && !shownGrid) ? <Working label="Reading the players' games…" shape="grid" /> : !shownGrid ? (
-                        <EmptyState compact title="No grid yet" body="Could not load player games for this match." />
-                      ) : (
-                        <View style={{ gap: space.snug }}>
-                          <View style={styles.gridHead}><TeamBadge name={shownGrid.name} size={24} /><Text style={styles.gridTitle}>{shownGrid.name}</Text><Text style={styles.empty}>{(STATS as any)[gStat].label} over {gLine}</Text></View>
-                          <GridTable g={shownGrid.g} teamIdx={shownGrid.team} line={gLine} />
-                          <Text style={styles.empty}>Clears {gLine} in green, under it in red. VOID: in the XI, did not bat or bowl, so the bet is void. A dash: not in the XI.</Text>
-                        </View>
-                      )}
-                    </>
+                  {tab === "trends" ? <GridFilters stat={gStat} line={gLine} games={games} hit={tab === "trends" ? hit : undefined} onStat={setGStat} onLine={setGLine} onGames={setGames} onHit={setHit} /> : null}
+                  {tab === "oddeven" ? (
+                    <EmptyState compact title="Odd / Even" body="Coming to the app. It is on the site now." />
                   ) : grids.data ? <TrendList grids={grids.data} line={gLine} minHit={hit} stat={gStat} /> : !matchesReady || grids.isLoading ? <Working label="Reading the players' games…" shape="list" /> : <EmptyState compact title="No trends" body="Could not load player games for this match." />}
                 </View>
               )}
@@ -265,8 +252,6 @@ const styles = StyleSheet.create({
   pad: { paddingHorizontal: space.gutter, paddingTop: space.snug },
   bleed: { marginHorizontal: -space.gutter },
   sections: { paddingTop: rhythm.top },
-  gridHead: { flexDirection: "row", alignItems: "center", gap: space.tight },
-  gridTitle: { ...t.bodyLabel, color: color.foreground },
   titleRow: { flexDirection: "row", alignItems: "center", gap: space.tight, paddingTop: space.group, paddingBottom: space.snug },
   title: { ...type.heading, color: color.foreground },
   empty: { ...type.callout, color: color["muted-foreground"] },

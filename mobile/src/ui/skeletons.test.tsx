@@ -98,7 +98,7 @@ describe("skeleton routes (every page / subpage)", () => {
     const ids = SKELETON_ROUTES.map((r) => r.id);
     for (const need of [
       "tabs/home-rail", "tabs/home-props", "tabs/props", "tabs/fancy", "tabs/leagues",
-      "fixture", "fixture/props", "fixture/fancy", "fixture/grid", "fixture/trends", "fixture/fancy-market", "fixture/ground",
+      "fixture", "fixture/props", "fixture/fancy", "fixture/trends", "fixture/fancy-market", "fixture/ground",
       "player", "team/grid", "team/markets", "team/top", "league", "competitions", "venue", "ground-page", "tournament-stats",
     ]) {
       expect(ids).toContain(need);

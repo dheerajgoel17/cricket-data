@@ -567,8 +567,8 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
       )}
       {urlState ? (
         <StickyFilterBand>
-          <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
-            <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
+          <div className="flex min-w-0 items-center gap-snug px-gutter py-snug">
+            <PillGroup chips layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
             <FilterButton count={active.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {active.length > 0 && (
@@ -580,8 +580,8 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
         </StickyFilterBand>
       ) : (
         <div className="flex flex-col">
-          <div className="-mx-gutter flex min-w-0 items-center gap-snug border-b border-hairline px-gutter">
-            <PillGroup layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
+          <div className="-mx-gutter flex min-w-0 items-center gap-snug px-gutter py-snug">
+            <PillGroup chips layoutId="hot-stat" label="Prop type" resetValue={teams ? "all" : undefined} value={stat} onChange={(v) => update({ stat: v })} items={tabs} className="min-w-0 flex-1" />
             <FilterButton count={active.length} onClick={() => setFiltersOpen(true)} />
           </div>
           {active.length > 0 && (

@@ -84,8 +84,8 @@ export function GridFilterBar({ stat, line, games, hit, items, setQ }: {
   };
   return (
     <div className="flex flex-col gap-snug">
-      <div className="flex items-center gap-snug">
-        <PillGroup layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={items} className="min-w-0 flex-1" />
+      <div className="-mx-gutter flex items-center gap-snug px-gutter">
+        <PillGroup chips layoutId="fx-stat" label="Stat" value={stat} onChange={(v) => setQ({ stat: v })} items={items} className="min-w-0 flex-1" />
         <FilterButton label={`L${games}`} count={active.length} onClick={() => setOpen(true)} />
       </div>
       {active.length > 0 && (

@@ -569,7 +569,7 @@ function Loaded({ idx, name, pid, stat, next, res, q, book, navigateWith, scope,
       )}
 
       <div ref={tabRef} className="flex scroll-mt-[calc(var(--header-h)+var(--control)+var(--space-tight)*2)] flex-col gap-stack">
-        <PillGroup segmented layoutId="pl-tab" label="Sections" value={tabItems.some(([k]) => k === tab) ? tab : tabItems[0][0]} onChange={switchTab} items={tabItems} />
+        <div className="-mx-gutter border-b border-hairline px-gutter"><PillGroup sub layoutId="pl-tab" label="Sections" value={tabItems.some(([k]) => k === tab) ? tab : tabItems[0][0]} onChange={switchTab} items={tabItems} /></div>
         <AnimatedHeight>
           <motion.div key={tab} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }} className="flex flex-col gap-stack">
             {tab === "lines" && !book && <LadderTable bleed ladder={res.ladder} />}

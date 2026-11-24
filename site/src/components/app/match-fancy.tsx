@@ -47,7 +47,6 @@ import { Crumbs } from "./page";
 import { EmptyState } from "./empty-state";
 import { PillGroup } from "./pill-group";
 import { FancySkeleton } from "./skeletons";
-import { tossRows as tossRowsOf } from "@cricket/engine/toss.js";
 
 export { FancyLines, OverviewRow } from "./fancy-lines";
 
@@ -165,8 +164,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // the toss is the last market of the Match list: a price (a book's, else 1.95) and each side's toss record, with no edge to rank it by
-  const listRows = useMemo(() => (mode === "list" && scope < 0 && !doc.isLoading ? [...overview, ...(tossRowsOf as any)(store, doc.data, fxInfo, { teams, fmt: fmtIdx, gender, venue: venueIdx })] : overview), [mode, scope, doc.isLoading, doc.data, overview, store, fxInfo, teams, fmtIdx, gender, venueIdx]);
+  const listRows = overview; // the toss has its own tab (pages/Toss.tsx)
   const book = useMemo(() => byLine(bookedNow), [bookedNow]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
   const bookMain = useMemo(() => mainBookLine(book), [book]);
@@ -273,10 +271,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
         </div>
       )}
       {mode === "detail" ? (
-        <StickyFilterBand>
-          <div className="flex min-w-0 items-center gap-snug border-b border-hairline px-gutter py-snug">
+        <StickyFilterBand className="border-b border-hairline">
+          <div className="flex min-w-0 items-center gap-snug px-gutter py-snug">
             {scopes.length > 1 ? (
-              <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
+              <PillGroup chips layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
                 className="min-w-0 flex-1"
                 items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
             ) : <span className="min-w-0 flex-1" />}
@@ -284,7 +282,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
           </div>
           {keyList.length > 1 && (
             <div className="px-gutter py-snug">
-              <PillGroup layoutId="fancy-market" label="Market" value={fm} onChange={setMarket} items={keyList} className="min-w-0" />
+              <PillGroup chips layoutId="fancy-market" label="Market" value={fm} onChange={setMarket} items={keyList} className="min-w-0" />
             </div>
           )}
           {activeFilters.length > 0 && (
@@ -296,10 +294,10 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
         </StickyFilterBand>
       ) : (
         <div className="flex flex-col gap-snug">
-          {/* Edge-to-edge hairline like HomePhaseBar / StickyFilterBand (page gutter would inset the rule). */}
-          <div className="-mx-gutter flex min-w-0 items-center gap-snug border-b border-hairline px-gutter">
+          {/* second level under the underlined section tabs: small outlined chips and the one filter button */}
+          <div className="-mx-gutter flex min-w-0 items-center gap-snug px-gutter">
             {scopes.length > 1 ? (
-              <PillGroup sub layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
+              <PillGroup chips layoutId="fancy-scope" label="Scope" resetValue="-1" value={String(scope)} onChange={setScope}
                 className="min-w-0 flex-1"
                 items={scopes.map(([v, label]) => [v, v === "-1" ? "Match" : <span key={v} className="flex items-center gap-tight"><TeamBadge name={label} size="xs" />{abbr(label)}</span>] as [string, React.ReactNode])} />
             ) : <span className="min-w-0 flex-1" />}

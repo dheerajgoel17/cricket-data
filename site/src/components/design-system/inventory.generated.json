@@ -1710,6 +1710,16 @@
     ]
   },
   {
+    "path": "site/src/components/app/mark-rows.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "MarkRow",
+      "MarkSection"
+    ],
+    "dependencies": []
+  },
+  {
     "path": "site/src/components/app/match-fancy.tsx",
     "platform": "web",
     "route": false,
@@ -2661,6 +2671,8 @@
       "site/src/components/app/hot-props.tsx",
       "site/src/components/app/match-fancy.tsx",
       "site/src/components/app/grid.tsx",
+      "site/src/pages/OddEven.tsx",
+      "site/src/pages/Toss.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/fixture-card.tsx",
       "site/src/components/app/match-scoreboard.tsx",
@@ -2769,6 +2781,23 @@
     ]
   },
   {
+    "path": "site/src/pages/OddEven.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "OddEven"
+    ],
+    "dependencies": [
+      "site/src/components/app/pill-group.tsx",
+      "site/src/components/app/page.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/fancy-filters.tsx",
+      "site/src/components/app/mark-rows.tsx"
+    ]
+  },
+  {
     "path": "site/src/pages/Player.tsx",
     "platform": "web",
     "route": true,
@@ -2850,6 +2879,21 @@
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/result.tsx",
       "site/src/components/app/skeletons.tsx"
+    ]
+  },
+  {
+    "path": "site/src/pages/Toss.tsx",
+    "platform": "web",
+    "route": true,
+    "exports": [
+      "Toss"
+    ],
+    "dependencies": [
+      "site/src/components/app/mark-rows.tsx",
+      "site/src/components/app/badges.tsx",
+      "site/src/components/app/empty-state.tsx",
+      "site/src/components/app/chip.tsx",
+      "site/src/components/app/fancy-filters.tsx"
     ]
   }
 ]

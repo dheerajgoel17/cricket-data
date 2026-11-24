@@ -19,7 +19,6 @@ export const SKELETON_ROUTES: readonly SkeletonRoute[] = [
   { id: "hot-props", page: "Hot props scoring", shape: "rows", file: "components/app/hot-props.tsx" },
   { id: "fixture", page: "Fixture · header + props", shape: "match", file: "pages/Fixtures.tsx" },
   { id: "fixture/props", page: "Fixture · Props", shape: "rows", file: "pages/Fixtures.tsx" },
-  { id: "fixture/grid", page: "Fixture · Grid", shape: "grid", file: "pages/Fixtures.tsx" },
   { id: "fixture/trends", page: "Fixture · Custom line", shape: "list", file: "pages/Fixtures.tsx" },
   { id: "fixture/fancy", page: "Fixture · Match Fancy", shape: "fancy", file: "components/app/match-fancy.tsx" },
   { id: "fixture/ground", page: "Fixture · Ground", shape: "ground", file: "components/app/fixture-ground.tsx" },
