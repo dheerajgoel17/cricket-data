@@ -240,3 +240,14 @@ def test_collect_heals_before_it_rejects(tmp_path, monkeypatch):
         assert res["healed"] == 1 and len(store.read("balls", "2026-10")) == 215
     else:
         assert store.read("balls", "2026-10") == []
+
+
+def test_pick_targets_does_not_let_failing_matches_starve_an_older_one():
+    from datetime import datetime
+
+    now = datetime(2026, 11, 24, 9, 0)
+    cands = [("crex-z-fail", "2026-11-24", "u"), ("crex-a-eng", "2026-11-21", "u"), ("crex-y-fail", "2026-11-23", "u")]
+    tried = {"crex-z-fail": [2, "2026-11-24T07:00:00"], "crex-y-fail": [3, "2026-11-23T07:00:00"]}
+    assert [c[0] for c in crex_balls.pick_targets(cands, tried, now, 2)] == ["crex-a-eng", "crex-y-fail"]  # z waits (failed twice, 2 h ago); y is due again after 12 h
+    after = crex_balls.record_tries(tried, cands, {"crex-a-eng"}, now)
+    assert "crex-a-eng" not in after and after["crex-z-fail"][0] == 3
