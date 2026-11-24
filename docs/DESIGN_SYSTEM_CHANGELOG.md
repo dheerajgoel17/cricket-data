@@ -594,3 +594,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Change:** the Toss winner rows are gone from the Match Fancy list and live in a Toss tab built like Odd / Even from the same shared `MarkRow` (title, headline figure, tappable marks) and `MarkSection` (heading over hairline rows). The toss rendering inside `FancyLines` stays for the app's twin until its Toss screen exists.
 - **Callers:** fixture tabs Toss and Odd / Even
 
+### 2026-11-24 — App: Odd / Even and Toss screens (`MarkRow` / `MarkSection`)
+- **Path:** `mobile/src/ui/mark-rows.tsx` (new), `odd-even.tsx` (new), `toss.tsx` (new), `match-fancy.tsx`, `mobile/src/app/fixture/[id]/index.tsx`
+- **Change:** the app's Odd / Even tab (was a "coming soon" placeholder) and a new Toss tab are the twins of the site's: a heading per side, then hairline rows with tap-for-detail marks (`MarkRow`, `MarkSection`, twins of the site's `mark-rows.tsx`), overs as the existing `Chips` and the window in the existing `FilterSheet`. The toss rows leave the app's Match Fancy list. Same engine functions as the site (`parity.js`, `toss.js`).
+- **Callers:** fixture screen tabs Toss and Odd / Even
+

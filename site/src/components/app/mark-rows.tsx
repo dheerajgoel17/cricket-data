@@ -20,7 +20,7 @@ export function MarkRow({ title, sub, headline, headlineSub, marks, note, hideWh
         </div>
         <div className="shrink-0 text-right tabular-nums">
           <div className="text-callout font-label">{headline}</div>
-          {headlineSub != null && <div className="text-footnote text-muted-foreground">{headlineSub}</div>}
+          {headlineSub != null && <div className="flex justify-end text-footnote text-muted-foreground">{headlineSub}</div>}
         </div>
       </div>
       {marks.length > 0 && (
