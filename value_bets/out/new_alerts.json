@@ -1,4 +1,67 @@
 {
- "generated_at_ist": "2026-11-24 18:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-24 18:22 IST",
+ "alerts": [
+  {
+   "event_key": "male|Australia|England|2026-11-27",
+   "match": "Australia vs England",
+   "start_utc": "2026-11-27T08:15:00Z",
+   "start_ist": "2026-11-27 13:45 IST",
+   "format": "T20",
+   "gender": "male",
+   "market_type": "batter_milestone",
+   "market": "Aneurin Donald To Score 50",
+   "team_scope": "",
+   "selection": "Aneurin Donald 50+ yes",
+   "player_matched_as": "Aneurin Donald",
+   "player_id": "72918338",
+   "player_team": "England",
+   "stat": "runs",
+   "inn": 0,
+   "line": 49.5,
+   "side": "over",
+   "best_odds": 5.0,
+   "best_source": "feede_lb",
+   "effective_odds_after_commission": 5.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0929,
+   "implied_prob": 0.2,
+   "fair_odds": 4.112,
+   "fair_prob": 0.2432,
+   "model_prob": 0.2192,
+   "market_prob": 0.2628,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.2159,
+   "edge_pct": 21.59,
+   "kelly_quarter_stake_pct": 1.35,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 22% vs market 26% for 50+ runs; form 30.1 runs/inn recency-weighted T20 (n_eff 34.2; last 5: 85, 10, 13, 21, 12), bats in 98% of games played; vs Australia: 2 inns avg 47.5",
+   "notes": "2 market source(s) for fair price; model 0.219 vs market 0.263; milestone: assumes loses if player doesn't bat/bowl (void if not in XI)",
+   "model_detail": {
+    "n_eff": 34.2,
+    "expected": 32.64,
+    "nb_alpha": 1.213,
+    "p_bats_or_bowls": 0.983,
+    "venue_matched": "the gabba",
+    "context_terms": [
+     "p_bat",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": null,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": null,
+    "cloud_pct": null,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "ebe190dc4350bbe7",
+   "alert_key": "male|Australia|England|2026-11-27|batter_milestone||Aneurin Donald 50+ yes|49.5|over",
+   "alerted_at_ist": "2026-11-24 18:25 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
