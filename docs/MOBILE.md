@@ -110,3 +110,6 @@ Phase 0 (this): the Home tab as described under Look (pull to refresh, last live
 * Phase 2: teams, venues, pair, trends, competitions, tools, odds, glossary, legal.
 * Phase 3: links from shared URLs that open the app, share cards, icons at store size, VoiceOver / TalkBack, offline, TestFlight and Play closed testing.
 * Before the first store upload: confirm the bundle id / package name (`cash.fancy.app` is a placeholder in `app.json`, matching the site's domain, and cannot be changed after release) and make the 1024 px icon (the site's 512 px one stands in).
+
+* **Android predictive back (checked 2026-11-24, not enabled):** in Expo SDK 58 the predictive back gesture ships with Expo Router's alpha `ExperimentalStack` (plus `android.predictiveBackGestureEnabled` in the app config), which supports only `title` and `headerShown`. The app's stack relies on `presentation: "formSheet"`, per-screen animations and a nested fixture stack, so it stays on `Stack` with `ios_from_right` until the experimental stack covers them. Revisit at the next SDK.
+* **Lint:** `npm run lint` (ESLint, Expo config) runs in CI: errors fail, the React Compiler findings (setState in effects, impure render calls) are warnings and the backlog.

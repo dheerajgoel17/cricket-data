@@ -29,6 +29,7 @@ import { ScreenerFilters } from "@/ui/screener-filters";
 import { Text } from "@/ui/text";
 import { color, control, font, radius, space, tint, type, t } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
+import { hitSlopFor } from "@/ui/platform";
 
 const WINS = Object.entries(WIN_LABEL) as [string, string][];
 const NEED: Record<string, number> = { l5: 3, l10: 5, season: 5, h2h: 3, ven: 3 };
@@ -123,7 +124,7 @@ function PlayerProps() {
                   body={active.length
                     ? "Clear a filter to see the rest of the day's lines."
                     : otherDay ? `${otherDay} lines are priced on other days — pick another chip above.` : "Lines usually land a few hours before the toss."}
-                  action={active.length ? <Press onPress={() => setSc({ ...DEFAULTS })}><Text style={styles.link}>Clear filters</Text></Press> : undefined}
+                  action={active.length ? <Press accessibilityRole="button" accessibilityLabel="Clear filters" hitSlop={hitSlopFor(80, 20)} onPress={() => setSc({ ...DEFAULTS })}><Text style={styles.link}>Clear filters</Text></Press> : undefined}
                 />
               </View>
             )

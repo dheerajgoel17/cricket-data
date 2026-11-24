@@ -102,7 +102,7 @@ export function SignInSheet() {
 
                 <Button disabled={busy} label={mode === "in" ? "Sign in with email" : "Create account"} onPress={submit} style={styles.submitGap} />
 
-                <Press onPress={() => { setMode((m) => (m === "in" ? "up" : "in")); setErr(null); }} style={styles.switchRow}>
+                <Press accessibilityRole="button" accessibilityLabel={mode === "in" ? "Create an account" : "Sign in instead"} onPress={() => { setMode((m) => (m === "in" ? "up" : "in")); setErr(null); }} style={styles.switchRow}>
                   <Text style={styles.switchMuted}>
                     {mode === "in" ? "No account? " : "Already have an account? "}
                     <Text style={styles.switchLink}>{mode === "in" ? "Create one free" : "Sign in"}</Text>
