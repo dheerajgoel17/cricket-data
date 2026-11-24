@@ -37,7 +37,6 @@ import { LiveMarketRow } from "@/ui/live-market-row";
 import { TeamSpot } from "@/ui/live-spot";
 import { liveRows } from "@cricket/engine/inplay-lines.js";
 import { LineStepper } from "@/ui/line-stepper";
-import { tossRows as tossRowsOf } from "@cricket/engine/toss.js";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { StandingMark, type Standing } from "@/ui/tick";
@@ -107,8 +106,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc, ms, fxInfo, team, scope, hist, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
-  // the toss is the last market of the Match list: a price (a book's, else 1.95) and each side's toss record, with no edge to rank it by
-  const listRows = useMemo(() => (mode === "list" && scope < 0 && hist ? [...overview, ...(tossRowsOf as any)(store, doc, fxInfo, { teams, fmt: fmtIdx, gender, venue: venueIdx })] : overview), [mode, scope, hist, overview, store, doc, fxInfo, teams, fmtIdx, gender, venueIdx]);
+  const listRows = overview; // the toss has its own tab (ui/toss.tsx)
 
   const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc, { a: fx.a, b: fx.b }) : []), [doc, fx.a, fx.b, mode]);
   // same Edge + L10 as scored fancy: overs tape vs the live OU line

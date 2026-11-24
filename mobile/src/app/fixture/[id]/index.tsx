@@ -37,6 +37,8 @@ import { ActiveChip, ChoiceChip, ChoiceRow, Chips, FilterButton, ChipsEdge, filt
 import { HScroll } from "@/ui/h-scroll";
 import { EmptyState } from "@/ui/empty-state";
 import { InfoButton } from "@/ui/info-button";
+import { OddEven } from "@/ui/odd-even";
+import { Toss } from "@/ui/toss";
 import { GridFilters, TrendList } from "@/ui/grid-table";
 import { useScreenInsets } from "@/ui/insets";
 import { MatchAccordions, ScorecardCard } from "@/ui/live-board";
@@ -68,7 +70,7 @@ export default function FixturePage() {
   const { fx: f, doc, archived, isLoading: fxLoading } = useFixtureBooks(id);
   const item: RailItem | null = f ? { fixture: f, state: fixtureState(f, liveForFixture(live.data, f)?.status, now), live: liveMatchFor(live.data, doc, f), noProps: false } : null;
   const books = useMemo(() => (f ? fixtureBooks(doc, f) : { props: false, fancy: false }), [doc, f]);
-  const tabs = useMemo(() => ([["props", "Props"], ["fancy", "Match Fancy"], ["oddeven", "Odd / Even"], ["trends", "Custom line"]] as [string, string][]).filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy || (!!f && f.status !== "Completed") : true)), [books, f]);
+  const tabs = useMemo(() => ([["props", "Props"], ["fancy", "Match Fancy"], ["toss", "Toss"], ["oddeven", "Odd / Even"], ["trends", "Custom line"]] as [string, string][]).filter(([k]) => (k === "props" ? books.props : k === "fancy" ? books.fancy || (!!f && f.status !== "Completed") : true)), [books, f]);
   const [tabAsked, setTab] = useState<string | undefined>(tabParam);
   useEffect(() => { setTab(tabParam); }, [id, tabParam]);
   const tab = tabs.some(([k]) => k === tabAsked) ? tabAsked! : tabs[0][0];
@@ -188,12 +190,14 @@ export default function FixturePage() {
                 </>
               ) : tab === "fancy" ? (
                 <View style={[styles.pad, { paddingTop: 0 }]}><MatchFancy key={`${f.id}`} fx={f} teams={known} fmt={fmt} doc={doc} mode="list" /></View>
+              ) : tab === "toss" ? (
+                <Toss key={f.id} fx={f} doc={doc} />
+              ) : tab === "oddeven" ? (
+                <OddEven key={f.id} fx={f} />
               ) : (
                 <View style={[styles.pad, { gap: space.stack, paddingTop: space.stack }]}>
-                  {tab === "trends" ? <GridFilters stat={gStat} line={gLine} games={games} hit={tab === "trends" ? hit : undefined} onStat={setGStat} onLine={setGLine} onGames={setGames} onHit={setHit} /> : null}
-                  {tab === "oddeven" ? (
-                    <EmptyState compact title="Odd / Even" body="Coming to the app. It is on the site now." />
-                  ) : grids.data ? <TrendList grids={grids.data} line={gLine} minHit={hit} stat={gStat} /> : !matchesReady || grids.isLoading ? <Working label="Reading the players' games…" shape="list" /> : <EmptyState compact title="No trends" body="Could not load player games for this match." />}
+                  <GridFilters stat={gStat} line={gLine} games={games} hit={hit} onStat={setGStat} onLine={setGLine} onGames={setGames} onHit={setHit} />
+                  {grids.data ? <TrendList grids={grids.data} line={gLine} minHit={hit} stat={gStat} /> : !matchesReady || grids.isLoading ? <Working label="Reading the players' games…" shape="list" /> : <EmptyState compact title="No trends" body="Could not load player games for this match." />}
                 </View>
               )}
             </>

@@ -182,6 +182,8 @@
       "mobile/src/ui/h-scroll.tsx",
       "mobile/src/ui/empty-state.tsx",
       "mobile/src/ui/info-button.tsx",
+      "mobile/src/ui/odd-even.tsx",
+      "mobile/src/ui/toss.tsx",
       "mobile/src/ui/grid-table.tsx",
       "mobile/src/ui/live-board.tsx",
       "mobile/src/ui/match-fancy.tsx",
@@ -813,6 +815,19 @@
     ]
   },
   {
+    "path": "mobile/src/ui/mark-rows.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "MarkRow",
+      "MarkSection"
+    ],
+    "dependencies": [
+      "mobile/src/ui/press.tsx",
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
     "path": "mobile/src/ui/match-chip.tsx",
     "platform": "native",
     "route": false,
@@ -918,6 +933,23 @@
       "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/tick.tsx",
       "mobile/src/ui/team-badge.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/odd-even.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "OddEven"
+    ],
+    "dependencies": [
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/mark-rows.tsx",
+      "mobile/src/ui/sheet.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/text.tsx",
+      "mobile/src/ui/motion.tsx"
     ]
   },
   {
@@ -1204,6 +1236,24 @@
     "dependencies": [
       "mobile/src/ui/text.tsx",
       "mobile/src/ui/icons.tsx"
+    ]
+  },
+  {
+    "path": "mobile/src/ui/toss.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Toss"
+    ],
+    "dependencies": [
+      "mobile/src/ui/chips.tsx",
+      "mobile/src/ui/empty-state.tsx",
+      "mobile/src/ui/mark-rows.tsx",
+      "mobile/src/ui/motion.tsx",
+      "mobile/src/ui/sheet.tsx",
+      "mobile/src/ui/book-badge.tsx",
+      "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/text.tsx"
     ]
   },
   {
@@ -2891,6 +2941,7 @@
     "dependencies": [
       "site/src/components/app/mark-rows.tsx",
       "site/src/components/app/badges.tsx",
+      "site/src/components/app/book-badge.tsx",
       "site/src/components/app/empty-state.tsx",
       "site/src/components/app/chip.tsx",
       "site/src/components/app/fancy-filters.tsx"

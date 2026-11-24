@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { MarkRow, MarkSection, type MarkData } from "@/components/app/mark-rows";
 import { TeamBadge } from "@/components/app/badges";
+import { BookBadge } from "@/components/app/book-badge";
 import { EmptyState } from "@/components/app/empty-state";
 import { FilterButton } from "@/components/app/chip";
 import { FancyFilters } from "@/components/app/fancy-filters";
@@ -56,7 +57,7 @@ export function Toss({ fx, doc, q = {}, setQ }: { fx: any; doc: any; q?: Record<
       <div className="grid gap-stack lg:grid-cols-2 lg:items-start">
         {sides.map((s) => (
           <MarkSection key={s.name} label={s.name} head={<><TeamBadge name={s.name} size="sm" /><span className="min-w-0 flex-1 truncate text-callout font-label">{s.name}</span><span className="text-footnote text-muted-foreground">toss winner</span></>}>
-            <MarkRow title="Price" sub={market.default ? "Default, no book lists the toss" : `Best of ${market.books.length} book${market.books.length === 1 ? "" : "s"}`} headline={s.side.price.toFixed(2)} headlineSub={s.side.book ?? "default"} marks={[]} hideWhenEmpty={false} />
+            <MarkRow title="Price" sub={market.default ? "Default, no book lists the toss" : `Best of ${market.books.length} book${market.books.length === 1 ? "" : "s"}`} headline={s.side.price.toFixed(2)} headlineSub={s.side.book ? <BookBadge source={s.side.book} /> : "default"} marks={[]} hideWhenEmpty={false} />
             <TossRow title="Last tosses" sub={`Last ${win}`} marks={s.last} vsName={vsName} />
             <TossRow title="At this ground" sub={`${ground} · last ${win}`} marks={s.here} vsName={vsName} />
             <TossRow title={`v ${abbr(s.name === fx.a ? fx.b : fx.a)}`} sub="Head to head · last 5" marks={s.vs} vsName={vsName} />
