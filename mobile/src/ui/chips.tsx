@@ -6,6 +6,7 @@ import { Press } from "@/ui/press";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { AnimatedText, Text } from "@/ui/text";
 import { color, control, radius, space, type, font, tint, duration, t, d, state, icon } from "@/ui/tokens";
 
@@ -72,6 +73,16 @@ export function ChoiceRow({ children }: { children: ReactNode }) {
   return <View style={styles.choiceRow}>{children}</View>;
 }
 
+/** The chips beside a Filters button: they scroll sideways and dissolve into the button (a 24 px fade at the right edge) instead of being cut off hard. */
+export function ChipsEdge({ children }: { children: ReactNode }) {
+  return (
+    <View style={filterBar.chips}>
+      {children}
+      <LinearGradient pointerEvents="none" colors={[tint.black(0), color.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.chipFade} />
+    </View>
+  );
+}
+
 /** Full-width filter chrome. Use flush chips so the bar owns the padding. */
 export const filterBar = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline },
@@ -81,6 +92,7 @@ export const filterBar = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
+  chipFade: { position: "absolute", right: 0, top: 0, bottom: 0, width: 24 },
   flushRow: { gap: space.tight },
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },

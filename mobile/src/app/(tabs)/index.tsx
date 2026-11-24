@@ -1,4 +1,4 @@
-import { memo, Profiler, useMemo, useState } from "react";
+import { memo, Profiler, useEffect, useMemo, useState } from "react";
 import { mark, onRender } from "@/lib/perf";
 import { FlatList, Platform, RefreshControl, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import { layoutWidth } from "@/lib/fit";
@@ -8,7 +8,7 @@ import { useLater } from "@/lib/use-later";
 import { useNow } from "@/lib/use-now";
 import { useRail } from "@/lib/use-rail";
 import { AppHeader } from "@/ui/brand";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { FixtureCard } from "@/ui/fixture-card";
 import { HotHome, HotHomeSkeleton } from "@/ui/hot-home";
 import { useScreenInsets } from "@/ui/insets";
@@ -28,7 +28,8 @@ const RAIL_MIN_H = 168;
  */
 function Fixtures() {
   mark("render:Fixtures");
-  const { ready, items, error, refetch } = useRail();
+  const { ready: railReady, settled, liveKnown, items, error, refetch } = useRail();
+  const ready = railReady && settled; // wait for the live feed: which phase opens depends on what is in play
   const [pulling, setPulling] = useState(false);
   const pull = () => { setPulling(true); void refetch().finally(() => setPulling(false)); };
   const inset = useScreenInsets();
@@ -38,7 +39,10 @@ function Fixtures() {
   // the rail paints first; the props block (the tape, the chips, the rows) mounts after it as a transition, in slices
   const propsReady = useLater(ready);
 
-  const { counts, phase, shown } = useMemo(() => phaseView(items, asked), [items, asked]);
+  // Once the live feed has chosen the opening phase it stays: a score poll or a match starting under your thumb never yanks the page to another tab; only a tap on the bar changes it.
+  const [opened, setOpened] = useState<HomePhase>();
+  const { counts, phase, shown } = useMemo(() => phaseView(items, asked ?? opened), [items, asked, opened]);
+  useEffect(() => { if (ready && liveKnown && !opened && !asked) setOpened(phase); }, [ready, liveKnown, opened, asked, phase]);
 
   const cardW = Math.round(width * FIXTURE_CARD_SHARE);
   const gap = space.snug;
@@ -62,7 +66,7 @@ function Fixtures() {
         <View style={{ height: bandH }}>
           <Profiler id="rail" onRender={onRender}>
           {!ready ? (
-            error ? <View style={styles.emptyPad}><EmptyState title="Could not load fixtures" body="Pull to retry." /></View> : <RailSkeleton width={cardW} />
+            error ? <View style={styles.emptyPad}><ErrorState title="Could not load fixtures" onRetry={pull} /></View> : <RailSkeleton width={cardW} />
           ) : shown.length === 0 ? (
             <View style={styles.emptyPad}><EmptyState title={EMPTY_PHASE[phase].title} body={EMPTY_PHASE[phase].body} /></View>
           ) : (

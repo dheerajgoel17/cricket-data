@@ -18,8 +18,10 @@ export function fromIst(str?: string | null) {
   return m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) - 330 * 60000) : null;
 }
 
-export const initials = (n: string) => String(n).replace(/\(W\)/, "").trim().split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
-export const abbr = (n: string) => { const w = String(n).replace(/\(W\)/, "").trim().split(/\s+/); return (w.length > 1 ? w.map((x) => x[0]).join("") : w[0]).slice(0, 3).toUpperCase(); };
+/** A team name without any bracketed tag a book adds ("(W)", "(w)", "(Women)", an unclosed "(W"): none of them is part of the abbreviation. */
+const bare = (n: string) => String(n).replace(/\s*\([^)]*\)?/g, "").trim();
+export const initials = (n: string) => bare(n).split(/\s+/).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
+export const abbr = (n: string) => { const w = bare(n).split(/\s+/); return (w.length > 1 ? w.map((x) => x[0]).join("") : w[0]).slice(0, 3).toUpperCase(); };
 
 /** Famous grounds people already shorten; matched against the stadium + city blob. */
 const VENUE_SHORT: [RegExp, string][] = [

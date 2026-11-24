@@ -39,7 +39,7 @@ function PropRowView({ r, i, soFar, out, bars = true }: { r: Row; i: number; soF
         accessibilityLabel={`${r.name}, ${sideLetter} ${r.line} ${label}${price > 1 ? `, ${odds(price)}` : ""}${r.edge != null ? `, edge ${(r.edge * 100).toFixed(0)}` : ""}`}
         style={({ pressed }) => [styles.row, pressed && styles.pressed]}
       >
-        <PlayerAvatar pid={r.pid} team={r.team} test={r.fmt === "Test"} size={control} />
+        <PlayerAvatar pid={r.pid} team={r.team} test={r.fmt === "Test"} size={control} name={r.name} />
         <View style={styles.main}>
           <View style={styles.titleRow}>
             <Text style={styles.name} numberOfLines={1}>{r.name}</Text>

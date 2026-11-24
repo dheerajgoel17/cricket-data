@@ -142,7 +142,8 @@
       "mobile/src/ui/match-header.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-header.tsx",
-      "mobile/src/ui/page-atmosphere.tsx"
+      "mobile/src/ui/page-atmosphere.tsx",
+      "mobile/src/ui/tab-fade.tsx"
     ]
   },
   {
@@ -472,6 +473,7 @@
     "exports": [
       "ActiveChip",
       "Chips",
+      "ChipsEdge",
       "ChoiceChip",
       "ChoiceRow",
       "FilterButton"
@@ -621,7 +623,8 @@
       "mobile/src/ui/line-tabs.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/text.tsx",
-      "mobile/src/ui/bleed.tsx"
+      "mobile/src/ui/bleed.tsx",
+      "mobile/src/ui/tab-fade.tsx"
     ]
   },
   {
@@ -945,7 +948,9 @@
       "PlayerFace",
       "PlayerPortrait"
     ],
-    "dependencies": []
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
   },
   {
     "path": "mobile/src/ui/press.tsx",

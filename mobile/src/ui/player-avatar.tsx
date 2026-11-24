@@ -4,7 +4,9 @@ import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import { faceUrls, shirtUrls } from "@/lib/photo-urls";
 import { photosQuery } from "@/lib/queries";
-import { color, duration } from "@/ui/tokens";
+import { initials } from "@/lib/format";
+import { Text } from "@/ui/text";
+import { color, duration, w } from "@/ui/tokens";
 
 /** A picture that arrives after its circle fades in instead of popping (the circle is already there, so nothing shifts). */
 const AVATAR_FADE = { duration: duration.fast, effect: "cross-dissolve" as const };
@@ -21,12 +23,14 @@ function useUrls(pid: string, team?: string, test?: boolean) {
  * Round row avatar: face + kit fill the circle as one image (no nested flag/crest).
  * Matches the site's `PlayerAvatar` fill.
  */
-export function PlayerAvatar({ pid, team, test, size = 36 }: { pid: string; team?: string; test?: boolean; size?: number }) {
+export function PlayerAvatar({ pid, team, test, size = 36, name }: { pid: string; team?: string; test?: boolean; size?: number; /** Shown as initials when there is no picture at all, so an empty circle never reads as broken. */ name?: string }) {
   const { faces, shirts } = useUrls(pid, team, test);
   const [face, setFace] = useState(0), [shirt, setShirt] = useState(0);
   const h = size * WITH_SHIRT;
+  const bare = !faces[face] && !shirts[shirt];
   return (
     <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
+      {bare && name ? <Text style={[styles.initials, { fontSize: size * 0.36 }]}>{initials(name)}</Text> : null}
       <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, width: size, height: h }}>
         {faces[face] ? (
           <Image
@@ -80,6 +84,7 @@ export function PlayerFace({ pid, size = 36 }: { pid: string; size?: number }) {
 }
 
 const styles = StyleSheet.create({
+  initials: { ...w.strong, color: color["muted-foreground"], textAlign: "center" },
   circle: { overflow: "hidden", backgroundColor: color.secondary },
 });
 

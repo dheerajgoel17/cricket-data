@@ -17,6 +17,7 @@ import { Working } from "@/ui/motion";
 import { PageHeader } from "@/ui/page-header";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { space } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 /** One fancy market for a fixture: chart, over/under and ladder (the site's `/fixture/:id/fancy`). */
 const one = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
@@ -61,6 +62,7 @@ export default function FancyMarketPage() {
         {item ? <MatchHeader item={item} /> : null}
         <MatchFancy key={f.id} fx={f} teams={known} fmt={fmt} doc={doc} mode="detail" start={start} />
       </ScrollView>
+      <TabFade withTabBar={false} />
     </PageAtmosphere>
   );
 }

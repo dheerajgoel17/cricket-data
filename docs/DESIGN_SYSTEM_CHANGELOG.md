@@ -15,6 +15,16 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-24 — ChipsEdge, retry on every failed load, wrapping tag on Match Fancy rows
+- **Path:** `mobile/src/ui/chips.tsx`, `mobile/src/ui/fancy-row.tsx`, `mobile/src/ui/empty-state.tsx`
+- **Change:** `ChipsEdge` wraps the stat chips beside a Filters button and fades them out at the right edge (Props, Grid, Match Fancy, fixture Props) instead of a hard cut. `OverviewRow` lets the "In Play Market" tag drop to its own line rather than truncating the market name ("SA • 25 o..."). The team page (grid, markets, top batters), Grid and Trends, the Fancy tab, the Home rail and the player's games now use `ErrorState` with a Try again button; a test fails on "try again in a moment" copy.
+- **Callers:** every screen with a chips + Filters row; every Match Fancy / Fancy row with an in-play tag.
+
+### 2026-11-24 — Phone audit fixes (avatar initials, chip fade, edge-to-edge)
+- **Path:** `mobile/src/ui/player-avatar.tsx`, `mobile/src/ui/chips.tsx`, `mobile/src/app/info/[topic].tsx`, `mobile/src/ui/ground-page.tsx`, `mobile/src/app/fixture/[id]/fancy.tsx`, `site/src/lib/format.ts`
+- **Change:** `PlayerAvatar` takes `name` and shows initials when there is no picture (Search, Props rows). The stat chips beside `FilterButton` dissolve into it (a 24 px gradient) instead of being cut off. The info sheet clears the system navigation buttons; the ground page and the fixture Fancy page end in the shared bottom fade (`edge-contract.test.ts` lists every detail page). `abbr` / `initials` ignore any bracketed tag a book adds, so "Perth Scorchers (w)" is "PS", not "PS(". No new variant.
+- **Callers:** Search, Props, Fancy, Match Fancy, fixture and ground pages.
+
 ### 2026-11-24 — App motion curves, photo URL cache, lint gate
 - **Path:** `mobile/src/ui/curves.ts`, `mobile/src/lib/photo-urls.ts`, `mobile/eslint.config.js`
 - **Change:** `easeOutCubic`, `easeOutExpo` and `bounce` (spring configs) replace the curve and spring literals in tick, charts, accordion, segmented, count-up, collapsible, star and the splash; `tokens.test.ts` fails on a new `damping`, `stiffness` or `Easing.bezier` elsewhere. Crests, league badges and avatars read their URLs from one cache per photos file and fade in (`duration.fast`). The app gets an ESLint gate in CI (errors fail, warnings are the backlog).

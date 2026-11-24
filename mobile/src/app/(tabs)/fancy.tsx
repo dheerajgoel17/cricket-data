@@ -15,7 +15,7 @@ import { fancyMarketPath, fixturePath, push } from "@/lib/nav";
 import { useNow } from "@/lib/use-now";
 import { AppHeader } from "@/ui/brand";
 import { Chips } from "@/ui/chips";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { OverviewRow } from "@/ui/fancy-row";
 import { LiveScore } from "@/ui/fixture-card";
 import { useScreenInsets } from "@/ui/insets";
@@ -34,7 +34,7 @@ const fxChip = (f: any) => matchChipId(`${f.a} vs ${f.b}`, f.start, f.fmt);
 function Fancy() {
   mark("render:Fancy");
   const inset = useScreenInsets();
-  const { cards, ready, error } = useFancyCards();
+  const { cards, ready, error, refetch } = useFancyCards();
   const [day, setDay] = useState("0");
   const [match, setMatch] = useState("all");
   const days = useMemo(() => (hotDayLabels() as [string, string][]).map(([id, label]) => [id, label] as [string, string]), []);
@@ -67,7 +67,7 @@ function Fancy() {
         contentContainerStyle={{ paddingHorizontal: space.gutter, paddingTop: space.snug, paddingBottom: inset.bottom + 24 }}
         ListEmptyComponent={
           !ready
-            ? (error ? <View style={styles.emptyPad}><EmptyState title="Could not score fancy lines" body="Try again in a moment." /></View> : <Working label="Scoring the fancy lines…" shape="fancy" />)
+            ? (error ? <View style={styles.emptyPad}><ErrorState title="Could not score fancy lines" body="Something went wrong scoring the fancy lines." onRetry={refetch} /></View> : <Working label="Scoring the fancy lines…" shape="fancy" />)
             : !scored.length
               ? <View style={styles.emptyPad}><EmptyState title="No fancy lines yet" body="They open a day or two before a match, once there are past matches to score them on." /></View>
               : <View style={styles.emptyPad}><EmptyState title={day === "0" ? "No fancy lines today" : "No fancy lines for this day"} body={otherDay ? "Lines are priced on other days — pick another chip above." : "Lines usually land a day or two before the toss."} /></View>

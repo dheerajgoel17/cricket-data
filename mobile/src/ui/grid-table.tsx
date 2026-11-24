@@ -12,9 +12,9 @@ import { odds, pc, shortDate } from "@site/lib/format";
 import type { Grid } from "@site/lib/grid";
 import { useStore } from "@/lib/use-store";
 import { playerLabel } from "@/lib/player-label";
-import { ActiveChip, ChoiceChip, ChoiceRow, FilterButton, filterBar } from "@/ui/chips";
+import { ActiveChip, ChoiceChip, ChoiceRow, FilterButton, ChipsEdge, filterBar } from "@/ui/chips";
 import { CapsuleTabs } from "@/ui/capsule";
-import { EmptyState } from "@/ui/empty-state";
+import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { Bleed } from "@/ui/bleed";
 import { LineStepper } from "@/ui/line-stepper";
 import { MiniBars } from "@/ui/mini-bars";
@@ -47,7 +47,7 @@ export function GridFilters({ stat, line, games, hit, onStat, onLine, onGames, o
   return (
     <View style={styles.filterBleed}>
       <View style={filterBar.row}>
-        <View style={filterBar.chips}><CapsuleTabs flush label="Stat" items={STAT_ITEMS.map(([k, l]) => [k, l, false] as [string, string, boolean])} value={stat} onChange={onStat} /></View>
+        <ChipsEdge><CapsuleTabs flush label="Stat" items={STAT_ITEMS.map(([k, l]) => [k, l, false] as [string, string, boolean])} value={stat} onChange={onStat} /></ChipsEdge>
         <FilterButton label={`L${games}`} count={activeN} onPress={() => setOpen(true)} />
       </View>
       {activeN > 0 ? (
@@ -83,7 +83,7 @@ const NAME_W = 132, HIT_W = 44, CELL_W = 46, ROW_H = 46;
 export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line: number }) {
   const stats = useStore();
   const store: any = stats.data?.store, names = stats.data?.names;
-  if (!store || !stats.matchesReady || !store.M) return <EmptyState compact title="Could not load grid" body="Pull to retry once the stats data is ready." />;
+  if (!store || !stats.matchesReady || !store.M) return <ErrorState compact title="Could not load grid" body="The stats data is not ready yet." onRetry={() => void stats.refetch()} />;
   if (!g.fx.length) return <EmptyState compact title="No fixtures" body="No fixtures for this format." />;
   const M = store.M;
   const label = (i: number) => playerLabel(store, names, i);
@@ -137,7 +137,7 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
 export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; team: number }[]; line: number; minHit: number; stat: string }) {
   const stats = useStore();
   const store: any = stats.data?.store, names = stats.data?.names;
-  if (!store || !stats.matchesReady) return <EmptyState compact title="Could not load trends" body="Pull to retry once the stats data is ready." />;
+  if (!store || !stats.matchesReady) return <ErrorState compact title="Could not load trends" body="The stats data is not ready yet." onRetry={() => void stats.refetch()} />;
   const items: any[] = [];
   for (const { g, team } of grids) for (const r of g.body) {
     const played = g.fx.filter((m) => r.map.has(m));

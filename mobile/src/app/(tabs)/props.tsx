@@ -15,7 +15,7 @@ import { MAX_ROWS } from "@/lib/hot";
 import { useHotView } from "@/lib/use-hot";
 import { AppHeader } from "@/ui/brand";
 import { STATS } from "@cricket/engine/rules.js";
-import { Chips, ActiveChip, FilterButton, filterBar } from "@/ui/chips";
+import { Chips, ActiveChip, FilterButton, ChipsEdge, filterBar } from "@/ui/chips";
 import { HScroll } from "@/ui/h-scroll";
 import { makeStabilizer } from "@/lib/stable-rows";
 import { MatchChips } from "@/ui/match-chip";
@@ -92,7 +92,7 @@ function PlayerProps() {
       <Chips items={days} value={sc.day} onChange={(day) => setSc((s) => ({ ...s, day, match: "all" }))} />
       {matchChips.length ? <MatchChips all items={matchChips} tags={matchTags} value={pick} onChange={(match) => setSc((s) => ({ ...s, match }))} /> : null}
       <View style={filterBar.row}>
-        <View style={filterBar.chips}><Chips flush items={statTabs} value={statTabs.some(([k]) => k === sc.stat) ? sc.stat : "all"} onChange={(stat) => setSc((s) => ({ ...s, stat }))} /></View>
+        <ChipsEdge><Chips flush items={statTabs} value={statTabs.some(([k]) => k === sc.stat) ? sc.stat : "all"} onChange={(stat) => setSc((s) => ({ ...s, stat }))} /></ChipsEdge>
         <FilterButton count={active.length} onPress={() => setFiltersOpen(true)} />
       </View>
       {active.length ? (
