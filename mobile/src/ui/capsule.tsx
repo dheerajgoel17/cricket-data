@@ -7,6 +7,7 @@ import { AnimatedText } from "@/ui/text";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { color, control, radius, space, t } from "@/ui/tokens";
+import { CHIP_SLOP } from "@/ui/platform";
 
 /**
  * A row of chips, the chosen one filled with the accent colour (the site's `PillGroup` / `Chip`: the stat switch on a player, the sections of a match). Scrolls sideways when there
@@ -26,7 +27,7 @@ export function CapsuleTabs({ items, value: valueProp, onChange: onChangeProp, l
 
 function Tab({ text, on, muted, onPress, calm }: { calm: boolean; text: string; on: boolean; muted?: boolean; onPress: () => void }) {
   return (
-    <Press onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: on }}>
+    <Press onPress={onPress} hitSlop={CHIP_SLOP} accessibilityRole="tab" accessibilityState={{ selected: on }}>
       <Animated.View style={[styles.tab, { backgroundColor: on ? color.primary : color.card }, !calm && chipFillTransition]}>
         <AnimatedText style={[styles.text, on ? styles.textOn : muted && styles.textMuted, !calm && chipTextTransition]} numberOfLines={1}>{text}</AnimatedText>
       </Animated.View>

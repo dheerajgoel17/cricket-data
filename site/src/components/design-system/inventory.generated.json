@@ -281,6 +281,7 @@
       "mobile/src/ui/list.tsx",
       "mobile/src/ui/player-avatar.tsx",
       "mobile/src/ui/team-badge.tsx",
+      "mobile/src/ui/motion.tsx",
       "mobile/src/ui/page-atmosphere.tsx",
       "mobile/src/ui/tab-fade.tsx"
     ]

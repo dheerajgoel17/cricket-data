@@ -9,6 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { AnimatedText, Text } from "@/ui/text";
 import { color, control, radius, space, type, font, tint, duration, t, d, state, icon } from "@/ui/tokens";
+import { CHIP_SLOP } from "@/ui/platform";
 
 /** The site's series chips: one row that scrolls sideways, the chosen one filled with the accent colour (the fill fades between chips); each carries how many matches it holds. */
 export function Chips({ items, value: valueProp, onChange: onChangeProp, flush }: { items: [id: string, label: string, count?: number | string, muted?: boolean][]; value: string; onChange: (id: string) => void; flush?: boolean }) {
@@ -29,7 +30,7 @@ export const chipTextTransition = { ...chipFillTransition, transitionProperty: "
 function Chip({ label, count, on, muted, onPress, calm }: { calm: boolean; label: string; count?: number | string; on: boolean; muted?: boolean; onPress: () => void }) {
   const ink = on ? color["primary-foreground"] : color.foreground;
   return (
-    <Press accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={onPress}>
+    <Press hitSlop={CHIP_SLOP} accessibilityRole="tab" accessibilityState={{ selected: on }} onPress={onPress}>
       <Animated.View style={[styles.chip, { backgroundColor: on ? color.primary : color.card }, !calm && chipFillTransition, muted && !on && state.dim]}>
         <AnimatedText style={[styles.label, { color: ink }, !calm && chipTextTransition]}>{label}</AnimatedText>
         {count != null ? <AnimatedText style={[styles.count, { color: on ? ink : color["muted-foreground"] }, !calm && chipTextTransition]}>{count}</AnimatedText> : null}
@@ -52,7 +53,7 @@ export function FilterButton({ label = "Filters", count = 0, onPress, style }: {
 /** Dismissible active-filter chip (Props / Fancy / Grid sheets). */
 export function ActiveChip({ label, onClear }: { label: string; onClear: () => void }) {
   return (
-    <Press scale={1} onPress={onClear} accessibilityRole="button" style={styles.active}>
+    <Press scale={1} hitSlop={CHIP_SLOP} onPress={onClear} accessibilityRole="button" style={styles.active}>
       <Text style={styles.activeTxt}>{label}</Text>
       <Ionicons name="close" size={icon.xs} color={color.primary} />
     </Press>
@@ -62,7 +63,7 @@ export function ActiveChip({ label, onClear }: { label: string; onClear: () => v
 /** Sheet / accordion choice chip (on = the accent fill, as the site's `Chip`). */
 export function ChoiceChip({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
   return (
-    <Press scale={1} onPress={onPress} accessibilityRole="button" style={[styles.choice, on && styles.choiceOn]}>
+    <Press scale={1} hitSlop={CHIP_SLOP} onPress={onPress} accessibilityRole="button" style={[styles.choice, on && styles.choiceOn]}>
       <Text style={[styles.choiceTxt, on && styles.choiceTxtOn]}>{label}</Text>
     </Press>
   );

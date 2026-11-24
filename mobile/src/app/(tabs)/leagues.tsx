@@ -24,6 +24,7 @@ import { LeagueBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
 import { cap, color, font, radius, space, type, fs, rhythm, t, w, icon } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
+import { hitSlopFor } from "@/ui/platform";
 
 /** Listed first, in this order, when they are live or due to start: Big Bash on top (the women's season live, the men's due). */
 const PIN_FIRST = ["big bash"];
@@ -43,7 +44,7 @@ function Leagues() {
   return (
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <AppHeader title="Leagues" action={
-        <Press onPress={() => push("/competitions")} accessibilityRole="button" hitSlop={8} style={styles.all}>
+        <Press onPress={() => push("/competitions")} accessibilityRole="button" hitSlop={hitSlopFor(120, 20)} style={styles.all}>
           <Text style={styles.allText}>All competitions</Text><ChevronRight color={color["muted-foreground"]} size={icon.sm} />
         </Press>
       } />
@@ -66,7 +67,7 @@ function Leagues() {
               <View style={styles.leagueHead}>
                 <LeagueBadge name={store.events[e]} size={40} />
                 <Text style={styles.leagueName} numberOfLines={1}>{store.events[e]}</Text>
-                <Press onPress={() => push(`/league/${e}`)} accessibilityRole="button" hitSlop={8} style={styles.all}>
+                <Press onPress={() => push(`/league/${e}`)} accessibilityRole="button" hitSlop={hitSlopFor(80, 20)} style={styles.all}>
                   <Text style={styles.allText}>More</Text><ChevronRight color={color["muted-foreground"]} size={icon.sm} />
                 </Press>
               </View>

@@ -97,7 +97,7 @@ export function GridTable({ g, teamIdx, line }: { g: Grid; teamIdx: number; line
           return (
             <Press scale={1} key={p} onPress={() => push(`/player/${p}`)} accessibilityRole="button" accessibilityLabel={label(p)} style={({ pressed }) => [styles.cell, styles.rowStart, pressed && state.pressed]}>
               <View style={{ width: NAME_W, flexDirection: "row", alignItems: "center", gap: space.tight }}>
-                <PlayerAvatar pid={store.P.id[p]} team={store.teamName(teamIdx)} size={28} />
+                <PlayerAvatar pid={store.P.id[p]} team={store.teamName(teamIdx)} size={28} name={label(p)} />
                 <Text style={styles.name} numberOfLines={1}>{label(p)}</Text>
               </View>
               <Text style={[styles.hit, { width: HIT_W }]}>{vals.length ? `${k}/${vals.length}` : "–"}</Text>
@@ -155,7 +155,7 @@ export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; tea
     <Bleed style={{ paddingHorizontal: 0 }}>
       {list.map((i, n) => (
         <Press scale={1} key={`${i.p}-${i.team}`} onPress={() => push(`/player/${i.p}`)} accessibilityRole="button" style={({ pressed }) => [styles.trend, n > 0 && styles.sep, pressed && { backgroundColor: color.card }]}>
-          <PlayerAvatar pid={store.P.id[i.p]} team={store.teamName(i.team)} size={44} />
+          <PlayerAvatar pid={store.P.id[i.p]} team={store.teamName(i.team)} size={44} name={who(i.p)} />
           <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
             <Text style={styles.name} numberOfLines={1}>{who(i.p)}</Text>
             <Text style={styles.desc} numberOfLines={1}><Text style={{ color: color.primary }}>O {line} {label}</Text> · {i.k}/{i.vals.length}</Text>

@@ -117,7 +117,7 @@ function LeaderCard({ l, test, width }: { l: any; test: boolean; width: number }
     <Press scale={1} onPress={() => push(`/player/${r.p}`)} accessibilityRole="button" accessibilityLabel={`${l.label}: ${who}, ${r.v}`} style={({ pressed }) => [styles.leader, { width }, pressed && state.pressed]}>
       <Text style={styles.cap}>{l.label}</Text>
       <View style={styles.leaderRow}>
-        <PlayerAvatar pid={store.P.id[r.p]} team={team} test={test} size={52} />
+        <PlayerAvatar pid={store.P.id[r.p]} team={team} test={test} size={52} name={who} />
         <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
           <Text style={styles.leaderName} numberOfLines={1}>{who}</Text>
           <Text style={styles.sub} numberOfLines={1}>{abbr(team)}</Text>
@@ -159,7 +159,7 @@ function BoardCard({ b }: { b: any }) {
           <Press scale={1} key={`${r.rank}-${r.p ?? r.t}-${r.m ?? ""}`} disabled={!player} onPress={() => push(`/player/${r.p}`)} accessibilityRole={player ? "button" : "text"} style={({ pressed }) => [styles.tr, styles.trSep, pressed && state.pressed]}>
             <Text style={[styles.rank, { width: 22 }]}>{r.rank}</Text>
             <View style={styles.who}>
-              {player ? <PlayerAvatar pid={store.P.id[r.p]} team={crest} size={32} /> : <TeamBadge name={crest} size={32} />}
+              {player ? <PlayerAvatar pid={store.P.id[r.p]} team={crest} size={32} name={name} /> : <TeamBadge name={crest} size={32} />}
               <View style={{ flex: 1, minWidth: 0 }}>
                 <Text style={styles.name} numberOfLines={1}>{name}</Text>
                 {sub ? <Text style={styles.subSmall} numberOfLines={1}>{sub}</Text> : null}

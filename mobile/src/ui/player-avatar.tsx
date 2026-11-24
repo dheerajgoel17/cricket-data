@@ -16,7 +16,7 @@ const FACE = 300 / 310, SHIRT_TOP = 0.627, WITH_SHIRT = 1.03;
 
 function useUrls(pid: string, team?: string, test?: boolean) {
   const { data: photos } = useQuery(photosQuery);
-  return { faces: faceUrls(photos, pid), shirts: shirtUrls(photos, team || "", !!test) };
+  return { faces: faceUrls(photos, pid), shirts: shirtUrls(photos, team || "", !!test), loaded: photos !== undefined };
 }
 
 /**
@@ -24,10 +24,10 @@ function useUrls(pid: string, team?: string, test?: boolean) {
  * Matches the site's `PlayerAvatar` fill.
  */
 export function PlayerAvatar({ pid, team, test, size = 36, name }: { pid: string; team?: string; test?: boolean; size?: number; /** Shown as initials when there is no picture at all, so an empty circle never reads as broken. */ name?: string }) {
-  const { faces, shirts } = useUrls(pid, team, test);
+  const { faces, shirts, loaded } = useUrls(pid, team, test);
   const [face, setFace] = useState(0), [shirt, setShirt] = useState(0);
   const h = size * WITH_SHIRT;
-  const bare = !faces[face] && !shirts[shirt];
+  const bare = loaded && !faces[face] && !shirts[shirt]; // initials only once the photos file is in: before that, a picture may still arrive, and a flash of letters before it is worse than an empty circle
   return (
     <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
       {bare && name ? <Text style={[styles.initials, { fontSize: size * 0.36 }]}>{initials(name)}</Text> : null}
