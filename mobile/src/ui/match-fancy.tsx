@@ -377,7 +377,7 @@ function TopBatters({ ms, scope, teamName }: { ms: number[]; scope: number; team
       {t.rows.map((r) => (
         <Press scale={1} key={r.player} onPress={() => push(`/player/${r.player}`)} accessibilityRole="button" style={({ pressed }) => [styles.topRow, pressed && state.pressed]}>
           <View style={[styles.topFill, { width: `${(r.pSole / max) * 100}%` }]} />
-          <PlayerAvatar pid={store.P.id[r.player]} team={store.teamName(store.P.tm[r.player])} size={36} />
+          <PlayerAvatar pid={store.P.id[r.player]} team={store.teamName(store.P.tm[r.player])} size={36} name={r.name} />
           <View style={{ flex: 1, minWidth: 0 }}>
             <Text style={styles.topName} numberOfLines={1}>{r.name}</Text>
             <Text style={styles.note}>{r.sole} sole{r.tied ? ` + ${r.tied} tied` : ""} of {t.n}</Text>
