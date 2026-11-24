@@ -14,11 +14,13 @@ import { playerLabel } from "@/lib/player-label";
 import { fixturePath, goBack, push } from "@/lib/nav";
 import { fixturesQuery } from "@/lib/queries";
 import { useRecents } from "@/lib/saved";
+import { leaguesOf } from "@/lib/search-leagues";
 import { EmptyState } from "@/ui/empty-state";
 import { useScreenInsets } from "@/ui/insets";
 import { ListRow, Section } from "@/ui/list";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { LeagueBadge, TeamBadge } from "@/ui/team-badge";
+import { Working } from "@/ui/motion";
 import { PageAtmosphere } from "@/ui/page-atmosphere";
 import { color, font, space, type, radius, rhythm, w } from "@/ui/tokens";
 import { TabFade } from "@/ui/tab-fade";
@@ -46,7 +48,7 @@ export default function Search() {
       matches: games as any[],
       teams: team ? [team] : [],
       players: rz.players(t, {}, 6) as any[],
-      leagues: (rz.event(t) as number[]).slice(0, 4),
+      leagues: leaguesOf(rz, t),
       grounds: (rz.venues?.(t, 4) ?? []) as { idx: number; name: string }[],
     };
   }, [query, rz, fx.data]);
@@ -64,7 +66,9 @@ export default function Search() {
         <Press accessibilityRole="button" accessibilityLabel="Cancel search" onPress={goBack} hitSlop={hitSlopFor(52, 20)}><Text style={styles.cancel}>Cancel</Text></Press>
       </View>
       <ScrollView keyboardShouldPersistTaps="handled" keyboardDismissMode="on-drag" contentContainerStyle={[styles.body, { paddingBottom: inset.bottom + 24 }]}>
-        {!found ? (
+        {query.trim().length >= 2 && !rz ? (
+          <Working label="Loading search…" shape="list" rows={4} />
+        ) : !found ? (
           <>
             <Section title="Go to">
               {GO.map(([label, path], n) => <ListRow key={path} first={n === 0} title={label} onPress={() => go(path)} />)}
