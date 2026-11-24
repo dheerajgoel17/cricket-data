@@ -76,7 +76,7 @@ export default function FixturePage() {
   const [filters, setFilters] = useState<Screener>(DEFAULTS);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [draft, setDraft] = useState({ win: DEFAULTS.win, sort: DEFAULTS.sort, team: DEFAULTS.team });
-  const { rows, isLoading, scoring, error, soFarOf, outOf, matchOf } = useHotView(scope, undefined, archived ? doc : undefined);
+  const { rows, isLoading, scoring, error, soFarOf, outOf, matchOf } = useHotView(scope, undefined, archived ? doc : undefined, filters.inns === "all" ? undefined : filters.inns);
   // this match: the same two sides, a Test on any of its days, not the series' next game
   const here = useMemo(() => (f ? rows.filter((r) => sameFixture({ match: r.match, start_utc: r.start, fmt: r.fmt }, { a: f.a, b: f.b, start: f.start, fmt: f.fmt })) : []), [rows, f]);
   const statKeys = useMemo(() => [...new Set(here.map((r) => r.stat))], [here]);
