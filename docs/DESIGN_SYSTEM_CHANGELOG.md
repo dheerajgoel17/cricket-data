@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-24 — Phone audit fixes (avatar initials, chip fade, edge-to-edge)
+- **Path:** `mobile/src/ui/player-avatar.tsx`, `mobile/src/ui/chips.tsx`, `mobile/src/app/info/[topic].tsx`, `mobile/src/ui/ground-page.tsx`, `mobile/src/app/fixture/[id]/fancy.tsx`, `site/src/lib/format.ts`
+- **Change:** `PlayerAvatar` takes `name` and shows initials when there is no picture (Search, Props rows). The stat chips beside `FilterButton` dissolve into it (a 24 px gradient) instead of being cut off. The info sheet clears the system navigation buttons; the ground page and the fixture Fancy page end in the shared bottom fade (`edge-contract.test.ts` lists every detail page). `abbr` / `initials` ignore any bracketed tag a book adds, so "Perth Scorchers (w)" is "PS", not "PS(". No new variant.
+- **Callers:** Search, Props, Fancy, Match Fancy, fixture and ground pages.
+
 ### 2026-11-24 — App motion curves, photo URL cache, lint gate
 - **Path:** `mobile/src/ui/curves.ts`, `mobile/src/lib/photo-urls.ts`, `mobile/eslint.config.js`
 - **Change:** `easeOutCubic`, `easeOutExpo` and `bounce` (spring configs) replace the curve and spring literals in tick, charts, accordion, segmented, count-up, collapsible, star and the splash; `tokens.test.ts` fails on a new `damping`, `stiffness` or `Easing.bezier` elsewhere. Crests, league badges and avatars read their URLs from one cache per photos file and fade in (`duration.fast`). The app gets an ESLint gate in CI (errors fail, warnings are the backlog).

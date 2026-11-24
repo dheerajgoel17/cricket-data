@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
 import { useLocalSearchParams } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { shortDate } from "@site/lib/format";
 import { INFO } from "@/lib/info";
 import { goBack } from "@/lib/nav";
@@ -16,6 +17,7 @@ type Params = { topic: string; n?: string; d?: string; o?: string; v?: string; x
  */
 export default function InfoSheet() {
   const p = useLocalSearchParams<Params>();
+  const { bottom } = useSafeAreaInsets(); // edge-to-edge: the last lines must clear the system navigation buttons
   const info = INFO[p.topic ?? ""];
   const game = p.topic === "game";
   const rows: [string, string][] = game
@@ -27,7 +29,7 @@ export default function InfoSheet() {
         <Text style={styles.title} numberOfLines={1}>{game ? `${p.n ?? "Game"} · ${p.d ? shortDate(p.d) : ""}` : info?.title ?? "Info"}</Text>
         <Press onPress={goBack} hitSlop={10} accessibilityRole="button" accessibilityLabel="Done"><Text style={styles.done}>Done</Text></Press>
       </View>
-      <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.body, { paddingBottom: rhythm.section + bottom }]} showsVerticalScrollIndicator={false}>
         {game ? rows.map(([k, v], i) => (
           <View key={k} style={[styles.row, i > 0 && styles.sep]}><Text style={styles.key}>{k}</Text><Text style={styles.val}>{v}</Text></View>
         )) : info ? info.points.map(([term, text]) => (

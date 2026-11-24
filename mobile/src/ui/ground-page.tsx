@@ -35,6 +35,7 @@ import { TeamBadge } from "@/ui/team-badge";
 import { Text } from "@/ui/text";
 import { Bleed } from "@/ui/bleed";
 import { cap, color, font, num, radius, space, type, fs, surface, rhythm, t, state, icon } from "@/ui/tokens";
+import { TabFade } from "@/ui/tab-fade";
 
 /** Past games listed before "Show more": a busy ground has hundreds, and each is a card. */
 const PAGE = 8;
@@ -101,6 +102,7 @@ export function GroundPage({ venue, fixtureId, from }: { venue?: string; fixture
           ? <GroundMarkets store={store} venueIndexes={g.venueIndices} fmt={activeFmt} gender={gender} />
           : <GroundMatches key={`${activeFmt}|${gender}`} list={list} preferUpcoming={!!fixtureId} />}
       </ScrollView>
+      <TabFade withTabBar={false} />
     </PageAtmosphere>
   );
 }

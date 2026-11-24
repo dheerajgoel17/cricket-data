@@ -71,7 +71,7 @@ export default function Search() {
             </Section>
             {store && seen.length ? (
               <Section title="Recently viewed">
-                {seen.map((i, n) => <ListRow key={i} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={40} />} title={label(i)} sub={team(i)} onPress={() => open(`/player/${i}`)} />)}
+                {seen.map((i, n) => <ListRow key={i} first={n === 0} left={<PlayerAvatar pid={store.P.id[i]} team={team(i)} size={40} name={label(i)} />} title={label(i)} sub={team(i)} onPress={() => open(`/player/${i}`)} />)}
               </Section>
             ) : null}
           </>
@@ -86,7 +86,7 @@ export default function Search() {
             ) : null}
             {found.players.length ? (
               <Section title="Players">
-                {found.players.map((p: any, n: number) => <ListRow key={p.idx} first={n === 0} left={<PlayerAvatar pid={store.P.id[p.idx]} team={store.teamName(p.team)} size={40} />} title={label(p.idx)} sub={store.teamName(p.team)} onPress={() => open(`/player/${p.idx}`)} />)}
+                {found.players.map((p: any, n: number) => <ListRow key={p.idx} first={n === 0} left={<PlayerAvatar pid={store.P.id[p.idx]} team={store.teamName(p.team)} size={40} name={label(p.idx)} />} title={label(p.idx)} sub={store.teamName(p.team)} onPress={() => open(`/player/${p.idx}`)} />)}
               </Section>
             ) : null}
             {found.teams.length ? (

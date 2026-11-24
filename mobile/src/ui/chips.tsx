@@ -6,6 +6,7 @@ import { Press } from "@/ui/press";
 import Animated, { useReducedMotion } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { AnimatedText, Text } from "@/ui/text";
 import { color, control, radius, space, type, font, tint, duration, t, d, state, icon } from "@/ui/tokens";
 
@@ -40,11 +41,14 @@ function Chip({ label, count, on, muted, onPress, calm }: { calm: boolean; label
 /** The one "open the filters" button (Props, Fancy, Grid, Home): options icon, a label, and the number of active filters as a badge on the corner (the site's `Filters` button). */
 export function FilterButton({ label = "Filters", count = 0, onPress, style }: { label?: string; count?: number; onPress: () => void; style?: StyleProp<ViewStyle> }) {
   return (
+    <View>
+      <LinearGradient pointerEvents="none" colors={[tint.black(0), color.background]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={styles.chipFade} />
     <Press scale={1} onPress={() => { void Haptics.selectionAsync(); onPress(); }} accessibilityRole="button" accessibilityLabel={`Filters${count ? `, ${count} active` : ""}`} style={[styles.filterBtn, style]}>
       <Ionicons name="options-outline" size={icon.sm} color={color.foreground} />
       <Text style={styles.filterLbl}>{label}</Text>
       {count > 0 ? <View style={styles.filterBadge}><Text style={styles.filterBadgeTxt}>{count}</Text></View> : null}
     </Press>
+    </View>
   );
 }
 
@@ -81,6 +85,8 @@ export const filterBar = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
+  /** The chips beside the Filters button dissolve into it instead of being cut off hard. */
+  chipFade: { position: "absolute", right: "100%", top: 0, bottom: 0, width: 24 },
   flushRow: { gap: space.tight },
   row: { gap: space.tight, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   chip: { height: control, paddingHorizontal: space.stack, borderRadius: radius.chip, flexDirection: "row", alignItems: "center", gap: space.tight },
