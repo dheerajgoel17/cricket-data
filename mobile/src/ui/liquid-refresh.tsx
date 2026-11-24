@@ -100,9 +100,10 @@ const Liquid = forwardRef<ScrollRef, LiquidRefreshProps>(function Liquid({ onRef
     setState("done"); setLabel(LABELS.done);
     mark.value = withTiming(1, { duration: 320, easing: easeOutCubic });
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    // the label and the state go back to "pull" only once the list has sprung back, so "Updated just now" stays with the check
+    const rest = () => { setState("idle"); setLabel(LABELS.pull); busy.current = false; };
     setTimeout(() => {
-      y.value = withSpring(0, bounce.liquid, (fin) => { if (fin) mark.value = 0; });
-      setState("idle"); setLabel(LABELS.pull); busy.current = false;
+      y.value = withSpring(0, bounce.liquid, (fin) => { if (fin) { mark.value = 0; runOnJS(rest)(); } });
     }, doneMs);
   };
 
