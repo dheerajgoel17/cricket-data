@@ -1,9 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
-import { playerPhotos, teamJerseys } from "@cricket/engine/photos.js";
-import { abs } from "@/lib/config";
+import { faceUrls, shirtUrls } from "@/lib/photo-urls";
 import { photosQuery } from "@/lib/queries";
 import { color, duration } from "@/ui/tokens";
 
@@ -15,10 +14,7 @@ const FACE = 300 / 310, SHIRT_TOP = 0.627, WITH_SHIRT = 1.03;
 
 function useUrls(pid: string, team?: string, test?: boolean) {
   const { data: photos } = useQuery(photosQuery);
-  return useMemo(() => ({
-    faces: (playerPhotos(photos, pid) as string[]).map(abs),
-    shirts: (teamJerseys(photos, team || "", !!test) as string[]).map(abs),
-  }), [photos, pid, team, test]);
+  return { faces: faceUrls(photos, pid), shirts: shirtUrls(photos, team || "", !!test) };
 }
 
 /**

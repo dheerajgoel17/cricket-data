@@ -2,10 +2,11 @@ import { useEffect, useState, type ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
-import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import * as Haptics from "expo-haptics";
 import { ChevronRight } from "@/ui/icons";
 import { color, space, type, duration, state } from "@/ui/tokens";
+import { easeOutCubic } from "@/ui/curves";
 
 /**
  * A collapsible section (the site's accordion): a header with the title, what is chosen inside it, and a chevron that turns; the content's height and fade are animated on the
@@ -20,7 +21,7 @@ export function Accordion({ title, value, right, defaultOpen = false, open, onTo
   const isOpen = open ?? own;
   const [h, setH] = useState(0);
   const p = useSharedValue(isOpen ? 1 : 0);
-  useEffect(() => { p.value = withTiming(isOpen ? 1 : 0, { duration: duration.base, easing: Easing.out(Easing.cubic) }); }, [isOpen, p]);
+  useEffect(() => { p.value = withTiming(isOpen ? 1 : 0, { duration: duration.base, easing: easeOutCubic }); }, [isOpen, p]);
   const body = useAnimatedStyle(() => ({ height: interpolate(p.value, [0, 1], [0, h]), opacity: p.value }));
   const chevron = useAnimatedStyle(() => ({ transform: [{ rotate: `${interpolate(p.value, [0, 1], [0, 90])}deg` }] }));
   const toggle = () => { void Haptics.selectionAsync(); const next = !isOpen; if (onToggle) onToggle(next); else setOwn(next); };

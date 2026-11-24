@@ -1,10 +1,11 @@
 import { useEffect, useRef } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withSpring, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 import * as SplashScreen from "expo-splash-screen";
 import { Text } from "@/ui/text";
 import { color, fs, duration } from "@/ui/tokens";
+import { easeOutCubic, easeOutExpo, bounce } from "@/ui/curves";
 
 /** The mark's drawing units (the site's `BrandMark`: a 64-unit tile) and the size it is drawn at. */
 const SIZE = 112, U = SIZE / 64;
@@ -12,7 +13,7 @@ const SIZE = 112, U = SIZE / 64;
 const MIN_MS = 1100, FADE_MS = 300;
 const GREEN = color.primary;
 
-const out = Easing.out(Easing.cubic);
+const out = easeOutCubic;
 
 /**
  * The splash after the system's: the same black, then the F is drawn in (the stem down, the two arms across, the ball springing in at the end of the top arm), the wordmark rises under it, and
@@ -30,7 +31,7 @@ export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () =
     stem.value = withTiming(1, { duration: duration.moderate, easing: out });
     top.value = withDelay(150, withTiming(1, { duration: duration.moderate, easing: out }));
     mid.value = withDelay(270, withTiming(1, { duration: duration.base, easing: out }));
-    ball.value = withDelay(430, withSpring(1, { damping: 9, stiffness: 240, mass: 0.7 }));
+    ball.value = withDelay(430, withSpring(1, bounce.splash));
     word.value = withDelay(620, withTiming(1, { duration: duration.moderate, easing: out })); // in the system font, so it never waits for the app's fonts
   }, [calm, stem, top, mid, ball, word]);
 
@@ -39,7 +40,7 @@ export function AnimatedSplash({ ready, onDone }: { ready: boolean; onDone: () =
   useEffect(() => {
     if (!ready) return;
     const wait = Math.max(0, MIN_MS - (Date.now() - t0.current));
-    const id = setTimeout(() => { shell.value = withTiming(0, { duration: FADE_MS, easing: Easing.bezier(0.23, 1, 0.32, 1) }, (finished) => { if (finished) scheduleOnRN(onDone); }); }, wait);
+    const id = setTimeout(() => { shell.value = withTiming(0, { duration: FADE_MS, easing: easeOutExpo }, (finished) => { if (finished) scheduleOnRN(onDone); }); }, wait);
     return () => clearTimeout(id);
   }, [ready, shell, onDone]);
 

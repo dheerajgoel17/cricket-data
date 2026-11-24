@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { StyleSheet, View, type TextStyle } from "react-native";
 import { Text } from "@/ui/text";
-import Animated, { Easing, interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { interpolateColor, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { stillNeed } from "@cricket/engine/tape.js";
 import { ArrowDown, ArrowUp } from "@/ui/icons";
 import { color, font, space, tint, type, radius, duration, spring, d } from "@/ui/tokens";
+import { easeOutCubic } from "@/ui/curves";
 
 /** Colour/arrow hold after a move — stock-ticker brief (~1 s), not sticky. */
 const HOLD_MS = 1000;
@@ -58,7 +59,7 @@ function Flash({ dir, value, calm, children }: { dir: -1 | 0 | 1; value: number 
   useEffect(() => {
     if (dir === 0 || calm) return;
     flash.value = 1;
-    flash.value = withTiming(0, { duration: WASH_MS, easing: Easing.out(Easing.cubic) });
+    flash.value = withTiming(0, { duration: WASH_MS, easing: easeOutCubic });
     y.value = dir * ROLL;
     y.value = withSpring(0, spring.roll);
   }, [dir, value, flash, y, calm]);

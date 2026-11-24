@@ -35,6 +35,11 @@ describe("tokens derived from tokens.json", () => {
   });
 
   // Centralised pieces: one bottom sheet, one round button. A screen that needs one imports it; a hand-built copy fails here.
+  it("writes no spring or easing literals outside the shared curves (ui/curves.ts, tokens)", () => {
+    const hits = files(src).filter((f) => !/ui\/(curves|tokens)\.ts$/.test(f) && /\b(damping|stiffness)\s*:|Easing\.bezier\(|Easing\.out\(Easing\.cubic\)/.test(readFileSync(f, "utf8")));
+    expect(hits).toEqual([]);
+  });
+
   it("builds sheets and round buttons only in their shared components", () => {
     const hits = (re: RegExp, allow: RegExp) => files(src).filter((f) => !allow.test(f)).flatMap((f) => readFileSync(f, "utf8").split("\n").flatMap((l, i) => (re.test(l) ? [`${f.replace(src, "")}:${i + 1}`] : [])));
     expect(hits(/<Modal\b/, /(ui\/sheet|ui\/sign-in-sheet)\.tsx$/)).toEqual([]);

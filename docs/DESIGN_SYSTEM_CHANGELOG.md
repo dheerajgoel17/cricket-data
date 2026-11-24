@@ -15,6 +15,11 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 
 ---
 
+### 2026-11-24 — App motion curves, photo URL cache, lint gate
+- **Path:** `mobile/src/ui/curves.ts`, `mobile/src/lib/photo-urls.ts`, `mobile/eslint.config.js`
+- **Change:** `easeOutCubic`, `easeOutExpo` and `bounce` (spring configs) replace the curve and spring literals in tick, charts, accordion, segmented, count-up, collapsible, star and the splash; `tokens.test.ts` fails on a new `damping`, `stiffness` or `Easing.bezier` elsewhere. Crests, league badges and avatars read their URLs from one cache per photos file and fade in (`duration.fast`). The app gets an ESLint gate in CI (errors fail, warnings are the backlog).
+- **Callers:** any new animation takes curves from `ui/curves.ts` and durations from `duration`.
+
 ### 2026-11-24 — ErrorState (app) and the route error boundary
 - **Path:** `mobile/src/ui/empty-state.tsx`, `mobile/src/app/_layout.tsx`, `mobile/src/lib/error-log.ts`
 - **Change:** `ErrorState` is `EmptyState` plus one secondary "Try again" `Button` that re-runs the failed request. It replaces the "reopen this page to retry" sentences on Leagues, League, Competitions, Team, Player, the fixture Fancy tab, Match Fancy and Tournament stats, and the Props tab. The root layout exports Expo Router's `ErrorBoundary` (a screen that throws shows `ErrorState` with a retry) and keeps the last 50 errors on the device. No new visual variant: same surface, same `Button`. Modal sheets are edge-to-edge on Android (`statusBarTranslucent`, `navigationBarTranslucent`); the star, charts and segmented control now hold still under reduce-motion.
