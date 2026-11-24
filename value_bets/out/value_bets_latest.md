@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-24 07:59 IST
+# Cricket value bets - 2026-11-24 09:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1960 prices
+- **moviodds_bet365**: ok, 2073 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
 - **smarkets**: ok, 489 prices
 - **feedk**: ok, 230 prices, 6 events
-- **feedl**: ok, 701 prices, 34 events
-- **feedj**: ok, 148 prices, 6 events
-- **feede**: ok, 762 prices, 34 events
-- **feedh**: ok, 1786 prices, 68 events
-- **feedf**: ok, 668 prices, 24 events
-- **feedi**: ok, 2482 prices, 48 events
+- **feedl**: ok, 701 prices, 30 events
+- **feedj**: ok, 152 prices, 6 events
+- **feede**: ok, 678 prices, 30 events
+- **feedh**: ok, 1752 prices, 64 events
+- **feedf**: ok, 612 prices, 20 events
+- **feedi**: ok, 2514 prices, 46 events
 
-Matches starting in next 168h: **49**, markets priced: **602**, value bets: **6** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **44**, markets priced: **580**, value bets: **6** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -39,4 +39,4 @@ Matches starting in next 168h: **49**, markets priced: **602**, value bets: **6*
 
 Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), East Zone (W) (female), Lokseva Academy (male), North East Zone (W) (female), North Zone (W) (female), Omr Checker (male), Pondicherry (male), South Zone (W) (female), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), West Zone (W) (female)
 
-Runtime 237.2s. Snapshot: `odds_20261124T022924Z.jsonl.gz`
+Runtime 374.9s. Snapshot: `odds_20261124T033039Z.jsonl.gz`
