@@ -18,5 +18,15 @@
   "edge": 0.2159,
   "start_utc": "2026-11-27T08:15:00Z",
   "alerted_at": "2026-11-24T12:55:22.936080+00:00"
+ },
+ "male|Australia|England|2026-11-27|batter_sixes||Aneurin Donald under 0.5|0.5|under": {
+  "edge": 0.1518,
+  "start_utc": "2026-11-27T08:15:00Z",
+  "alerted_at": "2026-11-24T15:35:07.837058+00:00"
+ },
+ "male|Australia|England|2026-11-27|batter_sixes||Jake Fraser-McGurk under 0.5|0.5|under": {
+  "edge": 0.1472,
+  "start_utc": "2026-11-27T08:15:00Z",
+  "alerted_at": "2026-11-24T15:35:07.837058+00:00"
  }
 }
