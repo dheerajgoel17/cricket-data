@@ -1,4 +1,69 @@
 {
- "generated_at_ist": "2026-11-25 11:11 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-25 11:27 IST",
+ "alerts": [
+  {
+   "event_key": "male|Desert Vipers|Dubai Capitals|2026-11-25",
+   "match": "Dubai Capitals vs Desert Vipers",
+   "start_utc": "2026-11-25T14:30:00Z",
+   "start_ist": "2026-11-25 20:00 IST",
+   "format": "T20",
+   "gender": "male",
+   "market_type": "batter_fours",
+   "market": "G9182 batter_fours",
+   "team_scope": "",
+   "selection": "Faf du Plessis under 2.5",
+   "player_matched_as": "F du Plessis",
+   "player_id": "3355b542",
+   "player_team": "Dubai Capitals",
+   "stat": "fours",
+   "inn": 0,
+   "line": 2.5,
+   "side": "under",
+   "best_odds": 2.0,
+   "best_source": "feedi_d",
+   "effective_odds_after_commission": 2.0,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.079,
+   "implied_prob": 0.5,
+   "fair_odds": 1.875,
+   "fair_prob": 0.5334,
+   "model_prob": 0.5677,
+   "market_prob": 0.5053,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0668,
+   "edge_pct": 6.68,
+   "kelly_quarter_stake_pct": 1.67,
+   "n_sources": 3,
+   "confidence": "medium",
+   "why": "Model 57% vs market 51% for under 2.5 fours; form 3.1 fours/inn recency-weighted T20 (n_eff 67.9; last 5: 3, 9, 3, 7, 2), bats in 96% of games played; at Dubai International Cricket Stadium, Dubai: 11 inns avg 3.5; context adj: at this venue +2%, team H2H context +5%",
+   "notes": "3 market source(s) for fair price; model 0.568 vs market 0.505; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 67.9,
+    "expected": 3.06,
+    "nb_alpha": 0.958,
+    "p_bats_or_bowls": 0.962,
+    "venue_matched": "dubai international cricket stadium",
+    "context_terms": [
+     "p_bat",
+     "env_fours",
+     "ven_fours",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 66,
+    "cloud_pct": 32,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "a452d70300ca7848",
+   "alert_key": "male|Desert Vipers|Dubai Capitals|2026-11-25|batter_fours||Faf du Plessis under 2.5|2.5|under",
+   "alerted_at_ist": "2026-11-25 11:31 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
