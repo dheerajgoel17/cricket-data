@@ -1,73 +1,73 @@
 {
- "generated_at_utc": "2026-11-25T02:30:43Z",
- "generated_at_ist": "2026-11-25 08:00 IST",
- "runtime_secs": 270.8,
+ "generated_at_utc": "2026-11-25T03:30:41Z",
+ "generated_at_ist": "2026-11-25 09:00 IST",
+ "runtime_secs": 229.4,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-24",
-  "commit": "3ad2cb3c18"
+  "commit": "87ccb31eba"
  },
  "sources": {
+  "moviodds_bet365": {
+   "status": "ok",
+   "rows": 2460,
+   "secs": 0.3
+  },
   "feedg": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}",
-   "secs": 1.7
-  },
-  "moviodds_bet365": {
-   "status": "ok",
-   "rows": 2470,
-   "secs": 2.0
+   "secs": 1.8
   },
   "smarkets": {
    "status": "ok",
    "rows": 449,
-   "secs": 2.9
+   "secs": 2.4
   },
   "feedl": {
    "status": "ok",
    "rows": 648,
-   "secs": 19.7,
-   "events": 36
+   "secs": 18.7,
+   "events": 35
   },
   "feedk": {
    "status": "ok",
    "rows": 288,
-   "secs": 20.7,
+   "secs": 21.0,
    "events": 8
   },
   "feedj": {
    "status": "ok",
    "rows": 668,
-   "secs": 57.4,
+   "secs": 56.8,
    "events": 11
-  },
-  "feede": {
-   "status": "ok",
-   "rows": 608,
-   "secs": 93.1,
-   "events": 35
   },
   "feedh": {
    "status": "ok",
    "rows": 2111,
-   "secs": 95.1,
-   "events": 87
+   "secs": 86.9,
+   "stopped": "HTTP 523",
+   "events": 85
+  },
+  "feede": {
+   "status": "ok",
+   "rows": 608,
+   "secs": 88.2,
+   "events": 35
   },
   "feedf": {
    "status": "ok",
    "rows": 644,
-   "secs": 129.6,
+   "secs": 120.8,
    "events": 23
   },
   "feedi": {
    "status": "ok",
-   "rows": 1834,
-   "secs": 180.3,
-   "stopped": "time budget",
-   "events": 27
+   "rows": 1999,
+   "secs": 143.2,
+   "events": 35
   }
  },
- "snapshot": "odds_20261125T023043Z.jsonl.gz",
+ "snapshot": "odds_20261125T033041Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -150,26 +150,26 @@
  },
  "stats": {
   "events_in_window": 56,
-  "rows_in_window": 9558,
+  "rows_in_window": 9715,
   "selections_with_model": 3330,
-  "selections_with_market_fair": 4814,
-  "markets_in_window": 619,
+  "selections_with_market_fair": 4935,
+  "markets_in_window": 626,
   "value_bets": 4,
   "dropped_by_filter": {
-   "odds_range": 151,
-   "model_market_gap": 1745,
-   "suspect_edge": 3,
-   "model_disagrees": 5,
+   "odds_range": 149,
+   "model_market_gap": 1756,
+   "market_disabled": 5,
+   "model_disagrees": 7,
    "model_only_no_market": 288,
-   "market_disabled": 3,
    "loose_name_match": 5,
    "policy_max_odds": 12,
    "top_wide_book": 4,
+   "suspect_edge": 2,
    "policy_min_edge": 1,
-   "small_sample": 10,
+   "small_sample": 11,
    "top_thin_market": 1
   },
-  "suspect_edges": 3,
+  "suspect_edges": 2,
   "innings_milestones_unmodelled": 192,
   "model_vs_market": {
    "top_batter_team": {
@@ -186,13 +186,13 @@
     "mean_market_p": 0.112,
     "mean_logit_diff_model_minus_market": -0.01,
     "mean_abs_logit_diff": 0.34,
-    "corr": 0.672
+    "corr": 0.673
    },
    "batter_runs": {
     "n_prices": 1014,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
-    "mean_logit_diff_model_minus_market": 0.0,
+    "mean_logit_diff_model_minus_market": -0.0,
     "mean_abs_logit_diff": 0.586,
     "corr": 0.127
    },
@@ -201,40 +201,40 @@
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.358,
-    "corr": 0.904
+    "mean_abs_logit_diff": 0.362,
+    "corr": 0.903
    },
    "batter_fours": {
     "n_prices": 201,
     "mean_model_p": 0.499,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.002,
-    "mean_abs_logit_diff": 0.347,
-    "corr": 0.424
+    "mean_abs_logit_diff": 0.355,
+    "corr": 0.401
    },
    "batter_milestone": {
     "n_prices": 1217,
     "mean_model_p": 0.433,
     "mean_market_p": 0.459,
     "mean_logit_diff_model_minus_market": -0.184,
-    "mean_abs_logit_diff": 0.795,
+    "mean_abs_logit_diff": 0.794,
     "corr": 0.98
    },
    "top_batter_match": {
-    "n_prices": 888,
+    "n_prices": 885,
     "mean_model_p": 0.017,
     "mean_market_p": 0.03,
-    "mean_logit_diff_model_minus_market": -0.128,
-    "mean_abs_logit_diff": 1.037,
-    "corr": 0.523
+    "mean_logit_diff_model_minus_market": -0.126,
+    "mean_abs_logit_diff": 1.04,
+    "corr": 0.528
    },
    "top_bowler_match": {
-    "n_prices": 607,
+    "n_prices": 612,
     "mean_model_p": 0.034,
-    "mean_market_p": 0.041,
-    "mean_logit_diff_model_minus_market": 0.016,
-    "mean_abs_logit_diff": 1.569,
-    "corr": 0.131
+    "mean_market_p": 0.04,
+    "mean_logit_diff_model_minus_market": 0.026,
+    "mean_abs_logit_diff": 1.545,
+    "corr": 0.14
    },
    "bowler_wickets": {
     "n_prices": 134,
@@ -564,7 +564,8 @@
    "format_source": "unknown",
    "teams_matched": null,
    "sources": [
-    "feedh_d"
+    "feedh_d",
+    "feedi_d"
    ]
   },
   {
@@ -574,7 +575,8 @@
    "format_source": "unknown",
    "teams_matched": null,
    "sources": [
-    "feedh_d"
+    "feedh_d",
+    "feedi_d"
    ]
   },
   {
@@ -584,7 +586,8 @@
    "format_source": "unknown",
    "teams_matched": null,
    "sources": [
-    "feedh_d"
+    "feedh_d",
+    "feedi_d"
    ]
   },
   {
@@ -594,7 +597,8 @@
    "format_source": "unknown",
    "teams_matched": null,
    "sources": [
-    "feedh_d"
+    "feedh_d",
+    "feedi_d"
    ]
   },
   {
@@ -696,6 +700,7 @@
    ],
    "sources": [
     "feedh_d",
+    "feedi_d",
     "feedl",
     "smarkets"
    ]
@@ -1036,46 +1041,46 @@
  "value_bets": [
   {
    "event_key": "female|Brisbane Heat Women|Melbourne Renegades Women|2026-11-25",
-   "match": "Melbourne Renegades vs Brisbane Heat",
+   "match": "Melbourne Renegades (Women) vs Brisbane Heat (Women)",
    "start_utc": "2026-11-25T08:10:00Z",
    "start_ist": "2026-11-25 13:40 IST",
    "format": "T20",
    "gender": "female",
    "market_type": "batter_fours",
-   "market": "M13710 batter_fours",
+   "market": "G9182 batter_fours",
    "team_scope": "",
-   "selection": "Orla Prendergast over 1.5",
-   "player_matched_as": "Orla Prendergast",
-   "player_id": "d8f20ba5",
-   "player_team": "Brisbane Heat Women",
+   "selection": "Sophie Molineux under 1.5",
+   "player_matched_as": "Sophie Molineux",
+   "player_id": "99e23670",
+   "player_team": "Melbourne Renegades Women",
    "stat": "fours",
    "inn": 0,
    "line": 1.5,
-   "side": "over",
-   "best_odds": 1.92,
-   "best_source": "feedj_d",
-   "effective_odds_after_commission": 1.92,
+   "side": "under",
+   "best_odds": 2.0,
+   "best_source": "feedi_d",
+   "effective_odds_after_commission": 2.0,
    "lay_odds": null,
    "back_liquidity": null,
-   "overround": 0.0989,
-   "implied_prob": 0.5208,
-   "fair_odds": 1.737,
-   "fair_prob": 0.5757,
-   "model_prob": 0.5746,
-   "market_prob": 0.5766,
+   "overround": 0.079,
+   "implied_prob": 0.5,
+   "fair_odds": 1.833,
+   "fair_prob": 0.5456,
+   "model_prob": 0.6264,
+   "market_prob": 0.4795,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.1054,
-   "edge_pct": 10.54,
+   "edge": 0.0912,
+   "edge_pct": 9.12,
    "kelly_quarter_stake_pct": 2.0,
    "n_sources": 3,
    "confidence": "medium",
-   "why": "Model 57% vs market 58% for over 1.5 fours; form 2.8 fours/inn recency-weighted T20 (n_eff 42.5; last 5: 2, 0, 6, 2, 2), bats in 92% of games played; at Junction Oval, Melbourne: 2 inns avg 4.0; context adj: venue environment +11%, at this venue +3%",
-   "notes": "3 market source(s) for fair price; model 0.575 vs market 0.577; assumes bet void if player doesn't bat/bowl - check book rules",
+   "why": "Model 63% vs market 48% for under 1.5 fours; form 1.8 fours/inn recency-weighted T20 (n_eff 33.2; last 5: 8, 7, 1, 0, 1), bats in 70% of games played; at Junction Oval, Melbourne: 18 inns avg 1.8; context adj: venue environment +11%",
+   "notes": "3 market source(s) for fair price; model 0.626 vs market 0.480; assumes bet void if player doesn't bat/bowl - check book rules",
    "model_detail": {
-    "n_eff": 42.5,
-    "expected": 3.07,
+    "n_eff": 33.2,
+    "expected": 1.56,
     "nb_alpha": 0.958,
-    "p_bats_or_bowls": 0.919,
+    "p_bats_or_bowls": 0.697,
     "venue_matched": "junction oval",
     "context_terms": [
      "p_bat",
@@ -1103,38 +1108,38 @@
    "market_type": "batter_fours",
    "market": "M13710 batter_fours",
    "team_scope": "",
-   "selection": "Sophie Molineux under 1.5",
-   "player_matched_as": "Sophie Molineux",
-   "player_id": "99e23670",
-   "player_team": "Melbourne Renegades Women",
+   "selection": "Orla Prendergast over 1.5",
+   "player_matched_as": "Orla Prendergast",
+   "player_id": "d8f20ba5",
+   "player_team": "Brisbane Heat Women",
    "stat": "fours",
    "inn": 0,
    "line": 1.5,
-   "side": "under",
-   "best_odds": 1.98,
+   "side": "over",
+   "best_odds": 1.92,
    "best_source": "feedj_d",
-   "effective_odds_after_commission": 1.98,
+   "effective_odds_after_commission": 1.92,
    "lay_odds": null,
    "back_liquidity": null,
-   "overround": 0.1003,
-   "implied_prob": 0.5051,
-   "fair_odds": 1.796,
-   "fair_prob": 0.5569,
-   "model_prob": 0.6264,
-   "market_prob": 0.5,
+   "overround": 0.0989,
+   "implied_prob": 0.5208,
+   "fair_odds": 1.816,
+   "fair_prob": 0.5506,
+   "model_prob": 0.5746,
+   "market_prob": 0.531,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.1026,
-   "edge_pct": 10.26,
-   "kelly_quarter_stake_pct": 2.0,
+   "edge": 0.0571,
+   "edge_pct": 5.71,
+   "kelly_quarter_stake_pct": 1.55,
    "n_sources": 3,
    "confidence": "medium",
-   "why": "Model 63% vs market 50% for under 1.5 fours; form 1.8 fours/inn recency-weighted T20 (n_eff 33.2; last 5: 8, 7, 1, 0, 1), bats in 70% of games played; at Junction Oval, Melbourne: 18 inns avg 1.8; context adj: venue environment +11%",
-   "notes": "3 market source(s) for fair price; model 0.626 vs market 0.500; assumes bet void if player doesn't bat/bowl - check book rules",
+   "why": "Model 57% vs market 53% for over 1.5 fours; form 2.8 fours/inn recency-weighted T20 (n_eff 42.5; last 5: 2, 0, 6, 2, 2), bats in 92% of games played; at Junction Oval, Melbourne: 2 inns avg 4.0; context adj: venue environment +11%, at this venue +3%",
+   "notes": "3 market source(s) for fair price; model 0.575 vs market 0.531; assumes bet void if player doesn't bat/bowl - check book rules",
    "model_detail": {
-    "n_eff": 33.2,
-    "expected": 1.56,
+    "n_eff": 42.5,
+    "expected": 3.07,
     "nb_alpha": 0.958,
-    "p_bats_or_bowls": 0.697,
+    "p_bats_or_bowls": 0.919,
     "venue_matched": "junction oval",
     "context_terms": [
      "p_bat",
@@ -1202,7 +1207,7 @@
    },
    "rain_risk": false,
    "weather": {
-    "rain_prob_max_pct": 4,
+    "rain_prob_max_pct": 6,
     "rain_mm_in_window": 0.0,
     "humidity_pct": 85,
     "cloud_pct": 58,
@@ -1259,7 +1264,7 @@
    },
    "rain_risk": false,
    "weather": {
-    "rain_prob_max_pct": 29,
+    "rain_prob_max_pct": 33,
     "rain_mm_in_window": 0.0,
     "humidity_pct": 88,
     "cloud_pct": 96,
@@ -1268,21 +1273,6 @@
   }
  ],
  "suspect_not_alerted": [
-  {
-   "match": "Melbourne Renegades vs Brisbane Heat",
-   "start_ist": "2026-11-25 13:40 IST",
-   "market_type": "batter_sixes",
-   "market": "M13711 batter_sixes",
-   "selection": "Orla Prendergast over 0.5",
-   "odds": 5.0,
-   "source": "feedj_d",
-   "fair_prob": 0.2621,
-   "model_prob": 0.2964,
-   "market_prob": 0.234,
-   "edge_pct": 31.05,
-   "fair_basis": "blend 0.45 model + 0.55 market",
-   "market_fair_from": null
-  },
   {
    "match": "Sydney Sixers vs Melbourne Stars",
    "start_ist": "2026-11-26 13:40 IST",
@@ -1380,6 +1370,7 @@
   "Ajaz Patel",
   "Alfred Mothoa",
   "Ali Zaryab",
+  "Aliakbar Hamid",
   "Aluth Gedara Chethana Vimukthi",
   "Amith Sathvik V P",
   "Amshi De Silva",
@@ -1409,6 +1400,7 @@
   "B Sachin",
   "B Tahir",
   "Babar Azam",
+  "Baxon Gopito",
   "Baxton Gopito",
   "Ben Pomare",
   "Bhanu Anand",
@@ -1480,6 +1472,7 @@
   "F du Plessis",
   "Faf Du Plessis",
   "Faf du Plessis",
+  "Faham Ul Haq",
   "Faham ul-Haq",
   "Faridoon Dawoodzai",
   "Fortune Mhlanga",
@@ -1518,6 +1511,7 @@
   "I Noble",
   "IY McKeon",
   "Imam-ul-Haq",
+  "Imran Dogar",
   "Indigo Noble",
   "Ines Mackeon",
   "Ines Mckeon",
@@ -1544,15 +1538,11 @@
   "Jason Raubenheimer",
   "Jason Rowles",
   "Jayden Lennox",
+  "Jeffery Mhuriyengwe",
   "Jeffrey Mhuriyengwe",
   "Jemimah Ivan Rodrigues",
   "Jemimah Rodrigues",
-  "Jevano Baron",
-  "Jewel Andrew",
-  "Jimmy Nyangoni",
-  "Jitu Ali",
-  "Jiveshan Pillay",
-  "Joe Carter"
+  "Jevano Baron"
  ],
  "model_backtest": {
   "generated_at_ist": "2026-10-17 13:34 IST",
@@ -1677,29 +1667,30 @@
   }
  },
  "log": [
-  "[08:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[08:00 IST] history: 24241 matches, last 2026-11-24, players 437506",
-  "[08:03 IST] source feedg: {'status': 'error', 'reason': 'HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}', 'secs': 1.7}",
-  "[08:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2470, 'secs': 2.0}",
-  "[08:03 IST] source smarkets: {'status': 'ok', 'rows': 449, 'secs': 2.9}",
-  "[08:03 IST] source feedl: {'status': 'ok', 'rows': 648, 'secs': 19.7, 'events': 36}",
-  "[08:03 IST] source feedk: {'status': 'ok', 'rows': 288, 'secs': 20.7, 'events': 8}",
-  "[08:03 IST] source feedj: {'status': 'ok', 'rows': 668, 'secs': 57.4, 'events': 11}",
-  "[08:03 IST] source feede: {'status': 'ok', 'rows': 608, 'secs': 93.1, 'events': 35}",
-  "[08:03 IST] source feedh: {'status': 'ok', 'rows': 2111, 'secs': 95.1, 'events': 87}",
-  "[08:03 IST] source feedf: {'status': 'ok', 'rows': 644, 'secs': 129.6, 'events': 23}",
-  "[08:03 IST] source feedi: {'status': 'ok', 'rows': 1834, 'secs': 180.3, 'stopped': 'time budget', 'events': 27}",
-  "[08:04 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[08:04 IST] 94 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[08:04 IST] 218 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[08:04 IST] 192 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[08:04 IST] name map: Zimbabwe vs Ireland A -> Zimbabwe A vs Ireland A (2026-11-25T07:30:00Z)",
-  "[08:04 IST] name map: Zimbabwe XI vs Ireland A -> Zimbabwe A vs Ireland A (2026-11-25T07:30:00Z)",
-  "[08:04 IST] held back 1 player and 0 fancy lines first priced after their match started (not pre-match prices)",
-  "[08:04 IST] book lines: 610 player lines from 8 source(s)",
-  "[08:04 IST] 150 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[08:05 IST] weather: forecasts for 15 events, 0 failed",
-  "[08:05 IST] prop model: 1873 prop selections modelled, 635 milestone ladder prices anchored to O/U",
-  "[08:05 IST] ledger upsert model: {'upserted': 4, 'skipped_settled': 0}"
+  "[09:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[09:00 IST] history: 24241 matches, last 2026-11-24, players 437506",
+  "[09:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 2460, 'secs': 0.3}",
+  "[09:03 IST] source feedg: {'status': 'error', 'reason': 'HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}', 'secs': 1.8}",
+  "[09:03 IST] source smarkets: {'status': 'ok', 'rows': 449, 'secs': 2.4}",
+  "[09:03 IST] source feedl: {'status': 'ok', 'rows': 648, 'secs': 18.7, 'events': 35}",
+  "[09:03 IST] source feedk: {'status': 'ok', 'rows': 288, 'secs': 21.0, 'events': 8}",
+  "[09:03 IST] source feedj: {'status': 'ok', 'rows': 668, 'secs': 56.8, 'events': 11}",
+  "[09:03 IST] source feedh: {'status': 'ok', 'rows': 2111, 'secs': 86.9, 'stopped': 'HTTP 523', 'events': 85}",
+  "[09:03 IST] source feede: {'status': 'ok', 'rows': 608, 'secs': 88.2, 'events': 35}",
+  "[09:03 IST] source feedf: {'status': 'ok', 'rows': 644, 'secs': 120.8, 'events': 23}",
+  "[09:03 IST] source feedi: {'status': 'ok', 'rows': 1999, 'secs': 143.2, 'events': 35}",
+  "[09:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[09:03 IST] 94 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[09:03 IST] 218 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[09:03 IST] 192 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[09:03 IST] name map: Zimbabwe vs Ireland A -> Zimbabwe A vs Ireland A (2026-11-25T07:30:00Z)",
+  "[09:03 IST] name map: Jammu & Kashmir vs Haryana -> Jammu and Kashmir vs Haryana (2026-11-26T03:30:00Z)",
+  "[09:03 IST] name map: Zimbabwe XI vs Ireland A -> Zimbabwe A vs Ireland A (2026-11-25T07:30:00Z)",
+  "[09:03 IST] held back 1 player and 0 fancy lines first priced after their match started (not pre-match prices)",
+  "[09:03 IST] book lines: 610 player lines from 8 source(s)",
+  "[09:03 IST] 150 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[09:04 IST] weather: forecasts for 15 events, 0 failed",
+  "[09:04 IST] prop model: 1875 prop selections modelled, 635 milestone ladder prices anchored to O/U",
+  "[09:04 IST] ledger upsert model: {'upserted': 4, 'skipped_settled': 0}"
  ]
 }
