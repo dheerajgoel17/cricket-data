@@ -1,6 +1,8 @@
 import datetime as dt
 import json
 
+import pytest
+
 from value_bets.booklines import book_lines, carry_started, hold_started, prop_events, public
 
 
@@ -465,3 +467,72 @@ def test_an_event_row_of_a_started_match_with_no_lines_left_is_not_kept():
     ]}
     prev = {"generated_at_utc": "t", "lines": [], "fancy": [], "events": []}
     assert [e["match"] for e in carry_started(book, prev, NOW)["events"]] == ["India vs NZ"]
+
+
+def test_an_event_row_of_a_match_on_now_stays_though_it_has_no_lines():
+    """23 Nov 2026 (Sri Lanka Women v Ireland Women): a match priced only by an event row lost it at the first ball, and with it its live score. Only a leftover past LIVE_KEEP goes."""
+    book = {"generated_at_utc": "t", "lines": [], "fancy": [], "events": [
+        {"match": "Sri Lanka (W) vs Ireland (W)", "start_utc": "2026-10-27T08:30:00Z", "markets": ["top_batter_team"], "sources": ["bet365"], "n": 28},  # began an hour ago
+        {"match": "South Africa vs Bangladesh", "start_utc": "2026-10-22T08:00:00Z", "markets": ["batter_runs"], "sources": ["bet365"], "n": 206},  # began days ago
+    ]}
+    prev = {"generated_at_utc": "t", "lines": [], "fancy": [], "events": []}
+    assert [e["match"] for e in carry_started(book, prev, NOW)["events"]] == ["Sri Lanka (W) vs Ireland (W)"]
+
+
+def test_the_last_prices_of_a_match_about_to_start_are_carried_when_the_books_pull_their_markets():
+    """Women's Emerging Nations Trophy final, 25 Nov 2026: at 04:30 UTC (start 05:00) the books pulled their player markets and kept one; with no carry before the start the file had
+    no lines when play began, and the live score (read only for matches the file prices) stopped. Every format and any spelling of the pair: it is the rows' own start that decides."""
+    start = "2026-11-25T05:00:00Z"
+    prev = doc(("Ireland W vs Sri Lanka W", start, "T20"), ("Ireland (Wom) vs Sri Lanka (Wom)", start, "T20"), ("Sri Lanka vs Ireland", start, "T20"))
+    pull = {"generated_at_utc": "n", "lines": [], "fancy": [], "events": [{"match": "Sri Lanka (W) vs Ireland (W)", "start_utc": start, "markets": ["top_batter_team"], "sources": ["bet365"], "n": 28}]}
+    half_hour_before = dt.datetime(2026, 11, 25, 4, 30, tzinfo=dt.timezone.utc)
+    out = carry_started(pull, prev, half_hour_before)
+    assert {x["match"] for x in out["lines"]} == {x["match"] for x in prev["lines"]} and len(out["fancy"]) == 3
+    assert [e["n"] for e in out["events"] if e["match"] == "Sri Lanka (W) vs Ireland (W)"] == [28]  # the pull's own event row stays
+    # the next pull is after the start and has nothing at all: the rows carried a pull ago are still there (40 h), with the match's event row
+    gone = {"generated_at_utc": "m", "lines": [], "fancy": [], "events": []}
+    later = carry_started(gone, out, dt.datetime(2026, 11, 25, 5, 27, tzinfo=dt.timezone.utc))
+    assert len(later["lines"]) == 3 and len(later["fancy"]) == 3 and {e["match"] for e in later["events"]} >= {"Sri Lanka (W) vs Ireland (W)"}
+
+
+@pytest.mark.parametrize("fmt", ["T20", "ODI", "Hundred", "T10", "Test"])
+def test_the_hold_before_the_start_is_three_hours_in_every_format(fmt):
+    prev = doc(("A vs B", "2026-10-27T11:00:00Z", fmt))  # 87 minutes ahead of NOW
+    assert len(carry_started(doc(), prev, NOW)["lines"]) == 1
+    far = doc(("A vs B", "2026-10-27T13:30:00Z", fmt))  # 4 h ahead: the books may simply not have priced it yet, or have taken it down
+    assert carry_started(doc(), far, NOW)["lines"] == []
+
+
+SCHEDULE = [{"start_utc": "2026-11-25T05:00Z", "team_a": "Sri Lanka Women", "team_b": "Ireland Women", "format": "T20", "gender": "female", "status": "Live", "series": "Women's Emerging Nations Trophy 2026"}]
+
+
+def test_a_match_the_source_has_not_called_over_is_not_let_go_on_the_clock():
+    """A start can be delayed or a day rained off; only the source's status ends the match. Completed (a result, abandoned, no result) goes on the usual clock."""
+    prev = doc(("Sri Lanka (W) vs Ireland (W)", "2026-11-25T05:00:00Z", "T20"))
+    three_days_on = dt.datetime(2026, 11, 28, 6, 0, tzinfo=dt.timezone.utc)
+    assert carry_started(doc(), prev, three_days_on)["lines"] == []
+    from value_bets.booklines import schedule_active
+    assert len(carry_started(doc(), prev, three_days_on, None, schedule_active(SCHEDULE))["lines"]) == 1
+    over = [{**SCHEDULE[0], "status": "Completed"}]
+    assert carry_started(doc(), prev, three_days_on, None, schedule_active(over))["lines"] == []
+    men = doc(("Sri Lanka vs Ireland", "2026-11-25T05:00:00Z", "T20"))  # the men's pair has the same names: the women's match being on says nothing of it
+    assert carry_started(doc(), men, three_days_on, None, schedule_active(SCHEDULE))["lines"] == []
+
+
+def test_a_match_the_file_lost_is_restored_from_the_archive_while_the_source_has_it_on(tmp_path):
+    """25 Nov 2026: the file had no row of the Sri Lanka Women v Ireland Women final (books pulled their markets before the start); the archive had every pre-match line."""
+    from value_bets import archive
+    now = dt.datetime(2026, 11, 25, 5, 55, tzinfo=dt.timezone.utc)
+    (tmp_path / "2026-11").mkdir()
+    entry = {"id": "2026-11-25-sri-lanka-women-v-ireland-women", "match": "Ireland (W) vs Sri Lanka (W)", "competition": "ICC Emerging Nations T20 Trophy Women", "start_utc": "2026-11-25T09:00:00Z",
+             "fixture": {"a": "Sri Lanka Women", "b": "Ireland Women"}, "events": [], "lines": [{"fmt": "T20", "player": "Amy Hunter", "stat": "runs", "line": 18.5, "books": [{"source": "1xBet", "kind": "bookmaker", "over": 1.85, "under": 1.85}]}],
+             "fancy": [{"match": "Ireland vs Sri Lanka", "start_utc": "2026-11-25T05:00:00Z", "key": "match_fours", "scope": "match", "team": None, "line": 26.5, "source": "x", "kind": "bookmaker"}]}  # fancy rows keep their own match and start
+    (tmp_path / "2026-11" / f"{entry['id']}.json").write_text(json.dumps(entry))
+    empty = {"generated_at_utc": "n", "lines": [], "fancy": [], "events": []}
+    active = __import__("value_bets.booklines", fromlist=["schedule_active"]).schedule_active(SCHEDULE)
+    assert archive.heal_book(empty, tmp_path, now) == empty  # nothing lists the match: nothing was asked for
+    out = archive.heal_book(empty, tmp_path, now, None, SCHEDULE, active)
+    assert [(x["player"], x["start_utc"]) for x in out["lines"]] == [("Amy Hunter", "2026-11-25T05:00Z")]  # the schedule's start, not the 09:00 a book first gave
+    assert len(out["fancy"]) == 1
+    over = [{**SCHEDULE[0], "status": "Completed"}]
+    assert archive.heal_book(empty, tmp_path, now, None, over, __import__("value_bets.booklines", fromlist=["schedule_active"]).schedule_active(over)) == empty
