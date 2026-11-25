@@ -35,8 +35,13 @@
   "alerted_at": "2026-11-25T06:34:41.369236+00:00"
  },
  "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||Andre Russell under 1.5|1.5|under": {
-  "edge": 0.1933,
+  "edge": 0.2306,
   "start_utc": "2026-11-26T14:30:00Z",
-  "alerted_at": "2026-11-25T15:34:28.137980+00:00"
+  "alerted_at": "2026-11-25T18:34:18.510582+00:00"
+ },
+ "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||Nicholas Pooran under 1.5|1.5|under": {
+  "edge": 0.0528,
+  "start_utc": "2026-11-26T14:30:00Z",
+  "alerted_at": "2026-11-25T18:34:18.510582+00:00"
  }
 }

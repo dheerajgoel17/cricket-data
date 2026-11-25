@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-25T17:41:45Z",
+ "generated_at_utc": "2026-11-25T18:35:03Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -323,9 +323,9 @@
    "hits": 14,
    "played": 20,
    "window": 20,
-   "chance": 0.6321,
-   "edge": 0.1821,
-   "edge_pct": 18.2,
+   "chance": 0.6324,
+   "edge": 0.1826,
+   "edge_pct": 18.3,
    "bat_first": false
   },
   {
