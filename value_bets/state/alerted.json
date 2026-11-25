@@ -43,5 +43,10 @@
   "edge": 0.0668,
   "start_utc": "2026-11-25T14:30:00Z",
   "alerted_at": "2026-11-25T06:01:05.627309+00:00"
+ },
+ "female|Adelaide Strikers Women|Sydney Thunder Women|2026-11-26|batter_fours||Laura Wolvaardt under 3.5|3.5|under": {
+  "edge": 0.0608,
+  "start_utc": "2026-11-26T04:40:00Z",
+  "alerted_at": "2026-11-25T06:34:41.369236+00:00"
  }
 }
