@@ -1,15 +1,15 @@
 {
- "generated_at_utc": "2026-11-25T10:36:56Z",
- "n": 77,
- "pnl_u": 16.459,
+ "generated_at_utc": "2026-11-25T11:36:26Z",
+ "n": 79,
+ "pnl_u": 18.379,
  "by": {
   "model|?|batter_fours": {
-   "n": 20,
-   "won": 10,
+   "n": 22,
+   "won": 12,
    "lost": 4,
    "push": 0,
    "void": 6,
-   "pnl_u": 5.986
+   "pnl_u": 7.906
   },
   "model|?|batter_runs": {
    "n": 17,
