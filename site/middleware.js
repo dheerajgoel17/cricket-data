@@ -13,6 +13,8 @@ export function crawlerSharePath(url) {
   const stat = url.searchParams.get("stat");
   const line = url.searchParams.get("line");
   if (/^player\/\d+$/.test(path) && stat && Number.isFinite(Number(line))) return `${path}/${stat}/${line}`;
+  const fm = url.searchParams.get("fm");
+  if (/^fixture\/[^/]+\/fancy$/.test(path) && /^[\w-]{1,100}(?::[12])?$/.test(fm || "")) return `${path}/${fm}/${/^-?\d{1,6}$/.test(url.searchParams.get("sc") || "") ? Number(url.searchParams.get("sc")) : -1}`;
   return path;
 }
 

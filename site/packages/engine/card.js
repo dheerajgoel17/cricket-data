@@ -8,6 +8,8 @@ import { playerPhotos, teamJerseys, teamLogos } from "./photos.js";
 import { windowRate } from "./windows.js";
 import { atGround } from "./next-match.js";
 import { fairOdds } from "./stats.js";
+import { labelOf } from "./fancy-poster.js";
+import { parseFm } from "./fancy-edge.js";
 export { CARD_V, cardPath, cardQuery } from "./card-path.js";
 
 const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
@@ -165,6 +167,10 @@ export function cardFields(q, data) {
   }
   const fixtures = Array.isArray(data.fixtures) ? data.fixtures : [];
   const fx = fixtures.find((x) => x.id === q.f);
+  if (fx && q.fm) { // one Match Fancy market of the fixture: the words only, the numbers come from the renderer's store
+    const { key } = parseFm(String(q.fm)), sc = Number.isFinite(Number(q.sc)) ? Number(q.sc) : -1;
+    return { kind: "fancyLink", a: fx.a, b: fx.b, fm: String(q.fm), sc, label: labelOf(key, sc), when: when(fx.start), venue: fx.venue || "", series: fx.series || "" };
+  }
   return fx ? { kind: "fixture", a: fx.a, b: fx.b, venue: fx.venue || "", series: fx.series || "", when: when(fx.start) } : null;
 }
 
@@ -173,6 +179,7 @@ export function cardText(f, brand = "Fancy.cash") {
   if (!f) return null;
   if (f.kind === "prop") return { title: `${f.name}: ${f.stat.toLowerCase()} over ${f.line}${f.price ? ` at ${f.price.toFixed(2)}` : ""}`, description: `${f.name}${f.team ? ` (${f.team})` : ""}, ${f.stat.toLowerCase()} over ${f.line}${f.price ? `, listed ${f.price.toFixed(2)} at ${f.book}` : ""}${f.match ? ` in ${f.match}` : ""}. Hit rates and form on ${brand}.` };
   if (f.kind === "player") return { title: `${f.name}: stats, hit rates and form`, description: `${f.name}${f.team ? ` (${f.team})` : ""}: hit rates over any line, recent form and listed lines on ${brand}.` };
+  if (f.kind === "fancyLink") return { title: `${f.a} v ${f.b}: ${f.label.toLowerCase()}, over or under`, description: `${f.label} in ${f.a} v ${f.b}${f.when ? `, ${f.when}` : ""}: listed lines, prices and the last ten results against the line on ${brand}.` };
   if (f.kind === "venue") return { title: `${f.name}: ground stats`, description: `Runs, sixes, fours and match totals at ${f.name}. Free cricket ground stats on ${brand}.` };
   return { title: `${f.a} v ${f.b}: stats, props and listed lines`, description: `${f.a} v ${f.b}${f.when ? `, ${f.when}` : ""}${f.venue ? `, ${f.venue}` : ""}: player stats, hit rates and listed lines on ${brand}.` };
 }
@@ -219,9 +226,9 @@ export async function renderCard(f, { photo = null, jersey = null, teamLogo = nu
   const marks = Object.fromEntries(await Promise.all(Object.entries(bookMarks || {}).map(async ([k, v]) => [k, await asImage(loadImage, v)])));
 
   if (f.kind === "prop") drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, marks, text, bold, reg, num });
-  else if (f.kind === "fixture" || f.kind === "venue") drawPlain(g, f, { text, bold, reg });
+  else if (f.kind === "fixture" || f.kind === "venue" || f.kind === "fancyLink") drawPlain(g, f, { text, bold, reg });
   else drawPlayer(g, f, { img, kit, text, bold, reg });
-  drawBrand(g, text, bold);
+  if (f.kind !== "prop") drawBrand(g, text, bold); // the prop card carries its own brand, top-left
   return jpegUnder(c);
 }
 
@@ -262,74 +269,39 @@ function drawPlayer(g, f, { img, kit, text, bold, reg }) {
   text("Free, with every price in decimal", 72, 468, 26, MUTED, reg, "left", 580);
 }
 
-function drawProp(g, f, { img, kit, teamImg, oppImg, bookImg, marks = {}, text, bold, reg, num }) {
-  // Share card on a 64 px margin grid: left column x 64..624 (three equal tiles per row, 13 px gutters), portrait right. Baselines: name 98, meta 128, stat 178, hero 240,
-  // tile rows 272 / 340 (56 px tall), chart labels 430, chart tracks 462..514 (figures above, opponents 536), book strip 552..600. A block with no data is skipped, never left as an empty label.
-  drawKitPortrait(g, f, img, kit, text, bold);
-  const L = 64, COL = 560, GAP = 13, TW = Math.floor((COL - 2 * GAP) / 3);
-
-  text(f.name, L, 98, 54, "#ffffff", bold, "left", COL);
-  const meta = [f.fmt, f.role, f.team].filter(Boolean).join("  ·  ");
-  if (meta) text(meta.toUpperCase(), L, 128, 18, MUTED, num, "left", COL);
-
-  text(String(f.stat || "").toUpperCase(), L, 178, 20, GREEN, num, "left", 260);
-  const hero = text(`OVER ${f.line}`, L, 240, 64, "#ffffff", num, "left", 330);
-  if (f.opp) { // matchup: the two crests at full size, no container, centred on the hero line
-    const bw = 84, bh = 60, x0 = L + Math.max(hero, 190) + 30, cy = 216;
-    crest(g, teamImg, abbr(f.team), x0 + bw / 2, cy, bw, text, bold, bh);
-    text("v", x0 + bw + 14, cy + 7, 20, MUTED, bold, "center", 24);
-    crest(g, oppImg, abbr(f.opp), x0 + bw + 28 + bw / 2, cy, bw, text, bold, bh);
+function bookChipAt(g, f, bookImg, x, y, h, text, bold, fill = "#1c1c1e") {
+  g.fillStyle = fill;
+  if (bookImg) {
+    const k = Math.min(150 / bookImg.width, (h - 24) / bookImg.height), w = bookImg.width * k, ih = bookImg.height * k, cw = w + 36;
+    g.beginPath(); g.roundRect(x, y, cw, h, 14); g.fill();
+    g.drawImage(bookImg, x + 18, y + (h - ih) / 2, w, ih);
+    return cw;
   }
+  return f.book ? text(f.book, x, y + h * 0.65, 26, "#ffffff", bold, "left", 220) : 0;
+}
 
-  // Tiles: one grid, filled in reading order (fair, listed, hit rates, records); a missing figure leaves no hole
-  const avg = f.l5 && Number.isFinite(Number(f.l5.mean)) ? Number(f.l5.mean) : null;
-  const l5p = f.l5 && Number.isFinite(Number(f.l5.p)) ? Number(f.l5.p) : (f.hit && Number.isFinite(Number(f.hit.p)) ? Number(f.hit.p) : null);
-  const tone = (p) => (p >= 0.6 ? GREEN : p < 0.4 ? RED : "#f5a524");
-  const rate = (r) => `${Math.round(r.p * 100)}% · ${r.hits}/${r.played}`;
-  const tiles = [];
-  if (f.fair?.odds) tiles.push({ k: `FAIR · ${f.fair.label}`, v: f.fair.odds.toFixed(2) });
-  if (f.price) tiles.push({ k: "LISTED", v: f.price.toFixed(2), tone: GREEN, logo: true });
-  if (l5p != null) tiles.push({ k: "L5 HIT", v: `${Math.round(l5p * 100)}%`, tone: tone(l5p) });
-  if (f.season?.p != null) tiles.push({ k: `${f.season.year} HIT`, v: rate(f.season), tone: tone(f.season.p) });
-  if (f.h2h?.p != null) tiles.push({ k: `VS ${abbr(f.h2h.name)}`, v: rate(f.h2h), tone: tone(f.h2h.p) });
-  if (f.atGround?.p != null) tiles.push({ k: `AT ${String(f.atGround.name).toUpperCase()}`, v: rate(f.atGround), tone: tone(f.atGround.p) });
-  else if (avg != null) tiles.push({ k: "L5 AVG", v: fmtAvg(avg) });
-  tiles.slice(0, 6).forEach((t, i) => {
-    const x = L + (i % 3) * (TW + GAP), y = 272 + Math.floor(i / 3) * 68;
-    g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x, y, TW, 56, 12); g.fill();
-    text(t.k, x + 16, y + 22, 13, MUTED, num, "left", TW - 32);
-    const vw = text(t.v, x + 16, y + 47, 28, t.tone || "#ffffff", num, "left", TW - 32);
-    if (t.logo && (bookImg || f.book)) {
-      const room = TW - 32 - vw - 10;
-      if (room > 40) bookChip(g, { img: bookImg, name: f.book }, x + TW - 16 - Math.min(room, 84), y + 26, Math.min(room, 84), 22, text, bold);
-    }
-  });
-
-  // Charts: his last five, and his games at this ground
-  const bars = f.last5 && f.last5.length ? f.last5 : (f.last && Number.isFinite(Number(f.last.value)) ? [{ value: f.last.value }] : []);
-  if (bars.length) {
-    text("LAST 5", L, 430, 16, MUTED, num, "left", 120);
-    drawLast5(g, { line: f.line, last5: bars }, null, text, bold, reg, num, L, 462, 232, 52);
+function drawProp(g, f, { img, kit, bookImg, text, bold, reg, num }) {
+  // Split card: black stats panel (name, the line as headline, book logo + price, last five) beside the player full-height on brand green; the hit count is a black sticker on the green side.
+  // Every figure comes from the fields (never invented); a block with no data is left out.
+  const L = 64, W = 500;
+  g.fillStyle = GREEN; g.fillRect(620, 0, 580, 630);
+  drawKitPortrait(g, f, img, kit, text, bold, { x: 620, w: 580, bottom: 630, glow: false, ink: BG });
+  drawBrandGroup(g, L, 48, 56, bold);
+  text(f.name, L, 176, 54, "#ffffff", bold, "left", W);
+  const meta = [f.team, f.fmt, f.opp ? `v ${f.opp}` : ""].filter(Boolean).join("  ·  ");
+  if (meta) text(meta, L, 210, 22, MUTED, reg, "left", W);
+  text(String(f.stat || "").toUpperCase(), L, 256, 24, GREEN, num, "left", W);
+  text(`OVER ${f.line}`, L, 328, 80, "#ffffff", num, "left", W);
+  if (f.price) { const cw = bookChipAt(g, f, bookImg, L, 352, 52, text, bold); text(f.price.toFixed(2), L + cw + 16, 396, 48, GREEN, num, "left", 140); }
+  if (f.last5?.length) { // the chart is the main body of the panel
+    text("LAST 5 INNINGS", L, 452, 20, MUTED, num, "left", 240);
+    drawLast5(g, { line: f.line, last5: f.last5 }, null, text, bold, reg, num, L, 510, 470, 68);
   }
-  if (f.atGround?.bars?.length) {
-    const gx = L + 296, a = f.atGround;
-    text(`AT ${String(a.name || "GROUND").toUpperCase()}${a.played ? `  ·  ${a.hits}/${a.played} HIT` : ""}`, gx, 430, 16, MUTED, num, "left", 250);
-    drawLast5(g, { line: f.line, last5: a.bars }, null, text, bold, reg, num, gx, 462, 232, 52);
-  }
-
-  // Book strip: each listed line with its best over price (or each book's price at the line), the best outlined
-  const bl = f.bookLines || [];
-  if (bl.length > 1) {
-    const w = Math.floor((COL - GAP * (bl.length - 1)) / bl.length);
-    bl.forEach((b, i) => {
-      const x = L + i * (w + GAP), on = !!b.best;
-      g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x, 552, w, 48, 12); g.fill();
-      if (on) { g.strokeStyle = GREEN; g.lineWidth = 2; g.beginPath(); g.roundRect(x, 552, w, 48, 12); g.stroke(); }
-      const mk = marks[b.stem];
-      if (mk) bookChipMark(g, mk, x + 14, 559, w - 28, 15); else text(String(b.book || "").toUpperCase(), x + 14, 572, 12, MUTED, num, "left", w - 28);
-      text(String(b.line), x + 14, 593, 24, "#ffffff", num, "left", w * 0.5);
-      text(b.price.toFixed(2), x + w - 14, 593, 22, on ? GREEN : MUTED, num, "right", w * 0.5);
-    });
+  const l5 = f.l5 && f.l5.played >= 3 ? f.l5 : null;
+  if (l5) { // the hit count as a black sticker on the green side
+    g.fillStyle = BG; g.beginPath(); g.roundRect(1136 - 200, 48, 200, 84, 20); g.fill();
+    text(`${l5.hits}/${l5.played}`, 1136 - 100, 106, 60, GREEN, num, "center", 190);
+    text("OVER IN LAST 5", 1136 - 100, 124, 14, MUTED, num, "center", 190);
   }
 }
 
@@ -413,14 +385,15 @@ function mark(g, img, x, y, maxW, maxH, align = "left") {
  * The player standing in his team's shirt, the way the site shows him: the face avatar and the shirt are the same width and the shirt rides up over the bottom third of the avatar,
  * so its collar hides the avatar's cut edge. Bottom-aligned on the right of the card over a soft green glow. Without a shirt it is the avatar alone; without a photo, the initials.
  */
-function drawKitPortrait(g, f, img, kit, text, bold) {
-  const w = 500, x = 640, bottom = 630;
-  const glow = g.createRadialGradient(x + w / 2, 400, 0, x + w / 2, 400, 360);
-  glow.addColorStop(0, "rgba(39,218,142,0.22)"); glow.addColorStop(1, "rgba(39,218,142,0)");
-  g.fillStyle = glow; g.fillRect(560, 0, 640, 630);
+function drawKitPortrait(g, f, img, kit, text, bold, { x = 640, w = 500, bottom = 630, glow: withGlow = true, ink = GREEN } = {}) {
+  if (withGlow) {
+    const glow = g.createRadialGradient(x + w / 2, 400, 0, x + w / 2, 400, 360);
+    glow.addColorStop(0, "rgba(39,218,142,0.22)"); glow.addColorStop(1, "rgba(39,218,142,0)");
+    g.fillStyle = glow; g.fillRect(560, 0, 640, 630);
+  }
   if (!img) {
-    g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x + 90, 150, 320, 400, 40); g.fill();
-    text(f.initials, x + 250, 400, 140, GREEN, bold, "center");
+    if (withGlow) { g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x + 90, 150, 320, 400, 40); g.fill(); }
+    text(f.initials, x + w / 2, 400, 140, ink, bold, "center");
     return;
   }
   const faceH = w * (img.height / img.width);

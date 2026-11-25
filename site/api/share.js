@@ -19,6 +19,10 @@ export function parseShare(path) {
     const withLine = seg[2] && seg[3] && Number.isFinite(Number(seg[3]));
     return { card: withLine ? { p: seg[1], stat: seg[2], line: seg[3] } : { p: seg[1] }, page: `/player/${seg[1]}${withLine ? `?stat=${encodeURIComponent(seg[2])}&line=${encodeURIComponent(seg[3])}` : ""}` };
   }
+  if (seg[0] === "fixture" && seg[1] && seg[2] === "fancy" && seg[3]) {
+    const sc = Number.isFinite(Number(seg[4])) ? Number(seg[4]) : -1;
+    return { card: { f: seg[1], fm: seg[3], sc: String(sc) }, page: `/fixture/${encodeURIComponent(seg[1])}/fancy?fm=${encodeURIComponent(seg[3])}${sc >= 0 ? `&sc=${sc}` : ""}` };
+  }
   if (seg[0] === "fixture" && seg[1]) return { card: { f: seg[1] }, page: `/fixture/${encodeURIComponent(seg[1])}` };
   if (seg[0] === "venue" && /^\d+$/.test(seg[1] || "")) return { card: { v: seg[1] }, page: `/venue/${seg[1]}` };
   return null;

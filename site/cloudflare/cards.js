@@ -2,12 +2,16 @@ import { timingSafeEqual } from "node:crypto";
 import { cardFields, cardQuery, cardText } from "@cricket/engine/card.js";
 import { parseCardLink, posterPath } from "@cricket/engine/card-link.js";
 import { fancyPosterFields } from "@cricket/engine/fancy-poster.js";
+import { attachForm } from "@cricket/engine/card-form.js";
+import { teamLogos } from "@cricket/engine/photos.js";
+import { fancyCardHtml, propCardHtml } from "./card-html.js";
 import { createStore } from "@cricket/engine/store.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { handleShare, isPerson, parseShare } from "../api/share.js";
 import { unwrapJson } from "../api/load-data.js";
 
 const missing = () => new Response(null, { status: 404 });
+const https = (list) => (list || []).find((u) => /^https:\/\//.test(u)) || "";
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 function normalizeCard(url) {
   const path = url.pathname.startsWith("/card/") ? url.pathname : url.searchParams.get("path");
@@ -25,8 +29,8 @@ function normalizeCard(url) {
     out.set("line", String(Number(query.line)));
   }
   if (query.poster === "1" && player) out.set("poster", "1");
-  else if (query.poster === "1" && out.has("f") && /^[\w-]{1,100}(?::[12])?$/.test(query.fm || "")) {
-    out.set("poster", "1");
+  else if (out.has("f") && /^[\w-]{1,100}(?::[12])?$/.test(query.fm || "")) { // one Match Fancy market: the poster, or without `poster` the link-preview card
+    if (query.poster === "1") out.set("poster", "1");
     out.set("fm", query.fm);
     out.set("sc", /^-?\d{1,6}$/.test(query.sc || "") ? String(Number(query.sc)) : "-1");
   }
@@ -107,8 +111,20 @@ export class Cards {
       .then(Object.fromEntries).catch((e) => { this.dataPromise = null; throw e; });
   }
 
+  /** The built site stylesheet (it carries the Satoshi and Barlow Condensed font faces), found through the built index page. */
+  async css() {
+    if (this.cssUrl !== undefined) return this.cssUrl;
+    try {
+      const html = await (await this.env.ASSETS.fetch(new Request("https://assets.invalid/"))).text();
+      const href = /href="(\/assets\/index-[^"]+\.css)"/.exec(html)?.[1];
+      this.cssUrl = href ? `${this.origin}${href}` : "";
+    } catch { this.cssUrl = ""; }
+    return this.cssUrl;
+  }
+
   async fetch(request) {
     const url = new URL(request.url);
+    this.origin = url.origin;
     if (url.pathname === "/api/share") {
       const path = url.searchParams.get("path");
       const headers = new Headers();
@@ -127,23 +143,32 @@ export class Cards {
   async render(query) {
     const data = await this.data();
     const poster = query.poster === "1";
-    const fancy = poster && query.f && query.fm;
-    let f, text;
+    const fancy = query.f && query.fm;
+    const store = () => this.store ||= createStore({ fetchJson: (path) => this.json(path.replace(/\.json$/, "")) });
+    let f, text, html;
     if (fancy) {
-      const store = await createStore({ fetchJson: (path) => this.json(path.replace(/\.json$/, "")) });
-      f = fancyPosterFields(store, data.lines, data.fixtures, { id: query.f, fm: query.fm, sc: query.sc });
+      f = fancyPosterFields(await store(), data.lines, data.fixtures, { id: query.f, fm: query.fm, sc: query.sc });
       if (f) text = { title: f.label, description: [`${f.a} v ${f.b}`, f.team, f.series].filter(Boolean).join(" · ") };
+      if (f && !poster) {
+        const logo = (name) => https(teamLogos(data.photos, f.female && !/\bwomen\b|\(w\)/i.test(name) ? `${name} Women` : name));
+        html = fancyCardHtml(f, { origin: this.origin, css: await this.css(), aLogo: logo(f.a), bLogo: logo(f.b) });
+      }
     } else {
       f = cardFields(query, data);
       text = cardText(f);
+      if (f?.kind === "prop" && !poster) {
+        try { f = await attachForm(f, await store()); } catch { /* the card without its form */ }
+        html = propCardHtml(f, { origin: this.origin, css: await this.css() });
+      }
     }
     if (!text || (poster && f.kind !== "prop" && f.kind !== "fancy")) return null;
     const photo = f.photos?.find((value) => /^https:\/\//.test(value));
     const width = poster ? 1080 : 1200, height = poster ? 1350 : 630;
     const type = poster ? "png" : "jpeg";
     const options = {
-      html: cardHtml(f, text, photo),
+      html: html || cardHtml(f, text, photo),
       viewport: { width, height },
+      ...(html ? { waitForSelector: { selector: "body[data-ready]", timeout: 8000 } } : {}),
       screenshotOptions: { type, ...(poster ? {} : { quality: 80 }), clip: { x: 0, y: 0, width, height } },
     };
     let r = await this.env.BROWSER.quickAction("screenshot", options);

@@ -3,16 +3,12 @@
 // L5 form reads matches.json + one player shard over HTTP from this deploy's /data (not bundled: Functions Storage).
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { cardFields, cardQuery, propForm, renderCard } from "@cricket/engine/card.js";
+import { cardFields, cardQuery, renderCard } from "@cricket/engine/card.js";
+import { attachForm } from "@cricket/engine/card-form.js";
 import { renderPoster } from "@cricket/engine/poster.js";
-import { fancyPosterFields, renderFancyPoster } from "@cricket/engine/fancy-poster.js";
+import { fancyPosterFields, renderFancyCard, renderFancyPoster } from "@cricket/engine/fancy-poster.js";
 import { teamLogos } from "@cricket/engine/photos.js";
-import { dominantFormat } from "@cricket/engine/props.js";
-import { STATS } from "@cricket/engine/rules.js";
 import { createStore } from "@cricket/engine/store.js";
-import { Resolver } from "@cricket/engine/resolve.js";
-import { runPlan } from "@cricket/engine/plan.js";
-import { fmtIndex } from "@cricket/engine/util.js";
 import { bookLogoFile, bookLogoStem, setBookManifest } from "@cricket/engine/books.js";
 import { loadData, unwrapJson } from "./load-data.js";
 
@@ -55,29 +51,6 @@ async function loadStore() {
     storeCache = await createStore({ fetchJson: fetchStoreJson });
     return storeCache;
   } catch { return null; }
-}
-
-/** L5 / last / hit rate from this player's shard in one format (never mixed). Times out so a slow shard does not drop the JPEG. */
-async function attachForm(f) {
-  if (f.kind !== "prop" || f.idx == null || !f.statKey) return f;
-  const store = await loadStore();
-  if (!store) return f;
-  const def = STATS[f.statKey];
-  if (!def) return f;
-  const opts = { year: f.year || String(new Date().getUTCFullYear()), ground: f.ground, opp: f.opp };
-  // the same games the site's row reads: the plan's chart (one format, the stat's own rows), so the card and the row say the same numbers
-  try {
-    const r = await runPlan(store, new Resolver(store), { kind: "player_prop", stat: f.statKey, line: f.line, side: "over", filters: { format: f.fmt || null, team_innings: null, innings: null }, split_by: [] }, { playerIdx: f.idx });
-    const entries = r?.ok ? r.chart?.entries || [] : [];
-    if (entries.length) return { ...f, ...propForm(entries.map((e) => ({ value: e.value, date: e.date, opp: e.opp, venueName: e.venueName })), f.line, (n) => n, opts) };
-  } catch { /* fall back to the rows below */ }
-  const all = await store.playerRows(f.idx);
-  const side = def.side === "bowl" ? all.bowl : def.side === "all" ? store.pointsRows(all) : all.bat;
-  let fmtIdx = fmtIndex(f.fmt);
-  if (fmtIdx < 0) fmtIdx = dominantFormat(side);
-  if (fmtIdx == null || fmtIdx < 0) return f;
-  const rows = side.filter((r) => r.fmt === fmtIdx && r[def.key] != null).map((r) => ({ value: r[def.key], date: r.date, opp: r.opp, venueName: store.venueName(r.v) }));
-  return { ...f, ...propForm(rows, f.line, (i) => store.teamName(i, true), opts) };
 }
 
 let namesCache = null;
@@ -180,11 +153,22 @@ export default async function handler(req, res) {
       res.setHeader("Content-Length", String(png.length));
       return res.end(png);
     }
+    const qq = q.path != null ? cardQuery(q.path) : q;
+    if (!q.poster && qq.f && qq.fm) { // the link-preview card of one Match Fancy market
+      const data = loadData(), store = await loadStore();
+      const ff = store && data.fixtures && data.lines ? fancyPosterFields(store, data.lines, data.fixtures, { id: String(qq.f), fm: String(qq.fm), sc: qq.sc }) : null;
+      if (!ff) return sendJpeg(res, await plainJpeg());
+      const side = (n) => (ff.female && !/\bwomen\b|\(w\)/i.test(n) ? `${n} Women` : n);
+      const [aLogo, bLogo] = await Promise.all([firstPhoto(teamLogos(data.photos, side(ff.a))), firstPhoto(teamLogos(data.photos, side(ff.b)))]);
+      const bookMarks = {};
+      for (const st of [ff.overStem, ff.underStem]) if (st && !bookMarks[st]) { const m = readBookMark(st); if (m) bookMarks[st] = m; }
+      return sendJpeg(res, await renderFancyCard(ff, { aLogo, bLogo, bookMarks, fonts: { bold: join(process.cwd(), FONTS.bold), regular: join(process.cwd(), FONTS.regular), num: join(process.cwd(), FONTS.num) } }));
+    }
     let f = cardFields(q.path != null ? cardQuery(q.path) : q, loadData()); // /card/<path>.jpg (vercel.json) or the plain query
     if (!f) return sendJpeg(res, await plainJpeg());
     const names = await withTimeout(loadNames(), 1500, {});
     if (f.pid && names && names[f.pid]) f.name = names[f.pid]; // the full name the site shows ("Maia Bouchier"), not the scorecard's initials
-    f = await withTimeout(attachForm(f), FORM_MS, f);
+    f = await withTimeout(loadStore().then((store) => attachForm(f, store)), FORM_MS, f);
     const [photo, jersey, teamLogo, oppLogo] = await Promise.all([firstPhoto(f.photos), firstPhoto(f.kitPhotos), firstPhoto(f.teamPhotos), firstPhoto(f.oppPhotos)]);
     if (q.poster && f.kind === "prop" && !f.bookLines?.length && f.price) f.bookLines = [{ line: f.line, price: f.price, book: f.book, stem: bookLogoStem(f.source), best: true }], f.bookTitle = `BOOKS AT ${f.line}`; // one book is still a box on the right, so the sheet is not lopsided
     const bookMarks = {}; // each listed book's own logo, by stem (the file the site's badges use)

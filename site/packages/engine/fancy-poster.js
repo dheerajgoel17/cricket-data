@@ -3,13 +3,14 @@
 import { drawBrand, visibleBounds } from "./brand-draw.js";
 import { MATCH_KEYS, TEAM_KEYS, fancyInputs, fancySample, marketRow, parseFm } from "./fancy-edge.js";
 import { bookName } from "./lines.js";
+import { bookLogoStem } from "./books.js";
 import { FORMATS } from "./util.js";
 
 const W = 1080, H = 1350, M = 44;
 const GREEN = "#27da8e", RED = "#ff4444", AMBER = "#f5a524", MUTED = "#8e8e93", BG = "#0f0f0f", HAIR = "#2c2c2e", PANEL = "#161618";
 const pct = (p) => `${Math.round(p * 100)}%`;
 const tone = (p) => (p >= 0.6 ? GREEN : p < 0.4 ? RED : AMBER);
-const labelOf = (key, scope) => [...(scope < 0 ? MATCH_KEYS : TEAM_KEYS)].find(([k]) => k === key)?.[1] ?? key.replace(/_/g, " ");
+export const labelOf = (key, scope) => [...(scope < 0 ? MATCH_KEYS : TEAM_KEYS)].find(([k]) => k === key)?.[1] ?? key.replace(/_/g, " ");
 
 /** The poster's fields for `fm` (+ `sc`, the team index or -1) of fixture `id`, or null when the fixture, the market or its books are not there. `doc` is lines.json, `fixtures` the schedule rows. */
 export function fancyPosterFields(store, doc, fixtures, { id, fm, sc = -1, lastN = 10 }) {
@@ -25,7 +26,7 @@ export function fancyPosterFields(store, doc, fixtures, { id, fm, sc = -1, lastN
   if (!r) return null;
   const mine = r.side === "over" ? r.over : r.under;
   return { kind: "fancy", id, key, inn, scope, label: labelOf(key, scope), team: teamName, a: f.a, b: f.b, fmt: f.fmt, series: f.series || "", female: f.gender === "female", batFirst: r.batFirst,
-    line: r.line, overLine: r.overLine, underLine: r.underLine, over: r.over, under: r.under, overBook: r.overBook ? bookName(r.overBook) : "", underBook: r.underBook ? bookName(r.underBook) : "",
+    line: r.line, overLine: r.overLine, underLine: r.underLine, over: r.over, under: r.under, overBook: r.overBook ? bookName(r.overBook) : "", underBook: r.underBook ? bookName(r.underBook) : "", overStem: r.overBook ? bookLogoStem(r.overBook) : "", underStem: r.underBook ? bookLogoStem(r.underBook) : "",
     side: r.side, edge: r.edge, hits: r.hits, played: r.played, chance: r.chance, fair: r.chance > 0 && mine ? 1 / r.chance : null, at: r.at, last: r.last };
 }
 
@@ -111,6 +112,84 @@ export async function renderFancyPoster(f, { aLogo = null, bLogo = null, fonts =
   }
   drawBrand(g, M, H - 100, 52, bold);
   return c.toBuffer("image/png");
+}
+
+/**
+ * The link-preview card (1200x630 JPEG buffer) for the same fields: the poster's numbers in the prop card's split layout, black panel (market, Over / Under tiles with the book logos, last ten against the line)
+ * beside the two crests on brand green with the better side's hit count as a sticker. `bookMarks` maps a logo stem to image bytes.
+ */
+export async function renderFancyCard(f, { aLogo = null, bLogo = null, bookMarks = {}, fonts = {} } = {}) {
+  const { createCanvas, GlobalFonts, loadImage } = await import("@napi-rs/canvas");
+  mk = createCanvas;
+  if (fonts.bold) GlobalFonts.registerFromPath(fonts.bold, "CardBold");
+  if (fonts.regular) GlobalFonts.registerFromPath(fonts.regular, "CardRegular");
+  if (fonts.num) GlobalFonts.registerFromPath(fonts.num, "CardNum");
+  const bold = fonts.bold ? "CardBold" : "sans-serif", reg = fonts.regular ? "CardRegular" : "sans-serif", num = fonts.num ? "CardNum" : bold;
+  const c = createCanvas(1200, 630), g = c.getContext("2d");
+  g.fillStyle = BG; g.fillRect(0, 0, 1200, 630);
+  g.fillStyle = GREEN; g.fillRect(620, 0, 580, 630);
+  const text = (s, x, y, size, color, font = bold, align = "left", max = 0) => {
+    g.font = `${size}px ${font}`; g.fillStyle = color; g.textAlign = align; g.textBaseline = "alphabetic";
+    let t = String(s ?? ""); if (max) while (g.measureText(t).width > max && t.length > 1) t = t.slice(0, -2) + "…";
+    g.fillText(t, x, y); return g.measureText(t).width;
+  };
+  const [ai, bi] = await Promise.all([aLogo, bLogo].map((b) => asImage(loadImage, b)));
+  const marks = Object.fromEntries(await Promise.all(Object.entries(bookMarks || {}).map(async ([k, v]) => [k, await asImage(loadImage, v)])));
+  const L = 64, W2 = 500;
+  drawBrand(g, L, 48, 56, bold);
+  text(f.label, L, 176, 54, "#ffffff", bold, "left", W2);
+  text([f.team || "Whole match", f.batFirst ? "If bats first" : "", f.fmt].filter(Boolean).join("  ·  "), L, 210, 22, MUTED, reg, "left", W2);
+
+  // each side's own line, best price and book (logo when there is one); the better side outlined
+  const tw = 242;
+  [["OVER", f.overLine, f.over, f.overBook, f.overStem, "over"], ["UNDER", f.underLine, f.under, f.underBook, f.underStem, "under"]].forEach(([name, line, price, book, stem, side], i) => {
+    const x = L + i * (tw + 16), y = 244, h = 168, on = f.side === side;
+    g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(x, y, tw, h, 20); g.fill();
+    if (on) { g.strokeStyle = GREEN; g.lineWidth = 3; g.beginPath(); g.roundRect(x, y, tw, h, 20); g.stroke(); }
+    text(name, x + 22, y + 36, 20, on ? GREEN : MUTED, num);
+    text(line != null ? String(line) : "--", x + 22, y + 104, 70, line != null ? "#ffffff" : MUTED, num, "left", tw - 44);
+    text(price ? price.toFixed(2) : "--", x + 22, y + 148, 36, price ? (on ? GREEN : "#ffffff") : MUTED, num, "left", 110);
+    const m = marks[stem];
+    if (m) { const k = Math.min(90 / m.width, 24 / m.height); g.drawImage(m, x + tw - 22 - m.width * k, y + 148 - 22 + (24 - m.height * k) / 2, m.width * k, m.height * k); }
+    else if (book) text(String(book).toUpperCase(), x + tw - 22, y + 148, 16, MUTED, num, "right", 100);
+  });
+
+  // last ten results against the line
+  const bars = (f.last || []).slice(-10);
+  if (bars.length) {
+    text("LAST 10", L, 452, 20, MUTED, num);
+    const ct = 484, cb = 590, x0 = L, x1 = L + W2 - 40, n = bars.length, gap = 8, bw = Math.floor((x1 - x0 - gap * (n - 1)) / n);
+    const ymax = Math.max(f.line, ...bars.map((b) => b.v), 1) * 1.15, ly = cb - (f.line / ymax) * (cb - ct);
+    bars.forEach((b, i) => {
+      const x = x0 + i * (bw + gap), fill = Math.max(0, (b.v / ymax) * (cb - ct));
+      const good = b.s === "push" ? null : f.side === "over" ? b.s === "hit" : b.s === "miss";
+      g.fillStyle = good == null ? AMBER : good ? GREEN : RED;
+      g.beginPath(); g.roundRect(x, cb - fill, bw, fill, 4); g.fill();
+    });
+    g.strokeStyle = "rgba(255,255,255,0.9)"; g.lineWidth = 2; g.setLineDash([5, 5]); g.beginPath(); g.moveTo(x0 - 4, ly); g.lineTo(x1 + 6, ly); g.stroke(); g.setLineDash([]);
+    text(String(f.line), x1 + 12, ly + 6, 18, MUTED, num);
+  }
+
+  // right: both crests on the green, names under them, the hit count as a sticker
+  crest(g, ai, f.a, 770, 270, 190, text, bold);
+  crest(g, bi, f.b, 1050, 270, 190, text, bold);
+  text("v", 910, 282, 40, BG, bold, "center");
+  text(f.a, 770, 430, 30, BG, bold, "center", 270);
+  text(f.b, 1050, 430, 30, BG, bold, "center", 270);
+  if (f.played) {
+    g.fillStyle = BG; g.beginPath(); g.roundRect(1136 - 200, 48, 200, 84, 20); g.fill();
+    text(`${f.hits}/${f.played}`, 1136 - 100, 106, 60, GREEN, num, "center", 190);
+    text(`${f.side === "over" ? "OVER" : "UNDER"} IN LAST ${f.played}`, 1136 - 100, 124, 14, MUTED, num, "center", 190);
+  }
+  const sideWon = (s) => (f.side === "over" ? s.over : s.under);
+  const pills = [f.at ? ["AT GROUND", `${sideWon(f.at)}/${f.at.n}`] : null, f.fair ? [`FAIR ${f.side === "over" ? "OVER" : "UNDER"}`, f.fair.toFixed(2)] : null].filter(Boolean);
+  pills.forEach(([k, v], i) => {
+    const w = 250, x = 650 + i * (w + 16), y = 500;
+    g.fillStyle = BG; g.beginPath(); g.roundRect(x, y, w, 90, 20); g.fill();
+    text(k, x + 22, y + 34, 18, MUTED, num, "left", w - 44);
+    text(v, x + 22, y + 76, 44, "#ffffff", num, "left", w - 44);
+  });
+  return c.toBuffer("image/jpeg", 82);
 }
 
 function crest(g, img, letters, cx, cy, box, text, bold) {

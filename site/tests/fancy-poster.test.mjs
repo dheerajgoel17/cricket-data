@@ -5,7 +5,7 @@ import { parseCardLink, posterPath } from "@cricket/engine/card-link.js";
 test("player links in every shape the site hands out", () => {
   assert.deepEqual(parseCardLink("https://x.test/player/12?stat=runs&line=24.5"), { kind: "player", p: 12, stat: "runs", line: 24.5 });
   assert.deepEqual(parseCardLink("/share/player/12/runs/24.5"), { kind: "player", p: 12, stat: "runs", line: 24.5 });
-  assert.deepEqual(parseCardLink("https://x.test/card/v15/pid/0a1b2c3d/wickets/1.5.jpg"), { kind: "player", pid: "0a1b2c3d", stat: "wickets", line: 1.5 });
+  assert.deepEqual(parseCardLink("https://x.test/card/v16/pid/0a1b2c3d/wickets/1.5.jpg"), { kind: "player", pid: "0a1b2c3d", stat: "wickets", line: 1.5 });
   assert.deepEqual(parseCardLink("/player/12"), { kind: "player", p: 12, stat: null, line: null });
   assert.equal(posterPath(parseCardLink("/player/12?stat=runs&line=24.5")), "/api/og?p=12&stat=runs&line=24.5&poster=1");
 });

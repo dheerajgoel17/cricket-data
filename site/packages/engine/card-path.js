@@ -1,4 +1,4 @@
-export const CARD_V = "15"; // bump when the drawing changes so Twitter/WhatsApp drop a stale cached picture
+export const CARD_V = "16"; // bump when the drawing changes so Twitter/WhatsApp drop a stale cached picture
 
 /** The card's address as a file path. Version is in the path (not ?v=): X ignores query strings when it caches a failed picture. */
 export function cardPath(q) {
@@ -6,6 +6,7 @@ export function cardPath(q) {
   if (q.pid != null) return `${prefix}/pid/${encodeURIComponent(q.pid)}${q.stat && q.line != null ? `/${encodeURIComponent(q.stat)}/${q.line}` : ""}.jpg`; // by player id (what the alerts know), not by index
   if (q.p != null) return `${prefix}/player/${q.p}${q.stat && q.line != null ? `/${encodeURIComponent(q.stat)}/${q.line}` : ""}.jpg`;
   if (q.v != null) return `${prefix}/venue/${q.v}.jpg`;
+  if (q.f && q.fm) return `${prefix}/fixture/${encodeURIComponent(q.f)}/fancy/${encodeURIComponent(q.fm)}/${Number.isFinite(Number(q.sc)) ? Number(q.sc) : -1}.jpg`; // one Match Fancy market of a fixture
   return q.f ? `${prefix}/fixture/${encodeURIComponent(q.f)}.jpg` : "/og.png";
 }
 
@@ -15,6 +16,7 @@ export function cardQuery(path) {
   if (seg[0] === "pid" && /^[0-9a-f]{8}$/.test(seg[1] || "")) return seg[2] && seg[3] ? { pid: seg[1], stat: seg[2], line: seg[3] } : { pid: seg[1] };
   if (seg[0] === "player" && /^\d+$/.test(seg[1] || "")) return seg[2] && seg[3] ? { p: seg[1], stat: seg[2], line: seg[3] } : { p: seg[1] };
   if (seg[0] === "venue" && /^\d+$/.test(seg[1] || "")) return { v: seg[1] };
+  if (seg[0] === "fixture" && seg[1] && seg[2] === "fancy" && seg[3]) return { f: seg[1], fm: seg[3], sc: seg[4] ?? "-1" };
   if (seg[0] === "fixture" && seg[1]) return { f: seg[1] };
   return {};
 }
