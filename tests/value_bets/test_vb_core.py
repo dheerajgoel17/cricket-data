@@ -79,7 +79,8 @@ def test_player_resolver_hand_link_follows_a_player_who_moved(monkeypatch):
     p.map = {"dunkley": ["d1"]}
     assert p.resolve("Dunkley", ["Sydney Sixers"])["player_id"] == "d1"
     assert p.resolve("Dunkley", ["Sydney Sixers"])["team"] == "Sydney Sixers"
-    assert p.resolve("Dunkley", ["Sydney Sixers", "Perth Scorchers"]) is None  # two sides named: not guessed
+    both = p.resolve("Dunkley", ["Sydney Sixers", "Perth Scorchers"])  # no side on the line: he gets his id, the side stays open
+    assert both["player_id"] == "d1" and both["team"] is None
     assert p.resolve("Nobody", ["Sydney Sixers"]) is None
 
 
