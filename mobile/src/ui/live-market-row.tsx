@@ -8,7 +8,7 @@ function leanSide(over: number, under: number) {
 }
 
 /**
- * Match Fancy `liveRows`: same OverviewRow as scored fancy — `live` → In Play Market.
+ * Match Fancy `liveRows`: same OverviewRow as scored fancy — `live` → In play line.
  * Prefer `scored` from `scoreLiveOuRow` (Edge + L10). No book logo.
  */
 export function LiveMarketRow({ m, scored, separated }: { m: any; scored?: any | null; separated?: boolean }) {

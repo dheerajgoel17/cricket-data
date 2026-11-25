@@ -3,7 +3,7 @@
 // (site/src/hooks/useEngine.ts, a React hook). Props are never deleted, so a link to an old match keeps working.
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { archiveFixture, fixtureBooks, isFixtureId, teamKey, withArchive } from "@cricket/engine/lines.js";
+import { archiveFixture, preMatchBooks, isFixtureId, teamKey, withArchive } from "@cricket/engine/lines.js";
 import { ARCHIVE_URL } from "@/lib/config";
 import { useStore } from "@/lib/use-store";
 import { fixturesQuery } from "@/lib/queries";
@@ -28,9 +28,9 @@ export function useFixtureBooks(id: string) {
   const stats = useStore(), fixtures = useQuery(fixturesQuery), lines = useLinesLive();
   const store: any = stats.data?.store;
   const listed = (fixtures.data || []).find((f: any) => f.id === id);
-  const books = listed ? fixtureBooks(lines.data, listed) : { props: false, fancy: false };
+  const books = listed ? preMatchBooks(lines.data, listed) : { props: false, fancy: false };
   const settled = !fixtures.isLoading && !lines.isLoading;
-  const need = settled && (!listed || (!books.props && !books.fancy));
+  const need = settled && (!listed || !books.props || !books.fancy);
   const archive = useQuery({ queryKey: ["archive", id], enabled: need, queryFn: () => loadArchive(id), staleTime: Infinity });
   const entry = need ? archive.data ?? null : null;
   return useMemo(() => {

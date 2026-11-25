@@ -173,7 +173,7 @@ describe("PropLines", () => {
 describe("a live props row", () => {
   const liveQuotes = () => bookQuotes([{ line: 49.5, books: [{ source: "bet365", kind: "bookmaker", over: 2.2, under: 1.65, live: true, opened: 39.5 }] }]);
 
-  it("Home PropRow + fixture PropLines: In Play Market, never per-player Live or Opened at", () => {
+  it("Home PropRow + fixture PropLines: In play line, never per-player Live or Opened at", () => {
     const live = { ...row, line: 49.5, quotes: liveQuotes() };
     // Home: one interleaved PropRow list; fixture Props: HotProps → PropLines.
     render(
@@ -182,24 +182,24 @@ describe("a live props row", () => {
         <PropLines rows={[live]} density="dense" win="l10" onWin={() => undefined} bars soFarOf={() => null} outOf={() => false} />
       </MemoryRouter>,
     );
-    expect(screen.getAllByText("In Play Market").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("In play line").length).toBeGreaterThanOrEqual(2);
     expect(screen.queryByText("Live")).toBeNull();
     expect(screen.queryByText(/Opened at/)).toBeNull();
   });
 
-  it("the card row keeps In Play Market, without so-far text, track, or Opened at", () => {
+  it("the card row keeps In play line, without so-far text, track, or Opened at", () => {
     render(<MemoryRouter><PropLines rows={[{ ...row, line: 49.5, quotes: liveQuotes() }]} density="compact" soFarOf={() => ({ v: 30, state: "live", verdict: null })} outOf={() => false} /></MemoryRouter>);
     expect(screen.queryByRole("img", { name: /30 of 49\.5/ })).toBeNull();
     expect(screen.queryByText(/30 so far/)).toBeNull();
     const title = screen.getByText("AM Tribe").closest("span.flex") as HTMLElement;
     expect(within(title).queryByText("Live")).toBeNull();
-    expect(within(title).getByText("In Play Market")).toBeInTheDocument();
+    expect(within(title).getByText("In play line")).toBeInTheDocument();
     expect(screen.queryByText(/Opened at/)).toBeNull();
   });
 
-  it("no In Play Market when the line is still the pre-match price", () => {
+  it("no In play line when the line is still the pre-match price", () => {
     render(<MemoryRouter><PropLines rows={[row]} density="compact" soFarOf={() => null} outOf={() => false} /></MemoryRouter>);
-    expect(screen.queryByText("In Play Market")).toBeNull();
+    expect(screen.queryByText("In play line")).toBeNull();
     expect(screen.queryByText("Live")).toBeNull();
   });
 });

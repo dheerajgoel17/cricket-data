@@ -8,7 +8,7 @@ import Animated, { useSharedValue } from "react-native-reanimated";
 import { router, useLocalSearchParams } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { liveForFixture } from "@cricket/engine/live.js";
+import { liveForFixture, scorecardRank } from "@cricket/engine/live.js";
 import { fixtureBooks, sameFixture } from "@cricket/engine/lines.js";
 import { STATS } from "@cricket/engine/rules.js";
 import { modelSide } from "@cricket/engine/props-view.js";
@@ -90,8 +90,10 @@ export default function FixturePage() {
     const scored = here
       .filter((r) => (stat === "all" || r.stat === stat) && enoughHistory(r, win, NEED[win]))
       .map((r) => ({ ...r, ...modelSide(r[win], r.prior, r.over, r.under), live: matchOf(r)?.status === "live", out: outOf(r) }));
-    return order(narrow(scored, filters), filters).slice(0, MAX_ROWS);
-  }, [here, stat, filters, matchOf, outOf]);
+    // players in scorecard order (crease, bowler now, batting order, bowling order) while the match is on
+    const place = scorecardRank(item?.live);
+    return order(narrow(scored, filters), filters, place ? (r: any) => place(r.name) : null).slice(0, MAX_ROWS);
+  }, [here, stat, filters, matchOf, outOf, item?.live]);
 
   const stats = useStore();
   const store: any = stats.data?.store;
@@ -195,7 +197,7 @@ export default function FixturePage() {
               ) : tab === "oddeven" ? (
                 <OddEven key={f.id} fx={f} />
               ) : (
-                <View style={[styles.pad, { gap: space.stack, paddingTop: space.stack }]}>
+                <View style={[styles.pad, { paddingTop: 0 }]}>
                   <GridFilters stat={gStat} line={gLine} games={games} hit={hit} onStat={setGStat} onLine={setGLine} onGames={setGames} onHit={setHit} />
                   {grids.data ? <TrendList grids={grids.data} line={gLine} minHit={hit} stat={gStat} /> : !matchesReady || grids.isLoading ? <Working label="Reading the players' games…" shape="list" /> : <EmptyState compact title="No trends" body="Could not load player games for this match." />}
                 </View>
@@ -247,9 +249,8 @@ export default function FixturePage() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.background },
   bar: { position: "absolute", top: 0, left: 0, right: 0, zIndex: 10 },
-  /** Web twin: `-mx-gutter … bg-card border-b` — fill + bottom rule both full width. */
+  /** The scoreboard has no fill of its own (it sits on the page); the bottom rule runs full width. */
   scoreShell: {
-    backgroundColor: color.card,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: color.hairline,
   },

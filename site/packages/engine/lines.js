@@ -277,6 +277,11 @@ export function fixtureBooks(doc, fixture) {
   return { props, fancy };
 }
 
+/** `fixtureBooks` counting only pre-match rows: an in-play row (`live`) of a started match is no reason to skip the archive, which holds the lines priced before the start. */
+export function preMatchBooks(doc, fixture) {
+  return fixtureBooks(doc && { ...doc, lines: (doc.lines || []).filter((l) => !l.books?.every((b) => b.live)), fancy: (doc.fancy || []).filter((l) => !l.live) }, fixture);
+}
+
 /**
  * The bookmaker's over/under line(s) for a match fancy market (`doc.fancy`, see src/value_bets/fancy.py) on a fixture: same two teams,
  * same format, start times within the book window. `team` picks a team-total market; omit it for whole-match markets. `inn` is 0 for the whole match
@@ -340,7 +345,7 @@ export function archiveFixture(entry, teamIx, now = Date.now()) {
 export function withArchive(doc, entry) {
   const fx = archiveFixture(entry);
   if (!fx) return doc;
-  const have = fixtureBooks(doc, fx), shared = { match: entry.match, competition: entry.competition, start_utc: entry.start_utc };
+  const have = preMatchBooks(doc, fx), shared = { match: entry.match, competition: entry.competition, start_utc: entry.start_utc };
   const rkey = (x) => `${x.pid}|${x.stat}|${lineScope(x)}`; // a first-innings result is not the match total's
   const done = new Map((entry.results || []).map((r) => [rkey(r), r.value]));
   const archived = (l) => (done.has(rkey(l)) ? { ...l, ...shared, result: done.get(rkey(l)) } : { ...l, ...shared });

@@ -56,7 +56,7 @@ describe("BookQuotes (per-side books under a Hot props row)", () => {
     expect(ticker.className).not.toMatch(/tick-(up|down)/);
   });
 
-  it("a live quote has no Live / Opened at in the strip (In Play Market is on the row name)", () => {
+  it("a live quote has no Live / Opened at in the strip (In play line is on the row name)", () => {
     const live = bookQuotes([{ line: 33.5, books: [{ ...B("bet365", 1.8, 1.9), live: true, opened: 25.5 }] }]);
     render(<BookQuotes quotes={live} />);
     expect(screen.queryByText("Live")).toBeNull();

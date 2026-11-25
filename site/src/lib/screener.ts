@@ -97,14 +97,17 @@ export function enoughHistory(r: { quotes?: { live?: boolean }[] } & Record<stri
 }
 
 /** Order rows: a match in play first (as the home rail does), then by the chosen sort, ties by the others. */
-export function order<T extends FilterRow>(rows: T[], s: Screener): T[] {
+export function order<T extends FilterRow>(rows: T[], s: Screener, rank?: ((r: T) => number | null) | null): T[] {
   const key = (r: T) => ({ live: !!r.live, p: sideRate((r as any)[s.win]?.p ?? null, (r as any).side), edge: r.edge }); // an under row ranks by how often the line was not cleared
   const by: Record<Sort, (x: T, y: T) => number> = {
     hit: (x, y) => hotOrder(key(x), key(y)),
     edge: (x, y) => Number(!!y.live) - Number(!!x.live) || (y.edge ?? -Infinity) - (x.edge ?? -Infinity) || (sideRate((y as any)[s.win]?.p ?? null, (y as any).side) ?? 0) - (sideRate((x as any)[s.win]?.p ?? null, (x as any).side) ?? 0),
     price: (x, y) => Number(!!y.live) - Number(!!x.live) || (y.over || 0) - (x.over || 0) || hotOrder(key(x), key(y)),
   };
-  return [...rows].sort((a, b) => Number(!!a.out) - Number(!!b.out) || by[s.sort](a, b));
+  // a live match's rows: rows whose line is in-play first, then the players in scorecard order (crease, bowler now, batting order, bowling order); the chosen sort orders the rest (docs/SITE.md, "In-play lines first")
+  const at = (r: T) => (rank ? rank(r) ?? Infinity : Infinity);
+  const inLine = (r: T) => Number(!!(r as any).quotes?.some((q: any) => q.live)); // the line itself is in-play
+  return [...rows].sort((a, b) => Number(!!a.out) - Number(!!b.out) || inLine(b) - inLine(a) || (at(a) === at(b) ? 0 : at(a) < at(b) ? -1 : 1) || by[s.sort](a, b));
 }
 
 /** The values a filter can take in these rows (so the filter view lists real choices only), most common first. */

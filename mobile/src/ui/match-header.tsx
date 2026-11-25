@@ -58,7 +58,7 @@ function SideBlock({
 
 /**
  * Fixture header (site MatchScoreboard): series · mirrored crest/score · centre StatusLabel · status / venue.
- * `bare`: inside the fixture flush `scoreShell` — internal gutter (web MatchScoreboard `px-gutter`); Fancy detail keeps outer pad + non-bare.
+ * `bare`: inside the fixture flush `scoreShell` — internal gutter (web MatchScoreboard `px-gutter`), no series line (the page header's subtitle already names it); Fancy detail keeps outer pad + non-bare.
  */
 export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem; onShare?: () => void; onGround?: () => void; bare?: boolean }) {
   const now = useNow(1000);
@@ -72,7 +72,7 @@ export function MatchHeader({ item, onShare, onGround, bare }: { item: RailItem;
   return (
     <View style={bare ? styles.bare : styles.box}>
       <View style={styles.top}>
-        <Text style={styles.series} numberOfLines={1}>{seriesName(f)}</Text>
+        {bare ? null : <Text style={styles.series} numberOfLines={1}>{seriesName(f)}</Text>}
         <View style={styles.topRight}>
           <Text style={styles.meta}>{f.fmt || "T20"} · {f.gender === "female" ? "Women" : "Men"}</Text>
           {onShare ? (
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   code: { ...cap, color: color["muted-foreground"] },
   figures: { flex: 1, minWidth: 0, gap: 2 },
   figuresEnd: { alignItems: "flex-end" },
-  total: { fontSize: fs.figure, letterSpacing: -0.4, ...w.dataStrong, color: color.foreground, fontVariant: ["tabular-nums"] },
+  total: { fontSize: fs.figure, lineHeight: Math.round(fs.figure * 1.2), paddingVertical: 1, letterSpacing: -0.4, ...w.dataStrong, color: color.foreground, fontVariant: ["tabular-nums"] },
   overs: { ...type.footnote, color: color["muted-foreground"] },
   dash: { ...type.body, color: color["muted-foreground"] },
   pending: { width: 72, height: 28, borderRadius: radius.sm, backgroundColor: color.secondary },

@@ -91,6 +91,7 @@ def book_lines(rows: list[dict], generated_at: str, fancy: list[dict] | None = N
 
 LIVE_KEEP = dt.timedelta(hours=40)  # buffer past the site's 24 h keep so a late pull still has the closing line
 TEST_KEEP = dt.timedelta(days=6)  # a multi-day match carries on across days
+PRE_HOLD = dt.timedelta(hours=3)  # books pull their player markets before the first ball (at the toss, or while a start is delayed): the last prices are carried from this long before the start
 
 
 def rescope_prev(prev: dict) -> dict:
@@ -187,12 +188,39 @@ def hold_started(book: dict, prev: dict | None, now: dt.datetime) -> tuple[dict,
     return out, held
 
 
-def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list | None = None) -> dict:
+SCHEDULE_START_DELTA = dt.timedelta(hours=12)  # books and the schedule often disagree on a start by hours (the join the pipeline's fixture match uses)
+
+
+def schedule_active(fixtures: list[dict] | None):
+    """``row -> bool``: does the schedule say the match of this book row is still to be played or being played? Its status is the source's word and is anything but ``Completed``
+    (a finished, abandoned or no-result match is ``Completed`` with the result in the row). A delay, a rain break or a resumed day then moves nothing: the match is kept until the
+    source says it is over, not for a fixed number of hours. Sides are matched by ``same_pair`` and the women's marker (Ireland men and women share their names), the start by
+    ``SCHEDULE_START_DELTA``."""
+    open_ = []
+    for f in fixtures or []:
+        st = parse_ts(f.get("start_utc"))
+        if f.get("status") == "Completed" or not st:
+            continue
+        open_.append((frozenset((side_key(f.get("team_a")), side_key(f.get("team_b")))), st, f.get("gender") == "female"))
+
+    def active(row: dict) -> bool:
+        a, b = (re.split(r"\s+vs\s+", str(row.get("match") or ""), maxsplit=1, flags=re.I) + ["", ""])[:2]
+        st = parse_ts(row.get("start_utc"))
+        if not (a and b and st):
+            return False
+        key, female = frozenset((side_key(a), side_key(b))), bool(_WOMEN.search(str(row.get("match") or "")))
+        return any(same_pair(key, k) and female == w and abs(st - s) <= SCHEDULE_START_DELTA for k, s, w in open_)
+    return active
+
+
+def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list | None = None, active=None) -> dict:
     """Keep matches that have started in the published file. Books stop pricing a match at the first ball, so the next pull would drop it and
     the site would lose the match mid-play (the live board, "so far" numbers and the lines they are read against). A match that began recently
-    and has no rows of a kind in this pull keeps the previous pull's rows of that kind: the last pre-match prices. Upcoming matches are never
-    revived, and a match is let go after ``LIVE_KEEP`` (``TEST_KEEP`` for a multi-day one). A Test that has a result goes ``RESULT_KEEP`` after it ended instead of
-    after ``TEST_KEEP``; ``ended`` is ``cricket_site.testend.ended`` (match, start, end) from the archive, and a Test with no result yet (stumps, a rain day) keeps its 6 days.
+    and has no rows of a kind in this pull keeps the previous pull's rows of that kind: the last pre-match prices. So does a match due to start within
+    ``PRE_HOLD``: books suspend their player markets at the toss or while a start is delayed, the pull then has none, and without this the rows would be gone before the first
+    ball (and with them the live score, which is read only for matches this file prices). A match further from its start is never revived, and a match is let go after ``LIVE_KEEP`` (``TEST_KEEP`` for a multi-day one). A Test that has a result goes ``RESULT_KEEP`` after it ended instead of
+    after ``TEST_KEEP``; ``active`` (``schedule_active``) says the source still has the match to be played or in play: it is then kept up to ``TEST_KEEP`` whatever the format, so a long
+    delay or a resumed day does not end it on the clock, and only the source's "Completed" (abandoned, no result, a result) lets it go on the usual 40 h; ``ended`` is ``cricket_site.testend.ended`` (match, start, end) from the archive, and a Test with no result yet (stumps, a rain day) keeps its 6 days.
 
     A Test is one match: books restamp ``start_utc`` each morning, so rows of the same pair within ``TEST_KEEP`` keep the earliest start
     (the first morning) and merge by player / stat / inn / line. A first-innings line is not dropped when a later day's pull only has the match total.
@@ -220,8 +248,12 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
 
     def alive(row: dict) -> bool:
         st = parse_ts(row.get("start_utc"))
-        if not st or st > now:
+        if not st or st > now + PRE_HOLD:
             return False
+        if st > now:
+            return True  # due to start within PRE_HOLD: what the books priced a pull ago stays until they price it again
+        if active and active(row):
+            return now < st + TEST_KEEP  # the source has not called it over: no clock but the backstop
         if not is_test(row):
             return now < st + LIVE_KEEP
         over = [end for m, start, end in ended or [] if m == row.get("match") and abs(start - st) < testend.TEST_WINDOW]  # the Test's result, if the archive has one
@@ -265,9 +297,11 @@ def carry_started(book: dict, prev: dict | None, now: dt.datetime, ended: list |
             elif kind == "lines":
                 by[k] = merge_books(by[k], y)
         out[kind] = sorted(by.values(), key=order)
-    # an event row summarises the match's lines: once a started match has none left (a finished Test the books still list, its lines let go) the row is a leftover with no format to say how long to keep it
+    # an event row summarises the match's lines. A started match with none left keeps it while the match is on (LIVE_KEEP): the live feed reads which matches the books price from these
+    # rows, so a match priced only by an event row (top batter, say) would lose its score at the first ball. Past LIVE_KEEP it is a leftover (a finished Test the books still list, its
+    # lines let go) with no format to say how long to keep it, and the data guard read it as a limited-overs match days old.
     have = {x.get("match") for k in ("lines", "fancy") for x in out.get(k) or []}
-    out["events"] = [e for e in out.get("events") or [] if e.get("match") in have or not ((st := parse_ts(e.get("start_utc"))) and st <= now)]
+    out["events"] = [e for e in out.get("events") or [] if e.get("match") in have or not ((st := parse_ts(e.get("start_utc"))) and st + LIVE_KEEP <= now)]
     return public(out)
 
 

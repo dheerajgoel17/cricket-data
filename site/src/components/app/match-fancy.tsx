@@ -40,7 +40,7 @@ import { AnimatedNumber } from "./animated-number";
 import { PlayerBadge, TeamBadge } from "./badges";
 import { TeamSpot } from "./live-spot";
 import { LiveMarketRow } from "./live-markets";
-import { liveRows } from "@cricket/engine/inplay-lines.js";
+import { inPlayFirst, liveRows } from "@cricket/engine/inplay-lines.js";
 import { ValueBars } from "./mini-bars";
 import { FancyLines } from "./fancy-lines";
 import { Crumbs } from "./page";
@@ -164,7 +164,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc.data, ms, fxInfo, team, scope, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const listRows = overview; // the toss has its own tab (pages/Toss.tsx)
+  const listRows = useMemo(() => inPlayFirst(overview), [overview]); // the toss has its own tab (pages/Toss.tsx)
   const book = useMemo(() => byLine(bookedNow), [bookedNow]);
   const base: any = useMemo(() => (!key || key === "top_batter" ? null : run(key)), [store, scoredMs, key, scope, inn]); // eslint-disable-line react-hooks/exhaustive-deps
   const bookMain = useMemo(() => mainBookLine(book), [book]);
@@ -320,13 +320,7 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
             <EmptyState title="No bookmaker lines" body="No priced fancy markets for this scope yet." />)}
           {mode === "list" && (listRows.length > 0 || liveList.length > 0) && (
             <section className="flex flex-col gap-snug" aria-label="Bookmaker lines">
-              <FancyLines
-                rows={listRows}
-                density="auto"
-                onOpen={(r) => open(r)}
-                standingOf={(r) => r.standing}
-                afterRow={(r) => <TeamSpot r={r} fx={fx} teams={teams} className="px-gutter pb-snug lg:px-0 lg:pb-0" />}
-              />
+              {/* in-play lines first (docs/SITE.md, "In-play lines first"): the in-play-only markets, then the scored rows with in-play ones leading, then the pre-match rows */}
               {liveScored.length ? (
                 <ul className="-mx-gutter">
                   {liveScored.map(({ m, r }, i) => (
@@ -336,6 +330,13 @@ export function MatchFancy({ fx, teams, fmt, q, setQ, doc: given, mode = "list" 
                   ))}
                 </ul>
               ) : null}
+              <FancyLines
+                rows={listRows}
+                density="auto"
+                onOpen={(r) => open(r)}
+                standingOf={(r) => r.standing}
+                afterRow={(r) => <TeamSpot r={r} fx={fx} teams={teams} className="px-gutter pb-snug lg:px-0 lg:pb-0" />}
+              />
             </section>)}
 
           {mode === "detail" && (

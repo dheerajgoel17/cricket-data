@@ -8,7 +8,7 @@ function leanSide(over: number, under: number) {
 }
 
 /**
- * Match Fancy `liveRows`: CompactFancyItem with `live` (In Play Market).
+ * Match Fancy `liveRows`: CompactFancyItem with `live` (In play line).
  * Prefer `scored` from `scoreLiveOuRow` (Edge + L10 from the overs tape). Unscored fallback has no book logo.
  */
 export function LiveMarketRow({ m, scored }: { m: any; scored?: any | null }) {

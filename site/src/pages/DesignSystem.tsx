@@ -378,9 +378,10 @@ export function DesignSystemPage() {
           <Badge variant="secondary">Secondary</Badge>
           <Badge variant="outline">Outline</Badge>
           <Badge variant="destructive">Destructive</Badge>
+          <Badge variant="miss">In play line</Badge>
           <Badge className="bg-primary/15 text-primary">Primary wash</Badge>
         </PreviewFrame>
-        <PreviewFrame title="StatusLabel" description="Match / row status: tone (live · inPlay · session · muted) × surface (pill · plain · dot). LIVE pill = match live. InPlayBadge copy = In Play Market (line/odds). Prop rows skip per-player Live." source="components/app/status-label.tsx">
+        <PreviewFrame title="StatusLabel" description="Match / row status: tone (live · inPlay · session · muted) × surface (pill · plain · dot). LIVE pill = match live. InPlayBadge copy = In play line (line/odds). Prop rows skip per-player Live." source="components/app/status-label.tsx">
           <div className="flex flex-col gap-stack">
             <div className="flex flex-wrap items-center gap-snug">
               <StatusLabel tone="live" surface="pill" />

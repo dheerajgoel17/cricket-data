@@ -7,6 +7,7 @@ last good deploy stays up. Warnings are listed and never stop a build. Each rule
 engine's own function would agree with a bug in it (the one place the engine is asked, check c, is compared with a recount).
 
     a  hard  a fixture published as Live has the schedule's word for it (a stop-gap row from the books cannot know); warn: the live body lists a match in play with no score and no players
+    a-gap  warn  every match the schedule calls Live or Started is in the live body (when --live is given)
     b  hard  a match flagged in play is inside its keep window (24 h, a Test 6 days) and has no result; published book lines are inside the pipeline's own carry window
     c  hard  each edition's bat-first win % equals a recount over every match in it with a winner (the engine is run on the built data)
     d  hard  a complete match (both innings ran their course) is not void; warn: the share of void summary-market matches per format per week
@@ -34,7 +35,7 @@ from pathlib import Path
 
 from .build import _side
 from .parse import FORMAT_NAMES, INN_LEN
-from .sides import find_scheduled
+from .sides import find_scheduled, same_pair, side_key
 from .wrap import unwrap
 
 HARD, WARN = "hard", "warn"
@@ -107,6 +108,26 @@ def check_live_evidence(fixtures: list[dict], live: dict | None = None) -> list[
         if not (scored or m.get("innings") or m.get("players")):
             w.problems.append(f"{' v '.join(str((t or {}).get('name')) for t in m.get('teams') or [])} ({str(m.get('start'))[:16]}) is in play with no score and no players")
     return [c, w]
+
+
+_WOMEN_MARK = re.compile(r"\(w\)|\(wom\)|\bwomen|\sw$", re.I)
+
+
+def check_live_gap(fixtures: list[dict], live: dict | None, now: float) -> Check:
+    """Every match the schedule calls Live or Started (inside its keep window) is in the live body. The body scores only the matches the published book lines price, so a match whose rows
+    left that file (books pull their markets at the toss, a rule that dropped an event row at the first ball) loses its score mid-play with nothing else to say so (25 Nov 2026). Men's and
+    women's sides share a pair of names, so the women's marker is compared too."""
+    c = Check("a-gap", "The live body has every match the schedule calls Live or Started", WARN)
+    bodies = [(frozenset(side_key(t.get("name")) for t in m.get("teams") or []), any(_WOMEN_MARK.search(str(t.get("name") or "")) for t in m.get("teams") or [])) for m in (live or {}).get("matches") or []]
+    for f in fixtures:
+        t = _ts(f.get("start"))
+        if f.get("status") not in ("Live", "Started") or t is None or now > t + keep_s(f.get("fmt")):
+            continue
+        c.checked += 1
+        pair, female = frozenset((side_key(f.get("a")), side_key(f.get("b")))), f.get("gender") == "female"
+        if not any(same_pair(pair, p) and w == female for p, w in bodies):
+            c.problems.append(f"{_name(f)} is {f['status']} on the schedule but not in the live body: no score")
+    return c
 
 
 # ------------------------------------------------------------------ b: keep windows
@@ -442,7 +463,7 @@ def run(site: Path, data: Path, live: dict | None = None, now: float | None = No
     if M is None:
         raise FileNotFoundError(f"{site / 'matches.json'} is missing or unreadable")
     meta = _read(site / "meta.json", {})
-    checks = [*check_live_evidence(fixtures, live), check_keep_window(fixtures, lines, now), check_lines_fresh(lines, now), check_book_sides(lines)]
+    checks = [*check_live_evidence(fixtures, live), *([check_live_gap(fixtures, live, now)] if live is not None else []), check_keep_window(fixtures, lines, now), check_lines_fresh(lines, now), check_book_sides(lines)]
     checks.append(check_bat_first(M, engine_editions(site) if editions == "run" else editions))
     checks += [check_complete_not_void(M), check_void_share(M, today), check_toss(M)]
     docs = [d for f in sorted((data / "provisional").glob("*.json")) if (d := _read(f))]

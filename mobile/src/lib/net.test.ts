@@ -27,6 +27,14 @@ beforeEach(() => {
 });
 
 describe("getJson keeps what it reads", () => {
+  test("a live route is asked with no-cache (the phone's HTTP cache must not answer a 3 s poll); a data file is not", async () => {
+    files = { "/api/live": { etag: '"l"', body: '{"matches":[]}' }, "/data/x.json": { etag: '"x"', body: '{"a":1}' } };
+    await getJson("/api/live");
+    await getJson("/data/x.json");
+    const ask = (u: string) => calls.find((c) => c.url.endsWith(u))!;
+    expect(ask("/api/live").headers["cache-control"]).toBe("no-cache");
+    expect(ask("/data/x.json").headers["cache-control"]).toBeUndefined();
+  });
   test("a plain file is read once; the next ask is conditional and a 304 returns the kept copy", async () => {
     files = { "/data/plain.json": { etag: '"v1"', body: JSON.stringify({ a: [1, 2, 3] }) } };
     expect(await getJson("/data/plain.json")).toEqual({ a: [1, 2, 3] });

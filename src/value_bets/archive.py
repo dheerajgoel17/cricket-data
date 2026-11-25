@@ -206,9 +206,23 @@ def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, 
     return written, bad
 
 
-def _wanted_matches(book: dict) -> list[dict]:
-    """Unique (sides, start) pairs still listed in the published book file."""
-    out: list[dict] = []
+def scheduled_wanted(schedule: list[dict] | None, now: dt.datetime) -> list[dict]:
+    """The matches the schedule has still to be played or in play (its status is not ``Completed``) that began no longer ago than a Test is kept or start within ``PRE_HOLD``: wanted whether
+    or not the book file lists them, because the file can lose a match (books pull their markets, a delay) that the source still has on."""
+    from .booklines import PRE_HOLD, TEST_KEEP
+    out = []
+    for f in schedule or []:
+        st = parse_ts(f.get("start_utc"))
+        if f.get("status") == "Completed" or not st or st > now + PRE_HOLD or now >= st + TEST_KEEP:
+            continue
+        out.append({"k": frozenset((team_key(f.get("team_a")), team_key(f.get("team_b")))), "start": st, "match": f"{f.get('team_a')} vs {f.get('team_b')}",
+                    "start_utc": f["start_utc"], "competition": f.get("series"), "scheduled": True})
+    return out
+
+
+def _wanted_matches(book: dict, extra: list[dict] | None = None) -> list[dict]:
+    """Unique (sides, start) pairs still listed in the published book file, then those the schedule still has on (``scheduled_wanted``)."""
+    out: list[dict] = list(extra or [])
     for kind in ("events", "lines", "fancy"):
         for x in book.get(kind) or []:
             a, b = _sides(x)
@@ -226,9 +240,9 @@ def _wanted_matches(book: dict) -> list[dict]:
     return out
 
 
-def _prev_from_archive(book: dict, root: Path) -> dict:
+def _prev_from_archive(book: dict, root: Path, extra: list[dict] | None = None) -> dict:
     """Archive rows for matches still in ``book``, shaped like a previous ``book_lines`` pull (lines get match/start back)."""
-    wanted = _wanted_matches(book)
+    wanted = _wanted_matches(book, extra)
     prev: dict = {"events": [], "lines": [], "fancy": []}
     if not wanted or not root.exists():
         return prev
@@ -242,18 +256,19 @@ def _prev_from_archive(book: dict, root: Path) -> dict:
         g = next((g for g in wanted if _same_match(d, g["k"], g["start"])), None)
         if not g:
             continue
+        # a match the schedule has on is stamped with the schedule's start: the archive keeps the first start a book gave, which can be hours off (a delayed or re-timed match)
         shared = {"match": d.get("match") or g["match"], "competition": d.get("competition") or g.get("competition"),
-                  "start_utc": d.get("start_utc") or g["start_utc"]}
+                  "start_utc": g["start_utc"] if g.get("scheduled") else d.get("start_utc") or g["start_utc"]}
         prev["events"].extend(d.get("events") or [])
         prev["fancy"].extend(d.get("fancy") or [])
         prev["lines"].extend([{**shared, **ln} for ln in d.get("lines") or []])
     return prev
 
 
-def heal_book(book: dict, root: Path, now: dt.datetime, ended: list | None = None) -> dict:
+def heal_book(book: dict, root: Path, now: dt.datetime, ended: list | None = None, schedule: list[dict] | None = None, active=None) -> dict:
     """Re-add closing lines and fancy a partial post-start pull wiped, from the permanent archive.
 
-    Only matches still listed in ``book`` and still in the carry window are healed (finished matches that left the
+    Only matches still listed in ``book`` (or that ``schedule`` still has on: a match the file lost while the source has it in play) and still in the carry window are healed (finished matches that left the
     file stay out). Uses ``booklines.carry_started`` so the same merge rules apply: missing player/stat/lines come
     back, and book sources a line still has in the archive but not in the published file are added without
     overwriting prices the published file still carries.
@@ -262,10 +277,10 @@ def heal_book(book: dict, root: Path, now: dt.datetime, ended: list | None = Non
         carry_started,  # late: archive is imported by the pipeline before booklines finishes loading
     )
 
-    prev = _prev_from_archive(book, root)
+    prev = _prev_from_archive(book, root, scheduled_wanted(schedule, now))
     if not any(prev.get(k) for k in ("events", "lines", "fancy")):
         return book
-    return carry_started(book, prev, now, ended)
+    return carry_started(book, prev, now, ended, active)
 
 
 def book_names(root: Path, *books: dict) -> dict[str, str]:

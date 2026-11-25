@@ -67,6 +67,22 @@ def test_a_a_match_in_play_in_the_live_body_has_a_score_or_players():
     assert len(w.problems) == 1 and w.problems[0].startswith("Eagles v Tuskers") and "no score and no players" in w.problems[0]
 
 
+def test_a_gap_a_match_the_schedule_calls_live_is_in_the_live_body():
+    """25 Nov 2026: Sri Lanka Women v Ireland Women was Live on the schedule and in play, and the live body had stopped listing it. A men's pair of the same names does not stand in for it."""
+    live = {"matches": [
+        {"status": "live", "teams": [{"name": "Sri Lanka"}, {"name": "Ireland"}]},                       # the men's match
+        {"status": "live", "teams": [{"name": "Eagles Women"}, {"name": "Tuskers Women"}]},
+        {"status": "live", "teams": [{"name": "Nope"}, {"name": "Other"}]},
+    ]}
+    rows = [fx(a="Sri Lanka Women", b="Ireland Women", start="2026-11-02T05:00Z", status="Live", source="src", fmt="T20", gender="female"),
+            fx(a="Eagles", b="Tuskers", start="2026-11-02T06:00Z", status="Started", fmt="T20", gender="female"),   # listed under the women's names
+            fx(a="Old", b="Match", start="2026-10-30T06:00Z", status="Started", fmt="T20"),                          # past its keep window: not asked of the body
+            fx(a="Fresh", b="Upcoming", start="2026-11-02T14:00Z", status="Upcoming", fmt="T20")]
+    c = G.check_live_gap(rows, live, NOW)
+    assert (c.id, c.level, c.checked) == ("a-gap", G.WARN, 2)
+    assert len(c.problems) == 1 and c.problems[0].startswith("Sri Lanka Women v Ireland Women")
+
+
 # ------------------------------------------------------------------ b
 def test_b_a_match_flagged_in_play_is_inside_its_window_and_has_no_result():
     rows = [fx(a="Gone", start="2026-10-31T07:30Z", status="Started", fmt="T20"),             # 51 h on: a T20 keeps 24 h

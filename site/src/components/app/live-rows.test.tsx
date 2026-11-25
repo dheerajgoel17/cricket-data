@@ -9,18 +9,18 @@ vi.mock("./badges", () => ({ PlayerBadge: () => <span>pic</span>, PlayerPhoto: (
 const row = { key: "team_total_runs", label: "Bangladesh 1st innings runs", team: "Bangladesh", line: 250.5, over: 1.9, under: 1.8, edge: 0.04, side: "over", books: [{ source: "bet365" }], live: true, opened: 240.5, last: [], max: 0 };
 
 describe("a live Match Fancy row", () => {
-  it("carries the In Play Market mark beside its name; no Opened at (in-play-only rows have no pre-match line)", () => {
+  it("carries the In play line mark beside its name; no Opened at (in-play-only rows have no pre-match line)", () => {
     render(<MemoryRouter><OverviewRow r={row} onOpen={() => undefined} /></MemoryRouter>);
     const title = screen.getByText("Bangladesh 1st innings runs");
-    expect(within(title.parentElement as HTMLElement).getByText("In Play Market")).toBeInTheDocument(); // the same line as the name
-    expect(screen.getAllByText("In Play Market")).toHaveLength(1);
+    expect(within(title.parentElement as HTMLElement).getByText("In play line")).toBeInTheDocument(); // the same line as the name
+    expect(screen.getAllByText("In play line")).toHaveLength(1);
     expect(screen.queryByText(/Opened at/)).toBeNull();
     expect(screen.getByText("Edge")).toBeInTheDocument();
   });
 
   it("has neither when the row is not live", () => {
     render(<MemoryRouter><OverviewRow r={{ ...row, live: false }} onOpen={() => undefined} /></MemoryRouter>);
-    expect(screen.queryByText("In Play Market")).toBeNull();
+    expect(screen.queryByText("In play line")).toBeNull();
     expect(screen.queryByText(/Opened at/)).toBeNull();
   });
 

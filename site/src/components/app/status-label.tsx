@@ -3,13 +3,13 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 /**
- * Match / row status marks — one recipe for LIVE, In Play Market, session breaks, and muted phases.
+ * Match / row status marks — one recipe for LIVE, In play line, session breaks, and muted phases.
  * Use named `tone` + `surface`; do not fork colours at the call site.
  *
  * - live + pill → white on miss (scoreboard: match is live)
  * - live + plain → miss caption (rarely used; props no longer mark Live per player)
  * - live + dot → miss text + pulse (fixture card / rail)
- * - inPlay → miss caption ("In Play Market" — line/odds are in-play)
+ * - inPlay → miss caption ("In play line" — line/odds are in-play; rows use `InPlayBadge`, a `Badge` variant)
  * - session → amber (Stumps / Rain delay / …)
  * - muted → Final / Started / Upcoming / Delayed
  */
@@ -57,7 +57,7 @@ export type StatusLabelProps = ComponentProps<"span"> &
 
 function defaultCopy(tone: StatusLabelProps["tone"], surface: StatusLabelProps["surface"]) {
   if (tone === "live") return surface === "pill" ? "LIVE" : "Live";
-  if (tone === "inPlay") return "In Play Market";
+  if (tone === "inPlay") return "In play line";
   return null;
 }
 

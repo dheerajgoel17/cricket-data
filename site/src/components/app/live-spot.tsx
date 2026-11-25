@@ -9,6 +9,7 @@ import { useLiveMatch } from "@/hooks/useLive";
 import { batterHistoryKey } from "@cricket/engine/inplay-history.js";
 import { loadJson, useData } from "@/lib/data";
 import { StatusLabel } from "./status-label";
+import { Badge } from "@/components/ui/badge";
 import { StandingMark, type Standing } from "./tick";
 import { cn } from "@/lib/utils";
 
@@ -22,9 +23,9 @@ export function LiveBadge({ className }: { className?: string }) {
   return <StatusLabel tone="live" surface="plain" className={className} />;
 }
 
-/** Line and odds are in-play ("In Play Market"): sits beside the name (player or market), never on the line. */
+/** Line and odds are in-play ("In play line"): sits beside the name (player or market), never on the line. */
 export function InPlayBadge({ className }: { className?: string }) {
-  return <StatusLabel tone="inPlay" surface="plain" className={className} />;
+  return <Badge variant="miss" className={className}>In play line</Badge>;
 }
 
 /** Where the line stood before the match, in two words and a number ("was 31.5"); nothing when it has not moved. */

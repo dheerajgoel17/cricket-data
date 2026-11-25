@@ -75,10 +75,10 @@ describe("BatterSpot", () => {
 });
 
 describe("LiveBadge, InPlayBadge and LiveOpened", () => {
-  it("Live is match-level copy; In Play Market is a live-priced line; where the line stood is two words and a number, only when it has moved", () => {
+  it("Live is match-level copy; In play line is a live-priced line; where the line stood is two words and a number, only when it has moved", () => {
     const { rerender } = render(<><LiveBadge /><InPlayBadge /></>);
     expect(screen.getByText("Live")).toBeInTheDocument();
-    expect(screen.getByText("In Play Market")).toBeInTheDocument();
+    expect(screen.getByText("In play line")).toBeInTheDocument();
     expect(screen.queryByText(/was/)).not.toBeInTheDocument();
     rerender(<LiveOpened opened={25.5} line={33.5} />);
     expect(screen.getByText("was 25.5")).toBeInTheDocument();
@@ -92,8 +92,8 @@ describe("LiveBadge, InPlayBadge and LiveOpened", () => {
 describe("live rows", () => {
   it("the tag, an over / under market with both prices and a pick with its outcomes", () => {
     render(<><InPlayBadge /><LiveMarketRow m={{ kind: "ou", market: "Runs at Fall of 3rd Wicket", line: 81.5, over: 1.9, under: 1.8, book: "BookK" }} /><LiveMarketRow m={{ kind: "pick", market: "To Score Most Runs", outcomes: [{ label: "A", price: 2.5 }, { label: "B", price: 3, sub: "Pakistan" }] }} /></>);
-    // CompactFancyItem + In Play Market; no book logo; scored rows fill Edge/L10 via scoreLiveOuRow at the Match Fancy call site
-    expect(screen.getAllByText("In Play Market").length).toBe(3);
+    // CompactFancyItem + In play line; no book logo; scored rows fill Edge/L10 via scoreLiveOuRow at the Match Fancy call site
+    expect(screen.getAllByText("In play line").length).toBe(3);
     expect(screen.getByText("Runs at Fall of 3rd Wicket")).toBeInTheDocument();
     expect(screen.getByText("81.5")).toBeInTheDocument();
     expect(screen.getAllByText("Edge")).toHaveLength(2);
@@ -109,7 +109,7 @@ describe("live rows", () => {
     };
     render(<LiveMarketRow m={{ kind: "ou", market: "Runs in First 50 Overs", line: 181.5, over: 1.83, under: 1.83 }} scored={scored} />);
     expect(screen.getByText("BAN · 50 overs")).toBeInTheDocument();
-    expect(screen.getByText("In Play Market")).toBeInTheDocument();
+    expect(screen.getByText("In play line")).toBeInTheDocument();
     expect(screen.getByText("+12")).toBeInTheDocument();
     expect(document.querySelector("[data-book]")).toBeNull();
   });

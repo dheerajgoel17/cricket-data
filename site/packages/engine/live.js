@@ -1035,6 +1035,22 @@ export function liveBoard(match) {
   };
 }
 
+/**
+ * Where a player stands on the scorecard, for ordering a live match's prop rows (smaller comes first): the batters at the crease (striker first), then the bowler bowling now, then the
+ * rest of the batting order (latest innings first, yet to bat last), then the rest of the bowling order. A player the card does not list ranks null (after everyone listed).
+ * Returns `(name) => number | null`, or null when there is no card to read.
+ */
+export function scorecardRank(match) {
+  const board = liveBoard(match), card = [...(match?.card || [])].reverse();
+  if (!board && !card.length) return null;
+  const seen = [], add = (name, base) => { if (name && !seen.some((s) => namesMatch(s.name, name))) seen.push({ name, rank: base + seen.length }); };
+  (board?.batters || []).forEach((p) => add(p.name, 0));
+  if (board?.bowler) add(board.bowler.name, 10);
+  for (const inn of card) { for (const p of inn.batters || []) add(p.name, 100); for (const n of inn.yetToBat || []) add(typeof n === "string" ? n : n?.name, 100); }
+  for (const inn of card) for (const p of inn.bowlers || []) add(p.name, 1000);
+  return (name) => seen.find((s) => namesMatch(s.name, name))?.rank ?? null;
+}
+
 /** True when this player is on now: not-out at the crease, or the current bowler. Used for the Live badge on prop rows (not for in-play priced lines). */
 export function onNow(match, name) {
   if (!match || !name) return false;
