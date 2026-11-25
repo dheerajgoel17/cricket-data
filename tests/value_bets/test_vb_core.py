@@ -72,6 +72,17 @@ def test_player_resolver():
     assert p.resolve("Nobody Atall", ["India"]) is None
 
 
+def test_player_resolver_hand_link_follows_a_player_who_moved(monkeypatch):
+    """A checked spelling in players.csv finds the player when the match names one side and the registry holds him under another (Dunkley: England, now the Sixers)."""
+    ros = {"England": [("SIR Dunkley", "d1", "2026-10-01", 50)], "Sydney Sixers": [("A Other", "o1", "2026-10-01", 5)]}
+    p = PlayerResolver(ros)
+    p.map = {"dunkley": ["d1"]}
+    assert p.resolve("Dunkley", ["Sydney Sixers"])["player_id"] == "d1"
+    assert p.resolve("Dunkley", ["Sydney Sixers"])["team"] == "Sydney Sixers"
+    assert p.resolve("Dunkley", ["Sydney Sixers", "Perth Scorchers"]) is None  # two sides named: not guessed
+    assert p.resolve("Nobody", ["Sydney Sixers"]) is None
+
+
 def test_optional_adapters_noop(monkeypatch):
     for k in ("ODDS_API_KEY", "BETFAIR_APP_KEY", "BETFAIR_USERNAME", "BETFAIR_PASSWORD"):
         monkeypatch.delenv(k, raising=False)

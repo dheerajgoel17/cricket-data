@@ -117,13 +117,18 @@ class PlayerResolver:
 
     def _resolve1(self, raw, teams):
         cands = [(t, *p) for t in teams for p in self.rosters.get(t, [])]
-        if not cands:
+        if not cands and not (len(teams) == 1 and self.map.get(raw.lower())):
             return None
         m = self.map.get(raw.lower())
         if m:
             for t, name, pid, last, n in cands:
                 if pid == m[0]:
                     return dict(player_id=pid, name=name, team=t, score=100)
+            if len(teams) == 1:  # a checked player who has moved: the book names his side, the registry has him under another (Dunkley: England / Welsh Fire, now Sixers)
+                for t0, ps in self.rosters.items():
+                    for name, pid, last, n in ps:
+                        if pid == m[0]:
+                            return dict(player_id=pid, name=name, team=teams[0], score=100)
         rt = _tokens(raw)
         if not rt:
             return None
