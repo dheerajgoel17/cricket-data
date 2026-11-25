@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-25T08:19:24Z",
+ "generated_at_utc": "2026-11-25T08:35:52Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -237,29 +237,6 @@
    "bat_first": false
   },
   {
-   "alert_id": "2026-11-25-dubai-capitals-v-desert-vipers|match_extras||0|under",
-   "fixture_id": "2026-11-25-dubai-capitals-v-desert-vipers",
-   "match": "Dubai Capitals vs Desert Vipers",
-   "format": "T20",
-   "series": "International League T20 2026",
-   "start_utc": "2026-11-25T14:30:00Z",
-   "start_ist": "2026-11-25 20:00 IST",
-   "key": "match_extras",
-   "team": null,
-   "inn": 0,
-   "side": "under",
-   "line": 17.5,
-   "best_odds": 1.82,
-   "best_source": "bc.game",
-   "hits": 25,
-   "played": 35,
-   "window": 20,
-   "chance": 0.6667,
-   "edge": 0.2133,
-   "edge_pct": 21.3,
-   "bat_first": false
-  },
-  {
    "alert_id": "2026-11-26-sydney-sixers-women-v-melbourne-stars-women|team_total_boundaries|Melbourne Stars Women|0|under",
    "fixture_id": "2026-11-26-sydney-sixers-women-v-melbourne-stars-women",
    "match": "Sydney Sixers Women vs Melbourne Stars Women",
@@ -441,29 +418,6 @@
    "chance": 0.5917,
    "edge": 0.1538,
    "edge_pct": 15.4,
-   "bat_first": false
-  },
-  {
-   "alert_id": "2026-11-25-dubai-capitals-v-desert-vipers|top_score||0|over",
-   "fixture_id": "2026-11-25-dubai-capitals-v-desert-vipers",
-   "match": "Dubai Capitals vs Desert Vipers",
-   "format": "T20",
-   "series": "International League T20 2026",
-   "start_utc": "2026-11-25T14:30:00Z",
-   "start_ist": "2026-11-25 20:00 IST",
-   "key": "top_score",
-   "team": null,
-   "inn": 0,
-   "side": "over",
-   "line": 64.5,
-   "best_odds": 1.85,
-   "best_source": "bc.game",
-   "hits": 23,
-   "played": 35,
-   "window": 20,
-   "chance": 0.6222,
-   "edge": 0.1511,
-   "edge_pct": 15.1,
    "bat_first": false
   }
  ]
