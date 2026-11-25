@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-25T22:35:13Z",
+ "generated_at_utc": "2026-11-25T23:34:22Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -280,6 +280,29 @@
    "chance": 0.6393,
    "edge": 0.2211,
    "edge_pct": 22.1,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-26-jammu-and-kashmir-v-haryana|top_score||0|under",
+   "fixture_id": "2026-11-26-jammu-and-kashmir-v-haryana",
+   "match": "Jammu and Kashmir vs Haryana",
+   "format": "T20",
+   "series": "Syed Mushtaq Ali Trophy Elite 2026",
+   "start_utc": "2026-11-26T03:30:00Z",
+   "start_ist": "2026-11-26 09:00 IST",
+   "key": "top_score",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 66.5,
+   "best_odds": 1.85,
+   "best_source": "bc.game",
+   "hits": 27,
+   "played": 39,
+   "window": 20,
+   "chance": 0.6531,
+   "edge": 0.2082,
+   "edge_pct": 20.8,
    "bat_first": false
   },
   {

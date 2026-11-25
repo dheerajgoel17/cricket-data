@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-26 04:00 IST
+# Cricket value bets - 2026-11-26 05:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2171 prices
+- **moviodds_bet365**: ok, 2173 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
 - **smarkets**: ok, 364 prices
 - **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
 - **feedk**: ok, 252 prices, 6 events
-- **feedl**: ok, 532 prices, 40 events
-- **feedj**: ok, 721 prices, 17 events
-- **feedh**: ok, 2071 prices, 102 events, stopped HTTP 523
+- **feedl**: ok, 548 prices, 40 events
+- **feedh**: ok, 2071 prices, 104 events
+- **feedj**: ok, 725 prices, 17 events
 - **feede**: ok, 690 prices, 40 events
 - **feedf**: ok, 650 prices, 21 events
 
-Matches starting in next 168h: **60**, markets priced: **628**, value bets: **3** (new alerts: 3). Min edge 5%.
+Matches starting in next 168h: **60**, markets priced: **623**, value bets: **3** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -33,4 +33,4 @@ Matches starting in next 168h: **60**, markets priced: **628**, value bets: **3*
 
 Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), IAS Invincibles (male), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Lokseva Academy (male), Majees Titan (male), Multan Region (male), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (male), Yalla Shabab Giants (male)
 
-Runtime 237.2s. Snapshot: `odds_20261125T223033Z.jsonl.gz`
+Runtime 157.9s. Snapshot: `odds_20261125T233049Z.jsonl.gz`
