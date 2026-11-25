@@ -1,4 +1,4 @@
-# Cricket value bets - 2026-11-25 10:57 IST
+# Cricket value bets - 2026-11-25 11:04 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
@@ -8,13 +8,13 @@ Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. St
 - **smarkets**: ok, 392 prices
 - **feedl**: ok, 682 prices, 36 events
 - **feedk**: ok, 288 prices, 8 events
-- **feedj**: ok, 589 prices, 9 events
-- **feedh**: ok, 2015 prices, 84 events
+- **feedj**: ok, 607 prices, 10 events
+- **feedh**: ok, 2015 prices, 83 events
 - **feede**: ok, 576 prices, 34 events
 - **feedf**: ok, 660 prices, 22 events
-- **feedi**: ok, 1653 prices, 35 events
+- **feedi**: ok, 1892 prices, 35 events
 
-Matches starting in next 168h: **55**, markets priced: **608**, value bets: **5** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **56**, markets priced: **627**, value bets: **5** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -34,6 +34,6 @@ Matches starting in next 168h: **55**, markets priced: **608**, value bets: **5*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-26 13:40 IST Sydney Sixers vs Melbourne Stars / M13704 top_bowler_team / Carly Leeson @ 15.00 (feedj_d): edge 47.8%, model 0.0764, market 0.1105
 
-Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), Central Zone (Women) (female), Central Zone (male), East Zone (W) (female), East Zone (Women) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), Ghubra Giants (W) (female), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Majees Titan (male), Multan Region (male), Muscat Shaheens (W) (female), Muscat Thunders (W) (female), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (Women) (female), North East Zone (male), North Zone (W) (female), North Zone (Women) (female), North Zone (male), Oca Invincibles (W) (female), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (Women) (female), South Zone (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (Women) (female), West Zone (male), Yalla Shabab Giants (male)
+Unmatched team names (add to mappings/teams.csv): Boland Rocks (male), Central (male), Central Zone (W) (female), Central Zone (Women) (female), Central Zone (male), East Zone (W) (female), East Zone (Women) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), Ghubra Giants (W) (female), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Majees Titan (male), Multan Region (male), Muscat Shaheens (W) (female), Muscat Thunders (W) (female), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (Women) (female), North East Zone (male), North Zone (W) (female), North Zone (Women) (female), North Zone (male), Oca Invincibles (W) (female), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (Women) (female), South Zone (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (Women) (female), West Zone (male), Yalla Shabab Giants (male)
 
-Runtime 220.0s. Snapshot: `odds_20261125T052753Z.jsonl.gz`
+Runtime 238.8s. Snapshot: `odds_20261125T053437Z.jsonl.gz`
