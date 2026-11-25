@@ -182,6 +182,9 @@ test("venueIndices finds a ground under every spelling the data holds, and nothi
   for (const [name, i] of [["Kennington Oval, London", 0], ["Lord's Cricket Ground, London", 1], ["Edgbaston Cricket Ground, Birmingham", 2], ["Sher-e-Bangla National Stadium, Mirpur, Dhaka", 3], ["St Lawrence Ground Canterbury, Kent", 4]]) assert.deepEqual(venueIndices(uk, name), [i], name);
   assert.deepEqual(venueIndices(store, ""), []);
   assert.deepEqual(venueIndices(store, undefined), []);
+  // renamed grounds, each checked on the web: the schedule's name finds the history's
+  const renamed = { venues: ["Sheikh Zayed Stadium, Abu Dhabi", "Wanderers Stadium, Johannesburg", "WACA, Perth", "Old Hararians, Harare", "University Oval, Dunedin", "JB Marks Oval, Potchefstroom", "Senwes Park, Potchefstroom", "Bandra Kurla Complex, Mumbai"] };
+  for (const [name, hit] of [["Zayed Cricket Stadium, Abu Dhabi", [0]], ["The Wanderers Stadium, Johannesburg", [1]], ["Western Australia Cricket Association Ground, Perth", [2]], ["Old Hararians Sports Club, Harare", [3]], ["University of Otago Oval, Dunedin", [4]], ["Sedgars Park, Potchefstroom", [5, 6]], ["Sharad Pawar Cricket Academy BKC", [7]]]) assert.deepEqual(venueIndices(renamed, name), hit, name);
 });
 
 test("Match Fancy includes a withheld T20 that qualified, not women's matches, and not a totals-only scrape", () => {

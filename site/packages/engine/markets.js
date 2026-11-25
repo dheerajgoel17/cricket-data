@@ -155,6 +155,16 @@ const VENUE_ALIASES = new Map([
   ["high performance center oval", "high performance oval"],
   ["al amerat cricket ground ministry turf 1", "al amerat cricket ground oman cricket ministry turf 1"],
   ["al amerat cricket ground ministry turf 2", "al amerat cricket ground oman cricket ministry turf 2"],
+  ["zayed cricket stadium", "sheikh zayed stadium"],
+  ["the wanderers stadium", "wanderers stadium"],
+  ["western australia cricket ground", "waca"],
+  ["old hararians sports club", "old hararians"],
+  ["university of otago oval", "university oval"],
+  ["sedgars park", "jb marks oval"],
+  ["senwes park", "jb marks oval"],
+  ["north west cricket stadium", "jb marks oval"],
+  ["sharad pawar cricket academy bkc", "bandra kurla complex"],
+  ["sharad pawar cricket academy ground", "bandra kurla complex"],
 ]);
 
 /** Compare venue names without the city suffix and account for known renames. */
