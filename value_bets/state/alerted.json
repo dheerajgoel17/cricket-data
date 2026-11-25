@@ -48,5 +48,10 @@
   "edge": 0.0608,
   "start_utc": "2026-11-26T04:40:00Z",
   "alerted_at": "2026-11-25T06:34:41.369236+00:00"
+ },
+ "male|Desert Vipers|Dubai Capitals|2026-11-25|batter_fours||Francois du Plessis under 2.5|2.5|under": {
+  "edge": 0.0572,
+  "start_utc": "2026-11-25T14:30:00Z",
+  "alerted_at": "2026-11-25T07:33:52.954450+00:00"
  }
 }

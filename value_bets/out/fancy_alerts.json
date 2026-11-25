@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-25T06:56:10Z",
+ "generated_at_utc": "2026-11-25T07:35:04Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -185,8 +185,8 @@
    "hits": 29,
    "played": 40,
    "window": 20,
-   "chance": 0.6806,
-   "edge": 0.2659,
+   "chance": 0.6808,
+   "edge": 0.2663,
    "edge_pct": 26.6,
    "bat_first": false
   },
@@ -300,9 +300,9 @@
    "hits": 26,
    "played": 38,
    "window": 20,
-   "chance": 0.6454,
-   "edge": 0.2068,
-   "edge_pct": 20.7,
+   "chance": 0.6451,
+   "edge": 0.2064,
+   "edge_pct": 20.6,
    "bat_first": false
   },
   {
@@ -375,29 +375,6 @@
    "bat_first": false
   },
   {
-   "alert_id": "2026-11-25-dubai-capitals-v-desert-vipers|match_fours||0|over",
-   "fixture_id": "2026-11-25-dubai-capitals-v-desert-vipers",
-   "match": "Dubai Capitals vs Desert Vipers",
-   "format": "T20",
-   "series": "International League T20 2026",
-   "start_utc": "2026-11-25T14:30:00Z",
-   "start_ist": "2026-11-25 20:00 IST",
-   "key": "match_fours",
-   "team": null,
-   "inn": 0,
-   "side": "over",
-   "line": 22.5,
-   "best_odds": 1.8,
-   "best_source": "Ladbrokes",
-   "hits": 24,
-   "played": 35,
-   "window": 20,
-   "chance": 0.6492,
-   "edge": 0.1686,
-   "edge_pct": 16.9,
-   "bat_first": false
-  },
-  {
    "alert_id": "2026-11-27-australia-v-england|first_innings_runs||0|under",
    "fixture_id": "2026-11-27-australia-v-england",
    "match": "Australia vs England",
@@ -464,6 +441,29 @@
    "chance": 0.6222,
    "edge": 0.1511,
    "edge_pct": 15.1,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-25-dubai-capitals-v-desert-vipers|match_fours||0|over",
+   "fixture_id": "2026-11-25-dubai-capitals-v-desert-vipers",
+   "match": "Dubai Capitals vs Desert Vipers",
+   "format": "T20",
+   "series": "International League T20 2026",
+   "start_utc": "2026-11-25T14:30:00Z",
+   "start_ist": "2026-11-25 20:00 IST",
+   "key": "match_fours",
+   "team": null,
+   "inn": 0,
+   "side": "over",
+   "line": 22.5,
+   "best_odds": 1.77,
+   "best_source": "Dafabet",
+   "hits": 24,
+   "played": 35,
+   "window": 20,
+   "chance": 0.6497,
+   "edge": 0.15,
+   "edge_pct": 15,
    "bat_first": false
   }
  ]
