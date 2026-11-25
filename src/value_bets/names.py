@@ -115,7 +115,27 @@ class PlayerResolver:
             return self._resolve1(" ".join(rt[:-1]), teams)
         return None
 
+    @staticmethod
+    def _full_name(raw):
+        t = _tokens(raw)
+        return len(t) >= 2 and len(t[0]) >= 3
+
+    def _moved(self, pid, teams):
+        """The checked player's registry row under whatever side he last played for. team: the book's side when it names one; with both sides open it stays None (the line gets his id and history, the model does not price it)."""
+        for ps in self.rosters.values():
+            for name, p, last, n in ps:
+                if p == pid:
+                    return dict(player_id=pid, name=name, team=teams[0] if len(teams) == 1 else None, score=100)
+        return None
+
     def _resolve1(self, raw, teams):
+        res = self._resolve1_core(raw, teams)
+        m = self.map.get(raw.lower())
+        if res is None and m and teams and not self._full_name(raw):  # "C Wilson", "L Shaw": the roster decides first, the checked id only when it finds nobody
+            return self._moved(m[0], teams)
+        return res
+
+    def _resolve1_core(self, raw, teams):
         cands = [(t, *p) for t in teams for p in self.rosters.get(t, [])]
         if not cands and not (teams and self.map.get(raw.lower())):
             return None
@@ -124,10 +144,8 @@ class PlayerResolver:
             for t, name, pid, last, n in cands:
                 if pid == m[0]:
                     return dict(player_id=pid, name=name, team=t, score=100)
-            for t0, ps in self.rosters.items():  # a checked player who has moved: the registry has him under another side (Dunkley: England / Welsh Fire, now Sixers)
-                for name, pid, last, n in ps:
-                    if pid == m[0]:  # team: the book's side when it names one; with both sides of the match open it stays None (the line gets his id and history, the model does not price it)
-                        return dict(player_id=pid, name=name, team=teams[0] if len(teams) == 1 else None, score=100)
+            if self._full_name(raw):  # a checked player who has moved: the registry has him under another side (Dunkley: England / Welsh Fire, now Sixers)
+                return self._moved(m[0], teams)
         rt = _tokens(raw)
         if not rt:
             return None

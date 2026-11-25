@@ -82,6 +82,12 @@ def test_player_resolver_hand_link_follows_a_player_who_moved(monkeypatch):
     both = p.resolve("Dunkley", ["Sydney Sixers", "Perth Scorchers"])  # no side on the line: he gets his id, the side stays open
     assert both["player_id"] == "d1" and both["team"] is None
     assert p.resolve("Nobody", ["Sydney Sixers"]) is None
+    # a bare initial + surname: the roster decides first
+    ros2 = {"England": [("SIR Dunkley", "d1", "2026-10-01", 50)], "Perth": [("D Shaw", "s1", "2026-10-01", 9)]}
+    q = PlayerResolver(ros2)
+    q.map = {"d shaw": ["d1"]}
+    assert q.resolve("D Shaw", ["Perth"])["player_id"] == "s1", "the other D Shaw on his own roster is not overridden"
+    assert q.resolve("D Shaw", ["Sydney Sixers"])["player_id"] == "d1", "nobody on the roster: the checked id is used"
 
 
 def test_optional_adapters_noop(monkeypatch):
