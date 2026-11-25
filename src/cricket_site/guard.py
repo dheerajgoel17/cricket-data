@@ -8,7 +8,7 @@ engine's own function would agree with a bug in it (the one place the engine is 
 
     a  hard  a fixture published as Live has the schedule's word for it (a stop-gap row from the books cannot know); warn: the live body lists a match in play with no score and no players
     a-gap  warn  every match the schedule calls Live or Started is in the live body (when --live is given)
-    b  hard  a match flagged in play is inside its keep window (24 h, a Test 6 days) and has no result; published book lines are inside the pipeline's own carry window
+    b  hard  a match flagged in play is inside its keep window (24 h, a Test 6 days) and has no result; published book lines are inside the pipeline's own carry window (a match the schedule still has open: 6 days)
     c  hard  each edition's bat-first win % equals a recount over every match in it with a winner (the engine is run on the built data)
     d  hard  a complete match (both innings ran their course) is not void; warn: the share of void summary-market matches per format per week
     e  warn  a scraped innings' stated total agrees with the batters' runs plus extras and with ball by ball
@@ -146,13 +146,24 @@ def check_keep_window(fixtures: list[dict], lines: dict | None, now: float) -> C
     ref = _ts((lines or {}).get("generated_at_utc")) or now
     rows = [x for k in ("lines", "events", "fancy") for x in (lines or {}).get(k) or []]
     tests = {x.get("match") for x in rows if x.get("fmt") == "Test"}
+    # the pipeline keeps a match the schedule has not called over for up to 6 days whatever its format (25 Nov 2026: four-day matches the source left open held the deploy at 40 h):
+    # a row whose match is an open fixture of the schedule (not Completed, same sides, same women's marker, start within 12 h) has the 6-day window too
+    open_ = [(frozenset((side_key(f.get("a")), side_key(f.get("b")))), _ts(f.get("start")), f.get("gender") == "female") for f in fixtures if f.get("status") not in ("Completed", None)]
+
+    def is_open(x: dict, t: float) -> bool:
+        a, b = (re.split(r"\s+vs\s+", str(x.get("match") or ""), maxsplit=1, flags=re.I) + ["", ""])[:2]
+        if not (a and b):
+            return False
+        pair, female = frozenset((side_key(a), side_key(b))), bool(_WOMEN_MARK.search(str(x.get("match") or "")))
+        return any(st is not None and abs(st - t) <= DUP_S and w == female and same_pair(pair, p) for p, st, w in open_)
+
     stale: dict[tuple, float] = {}
     for x in rows:
         t = _ts(x.get("start_utc"))
         if t is None:
             continue
         c.checked += 1
-        limit = TEST_CARRY_S if x.get("fmt") == "Test" or x.get("match") in tests else CARRY_S
+        limit = TEST_CARRY_S if x.get("fmt") == "Test" or x.get("match") in tests or is_open(x, t) else CARRY_S
         if ref > t + limit + GRACE_S:
             stale[(x.get("match"), x.get("start_utc"))] = (ref - t) / H
     c.problems += [f"book lines for {m} ({s[:16]}) were written {h:.0f} h after the start" for (m, s), h in sorted(stale.items(), key=lambda kv: str(kv[0]))]
