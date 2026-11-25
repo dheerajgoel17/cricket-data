@@ -188,3 +188,14 @@ test("a book's Fancy market is never set beside the line: not the listed price, 
   assert.deepEqual(f.bookLines.map((b) => [b.line, b.price, b.best]), [[24.5, 1.87, true], [24.5, 1.85, false]]);
   assert.equal(f.bookTitle, "BOOKS AT 24.5");
 });
+
+test("a Match Fancy market link has its own card path, share path and words", () => {
+  const q = { f: "2026-10-29-afghanistan-v-zimbabwe", fm: "match_sixes", sc: "-1" };
+  assert.equal(cardPath(q), `/card/v${CARD_V}/fixture/2026-10-29-afghanistan-v-zimbabwe/fancy/match_sixes/-1.jpg`);
+  assert.deepEqual(cardQuery(cardPath(q)), q);
+  assert.deepEqual(parseShare("fixture/2026-10-29-afghanistan-v-zimbabwe/fancy/match_sixes/-1").card, q);
+  assert.equal(parseShare("fixture/x/fancy/match_sixes/0").page, "/fixture/x/fancy?fm=match_sixes&sc=0");
+  const f = cardFields(q, data);
+  assert.equal(f.kind, "fancyLink");
+  assert.match(cardText(f).title, /Afghanistan v Zimbabwe: sixes/i);
+});

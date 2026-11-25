@@ -108,3 +108,9 @@ test("middleware: an assistant opening a player page is sent to the share HTML, 
   assert.equal(await call("/api/share?path=player%2F22", assistants[0]), undefined);
   assert.equal((await call("/api/live", assistants[0])).status, 403);
 });
+
+test("a copied Match Fancy URL reaches the share page with its market", () => {
+  assert.equal(crawlerSharePath(new URL("https://x.test/fixture/2026-10-29-a-v-b/fancy?fm=match_sixes&sc=1")), "fixture/2026-10-29-a-v-b/fancy/match_sixes/1");
+  assert.equal(crawlerSharePath(new URL("https://x.test/fixture/2026-10-29-a-v-b/fancy?fm=match_sixes")), "fixture/2026-10-29-a-v-b/fancy/match_sixes/-1");
+  assert.equal(crawlerSharePath(new URL("https://x.test/fixture/2026-10-29-a-v-b/fancy")), "fixture/2026-10-29-a-v-b/fancy");
+});

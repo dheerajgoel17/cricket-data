@@ -48,7 +48,7 @@ test("fallback protects site data and keeps shared player links usable", async (
     assert.equal((await fetch("/data/index.json", { ...browser, cookie: cookie + "a" })).status, 403);
     assert.equal((await fetch("/api/unknown")).status, 404);
     assert.equal((await fetch("/card/v9/pid/1/runs/20.5.jpg")).status, 404);
-    const card = await fetch("/card/v15/player/1/runs/20.5.jpg");
+    const card = await fetch("/card/v16/player/1/runs/20.5.jpg");
     assert.equal(card.headers.get("content-type"), "image/jpeg");
     await fetch("/api/og?f=match&fm=team_runs%3A2&sc=1&poster=1");
     assert.equal(cardRequests.at(-1).searchParams.get("fm"), "team_runs:2");
