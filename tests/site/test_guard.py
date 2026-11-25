@@ -112,6 +112,17 @@ def test_b_published_book_lines_are_inside_the_pipelines_carry_window_when_it_wr
     assert G.check_keep_window([], stale, NOW).problems == []   # 38 h after the start when it was written: inside the 40 h
 
 
+def test_b_a_match_the_schedule_still_has_open_keeps_the_six_day_window():
+    """The pipeline keeps a match the source has not called over for up to 6 days whatever its format; the guard must not stop the deploy over it (25 Nov 2026)."""
+    lines = {"generated_at_utc": "2026-11-02T09:50:00Z", "events": [], "fancy": [],
+             "lines": [{"match": "Dolphins vs Western Province", "start_utc": "2026-10-29T08:00:00Z", "fmt": "T20"}, {"match": "Ghost vs Nobody", "start_utc": "2026-10-29T08:00:00Z", "fmt": "T20"}]}
+    open_fx = [fx(a="Dolphins", b="Western Province", start="2026-10-29T08:00Z", status="Live", source="src", fmt="FC")]
+    problems = [p.split(" were")[0] for p in G.check_keep_window(open_fx, lines, NOW).problems]
+    assert problems == ["book lines for Ghost vs Nobody (2026-10-29T08:00)"], "the open match is kept 6 days; one with no open fixture is judged on 40 h"
+    closed = [{**open_fx[0], "status": "Completed", "result": "Dolphins won"}]
+    assert len(G.check_keep_window(closed, lines, NOW).problems) == 2, "once the schedule calls it over the 40 h applies"
+
+
 def test_b_a_book_lines_file_nobody_has_written_for_hours_is_flagged():
     assert G.check_lines_fresh({"generated_at_utc": "2026-11-02T09:20:00Z"}, NOW).problems == []
     c = G.check_lines_fresh({"generated_at_utc": "2026-11-01T21:18:00Z"}, NOW)
