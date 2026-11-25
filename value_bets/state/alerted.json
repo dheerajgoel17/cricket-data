@@ -43,5 +43,10 @@
   "edge": 0.0528,
   "start_utc": "2026-11-26T14:30:00Z",
   "alerted_at": "2026-11-25T18:34:18.510582+00:00"
+ },
+ "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||ADS Fletcher under 1.5|1.5|under": {
+  "edge": 0.0619,
+  "start_utc": "2026-11-26T14:30:00Z",
+  "alerted_at": "2026-11-25T19:34:59.844373+00:00"
  }
 }
