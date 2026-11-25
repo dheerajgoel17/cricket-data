@@ -1,44 +1,36 @@
-# Cricket value bets - 2026-11-26 03:00 IST
+# Cricket value bets - 2026-11-26 04:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2172 prices
+- **moviodds_bet365**: ok, 2171 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
 - **smarkets**: ok, 364 prices
 - **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
 - **feedk**: ok, 252 prices, 6 events
 - **feedl**: ok, 532 prices, 40 events
-- **feedh**: ok, 2071 prices, 102 events
-- **feede**: ok, 690 prices, 40 events
 - **feedj**: ok, 721 prices, 17 events
+- **feedh**: ok, 2071 prices, 102 events, stopped HTTP 523
+- **feede**: ok, 690 prices, 40 events
 - **feedf**: ok, 650 prices, 21 events
 
-Matches starting in next 168h: **59**, markets priced: **593**, value bets: **6** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **60**, markets priced: **628**, value bets: **3** (new alerts: 3). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
-| 11-26 10:10 IST | Sydney Thunder vs Adelaide Strikers | M13710 batter_fours | Laura Wolvaardt under 3.5 | 1.92 @ feedj_d | 1.81 | 0.5987 | 6.1% | 1.65% | medium |
-| 11-26 13:40 IST | Sydney Sixers vs Melbourne Stars | M13700 batter_runs | Ellyse Perry under 32.5 | 1.82 @ feedj_d | 1.68 | 0.6679 | 8.4% | 2.00% | medium |
-| 11-26 13:40 IST | Sydney Sixers vs Melbourne Stars | Ellyse Perry - Over/Under 29.5 Runs | Ellyse Perry under 29.5 | 1.83 @ feede_lb | 1.72 | 0.6366 | 6.4% | 1.92% | medium |
-| 11-26 20:00 IST | Abu Dhabi Knight Riders vs Mi Emirates | M13710 batter_fours | Andre Russell under 1.5 | 1.87 @ feedj_d | 1.52 | 0.6985 | 23.1% | 2.00% | medium |
-| 11-26 20:00 IST | Abu Dhabi Knight Riders vs Mi Emirates | M13710 batter_fours | Nicholas Pooran under 1.5 | 2.06 @ feedj_d | 1.96 | 0.5246 | 5.3% | 1.24% | medium |
-| 11-27 13:45 IST | Australia vs England | To score at least 50 Runs | Aneurin Donald 50+ yes | 5.00 @ feedk_leoal | 4.68 | 0.2191 | 6.8% | 0.42% | medium |
+| 11-26 20:00 IST | Abu Dhabi Knight Riders vs MI Emirates | Batsman Total Match Sixes | MM Ali under 0.5 | 2.62 @ moviodds_bet365 | 2.06 | 0.4677 | 27.4% | 2.00% | medium |
+| 11-27 13:45 IST | Australia vs England | Batsman Total Match Sixes | J Fraser-McGurk under 0.5 | 2.62 @ moviodds_bet365 | 2.40 | 0.4933 | 9.5% | 1.46% | low |
+| 11-27 20:00 IST | Sharjah Warriorz vs Dubai Capitals | Batsman Total Match Sixes | PI Walter under 0.5 | 2.62 @ moviodds_bet365 | 2.41 | 0.4876 | 8.8% | 1.36% | low |
 
 ### Why / notes per bet
-- **Sydney Thunder vs Adelaide Strikers / M13710 batter_fours / Laura Wolvaardt under 3.5** - why: Model 60% vs market 51% for under 3.5 fours; form 3.7 fours/inn recency-weighted T20 (n_eff 88.8; last 5: 4, 11, 4, 7, 2), bats in 98% of games played; at North Sydney Oval: 12 inns avg 2.7; context adj: venue environment +14%, at this venue -5%. Notes: 2 market source(s) for fair price; model 0.599 vs market 0.515; assumes bet void if player doesn't bat/bowl - check book rules
-- **Sydney Sixers vs Melbourne Stars / M13700 batter_runs / Ellyse Perry under 32.5** - why: Model 67% vs market 54% for under 32.5 runs; form 31.2 runs/inn recency-weighted T20 (n_eff 77.2; last 5: 9, 45, 3, 30, 59), bats in 96% of games played; at North Sydney Oval: 40 inns avg 37.5; vs Melbourne Stars Women: 1 inns avg 84.0; weather: high humidity 84%, cloud cover 75%. Notes: 2 market source(s) for fair price; model 0.668 vs market 0.537; assumes bet void if player doesn't bat/bowl - check book rules
-- **Sydney Sixers vs Melbourne Stars / Ellyse Perry - Over/Under 29.5 Runs / Ellyse Perry under 29.5** - why: Model 64% vs market 54% for under 29.5 runs; form 31.2 runs/inn recency-weighted T20 (n_eff 77.2; last 5: 9, 45, 3, 30, 59), bats in 96% of games played; at North Sydney Oval: 40 inns avg 37.5; vs Melbourne Stars Women: 1 inns avg 84.0; weather: high humidity 84%, cloud cover 75%. Notes: 2 market source(s) for fair price; model 0.637 vs market 0.536; assumes bet void if player doesn't bat/bowl - check book rules
-- **Abu Dhabi Knight Riders vs Mi Emirates / M13710 batter_fours / Andre Russell under 1.5** - why: Model 70% vs market 62% for under 1.5 fours; form 1.1 fours/inn recency-weighted T20 (n_eff 87.3; last 5: 1, 0, 2, 2, 3), bats in 89% of games played; vs MI Emirates: 8 inns avg 1.5; context adj: venue environment -4%, team H2H context -7%. Notes: 2 market source(s) for fair price; model 0.698 vs market 0.625; assumes bet void if player doesn't bat/bowl - check book rules
-- **Abu Dhabi Knight Riders vs Mi Emirates / M13710 batter_fours / Nicholas Pooran under 1.5** - why: Model 52% vs market 50% for under 1.5 fours; form 1.9 fours/inn recency-weighted T20 (n_eff 120.5; last 5: 1, 3, 0, 2, 2), bats in 97% of games played; vs Abu Dhabi Knight Riders: 8 inns avg 1.6; context adj: venue environment -4%, team H2H context +8%. Notes: 2 market source(s) for fair price; model 0.525 vs market 0.500; assumes bet void if player doesn't bat/bowl - check book rules
-- **Australia vs England / To score at least 50 Runs / Aneurin Donald 50+ yes** - why: Model 22% vs market 21% for 50+ runs; form 30.1 runs/inn recency-weighted T20 (n_eff 34.2; last 5: 85, 10, 13, 21, 12), bats in 98% of games played; vs Australia: 2 inns avg 47.5; weather: rain chance up to 51%, high humidity 90%, cloud cover 88%. Notes: 4 market source(s) for fair price; model 0.219 vs market 0.209; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); market fair anchored on feedk_leoal O/U 21.5 (de-vigged 0.500); RAIN RISK: up to 51% rain chance, 1.2 mm forecast during the match - shortened match or void props possible
+- **Abu Dhabi Knight Riders vs MI Emirates / Batsman Total Match Sixes / MM Ali under 0.5** - why: Model 47% vs market 50% for under 0.5 sixes; form 1.1 sixes/inn recency-weighted T20 (n_eff 95.4; last 5: 0, 0, 1, 3, 3), bats in 87% of games played; vs MI Emirates: 4 inns avg 1.2; context adj: venue environment +24%. Notes: 2 market source(s) for fair price; model 0.468 vs market 0.500; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting
+- **Australia vs England / Batsman Total Match Sixes / J Fraser-McGurk under 0.5** - why: Model 49% vs market 35% for under 0.5 sixes; form 1.3 sixes/inn recency-weighted T20 (n_eff 34.5; last 5: 3, 0, 0, 5, 1), bats in 96% of games played; vs England: 3 inns avg 1.7; context adj: venue environment -3%; weather: rain chance up to 51%, high humidity 90%, cloud cover 88%. Notes: 1 market source(s) for fair price; model 0.493 vs market 0.355; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting; RAIN RISK: up to 51% rain chance, 1.2 mm forecast during the match - shortened match or void props possible
+- **Sharjah Warriorz vs Dubai Capitals / Batsman Total Match Sixes / PI Walter under 0.5** - why: Model 49% vs market 35% for under 0.5 sixes; form 1.1 sixes/inn recency-weighted T20 (n_eff 49.2; last 5: 2, 4, 1, 8, 3), bats in 94% of games played; at Sharjah Cricket Stadium, Sharjah: 4 inns avg 1.5; context adj: venue environment +11%. Notes: 1 market source(s) for fair price; model 0.488 vs market 0.355; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
-- 11-26 10:10 IST Sydney Thunder (W) vs Adelaide Strikers (W) / Batsman Total Match Sixes / ME Bouchier over 0.5 @ 6.00 (moviodds_bet365): edge 68.6%, model 0.3201, market 0.249
-- 11-26 13:40 IST Sydney Sixers vs Melbourne Stars / M13704 top_bowler_team / Carly Leeson @ 15.00 (feedj_d): edge 69.9%, model 0.0882, market 0.1268
-- 11-26 13:40 IST Sydney Sixers (W) vs Melbourne Stars (W) / Batsman Total Match Sixes / AK Gardner under 0.5 @ 2.62 (moviodds_bet365): edge 36.1%, model 0.5409, market 0.5
-- 11-27 20:00 IST Sharjah Warriorz vs Dubai Capitals / Batter Milestones / SW Billings 50+ yes @ 9.00 (moviodds_bet365): edge 31.8%, model 0.1251, market 0.1639
+- 11-26 13:40 IST Sydney Sixers vs Melbourne Stars / M13704 top_bowler_team / Carly Leeson @ 15.00 (feedj_d): edge 90.1%, model None, market 0.1268
+- 11-27 20:00 IST Sharjah Warriorz vs Dubai Capitals / Batter Milestones / SW Billings 50+ yes @ 9.00 (moviodds_bet365): edge 32.0%, model 0.1256, market 0.1639
 
-Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Lokseva Academy (male), Majees Titan (male), Multan Region (male), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (male), Yalla Shabab Giants (male)
+Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), IAS Invincibles (male), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Lokseva Academy (male), Majees Titan (male), Multan Region (male), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (male), Yalla Shabab Giants (male)
 
-Runtime 197.7s. Snapshot: `odds_20261125T213035Z.jsonl.gz`
+Runtime 237.2s. Snapshot: `odds_20261125T223033Z.jsonl.gz`
