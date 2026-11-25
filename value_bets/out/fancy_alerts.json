@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-25T00:34:58Z",
+ "generated_at_utc": "2026-11-25T01:35:54Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -162,8 +162,8 @@
    "hits": 29,
    "played": 40,
    "window": 20,
-   "chance": 0.6808,
-   "edge": 0.2663,
+   "chance": 0.6806,
+   "edge": 0.2659,
    "edge_pct": 26.6,
    "bat_first": false
   },
@@ -257,6 +257,29 @@
    "chance": 0.6771,
    "edge": 0.2188,
    "edge_pct": 21.9,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-25-dubai-capitals-v-desert-vipers|match_extras||0|under",
+   "fixture_id": "2026-11-25-dubai-capitals-v-desert-vipers",
+   "match": "Dubai Capitals vs Desert Vipers",
+   "format": "T20",
+   "series": "International League T20 2026",
+   "start_utc": "2026-11-25T14:30:00Z",
+   "start_ist": "2026-11-25 20:00 IST",
+   "key": "match_extras",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 17.5,
+   "best_odds": 1.82,
+   "best_source": "bc.game",
+   "hits": 25,
+   "played": 35,
+   "window": 20,
+   "chance": 0.6667,
+   "edge": 0.2133,
+   "edge_pct": 21.3,
    "bat_first": false
   },
   {
@@ -392,9 +415,9 @@
    "hits": 14,
    "played": 20,
    "window": 20,
-   "chance": 0.6315,
-   "edge": 0.181,
-   "edge_pct": 18.1,
+   "chance": 0.6321,
+   "edge": 0.1821,
+   "edge_pct": 18.2,
    "bat_first": false
   },
   {
@@ -487,6 +510,29 @@
    "chance": 0.5917,
    "edge": 0.1538,
    "edge_pct": 15.4,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-25-dubai-capitals-v-desert-vipers|top_score||0|over",
+   "fixture_id": "2026-11-25-dubai-capitals-v-desert-vipers",
+   "match": "Dubai Capitals vs Desert Vipers",
+   "format": "T20",
+   "series": "International League T20 2026",
+   "start_utc": "2026-11-25T14:30:00Z",
+   "start_ist": "2026-11-25 20:00 IST",
+   "key": "top_score",
+   "team": null,
+   "inn": 0,
+   "side": "over",
+   "line": 64.5,
+   "best_odds": 1.85,
+   "best_source": "bc.game",
+   "hits": 23,
+   "played": 35,
+   "window": 20,
+   "chance": 0.6222,
+   "edge": 0.1511,
+   "edge_pct": 15.1,
    "bat_first": false
   }
  ]
