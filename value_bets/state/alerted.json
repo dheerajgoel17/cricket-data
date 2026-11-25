@@ -33,5 +33,10 @@
   "edge": 0.0608,
   "start_utc": "2026-11-26T04:40:00Z",
   "alerted_at": "2026-11-25T06:34:41.369236+00:00"
+ },
+ "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||Andre Russell under 1.5|1.5|under": {
+  "edge": 0.1933,
+  "start_utc": "2026-11-26T14:30:00Z",
+  "alerted_at": "2026-11-25T15:34:28.137980+00:00"
  }
 }

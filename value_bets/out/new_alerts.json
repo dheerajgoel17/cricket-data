@@ -1,4 +1,69 @@
 {
- "generated_at_ist": "2026-11-25 20:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-25 21:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26",
+   "match": "Abu Dhabi Knight Riders vs Mi Emirates",
+   "start_utc": "2026-11-26T14:30:00Z",
+   "start_ist": "2026-11-26 20:00 IST",
+   "format": "T20",
+   "gender": "male",
+   "market_type": "batter_fours",
+   "market": "M13710 batter_fours",
+   "team_scope": "",
+   "selection": "Andre Russell under 1.5",
+   "player_matched_as": "Andre Russell",
+   "player_id": "bbd41817",
+   "player_team": "Abu Dhabi Knight Riders",
+   "stat": "fours",
+   "inn": 0,
+   "line": 1.5,
+   "side": "under",
+   "best_odds": 1.87,
+   "best_source": "feedj_d",
+   "effective_odds_after_commission": 1.87,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0997,
+   "implied_prob": 0.5348,
+   "fair_odds": 1.567,
+   "fair_prob": 0.6381,
+   "model_prob": 0.6985,
+   "market_prob": 0.5888,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.1933,
+   "edge_pct": 19.33,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 70% vs market 59% for under 1.5 fours; form 1.1 fours/inn recency-weighted T20 (n_eff 87.3; last 5: 1, 0, 2, 2, 3), bats in 89% of games played; vs MI Emirates: 8 inns avg 1.5; context adj: venue environment -4%, team H2H context -7%",
+   "notes": "2 market source(s) for fair price; model 0.698 vs market 0.589; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 87.3,
+    "expected": 1.21,
+    "nb_alpha": 0.958,
+    "p_bats_or_bowls": 0.89,
+    "venue_matched": "zayed cricket stadium",
+    "context_terms": [
+     "p_bat",
+     "env_fours",
+     "ven_fours",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 64,
+    "cloud_pct": 4,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "6c1dcd1b3ed50b82",
+   "alert_key": "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||Andre Russell under 1.5|1.5|under",
+   "alerted_at_ist": "2026-11-25 21:04 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
