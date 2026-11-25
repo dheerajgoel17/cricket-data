@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { memo } from "react";
+import type * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
@@ -18,7 +19,7 @@ import { color, control, figure, font, space, type, t, d, w } from "@/ui/tokens"
 
 /**
  * Compact PropLines twin (native has no dense table): avatar · name · O/U sideLetter + price · Edge · MiniBars.
- * Not in XI / Score unavailable replace MiniBars. Match Live stays on fixtures; In Play Market = in-play line/odds.
+ * Not in XI / Score unavailable replace MiniBars. Match Live stays on fixtures; In play line = in-play line/odds.
  */
 function PropRowView({ r, i, soFar, out, bars = true }: { r: Row; i: number; soFar: Standing | null; out: boolean; bars?: boolean }) {
   const label = (STATS as any)[r.stat]?.label as string;
@@ -77,6 +78,29 @@ function PropRowView({ r, i, soFar, out, bars = true }: { r: Row; i: number; soF
         ) : (
           <View />
         )}
+      </Press>
+    </View>
+  );
+}
+
+/** One line of the Custom line tab: the same row as a prop (avatar · name · flag, line under it, a right-hand figure, MiniBars), the figure being the hit rate instead of the edge. */
+export function TrendRow({ i, pid, team, name, desc, rate, fair, last, line, onPress }: { i: number; pid: string; team: string; name: string; desc: React.ReactNode; rate: number; fair: string; last: { v: number; s: "hit" | "miss" | "push" }[]; line: number; onPress: () => void }) {
+  return (
+    <View style={i > 0 ? styles.sep : undefined}>
+      <Press scale={1} onPress={onPress} accessibilityRole="link" accessibilityLabel={`${name}, hit ${Math.round(rate * 100)}%, fair ${fair}`} style={({ pressed }) => [styles.row, pressed && styles.pressed]}>
+        <PlayerAvatar pid={pid} team={team} size={control} name={name} />
+        <View style={styles.main}>
+          <View style={styles.titleRow}>
+            <Text style={styles.name} numberOfLines={1}>{name}</Text>
+            <TeamBadge name={team} size={18} />
+          </View>
+          <Text style={styles.priceLine} numberOfLines={1}>{desc}</Text>
+        </View>
+        <View style={styles.edge}>
+          <Text style={styles.edgeLabel} numberOfLines={1} maxFontSizeMultiplier={1}>Hit</Text>
+          <Text style={[styles.edgeValue, { color: color.primary }]}>{Math.round(rate * 100)}%</Text>
+        </View>
+        <MiniBars last={last} line={line} width={72} />
       </Press>
     </View>
   );

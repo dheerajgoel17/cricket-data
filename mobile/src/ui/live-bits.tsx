@@ -2,6 +2,7 @@
 import { StyleSheet, View } from "react-native";
 import { Text } from "@/ui/text";
 import { trackOf } from "@/lib/live-track";
+import { Badge } from "@/ui/badge";
 import { StatusLabel } from "@/ui/status-label";
 import { StandingMark, type Standing } from "@/ui/tick";
 import { color, num, space, type } from "@/ui/tokens";
@@ -13,9 +14,9 @@ export function LiveBadge() {
   return <StatusLabel tone="live" surface="plain" />;
 }
 
-/** Line and odds are in-play ("In Play Market"). */
+/** Line and odds are in-play ("In play line"). */
 export function InPlayBadge() {
-  return <StatusLabel tone="inPlay" surface="plain" />;
+  return <Badge variant="miss">In play line</Badge>;
 }
 
 /** Where the line stood before the match; nothing when it has not moved. Scan rows use `Opened at`. */

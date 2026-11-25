@@ -23,7 +23,11 @@ let dataTag: string | undefined;
 const PINNED = /^\/data\/(?:index|matches|identity|names|p\/\d+)\.json$/;
 export function setDataBuild(tag: string | undefined): void { dataTag = tag; }
 
-const headers = () => ({ "user-agent": USER_AGENT, accept: "application/json", ...(cookie ? { cookie } : {}) });
+/**
+ * The live routes are polled every ~3 s and answer `max-age=3`: the phone's own HTTP cache then hands back the same body for as long as the poll lands inside that window (every poll came back from it
+ * in 1-7 ms with the same ciphertext, so a score and a match that had left the live feed stayed on screen). A `no-cache` request header makes it ask the server; the server's shared cache still answers.
+ */
+const headers = (path = "") => ({ "user-agent": USER_AGENT, accept: "application/json", ...(path.startsWith("/api/") ? { "cache-control": "no-cache" } : {}), ...(cookie ? { cookie } : {}) });
 
 /** Same object identity for an unchanged body: a 304 / same ciphertext must not allocate a new parse, or every 15 s live poll re-renders the rail. */
 const memo = new Map<string, { mark: string; obj: any; text?: string }>(); // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -72,7 +76,7 @@ export async function getJson(path: string): Promise<any> { // eslint-disable-li
     span(`get ${path} pinned`, t0, `chars=${kept.text.length}`);
     return o;
   }
-  const ask = () => fetch(SITE_URL + path, { headers: { ...headers(), ...(kept ? { "if-none-match": kept.etag } : {}) }, credentials: "omit" });
+  const ask = () => fetch(SITE_URL + path, { headers: { ...headers(path), ...(kept ? { "if-none-match": kept.etag } : {}) }, credentials: "omit" });
   let r = await ask();
   if (r.status === 403) { await gateKey(true); r = await ask(); } // the cookie lapsed
   const t1 = Date.now();

@@ -20,7 +20,7 @@ export function StatusLabel({
   surface?: StatusSurface;
   children?: ReactNode;
 }) {
-  const label = children ?? (tone === "live" ? (surface === "pill" ? "LIVE" : "Live") : tone === "inPlay" ? "In Play Market" : null);
+  const label = children ?? (tone === "live" ? (surface === "pill" ? "LIVE" : "Live") : tone === "inPlay" ? "In play line" : null);
   if (surface === "pill") {
     const bg = tone === "live" ? color.miss : tone === "session" ? tint.amber(0.2) : color.secondary;
     const fg = tone === "live" ? color.foreground : tone === "session" ? color.amber : color["muted-foreground"];

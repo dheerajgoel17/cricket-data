@@ -35,7 +35,7 @@ import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { BookList, OverviewRow } from "@/ui/fancy-row";
 import { LiveMarketRow } from "@/ui/live-market-row";
 import { TeamSpot } from "@/ui/live-spot";
-import { liveRows } from "@cricket/engine/inplay-lines.js";
+import { inPlayFirst, liveRows } from "@cricket/engine/inplay-lines.js";
 import { LineStepper } from "@/ui/line-stepper";
 import { Working } from "@/ui/motion";
 import { PlayerAvatar } from "@/ui/player-avatar";
@@ -106,7 +106,7 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       .map((r: any) => ({ ...r, venue: fx.venue, standing: fancyStanding(liveMatch, r) }))
       .sort((x: any, y: any) => (y.edge ?? -9) - (x.edge ?? -9));
   }, [doc, ms, fxInfo, team, scope, hist, store, liveMatch, venueIdx, fx.venue]); // eslint-disable-line react-hooks/exhaustive-deps
-  const listRows = overview; // the toss has its own tab (ui/toss.tsx)
+  const listRows = useMemo(() => inPlayFirst(overview), [overview]); // the toss has its own tab (ui/toss.tsx)
 
   const liveList = useMemo(() => (mode === "list" ? (liveRows as (d: any, f: any) => any[])(doc, { a: fx.a, b: fx.b }) : []), [doc, fx.a, fx.b, mode]);
   // same Edge + L10 as scored fancy: overs tape vs the live OU line
@@ -238,13 +238,14 @@ export function MatchFancy({ fx, teams, fmt, doc, start, mode = "list" }: { fx: 
       ) : null}
       {mode === "list" && (listRows.length > 0 || liveScored.length > 0) ? (
         <View style={styles.bleed}>
+          {/* the in-play lines come first (docs/SITE.md, "In-play lines first"): scored in-play rows, then the in-play-only markets, then the pre-match rows */}
+          {liveScored.map(({ m, r }, i) => (
+            <LiveMarketRow key={`live-${i}-${m.market}`} m={m} scored={r} separated={i > 0} />
+          ))}
           {listRows.map((r: any, i: number) => (
             <Reflow key={r.id || fancyFm(r.key, r.inn || 0)}>
-              <OverviewRow separated={i > 0} r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
+              <OverviewRow separated={i > 0 || liveScored.length > 0} r={r} onOpen={() => openMarket(fancyFm(r.key, r.inn || 0))} extra={r.live && r.key === "team_total_runs" ? <TeamSpot r={r} fx={fx} teams={teams} /> : undefined} />
             </Reflow>
-          ))}
-          {liveScored.map(({ m, r }, i) => (
-            <LiveMarketRow key={`live-${i}-${m.market}`} m={m} scored={r} separated={listRows.length > 0 || i > 0} />
           ))}
         </View>
       ) : null}

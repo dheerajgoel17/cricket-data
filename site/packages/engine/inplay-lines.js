@@ -257,6 +257,13 @@ export function liveMerge(doc, inplay, resolve, fixtures = [], innOf = null, _so
   return { ...doc, lines, fancy, live, live_sig: sig };
 }
 
+/** The row-table rule: a row whose line is in-play (`live`) comes before every pre-match row; the order inside each group is kept. Never reorders by anything else. */
+export function inPlayFirst(rows) {
+  const live = [], rest = [];
+  for (const r of rows || []) (r?.live ? live : rest).push(r);
+  return live.concat(rest);
+}
+
 /** The other live markets (over / under lines and picks) of a fixture, from `liveMerge`'s `doc.live`: the list for the two sides, either way round; [] when there are none. */
 export function liveRows(doc, fixture) {
   if (!fixture?.a || !fixture?.b) return [];

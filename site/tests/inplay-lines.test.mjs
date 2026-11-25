@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
-import { FIRST_GRACE_MS, SKIP_MARKET, mergeMatches, parseInplayFeed, parseQuotes, stampFirst } from "@cricket/engine/inplay-lines.js";
+import { FIRST_GRACE_MS, SKIP_MARKET, mergeMatches, parseInplayFeed, parseQuotes, stampFirst, inPlayFirst } from "@cricket/engine/inplay-lines.js";
 
 // The shape the feed gave for a match that had started (probed from a workflow run): one quote per side per line.
 const q = (group_name, label, handicap, odds_dec, extra = {}) => ({ group_name, label, line: handicap, side: label, handicap, odds_dec, ...extra });
@@ -413,4 +413,10 @@ test("the first line is the one nearest evens when several are listed at once, a
   assert.equal(Object.keys(stampFirst([], s.firsts, t0 + FIRST_GRACE_MS + 1).firsts).length, 0); // long gone (a new innings): forgotten
   const back = stampFirst([{ home: "A", away: "B", lines: [{ kind: "player_runs", player: "J Smith", line: 80.5, over: 1.9, under: 1.9 }] }], s.firsts, t0 + FIRST_GRACE_MS + 1);
   assert.equal(back.matches[0].lines[0].first, 80.5);
+});
+
+test("inPlayFirst puts in-play rows before pre-match ones and keeps the order inside each group", () => {
+  const rows = [{ id: "a" }, { id: "b", live: true }, { id: "c" }, { id: "d", live: true }];
+  assert.deepEqual(inPlayFirst(rows).map((r) => r.id), ["b", "d", "a", "c"]);
+  assert.deepEqual(inPlayFirst(undefined), []);
 });

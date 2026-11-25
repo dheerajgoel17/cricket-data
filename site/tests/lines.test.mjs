@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, ofBookMatch, overProb, sameFixture, sameFixtureId, sameFmt, sameMatchWindow, sameMatchWindowFor, teamKey, withArchive } from "@cricket/engine/lines.js";
+import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, ofBookMatch, overProb, sameFixture, sameFixtureId, sameFmt, sameMatchWindow, sameMatchWindowFor, teamKey, preMatchBooks, withArchive } from "@cricket/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -218,6 +218,18 @@ test("withArchive leaves the live doc as it is when it still has the match's lin
   assert.deepEqual(doc.fancy, live.fancy);
   assert.equal(withArchive(live, null), live);
   assert.equal(withArchive(undefined, ENTRY).lines.length, 1);
+});
+
+test("withArchive still adds the pre-match lines when the live doc holds only in-play rows of the started match", () => {
+  const fx = archiveFixture(ENTRY);
+  const liveFancy = { ...ENTRY.fancy[0], match: ENTRY.match, start_utc: ENTRY.start_utc, live: true }, liveLine = { ...ENTRY.lines[0], match: ENTRY.match, competition: ENTRY.competition, start_utc: ENTRY.start_utc, pid: "zz99", books: [{ source: "x", kind: "bookmaker", over: 1.9, under: 1.9, live: true }] };
+  const live = { lines: [liveLine], fancy: [liveFancy] };
+  assert.deepEqual(fixtureBooks(live, fx), { props: true, fancy: true });
+  assert.deepEqual(preMatchBooks(live, fx), { props: false, fancy: false }, "in-play rows are not the pre-match books");
+  const doc = withArchive(live, ENTRY);
+  assert.equal(doc.lines.length, 1 + ENTRY.lines.length);
+  assert.equal(doc.fancy.length, 1 + ENTRY.fancy.length);
+  assert.equal(withArchive({ lines: ENTRY.lines, fancy: ENTRY.fancy }, ENTRY).fancy.length, ENTRY.fancy.length, "pre-match rows already there: nothing doubled");
 });
 
 test("a fixture id the books named differently is the same page (Boland / Rocks), another day or side is not", () => {

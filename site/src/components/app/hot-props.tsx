@@ -7,7 +7,7 @@ import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/rea
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AnimatedHeight } from "./animated-height";
 import { RowsSkeleton } from "./skeletons";
-import { LIVE_TTL_MS, liveForFixture, lineNotIn, lineStanding } from "@cricket/engine/live.js";
+import { LIVE_TTL_MS, liveForFixture, lineNotIn, lineStanding, scorecardRank } from "@cricket/engine/live.js";
 import { booksOf, groupByChip, isLiveLine, lineKey, liveThresholdKey, patchHotQuotes, prematchLines, scoreLine, seedRow } from "@cricket/engine/hot-rows.js";
 import { Tick } from "./tick";
 import { bookLinesFor, bookQuotes, keepMsFor, lineScope, sameFixture, scopeTag } from "@cricket/engine/lines.js";
@@ -271,7 +271,7 @@ const propHref = (r: Row) => propLineHref(r);
 
 const rowKey = (r: Row) => `${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quotes.some((q: Quote) => q.live) ? "L" : ""}`;
 
-/** Shared: avatar · name · flag · In Play Market (when line/odds are in-play). Match Live stays on fixtures; Not in XI / void covers non-playing. */
+/** Shared: avatar · name · flag · In play line (when line/odds are in-play). Match Live stays on fixtures; Not in XI / void covers non-playing. */
 export function PropLineIdentity({ r, out, linkClass, onNameClick }: { r: Row; out: boolean; linkClass?: string; onNameClick?: (e: MouseEvent) => void }) {
   const inPlay = !out && r.quotes.some((q: Quote) => q.live);
   return (
@@ -538,7 +538,12 @@ export function HotProps({ teams, start, fmt, archive, phase, syncUrl }: { teams
   })
     .filter((r) => (teams ? onThis(r) : r.day === Number(day) && (pick === "all" || matchChipId(r.match, r.start, r.fmt) === pick)) && (stat === "all" || r.stat === stat) && enoughHistory(r, win, need)),
   [data, stat, win, need, day, teams, start, fmt, live.data, identity, pick]); // eslint-disable-line react-hooks/exhaustive-deps
-  const rows = useMemo(() => order(narrow(scored, sc), sc).slice(0, MAX_ROWS), [scored, sc]);
+  // a match page lists its live match's players in scorecard order (crease, bowler now, batting order, bowling order)
+  const rows = useMemo(() => {
+    const ranks = new Map<any, ((n: string) => number | null) | null>();
+    const rank = teams ? (r: any) => { const m = matchOf(r); if (!m) return null; if (!ranks.has(m)) ranks.set(m, scorecardRank(m)); return ranks.get(m)?.(r.name) ?? null; } : null;
+    return order(narrow(scored, sc), sc, rank).slice(0, MAX_ROWS);
+  }, [scored, sc]); // eslint-disable-line react-hooks/exhaustive-deps
   // what the filter view may offer: the values the day's rows really have
   const dayRows = useMemo(() => (data || []).filter((r) => (teams ? onThis(r) : r.day === Number(day))), [data, teams, day, start]); // eslint-disable-line react-hooks/exhaustive-deps
   const choices = useMemo(() => ({

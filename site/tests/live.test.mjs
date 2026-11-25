@@ -1321,3 +1321,24 @@ test("a poll that cannot read the scorecard keeps the innings already over, so a
   assert.equal(teamScore(buildMatch(row, live, null), "Sri Lanka").display ?? "", "");
   assert.deepEqual(buildMatch(row, live, null, { innings: [{ n: 3, team: "Pakistan", runs: 20, wkts: 1, overs: 6.4 }] }).innings.map((i) => i.n), [3], "the innings being batted is not carried");
 });
+
+import { scorecardRank } from "@cricket/engine/live.js";
+test("scorecardRank: crease first (striker first), then the bowler, then batting order, then bowling order; unlisted is null", () => {
+  const match = {
+    teams: [{ name: "Ireland Women", batting: true }, { name: "Sri Lanka Women" }],
+    players: [
+      { name: "G Lewis", team: "Ireland Women", runs: 4, out: false },
+      { name: "A Hunter", team: "Ireland Women", runs: 1, out: false, strike: true },
+      { name: "L Maritz", team: "Ireland Women", runs: 0, out: true },
+      { name: "S Sandeepani", team: "Sri Lanka Women", wickets: 1, conceded: 5, current: true },
+      { name: "I Dulani", team: "Sri Lanka Women", wickets: 0, conceded: 3 },
+    ],
+    card: [{ n: 1, team: "Ireland Women", batters: [{ name: "L Maritz", out: true }, { name: "A Hunter" }, { name: "G Lewis" }], yetToBat: ["L Little"], bowlers: [{ name: "S Sandeepani" }, { name: "I Dulani" }] }],
+  };
+  const rank = scorecardRank(match);
+  const order = ["G Lewis", "A Hunter", "S Sandeepani", "L Maritz", "L Little", "I Dulani", "Nobody"].sort((a, b) => (rank(a) ?? Infinity) - (rank(b) ?? Infinity));
+  assert.deepEqual(order.slice(0, 3), ["A Hunter", "G Lewis", "S Sandeepani"]);
+  assert.ok(rank("A Hunter") < rank("G Lewis") && rank("L Maritz") < rank("L Little") && rank("L Little") < rank("I Dulani"));
+  assert.equal(rank("Nobody"), null);
+  assert.equal(scorecardRank(null), null);
+});

@@ -17,7 +17,7 @@ export const abs = (u: string) => (u.startsWith("/") ? SITE_URL + u : u);
 export const IMG_CDN = (process.env.EXPO_PUBLIC_IMG_CDN ?? "").replace(/\/$/, "");
 
 /**
- * Where each match's permanent archive file lives (every line the books priced for it, kept for good): `EXPO_PUBLIC_ARCHIVE_URL` in mobile/.env.local, never written in a tracked file.
- * Without it a finished match whose lines the live feed has let go simply has no props to show.
+ * Where each match's permanent archive file lives (every line the books priced for it, kept for good). The site reads the same folder (`ARCHIVE` in site/src/lib/feeds.ts); `EXPO_PUBLIC_ARCHIVE_URL`
+ * overrides it. Without an archive a started match, whose pre-match props the live book file has let go, has no Props tab.
  */
-export const ARCHIVE_URL = (process.env.EXPO_PUBLIC_ARCHIVE_URL ?? "").replace(/\/$/, "");
+export const ARCHIVE_URL = (process.env.EXPO_PUBLIC_ARCHIVE_URL || "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/archive").replace(/\/$/, "");

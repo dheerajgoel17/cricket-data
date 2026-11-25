@@ -114,7 +114,7 @@ describe("OverviewRow wrapper", () => {
     expect(screen.getByText("Edge")).toBeInTheDocument();
   });
 
-  it("Home OverviewRow + fixture FancyLines: In Play Market, never per-row Live", () => {
+  it("Home OverviewRow + fixture FancyLines: In play line, never per-row Live", () => {
     const live = { ...row, live: true, opened: 240.5 };
     // Home: interleaved OverviewRow; fixture Match Fancy: FancyLines.
     render(
@@ -123,7 +123,7 @@ describe("OverviewRow wrapper", () => {
         <FancyLines rows={[live]} density="dense" onOpen={() => undefined} />
       </MemoryRouter>,
     );
-    expect(screen.getAllByText("In Play Market").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText("In play line").length).toBeGreaterThanOrEqual(2);
     expect(screen.queryByText("Live")).toBeNull();
   });
 });

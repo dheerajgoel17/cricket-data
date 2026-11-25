@@ -373,6 +373,17 @@
     ]
   },
   {
+    "path": "mobile/src/ui/badge.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "Badge"
+    ],
+    "dependencies": [
+      "mobile/src/ui/text.tsx"
+    ]
+  },
+  {
     "path": "mobile/src/ui/bleed.tsx",
     "platform": "native",
     "route": false,
@@ -606,6 +617,7 @@
       "mobile/src/ui/bleed.tsx",
       "mobile/src/ui/line-stepper.tsx",
       "mobile/src/ui/mini-bars.tsx",
+      "mobile/src/ui/prop-row.tsx",
       "mobile/src/ui/player-avatar.tsx",
       "mobile/src/ui/team-badge.tsx"
     ]
@@ -770,6 +782,7 @@
     ],
     "dependencies": [
       "mobile/src/ui/text.tsx",
+      "mobile/src/ui/badge.tsx",
       "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/tick.tsx"
     ]
@@ -1014,7 +1027,8 @@
     "platform": "native",
     "route": false,
     "exports": [
-      "PropRow"
+      "PropRow",
+      "TrendRow"
     ],
     "dependencies": [
       "mobile/src/ui/press.tsx",
@@ -1756,6 +1770,7 @@
     ],
     "dependencies": [
       "site/src/components/app/status-label.tsx",
+      "site/src/components/ui/badge.tsx",
       "site/src/components/app/tick.tsx"
     ]
   },

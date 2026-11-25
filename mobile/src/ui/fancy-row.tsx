@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   main: { minHeight: 56, flexDirection: "row", alignItems: "center", gap: space.snug, paddingHorizontal: space.gutter, paddingVertical: space.snug },
   icon: { width: control, height: control, borderRadius: control / 2, alignItems: "center", justifyContent: "center", backgroundColor: color.secondary },
   left: { flex: 1, minWidth: 0, gap: space.hair },
-  // the name keeps its width and the tag ("In Play Market") drops to the next line when they do not fit, so the market is never cut to "25 o..."
+  // the name keeps its width and the tag ("In play line") drops to the next line when they do not fit, so the market is never cut to "25 o..."
   titleRow: { flexDirection: "row", flexWrap: "wrap", alignItems: "center", columnGap: space.tight, rowGap: 2 },
   label: { ...t.bodyStrong, color: color.foreground, maxWidth: "100%" },
   sub: { ...type.footnote, color: color["muted-foreground"] },

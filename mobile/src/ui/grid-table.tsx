@@ -18,6 +18,7 @@ import { EmptyState, ErrorState } from "@/ui/empty-state";
 import { Bleed } from "@/ui/bleed";
 import { LineStepper } from "@/ui/line-stepper";
 import { MiniBars } from "@/ui/mini-bars";
+import { TrendRow } from "@/ui/prop-row";
 import { PlayerAvatar } from "@/ui/player-avatar";
 import { TeamBadge } from "@/ui/team-badge";
 import { cap, color, num, numLg, radius, space, type, tint, fs, surface, t, d, state } from "@/ui/tokens";
@@ -152,27 +153,19 @@ export function TrendList({ grids, line, minHit, stat }: { grids: { g: Grid; tea
   const label = (STATS as any)[stat].label;
   const who = (i: number) => playerLabel(store, names, i);
   return (
-    <Bleed style={{ paddingHorizontal: 0 }}>
+    <View style={styles.rows}>
       {list.map((i, n) => (
-        <Press scale={1} key={`${i.p}-${i.team}`} onPress={() => push(`/player/${i.p}`)} accessibilityRole="button" style={({ pressed }) => [styles.trend, n > 0 && styles.sep, pressed && { backgroundColor: color.card }]}>
-          <PlayerAvatar pid={store.P.id[i.p]} team={store.teamName(i.team)} size={44} name={who(i.p)} />
-          <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-            <Text style={styles.name} numberOfLines={1}>{who(i.p)}</Text>
-            <Text style={styles.desc} numberOfLines={1}><Text style={{ color: color.primary }}>O {line} {label}</Text> · {i.k}/{i.vals.length}</Text>
-          </View>
-          <View style={{ alignItems: "flex-end", gap: 2 }}>
-            <Text style={styles.rate}>{pc(i.rate)}</Text>
-            <Text style={styles.fairText}>fair {odds(i.rate ? 1 / i.rate : null)}</Text>
-          </View>
-          <MiniBars last={i.vals.slice(-10).map((v: number) => ({ v, s: v > line ? "hit" : v < line ? "miss" : "push" }))} line={line} />
-        </Press>
+        <TrendRow key={`${i.p}-${i.team}`} i={n} pid={store.P.id[i.p]} team={store.teamName(i.team)} name={who(i.p)} line={line} rate={i.rate} fair={odds(i.rate ? 1 / i.rate : null)}
+          desc={<><Text style={{ color: color.primary }}>O {line} {label}</Text><Text style={{ color: color["muted-foreground"] }}> · {i.k}/{i.vals.length}</Text></>}
+          last={i.vals.slice(-10).map((v: number) => ({ v, s: v > line ? "hit" : v < line ? "miss" : "push" }))} onPress={() => push(`/player/${i.p}`)} />
       ))}
-    </Bleed>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   filterBleed: { marginHorizontal: -space.gutter },
+  rows: { marginHorizontal: -space.gutter },
   table: { flexDirection: "row", ...surface.card, overflow: "hidden" },
   cell: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.hairline, paddingHorizontal: space.tight },
   rowStart: { height: ROW_H, flexDirection: "row", alignItems: "center" },

@@ -599,3 +599,14 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Change:** the app's Odd / Even tab (was a "coming soon" placeholder) and a new Toss tab are the twins of the site's: a heading per side, then hairline rows with tap-for-detail marks (`MarkRow`, `MarkSection`, twins of the site's `mark-rows.tsx`), overs as the existing `Chips` and the window in the existing `FilterSheet`. The toss rows leave the app's Match Fancy list. Same engine functions as the site (`parity.js`, `toss.js`).
 - **Callers:** fixture screen tabs Toss and Odd / Even
 
+
+### 2026-11-25 — In play line badge (`Badge` variant `miss`) and in-play rows first
+- **Path:** `site/src/components/ui/badge.tsx` (variant `miss`), `mobile/src/ui/badge.tsx` (new, twin of the shadcn `Badge`), `live-spot.tsx`, `mobile/src/ui/live-bits.tsx`, both `match-fancy.tsx`, `site/packages/engine/inplay-lines.js` (`inPlayFirst`), `site/src/pages/DesignSystem.tsx`
+- **Change:** the in-play mark on prop and fancy rows is the shadcn `Badge` (variant `miss`: miss-tinted, miss text) reading **In play line**, not a caption; `StatusLabel` keeps its plain `inPlay` caption only. The app gets a `Badge` twin with the same variants. Rule: in-play rows come first in every row table (AGENTS.md 9a, docs/SITE.md "In-play lines first"); Match Fancy now lists in-play-only markets and in-play scored rows before the pre-match ones.
+- **Also:** a match page's Props rows follow the live scorecard (crease, bowler now, batting order, bowling order) via `scorecardRank` and the screener's `order(rows, s, rank)`.
+- **Callers:** `InPlayBadge` on Props, Match Fancy (scored and `liveRows`), Hot props rows
+
+### 2026-11-25 — App: Custom line uses the prop row and the shared tab spacing
+- **Path:** `mobile/src/ui/prop-row.tsx` (`TrendRow`), `mobile/src/ui/grid-table.tsx` (`TrendList`), `mobile/src/app/fixture/[id]/index.tsx`
+- **Change:** the Custom line list is flat hairline rows built like a prop row (avatar, name and flag, the line under it, a right-hand Hit figure, MiniBars), not a bordered card of its own design. The Custom line page drops the extra top padding and gap, so its stat chips sit under the section chips at the same distance as Match Fancy, Toss and Odd / Even.
+- **Callers:** fixture tab Custom line

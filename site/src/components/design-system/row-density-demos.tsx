@@ -282,7 +282,7 @@ export function RowDensityDemos() {
         </div>
       </PreviewFrame>
       <PreviewFrame
-        title="In Play Market — liveRows"
+        title="In play line — liveRows"
         description="Match Fancy in-play-only markets reuse CompactFancyItem with `live`. `scoreLiveOuRow` fills Edge + L10 from the overs tape (same as scored fancy). Demo shows a scored row."
         canvasClassName="items-stretch justify-start bg-background"
         source="live-markets.tsx · scoreLiveOuRow"
