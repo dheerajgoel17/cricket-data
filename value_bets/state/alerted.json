@@ -29,24 +29,9 @@
   "start_utc": "2026-11-27T08:15:00Z",
   "alerted_at": "2026-11-24T15:35:07.837058+00:00"
  },
- "male|Desert Vipers|Dubai Capitals|2026-11-25|batter_fours||Faf du Plessis under 2.5|2.5|under": {
-  "edge": 0.1069,
-  "start_utc": "2026-11-25T14:30:00Z",
-  "alerted_at": "2026-11-25T08:34:55.454263+00:00"
- },
  "female|Adelaide Strikers Women|Sydney Thunder Women|2026-11-26|batter_fours||Laura Wolvaardt under 3.5|3.5|under": {
   "edge": 0.0608,
   "start_utc": "2026-11-26T04:40:00Z",
   "alerted_at": "2026-11-25T06:34:41.369236+00:00"
- },
- "male|Desert Vipers|Dubai Capitals|2026-11-25|batter_fours||Francois du Plessis under 2.5|2.5|under": {
-  "edge": 0.0572,
-  "start_utc": "2026-11-25T14:30:00Z",
-  "alerted_at": "2026-11-25T07:33:52.954450+00:00"
- },
- "male|Desert Vipers|Dubai Capitals|2026-11-25|batter_sixes||Joe Clarke under 0.5|0.5|under": {
-  "edge": 0.081,
-  "start_utc": "2026-11-25T14:30:00Z",
-  "alerted_at": "2026-11-25T08:34:55.454263+00:00"
  }
 }
