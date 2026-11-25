@@ -60,13 +60,13 @@ def test_resolve_initials_and_ambiguity():
 def test_link_players_fills_ids_and_reports(tmp_path):
     store = Store(tmp_path)
     _canon(store)
-    p = _prov(store, names=("Harry Brook", "Nobody Known"))
+    p = _prov(store, names=("Harry Brook", "Billy Bob Root"))
     st = link_players(store)
-    assert st["linked"] == 1 and st["unmatched"] == 1
+    assert st["linked"] == 1 and st["unmatched"] == 1  # a shared surname with no matching initial: reviewed, not minted
     doc = json.loads(p.read_text())
     assert doc["players"][0]["player_id"] == "4ae1755b"
     rep = (tmp_path / "provisional_unmatched.csv").read_text()
-    assert "Nobody Known" in rep and "Harry Brook" not in rep
+    assert "Billy Bob Root" in rep and "Harry Brook" not in rep
     assert ("england", "male") in build_rosters(store)
 
 
@@ -96,6 +96,18 @@ def test_link_players_mints_ids_for_a_side_base_has_no_roster_of(tmp_path):
     assert st["unmatched"] == 0 and st["minted"] == 3
     assert "Gurbaz" not in (tmp_path / "provisional_unmatched.csv").read_text()
     assert link_players(store)["already"] == 4, "a second run leaves every id as it is"
+
+
+def test_link_players_mints_a_debutant_on_a_side_base_lists(tmp_path):
+    """A full name nobody on the Base roster could be a spelling of gets a stable id; one who shares a surname stays unlinked."""
+    store = Store(tmp_path)
+    _canon(store)
+    p = _prov(store, names=("Zak Crawley", "Billy Bob Root", "Harry Brook", "Solo"))
+    st = link_players(store)
+    ids = [x["player_id"] for x in json.loads(p.read_text())["players"]]
+    assert ids[0] == minted_id("Zak Crawley") and ids[1] == "" and ids[2] == "4ae1755b" and ids[3] == ""
+    assert st["minted"] == 1 and st["unmatched"] == 2
+    assert link_players(store)["minted"] == 0, "a second run keeps the id"
 
 
 def test_combined_dedupes_when_cricsheet_lands(tmp_path):

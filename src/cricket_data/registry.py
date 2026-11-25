@@ -7,6 +7,9 @@ registry id. `link_players` fills `player_id` in provisional files from, in orde
   3. same surname + compatible first name/initials, accepted only when exactly one roster player fits;
   4. a team Base has no roster for at all (Afghanistan, many associates): the one Base player with exactly this full name on any team, else
      a minted id (`minted_id`), so the side's matches build a history and its players can be priced like any other.
+  5. a side Base does list, but a full name nobody on that roster shares a surname with (a debutant, a squad player Base never named): a minted id too
+     (`_new_to_roster`). A shared surname stays blank on purpose: it is probably one person under another spelling (Base's GWHM Perera is "Hasini Perera"),
+     and a second id would split his history; fix those by hand in player_aliases.csv / value_bets/mappings/players.csv.
 Anything else stays blank and is listed in data/provisional_unmatched.csv.
 """
 from __future__ import annotations
@@ -162,6 +165,17 @@ def minted_id(name: str, gender: str = "male") -> str:
     return hashlib.sha1(f"minted|{_gender(gender)}|{_key(name)}".encode()).hexdigest()[:8]
 
 
+def _new_to_roster(raw: str, team: str, gender: str, rosters) -> bool:
+    """True for a full name (two or more words) on a side Base does list, when no player on that roster shares his surname: nobody he could be a spelling of.
+    A shared surname stays unlinked and reviewed ("Hasini Perera" next to GWHM Perera is one person, and a second id would split his history)."""
+    rt = _tokens(raw)
+    ros = rosters.get((_team(team), _gender(gender, team)), {})
+    if len(rt) < 2 or not ros or not _team(team):
+        return False
+    sur = rt[-1].lower()
+    return not any(ct and ct[-1].lower() == sur for ct in (_tokens(n) for n, _, _ in ros.values()))
+
+
 def link_players(store: Store, today: date | None = None) -> dict[str, int]:
     """Fill player_id in every provisional JSON file; write data/provisional_unmatched.csv."""
     rosters, aliases = build_rosters(store), load_aliases(store)
@@ -189,6 +203,13 @@ def link_players(store: Store, today: date | None = None) -> dict[str, int]:
                 if len(same) == 1:
                     pid = next(iter(same))
                 elif (m := minted_id(pl["player"], g)) not in base_ids:
+                    pid = m
+                    stats["minted"] += 1
+                else:
+                    reason = "id_clash"
+            elif not pid and reason == "no_candidate" and _new_to_roster(pl.get("player", ""), pl.get("team", ""), doc.get("gender", ""), rosters):
+                g = _gender(doc.get("gender", ""), pl.get("team", ""))
+                if (m := minted_id(pl["player"], g)) not in base_ids:  # a debutant, a squad player Base never listed: one stable id so his history builds and a book's line finds him
                     pid = m
                     stats["minted"] += 1
                 else:
