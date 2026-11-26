@@ -66,7 +66,7 @@ async function send(res, status, body) {
 }
 
 export function liveHandler(readIdentity = () => readFile(join(process.cwd(), IDENTITY_FILE), "utf8").then(JSON.parse)) {
-  const feed = createFeed({ base, getJson, getText, getHtml, loadIdentity: identityLoader(readIdentity), ttlMs: LIVE_SCORE_TTL_MS });
+  const feed = createFeed({ base, getJson, getText, getHtml, loadIdentity: identityLoader(readIdentity), ttlMs: LIVE_SCORE_TTL_MS, readBudget: Number(process.env.LIVE_READ_BUDGET) || undefined });
   return async function handler(req, res) {
     res.setHeader("Cache-Control", `public, s-maxage=${LIVE_SCORE_TTL_MS / 1000}`);
     if (req.method !== "GET") return res.status(405).json({ error: "GET only" });
