@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-26 15:00 IST
+# Cricket value bets - 2026-11-26 16:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1663 prices
+- **moviodds_bet365**: ok, 1659 prices
+- **smarkets**: ok, 298 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
-- **smarkets**: ok, 302 prices
 - **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
-- **feedl**: ok, 461 prices, 17 events
+- **feedl**: ok, 441 prices, 13 events
 - **feedk**: ok, 188 prices, 4 events
-- **feede**: ok, 322 prices, 16 events
-- **feedf**: ok, 406 prices, 10 events
-- **feedj**: ok, 439 prices, 8 events
-- **feedh**: ok, 1053 prices, 46 events
+- **feedf**: ok, 348 prices, 8 events
+- **feede**: ok, 258 prices, 16 events
+- **feedj**: ok, 486 prices, 6 events
+- **feedh**: ok, 935 prices, 40 events
 
-Matches starting in next 168h: **24**, markets priced: **350**, value bets: **6** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **24**, markets priced: **337**, value bets: **6** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -36,6 +36,6 @@ Matches starting in next 168h: **24**, markets priced: **350**, value bets: **6*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-27 20:00 IST Sharjah Warriorz vs Dubai Capitals / Batter Milestones / SW Billings 50+ yes @ 9.00 (moviodds_bet365): edge 32.0%, model 0.1256, market 0.1639
 
-Unmatched team names (add to mappings/teams.csv): Central (male), East Zone (W) (female), Elite Cricket Academy (male), IAS Invincibles (male), Ias Invincibles (male), Majees Titan (male), Muscat Thunders (male), Mustafa Fragrance (male), North Zone (W) (female), Sunny 11 Pratishtan (male), Yalla Shabab Giants (male)
+Unmatched team names (add to mappings/teams.csv): Central (male), Elite Cricket Academy (male), IAS Invincibles (male), Ias Invincibles (male), Mustafa Fragrance (male), Sunny 11 Pratishtan (male), Yalla Shabab Giants (male)
 
-Runtime 118.0s. Snapshot: `odds_20261126T093032Z.jsonl.gz`
+Runtime 115.9s. Snapshot: `odds_20261126T103038Z.jsonl.gz`

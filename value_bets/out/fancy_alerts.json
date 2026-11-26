@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-26T09:33:13Z",
+ "generated_at_utc": "2026-11-26T10:33:42Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -126,7 +126,7 @@
    "fixture_id": "2026-11-26-mizoram-v-uttar-pradesh",
    "match": "Mizoram vs Uttar Pradesh",
    "format": "T20",
-   "series": "SMAT Elite T20 2026",
+   "series": "Syed Mushtaq Ali Trophy Elite 2026",
    "start_utc": "2026-11-26T11:00:00Z",
    "start_ist": "2026-11-26 16:30 IST",
    "key": "top_score",
@@ -208,9 +208,9 @@
    "hits": 15,
    "played": 20,
    "window": 20,
-   "chance": 0.6779,
-   "edge": 0.1862,
-   "edge_pct": 18.6,
+   "chance": 0.6781,
+   "edge": 0.1867,
+   "edge_pct": 18.7,
    "bat_first": false
   },
   {
