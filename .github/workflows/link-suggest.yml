@@ -1,0 +1,62 @@
+name: Link suggestions
+
+# After every hourly Value bets run: take the names the books print that no archived line has a player id for, tie each to its Base player from the fixture it is priced in
+# (the sides, or the nation they stand for) and to his source page by nationality, and commit ONLY the settled lines to the two mapping files. The mapping tests run first; if
+# any fails, nothing is committed. The rest is listed in the job summary for a person. See docs/OPERATIONS.md "Mapping a name" and src/cricket_site/link_suggest.py.
+on:
+  workflow_run:
+    workflows: ["Value bets"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: link-suggest
+  cancel-in-progress: false
+
+env:
+  LIVE_SOURCE_BASE: ${{ secrets.LIVE_SOURCE_BASE }}
+  LIVE_SITEMAP_DIR: ${{ secrets.LIVE_SITEMAP_DIR }}
+
+jobs:
+  suggest:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev,value-bets]"
+      - name: Suggest and apply the settled links
+        run: python -m cricket_site.link_suggest --data data --vb value_bets --apply --out link_suggest.md
+      - name: Summary
+        if: always()
+        run: '[ -f link_suggest.md ] && cat link_suggest.md >> "$GITHUB_STEP_SUMMARY" || true'
+      - name: Mapping tests
+        run: pytest -q tests/site/test_identity.py tests/site/test_link_suggest.py tests/value_bets
+      - name: Commit the mapping files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/mappings/player_identity.csv value_bets/mappings/players.csv
+          if git diff --cached --quiet; then echo "No new links."; exit 0; fi
+          git commit -q -m "link-suggest: settled links from the fixtures [skip ci]"
+          for i in 1 2 3; do
+            if git pull --rebase -q; then
+              git push -q && exit 0
+            elif git rebase --abort; then
+              echo "::error::Concurrent edits conflict with the mapping files; run again"
+              exit 1
+            fi
+            sleep $((i * 10))
+          done
+          echo "::error::push failed after retries"; exit 1
