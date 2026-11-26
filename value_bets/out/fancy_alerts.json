@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-26T08:35:09Z",
+ "generated_at_utc": "2026-11-26T09:33:13Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -234,6 +234,29 @@
    "chance": 0.6324,
    "edge": 0.1826,
    "edge_pct": 18.3,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-27-sharjah-warriorz-v-dubai-capitals|match_sixes||0|under",
+   "fixture_id": "2026-11-27-sharjah-warriorz-v-dubai-capitals",
+   "match": "Sharjah Warriorz vs Dubai Capitals",
+   "format": "T20",
+   "series": "ILT20 2026",
+   "start_utc": "2026-11-27T14:30:00Z",
+   "start_ist": "2026-11-27 20:00 IST",
+   "key": "match_sixes",
+   "team": null,
+   "inn": 0,
+   "side": "under",
+   "line": 13.5,
+   "best_odds": 1.91,
+   "best_source": "Ladbrokes",
+   "hits": 24,
+   "played": 37,
+   "window": 20,
+   "chance": 0.6146,
+   "edge": 0.1738,
+   "edge_pct": 17.4,
    "bat_first": false
   },
   {
