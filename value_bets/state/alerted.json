@@ -98,5 +98,10 @@
   "edge": 0.0906,
   "start_utc": "2026-11-27T10:10:00Z",
   "alerted_at": "2026-11-26T05:57:34.678595+00:00"
+ },
+ "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_fours||Amy Jones under 2.5|2.5|under": {
+  "edge": 0.1823,
+  "start_utc": "2026-11-26T08:10:00Z",
+  "alerted_at": "2026-11-26T06:33:25.424424+00:00"
  }
 }
