@@ -1,19 +1,4 @@
 {
- "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_milestone||Meg Lanning 50+ no|49.5|under": {
-  "edge": 0.0899,
-  "start_utc": "2026-11-26T08:10:00Z",
-  "alerted_at": "2026-11-23T07:36:31.275782+00:00"
- },
- "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_runs||Ellyse Perry under 32.5|32.5|under": {
-  "edge": 0.0841,
-  "start_utc": "2026-11-26T08:10:00Z",
-  "alerted_at": "2026-11-23T09:32:30.102779+00:00"
- },
- "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_runs||Ellyse Perry under 29.5|29.5|under": {
-  "edge": 0.0571,
-  "start_utc": "2026-11-26T08:10:00Z",
-  "alerted_at": "2026-11-24T04:35:46.336198+00:00"
- },
  "male|Australia|England|2026-11-27|batter_milestone||Aneurin Donald 50+ yes|49.5|over": {
   "edge": 0.2159,
   "start_utc": "2026-11-27T08:15:00Z",
@@ -64,16 +49,6 @@
   "start_utc": "2026-11-27T08:15:00Z",
   "alerted_at": "2026-11-26T01:34:06.421835+00:00"
  },
- "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_fours||AK Gardner under 2.5|2.5|under": {
-  "edge": 0.2027,
-  "start_utc": "2026-11-26T08:10:00Z",
-  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
- },
- "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_milestone||AK Gardner 50+ no|49.5|under": {
-  "edge": 0.0584,
-  "start_utc": "2026-11-26T08:10:00Z",
-  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
- },
  "male|Australia|England|2026-11-27|batter_sixes||Philip Salt under 0.5|0.5|under": {
   "edge": 0.0915,
   "start_utc": "2026-11-27T08:15:00Z",
@@ -98,10 +73,5 @@
   "edge": 0.0906,
   "start_utc": "2026-11-27T10:10:00Z",
   "alerted_at": "2026-11-26T05:57:34.678595+00:00"
- },
- "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_fours||Amy Jones under 2.5|2.5|under": {
-  "edge": 0.1823,
-  "start_utc": "2026-11-26T08:10:00Z",
-  "alerted_at": "2026-11-26T06:33:25.424424+00:00"
  }
 }
