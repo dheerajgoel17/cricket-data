@@ -29,11 +29,6 @@
   "start_utc": "2026-11-27T08:15:00Z",
   "alerted_at": "2026-11-24T15:35:07.837058+00:00"
  },
- "female|Adelaide Strikers Women|Sydney Thunder Women|2026-11-26|batter_fours||Laura Wolvaardt under 3.5|3.5|under": {
-  "edge": 0.0608,
-  "start_utc": "2026-11-26T04:40:00Z",
-  "alerted_at": "2026-11-25T06:34:41.369236+00:00"
- },
  "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||Andre Russell under 1.5|1.5|under": {
   "edge": 0.2306,
   "start_utc": "2026-11-26T14:30:00Z",
