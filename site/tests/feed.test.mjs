@@ -108,3 +108,31 @@ test("the fast score feed refreshes live cards while reusing discovery and compl
   assert.equal(calls.filter((url) => url.endsWith("/match/live")).length, 2);
   assert.equal(calls.filter((url) => url.endsWith("/match/done")).length, 1);
 });
+
+test("a busy day: 22 live and 12 upcoming do not crowd out a finished match's scorecard, and it is kept", async () => {
+  const row = (i, status, t, extra = {}) => ({
+    team1: `Home ${i}`, team2: `Away ${i}`, t1SName: `H${i}`, t2SName: `A${i}`, t: Date.parse(t), fo: "T20", mf: `M${i}`, link: `/match/m${i}`, ...extra,
+    ...(status === "live" ? { s1: "50-1", o1: "6.0", status: 1, winningTeam: -1, w: -1, statusText: "Live" } : status === "final" ? { s1: "150-5", o1: "20.0", s2: "151-4", o2: "19.0", status: 2, winningTeam: 1, w: 1, result: "Away won" } : { status: 0, statusText: "Upcoming" }),
+  });
+  const rows = [
+    ...Array.from({ length: 22 }, (_, i) => row(i, "live", "2026-11-05T02:00:00Z")),
+    ...Array.from({ length: 12 }, (_, i) => row(100 + i, "upcoming", "2026-11-05T03:20:00Z")),
+    row(200, "final", "2026-11-05T00:00:00Z"),
+  ];
+  const sched = pageHtml({ [FIXTURE]: rows });
+  const page = pageHtml({ [LIVE]: { team1_f_n: "Home 200", team2_f_n: "Away 200", status: 2, score1: "150-5", over1: "20.0", score2: "151-4", over2: "19.0", player_full_name1: "Kavem Hodge", run1: "40", ball1: "(30)" } });
+  let t = Date.parse("2026-11-05T03:00:00Z");
+  const feed = createFeed({
+    now: () => t, cardBudgetMs: 1000, base: () => "https://src.test", booksUrl: "books", scheduleUrl: "schedule.csv",
+    getJson: async () => ({ lines: rows.map((r) => ({ match: `${r.team1} vs ${r.team2}`, start_utc: new Date(r.t).toISOString().replace(".000", ""), fmt: "T20" })) }),
+    getText: async () => "", loadIdentity: async () => NO_IDENTITY,
+    getHtml: async (url) => (url.endsWith("/") || url.endsWith("/schedule") ? sched : url.includes("/match/m200") ? page : url.includes("/match/") ? "" : ""),
+  });
+  const body = await feed.snapshot();
+  assert.equal(body.matches.filter((m) => m.status === "live").length, 22);
+  const done = body.matches.find((m) => m.id === "M200");
+  assert.ok((done?.players || []).some((p) => p.name === "Kavem Hodge"), "the finished match has its scorecard");
+  t += 20_000;
+  const again = await feed.snapshot();
+  assert.ok((again.matches.find((m) => m.id === "M200")?.players || []).length > 0, "and it is still there on the next round");
+});

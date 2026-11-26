@@ -1,6 +1,6 @@
 // The live feed as a function of its inputs, with no runtime in it (no fs, no process.env): `createFeed` is run by the Vercel function api/live.js (every request, cached
 // ~15 s) and by the Cloudflare Worker that writes the match-state table (every minute). Both read the same source pages with the same rules, so they agree.
-import { bookFixtures, buildMatch, cardFetchList, cardPageUrl, keepGapRow, LIVE_TTL_MS, mergeSchedule, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows } from "./live.js";
+import { bookFixtures, buildMatch, cardFetchList, cardPageUrl, hasCard, keepGapRow, LIVE_TTL_MS, mergeSchedule, parseFixtureCsv, parseMatchPage, parseSchedule, parseCardPage, pricedLive, settleLines, unlistedRows } from "./live.js";
 
 export const BOOKS_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/book_lines.json";
 export const SCHEDULE_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/data/fixtures/upcoming.csv"; // our own schedule: the match pages of games the source's schedule no longer list
@@ -50,7 +50,7 @@ export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now 
         pages.set(m, got);
         if (got.live && (got.live.status === "final" || m.status === "final")) finals.set(m.url, { t: now(), pages: got });
       };
-      const wanted = cardFetchList(rows, MAX_CARDS, now());
+      const wanted = cardFetchList(rows, MAX_CARDS, now(), (m) => { const k = finals.get(m.url); return !!k && now() - k.t < FINAL_TTL_MS; });
       const liveCards = wanted.filter((m) => m.status === "live");
       const rest = wanted.filter((m) => m.status !== "live");
       await Promise.allSettled(liveCards.map(loadCard));
@@ -61,7 +61,10 @@ export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now 
       // and each match carries where its priced lines stand (the books' player lines, settled with the identity table)
       const priorById = new Map((memo.body?.matches || []).map((x) => [String(x.id), x]));
       const matches = rows.filter((m) => !gaps.includes(m) || keepGapRow(m, pages.get(m)?.live)).map((m) => {
-        const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card, priorById.get(String(m.id))) : m;
+        const prior = priorById.get(String(m.id));
+        // a finished match whose pages were not read this round (over the budget, or past the fetch list) keeps the scorecard of the last round: it cannot change, and its priced lines are settled from it
+        const carried = !pages.has(m) && m.status === "final" && prior?.status === "final" && hasCard(prior) ? prior : null;
+        const { url, ...pub } = pages.has(m) ? buildMatch(m, pages.get(m).live, pages.get(m).card, prior) : carried ? { ...m, ...carried } : m;
         return { ...pub, lines: settleLines(pub, booksDoc.lines, idn) };
       });
       const body = { asOf: new Date().toISOString(), source: "live", delaySec: ttlMs / 1000, linked: idn.size, matches };

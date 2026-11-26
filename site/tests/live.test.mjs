@@ -1190,6 +1190,23 @@ test("unlistedRows keeps a Test through the day break, and pricedLive matches a 
   assert.equal(cardFetchList([...finals, ...manyLive], 12, now).length, 15, "every live match is fetched, even past the finished-match cap");
 });
 
+test("cardFetchList: 25 live at once are all read, and a finished match comes before an upcoming one", () => {
+  const now = Date.parse("2026-11-26T07:55:00Z");
+  const mk = (id, status, start) => ({ id, status, url: `/${id}`, start, fmt: "T20" });
+  const live = Array.from({ length: 25 }, (_, i) => mk(`l${i}`, "live", "2026-11-26T05:30:00Z"));
+  const upcoming = Array.from({ length: 12 }, (_, i) => mk(`u${i}`, "upcoming", "2026-11-26T08:00:00Z"));
+  const done = mk("done", "final", "2026-11-26T03:30:00Z");
+  const got = cardFetchList([...upcoming, ...live, done], 12, now);
+  assert.equal(got.filter((m) => m.status === "live").length, 25, "every live match is read");
+  assert.ok(got.some((m) => m.id === "done"), "the finished match is read even with 25 live and 12 upcoming");
+  assert.ok(got.indexOf(got.find((m) => m.id === "done")) < got.findIndex((m) => m.status === "upcoming"), "finished before upcoming");
+  const fin = Array.from({ length: 10 }, (_, i) => mk(`f${i}`, "final", "2026-11-26T03:30:00Z"));
+  const held = new Set(fin.map((m) => m.id));
+  const again = cardFetchList([...fin, ...live, ...upcoming], 12, now, (m) => held.has(m.id));
+  assert.equal(again.filter((m) => m.status === "final").length, 10, "finished matches already held come free, outside the cap");
+  assert.ok(again.filter((m) => m.status === "upcoming").length >= 1, "a few upcoming cards still fit");
+});
+
 // --- a Test's first- and second-innings lines: read off the innings of the player's own side, not the match total ---
 const bat = (id, name, runs, balls, fours, sixes, out) => ({ id, name, runs, balls, fours, sixes, out });
 function testMatch(card, extra = {}) {
