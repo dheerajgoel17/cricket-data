@@ -5,7 +5,7 @@ import { bookName } from "@cricket/engine/lines.js";
 import { edgeTag } from "@cricket/engine/props-view.js";
 import { BookBadge } from "./book-badge";
 import { TeamBadge } from "./badges";
-import { InPlayBadge } from "./live-spot";
+import { InPlayBadge, LineMove } from "./live-spot";
 import { MiniBars, MiniBarsSlot, SCAN_ROW_GRID, ScanEdge } from "./mini-bars";
 import { FormChips } from "./recent-form";
 import { ResultStamp, sideStamp } from "./result-stamp";
@@ -133,7 +133,7 @@ export function CompactFancyItem({ r, onOpen, active, sub, standing, inset }: {
       <span className="grid min-w-0 gap-hair">
         <span className="flex min-w-0 items-center gap-tight">
           <span className="min-w-0 truncate text-body font-emphasis leading-snug">{r.label}</span>
-          {r.live ? <InPlayBadge /> : null}
+          {r.live ? <InPlayBadge /> : r.moved ? <LineMove from={r.moved.from} line={r.moved.to} /> : null}
         </span>
         {toss && !sub && tossSub(r) ? <TruncTip text={tossSub(r)} className="text-footnote text-muted-foreground" /> : sub ? <span className="truncate text-footnote text-muted-foreground">{sub}</span> : null}
         {toss ? <TossMeta r={r} /> : !voided ? <FancyLineMeta r={r} standing={mark} /> : null}
@@ -218,7 +218,7 @@ function DenseFancyTable({ rows, onOpen, standingOf, afterRow }: {
                     <span className="grid min-w-0 flex-1 gap-hair">
                       <span className="flex min-w-0 items-center gap-tight text-body font-emphasis leading-snug">
                         <span className="min-w-0 truncate">{r.label}</span>
-                        {r.live ? <InPlayBadge /> : null}
+                        {r.live ? <InPlayBadge /> : r.moved ? <LineMove from={r.moved.from} line={r.moved.to} /> : null}
                       </span>
                       {isToss(r) ? <TossMeta r={r} /> : !voided ? <FancyLineMeta r={r} standing={mark} /> : null}
                       {afterRow?.(r)}

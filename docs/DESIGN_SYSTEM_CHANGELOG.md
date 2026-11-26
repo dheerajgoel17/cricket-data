@@ -620,3 +620,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `mobile/src/ui/player-avatar.tsx` (`PlayerAvatar`, `PlayerFace`, `PlayerPortrait`), `mobile/assets/images/player-helmet.png`
 - **Change:** the same helmet head-and-shoulders picture as the site's fallback (see the entry above) in the face slot when the player has no photo, under the team shirt as for a photo; it replaces the initials the circle showed. It appears only once the photos file is in, so it never flashes before a photo arrives. `name` is now the circle's accessibility label.
 - **Callers:** every `PlayerAvatar`, `PlayerFace`, `PlayerPortrait` in the app
+
+### 2026-11-26 — Line moved mark (`LineMove`) and the match's moves strip
+- **Path:** `site/src/components/app/live-spot.tsx` (`LineMove`), `site/src/components/app/line-moves.tsx` (`LineMovesStrip`), `hot-props.tsx` (`PropLineIdentity`), `fancy-lines.tsx`, `home-mix-table.tsx`, `site/src/pages/Fixtures.tsx`, `site/src/pages/DesignSystem.tsx`
+- **Change:** when a book moves a pre-match line (fours 16.5 to 17.5) the row carries an amber arrow chip "was 16.5" beside the name, in the slot the In play line badge uses (never both: in-play wins). The match page shows a scrolling strip of one chip per moved market above its tabs. Amber like the session marks; no new `Badge` variant. The match card is not changed.
+- **Callers:** Props and Hot props rows, Match Fancy rows (scored and dense), Home mix, the match page

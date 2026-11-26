@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, ofBookMatch, overProb, sameFixture, sameFixtureId, sameFmt, sameMatchWindow, sameMatchWindowFor, teamKey, preMatchBooks, withArchive } from "@cricket/engine/lines.js";
+import { BOOK_KEEP_MS, BOOK_WINDOW_MS, SCOPE_LABEL, TEST_KEEP_MS, archiveFixture, bookFormatFor, bookLinesFor, bookName, bookQuotes, bookScopesFor, bookStatsFor, fancyByLine, fancyFor, fancyHeadline, fixtureBooks, isFixtureId, keepMsFor, lineProb, lineScope, ofBookMatch, overProb, sameFixture, sameFixtureId, sameFmt, sameMatchWindow, sameMatchWindowFor, teamKey, preMatchBooks, withArchive, withMoves, fixtureMoves } from "@cricket/engine/lines.js";
 
 const NOW = Date.parse("2026-10-27T05:00:00Z");
 const L = (line, over, under, extra = {}) => ({ pid: "ab12", stat: "runs", fmt: "T20", line, match: "India vs NZ", competition: "T20I",
@@ -476,4 +476,21 @@ test("a team line that only stands if the side bats first says so", async () => 
   assert.equal(BAT_FIRST_TAG, "If bats first");
   assert.equal(batFirstBooked([{ bat_first: true }], 0, 1), true);
   assert.equal(batFirstBooked([{ bat_first: true }, {}], 0, 1), false);
+});
+
+test("withMoves stamps the moved line on that source's entry only, before the start, and bookQuotes / fancyFor carry it", () => {
+  const mv = { t: "line", match: "India vs NZ", start_utc: "2026-10-27T07:00:00Z", pid: "ab12", stat: "runs", source: "bet365", kind: "bookmaker", open: 16.5, line: 17.5, at: "2026-10-27T04:00:00Z", n: 1 };
+  const fmv = { t: "fancy", match: "India vs NZ", start_utc: "2026-10-27T07:00:00Z", key: "match_runs", scope: "match", source: "bet365", kind: "bookmaker", open: 300.5, line: 310.5, at: "x", n: 2 };
+  const doc = { moves: [mv, fmv], lines: [L(17.5, 1.9, 1.9, { books: [{ source: "bet365", kind: "bookmaker", over: 1.9, under: 1.9 }, { source: "smarkets", kind: "exchange", over: 1.9, under: 1.9 }] }), L(22.5, 2.4, 1.55)],
+    fancy: [{ match: "India vs NZ", start_utc: "2026-10-27T07:00:00Z", fmt: "T20", key: "match_runs", scope: "match", line: 310.5, over: 1.9, under: 1.9, source: "bet365", kind: "bookmaker" }] };
+  const out = withMoves(doc, NOW);
+  assert.deepEqual(out.lines[0].books.map((b) => b.moved), [{ from: 16.5, to: 17.5, at: "2026-10-27T04:00:00Z", n: 1 }, undefined]);
+  assert.equal(out.lines[1].books[0].moved, undefined); // the other line of the ladder is untouched
+  assert.deepEqual(bookQuotes([out.lines[0]]).find((q) => q.source === "bet365").moved, { from: 16.5, to: 17.5, at: "2026-10-27T04:00:00Z", n: 1 });
+  assert.equal(bookQuotes([out.lines[0]]).find((q) => q.source === "smarkets").moved, undefined);
+  const fx = { a: "India", b: "NZ", fmt: "T20", start: "2026-10-27T07:00:00Z" };
+  assert.equal(fancyFor(out, fx, "match_runs")[0].moved.from, 300.5);
+  assert.equal(withMoves(doc, Date.parse("2026-10-27T07:30:00Z")).lines[0].books[0].moved, undefined); // started: not a pre-match move
+  assert.equal(withMoves({ lines: doc.lines }, NOW).lines, doc.lines); // no moves, the same doc
+  assert.equal(fixtureMoves(doc, fx, NOW).length, 2);
 });

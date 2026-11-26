@@ -329,13 +329,14 @@ def test_book_lines_are_copied_into_the_site_data_and_a_missing_or_broken_file_n
     vb.mkdir()
     doc = {"generated_at_utc": "2026-10-26T10:00:00Z", "lines": [{"pid": "ab12", "stat": "runs", "fmt": "T20", "line": 17.5, "books": [{"source": "smarkets", "over": 1.9, "under": 2.0}]}],
            "events": [{"match": "A vs B", "start_utc": "2026-10-27T07:00:00Z", "markets": ["batter_runs"], "sources": ["smarkets"], "n": 2}],
-           "fancy": [{"match": "A vs B", "key": "match_runs", "scope": "match", "team": None, "line": 300.5, "over": 1.9, "under": 1.9}]}
+           "fancy": [{"match": "A vs B", "key": "match_runs", "scope": "match", "team": None, "line": 300.5, "over": 1.9, "under": 1.9}],
+           "moves": [{"t": "line", "match": "A vs B", "pid": "ab12", "stat": "runs", "source": "smarkets", "open": 16.5, "line": 17.5, "at": "2026-10-26T09:00:00Z", "n": 1}]}
     (vb / "book_lines.json").write_text(json.dumps(doc))
     B.build(z, data, out, vb, workers=1)
     assert json.loads((out / "lines.json").read_text()) == doc
     (vb / "book_lines.json").write_text('{"lines": [')  # half-written
     B.build(z, data, tmp_path / "out2", vb, workers=1)
-    assert json.loads((tmp_path / "out2" / "lines.json").read_text()) == {"generated_at_utc": "", "lines": [], "events": [], "fancy": []}
+    assert json.loads((tmp_path / "out2" / "lines.json").read_text()) == {"generated_at_utc": "", "lines": [], "events": [], "fancy": [], "moves": []}
     B.build(z, data, tmp_path / "out3", None, workers=1)  # no value-bets output at all
     assert json.loads((tmp_path / "out3" / "lines.json").read_text())["lines"] == []
 

@@ -1,4 +1,5 @@
 import { DesignDocsShell, DesignHome } from "@/components/design-system/chrome";
+import { LineMove } from "@/components/app/live-spot";
 import { DocsArticle, slugify, type TocItem } from "@/components/design-system/docs-article";
 import { DocPanel, PreviewFrame } from "@/components/design-system/example-stage";
 import { Link, useLocation } from "react-router-dom";
@@ -137,6 +138,7 @@ const PAGE_TOC: Record<string, TocItem[]> = {
     { id: slugify("Loading"), label: "Loading" },
     { id: slugify("Badge"), label: "Badge" },
     { id: slugify("StatusLabel"), label: "StatusLabel" },
+    { id: slugify("LineMove"), label: "LineMove" },
   ],
   chips: [
     { id: slugify("Chip + ActiveChip"), label: "Chip" },
@@ -380,6 +382,12 @@ export function DesignSystemPage() {
           <Badge variant="destructive">Destructive</Badge>
           <Badge variant="miss">In play line</Badge>
           <Badge className="bg-primary/15 text-primary">Primary wash</Badge>
+        </PreviewFrame>
+        <PreviewFrame title="LineMove" description="A book moved a pre-match line (amber, arrow = direction, 'was' = the line it left). Beside the name on prop and fancy rows; LineMovesStrip lists a match's moves above its tabs." source="components/app/live-spot.tsx">
+          <div className="flex flex-wrap items-center gap-snug">
+            <LineMove from={16.5} line={17.5} />
+            <LineMove from={4.5} line={3.5} />
+          </div>
         </PreviewFrame>
         <PreviewFrame title="StatusLabel" description="Match / row status: tone (live · inPlay · session · muted) × surface (pill · plain · dot). LIVE pill = match live. InPlayBadge copy = In play line (line/odds). Prop rows skip per-player Live." source="components/app/status-label.tsx">
           <div className="flex flex-col gap-stack">

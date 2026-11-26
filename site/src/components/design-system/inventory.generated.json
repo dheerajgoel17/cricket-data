@@ -1708,6 +1708,17 @@
     ]
   },
   {
+    "path": "site/src/components/app/line-moves.tsx",
+    "platform": "web",
+    "route": false,
+    "exports": [
+      "LineMovesStrip"
+    ],
+    "dependencies": [
+      "site/src/components/app/scroll-row.tsx"
+    ]
+  },
+  {
     "path": "site/src/components/app/line-stepper.tsx",
     "platform": "web",
     "route": false,
@@ -1760,6 +1771,7 @@
     "exports": [
       "BatterSpot",
       "InPlayBadge",
+      "LineMove",
       "LineProgress",
       "LiveBadge",
       "LiveOpened",
@@ -2692,6 +2704,7 @@
       "DesignSystemPage"
     ],
     "dependencies": [
+      "site/src/components/app/live-spot.tsx",
       "site/src/components/app/badges.tsx",
       "site/src/components/app/book-table.tsx",
       "site/src/components/app/chip.tsx",
@@ -2728,6 +2741,7 @@
       "site/src/components/ui/button.tsx",
       "site/src/components/ui/skeleton.tsx",
       "site/src/components/ui/card.tsx",
+      "site/src/components/app/line-moves.tsx",
       "site/src/components/app/forms.tsx",
       "site/src/components/app/pill-group.tsx",
       "site/src/components/app/grid-filters.tsx",

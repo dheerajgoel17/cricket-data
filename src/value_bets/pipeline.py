@@ -468,6 +468,11 @@ def run():
     book, held = booklines.hold_started(book, prev_book, now)  # the file is pre-match prices: a started match takes no line the file did not already have (a Test is re-listed between days with prices that know the score)
     if held["lines"] or held["fancy"]:
         log(f"held back {held['lines']} player and {held['fancy']} fancy lines first priced after their match started (not pre-match prices)")
+    try:  # a source's line on a market that changed since the last file (fours 16.5 -> 17.5) before the start: published as ``moves``, never read by pricing or settlement
+        book["moves"] = booklines.track_moves(book, prev_book, now)
+    except Exception as e:
+        book["moves"] = [m for m in (prev_book or {}).get("moves") or [] if isinstance(m, dict)]
+        log(f"line moves not tracked: {e!r}")
     log(f"book lines: {len(book['lines'])} player lines from {len({x['source'] for r in book['lines'] for x in r['books']})} source(s)")
     n_inn = sum(1 for r in rows if r.get("inn"))
     if n_inn:

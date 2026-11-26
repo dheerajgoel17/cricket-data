@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Bookmaker lines and value bets: the live file from GitHub (hourly), else the copy bundled with the site build.
-import { isFixtureId } from "@cricket/engine/lines.js";
+import { isFixtureId, withMoves } from "@cricket/engine/lines.js";
 import { mergeBoardLive } from "@cricket/engine/live.js";
 import { saveLive } from "@/lib/live-cache";
 import { dataUrl } from "@/lib/data-url";
@@ -34,7 +34,7 @@ export function newerLines(bundle: any | null, fresh: any | null): any {
 /** Both files are fetched at once (the page waits for the slower of the two, at most LINES_LIVE_MS for the live one), not the live one after the bundle. */
 export async function loadLines(): Promise<any> {
   const [bundle, fresh] = await Promise.all([bundled("lines.json"), live("book_lines.json", LINES_LIVE_MS)]);
-  return newerLines(bundle, fresh);
+  return withMoves(newerLines(bundle, fresh));
 }
 
 /** The home rail's published settings (config/home_rail.json, read at view time so a change needs no deploy); null when it cannot be read, and the built-in ones apply. */

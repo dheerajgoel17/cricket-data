@@ -188,6 +188,69 @@ def hold_started(book: dict, prev: dict | None, now: dt.datetime) -> tuple[dict,
     return out, held
 
 
+def _quotes(doc: dict | None) -> dict[tuple, set]:
+    """``{(kind, who, source, book kind): lines}`` one source quotes on one market of one match: a player's stat (``who`` = match, player, stat, innings) or a fancy market
+    (match, key, scope, team, innings). More than one line for a key is a ladder of alternatives, which is not a move."""
+    out: dict[tuple, set] = defaultdict(set)
+    for x in (doc or {}).get("lines") or []:
+        for b in x.get("books") or []:
+            if x.get("line") is not None:
+                out[("line", (x.get("match"), x.get("pid") or x.get("player"), x.get("stat"), x.get("inn", 0)), b.get("source"), b.get("kind"))].add(float(x["line"]))
+    for x in (doc or {}).get("fancy") or []:
+        if x.get("line") is not None and x.get("source"):
+            out[("fancy", (x.get("match"), x.get("key"), x.get("scope"), x.get("team") or "", x.get("inn", 0)), x.get("source"), x.get("kind"))].add(float(x["line"]))
+    return out
+
+
+def _move_id(m: dict) -> tuple:
+    return (m["t"], m.get("match"), m.get("pid") or m.get("key"), m.get("stat") or m.get("scope"), (m.get("team") or "") if m["t"] == "fancy" else "", m.get("inn", 0), m.get("source"), m.get("kind"))
+
+
+def track_moves(book: dict, prev: dict | None, now: dt.datetime) -> list[dict]:
+    """The pre-match line moves to publish as ``book_lines.json`` ``moves``: where one source's single line on a market changed between the previous published file and this pull
+    (a player's fours 16.5 -> 17.5, a team total, a session line). Each entry is ``{t: "line" | "fancy", ..., source, kind, open, line, at, n}``: ``open`` is the first line this source
+    was seen with, ``line`` the one it quotes now, ``n`` how many times it moved, ``at`` when it last did. A line that moves back to ``open`` is no move and is dropped.
+
+    Only a match that has not started is tracked (a started match's lines are held: ``hold_started``), and only a source that quotes exactly one line before and after (a ladder of
+    alternative lines is not one price moving). The source's line before is the latest move's ``line`` when it has one: the previous file keeps an old line beside the new within ``PRE_HOLD`` of the start
+    (``carry_started``), so its lines alone would be a ladder. Moves of a match go with the match (``LIVE_KEEP``, ``TEST_KEEP``). Nothing here prices or changes a line."""
+    moves = {_move_id(m): m for m in (prev or {}).get("moves") or [] if isinstance(m, dict) and m.get("t")}
+    stamp = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    before, after = _quotes(rescope_prev(prev) if prev else None), _quotes(book)
+    meta: dict[tuple, dict] = {}
+    for x in book.get("lines") or []:
+        for b in x.get("books") or []:
+            meta[("line", (x.get("match"), x.get("pid") or x.get("player"), x.get("stat"), x.get("inn", 0)), b.get("source"), b.get("kind"))] = {
+                "t": "line", "match": x.get("match"), "start_utc": x.get("start_utc"), "pid": x.get("pid"), "player": x.get("player"), "team": x.get("team"),
+                "fmt": x.get("fmt"), "stat": x.get("stat"), **({"inn": x["inn"]} if x.get("inn") else {}), "source": b.get("source"), "kind": b.get("kind")}
+    for x in book.get("fancy") or []:
+        meta[("fancy", (x.get("match"), x.get("key"), x.get("scope"), x.get("team") or "", x.get("inn", 0)), x.get("source"), x.get("kind"))] = {
+            "t": "fancy", "match": x.get("match"), "start_utc": x.get("start_utc"), "key": x.get("key"), "scope": x.get("scope"), **({"team": x["team"]} if x.get("team") else {}),
+            "fmt": x.get("fmt"), **({"inn": x["inn"]} if x.get("inn") else {}), "source": x.get("source"), "kind": x.get("kind")}
+    for k, now_lines in after.items():
+        m = meta[k]
+        st = parse_ts(m.get("start_utc"))
+        if len(now_lines) != 1 or not st or st <= now:
+            continue
+        (line,) = now_lines
+        old = moves.get(_move_id(m))
+        was = old["line"] if old else (next(iter(before[k])) if len(before.get(k, ())) == 1 else None)
+        if was is None or was == line:
+            continue
+        opened = old["open"] if old else was
+        n = (old["n"] if old else 0) + 1
+        if line == opened:
+            moves.pop(_move_id(m), None)
+            continue
+        moves[_move_id(m)] = {**m, "open": opened, "line": line, "at": stamp, "n": n}
+
+    def keep(m: dict) -> bool:
+        st = parse_ts(m.get("start_utc"))
+        return bool(st) and now < st + (TEST_KEEP if m.get("fmt") == "Test" else LIVE_KEEP)
+
+    return public({"moves": sorted((m for m in moves.values() if keep(m)), key=lambda m: (m.get("start_utc") or "", m.get("match") or "", m.get("at") or ""))})["moves"]
+
+
 SCHEDULE_START_DELTA = dt.timedelta(hours=12)  # books and the schedule often disagree on a start by hours (the join the pipeline's fixture match uses)
 
 

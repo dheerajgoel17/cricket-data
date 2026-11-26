@@ -180,6 +180,9 @@ The apps are planned natively (Expo / React Native), like props.cash, whose webs
 
 When the Expo apps exist, reuse the same role names (`text-body`, `gap-stack`, `control`, `chip-radius`, …) from `site/src/index.css` `:root`. Swap only the values: HIG on iOS (17 px body, 44 px controls), Material 3 on Android. Do not copy web pixel values into native, and do not copy native HIG sizes back onto the website.
 
+## Line moves (pre-match)
+A book that moves a line before the start (a player's fours 16.5 to 17.5, a team total) is tracked by `booklines.track_moves` into `book_lines.json` `moves`. The engine's `withMoves` (`lines.js`, applied in `loadLines`) stamps `moved: {from, at, n}` on that source's entry; `bookQuotes` and `fancyFor` carry it; rows show `LineMove` ("was 16.5", amber arrow) beside the name, and `LineMovesStrip` lists the match's moves above the tabs of the match page. Only pre-match (the in-play badge wins), the match card is unchanged. The apps do not show it yet.
+
 ## Live lines in the tables (in-play)
 
 ### In-play lines first

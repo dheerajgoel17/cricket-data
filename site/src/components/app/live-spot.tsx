@@ -28,6 +28,21 @@ export function InPlayBadge({ className }: { className?: string }) {
   return <Badge variant="miss" className={className}>In play line</Badge>;
 }
 
+/**
+ * A book moved this line before the start: an arrow in the direction it went and the line it left ("↑ was 16.5"), amber like the other "heads up" marks (session breaks). Shown beside the name on a
+ * prop or fancy row, and on the line inside the book table. Nothing when the line did not move; the number the row already shows is the new line, so only the old one is written.
+ */
+export function LineMove({ from, line, className }: { from?: number | null; line?: number | null; className?: string }) {
+  if (from == null || line == null || from === line) return null;
+  const up = line > from;
+  return (
+    <span className={cn("inline-flex shrink-0 items-center gap-hair rounded-full bg-amber/20 px-snug py-hair text-footnote font-label tabular-nums text-amber", className)} title={`Line moved from ${from} to ${line}`} aria-label={`Line moved ${up ? "up" : "down"} from ${from} to ${line}`}>
+      <svg viewBox="0 0 12 12" className={cn("size-3", !up && "rotate-180")} aria-hidden><path d="M6 10V2M2.5 5.5 6 2l3.5 3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      was {from}
+    </span>
+  );
+}
+
 /** Where the line stood before the match, in two words and a number ("was 31.5"); nothing when it has not moved. */
 export function LiveOpened({ opened, line, className, label = "was" }: { opened?: number | null; line?: number | null; className?: string; label?: string }) {
   if (opened == null || line == null || opened === line) return null;

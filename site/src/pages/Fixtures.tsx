@@ -24,6 +24,7 @@ import { formatCountdown, useNow } from "@/lib/clock";
 import { setTitle } from "@/lib/title";
 import { HeaderActions, useHeaderFlush } from "@/lib/header-slot";
 import { fixtureBooks } from "@cricket/engine/lines.js";
+import { LineMovesStrip } from "@/components/app/line-moves";
 import { fixtureState, useFixtureBooks, useFixtures, usePricedFixtures } from "@/hooks/useEngine";
 import { useLiveMatch } from "@/hooks/useLive";
 import { Field, LiveForm, NativeSelect, useQ } from "@/components/app/forms";
@@ -206,6 +207,7 @@ export function FixturePage() {
       <MatchHeader f={fx} match={match} live={live} />
       {!ready ? <div className="flex flex-col gap-stack"><Skeleton className="h-control w-72 rounded-full" /><RowsSkeleton /></div> : (
         <div className="flex min-w-0 flex-col gap-stack">
+          <LineMovesStrip doc={doc} fx={fx} className="px-0" />
           <StickyFilterBand>
             <div className="border-b border-hairline px-gutter">
               <PillGroup sub layoutId="fx-tab" label="Sections" value={tab} onChange={switchTab} items={tabs} />
