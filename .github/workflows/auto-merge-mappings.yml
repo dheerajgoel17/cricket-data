@@ -1,0 +1,35 @@
+name: Auto-merge mapping PRs
+
+# A PR labelled `mapping` is merged once CI is green, but only if it touches nothing outside the hand-checked mapping files
+# (player identity links, scraped-name aliases, the odds job's player and team name maps). Anything else, in the same PR, stops it.
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  merge:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge labelled, in-scope, green PRs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          # the PR may already be merged and its branch deleted by the time CI finishes: then the lookup fails or is empty, which is fine
+          PR=$(gh api "repos/$REPO/commits/$SHA/pulls" --jq '[.[] | select(.state=="open")][0].number // empty' 2>/dev/null || true)
+          [ -z "$PR" ] && { echo "no open PR for $SHA"; exit 0; }
+          gh pr view "$PR" --repo "$REPO" --json labels --jq '.labels[].name' | grep -qx mapping \
+            || { echo "PR #$PR is not labelled mapping"; exit 0; }
+          [ "$(gh pr view "$PR" --repo "$REPO" --json headRefOid --jq .headRefOid)" = "$SHA" ] \
+            || { echo "head moved since CI ran"; exit 0; }
+          OUT=$(gh pr diff "$PR" --repo "$REPO" --name-only \
+            | grep -v -x -E 'data/mappings/(player_identity|player_aliases)\.csv|value_bets/mappings/(players|teams)\.csv' || true)
+          [ -n "$OUT" ] && { echo "PR #$PR touches files outside the mapping files:"; echo "$OUT"; exit 0; }
+          gh pr merge "$PR" --repo "$REPO" --squash --delete-branch
