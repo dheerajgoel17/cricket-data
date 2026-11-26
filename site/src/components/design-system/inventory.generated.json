@@ -1009,9 +1009,7 @@
       "PlayerFace",
       "PlayerPortrait"
     ],
-    "dependencies": [
-      "mobile/src/ui/text.tsx"
-    ]
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/press.tsx",

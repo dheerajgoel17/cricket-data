@@ -4,15 +4,19 @@ import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import { faceUrls, shirtUrls } from "@/lib/photo-urls";
 import { photosQuery } from "@/lib/queries";
-import { initials } from "@/lib/format";
-import { Text } from "@/ui/text";
-import { color, duration, w } from "@/ui/tokens";
+import { color, duration } from "@/ui/tokens";
 
 /** A picture that arrives after its circle fades in instead of popping (the circle is already there, so nothing shifts). */
 const AVATAR_FADE = { duration: duration.fast, effect: "cross-dissolve" as const };
 
 /** Face pictures are head and shoulders, nearly square (310 x 300); the shirt is the same width and rides up over the bottom third of the face (the site's `PlayerPortrait`). */
 const FACE = 300 / 310, SHIRT_TOP = 0.627, WITH_SHIRT = 1.03;
+
+/** No photo of the player: a batter in a helmet, the same head-and-shoulders crop as the source's avatars (the site's `Silhouette`), under the team shirt when there is one. */
+const HELMET = require("../../assets/images/player-helmet.png");
+function Helmet({ width, height }: { width: number; height: number }) {
+  return <Image source={HELMET} style={{ position: "absolute", left: 0, top: 0, width, height }} contentFit="contain" contentPosition="bottom" accessibilityElementsHidden />;
+}
 
 function useUrls(pid: string, team?: string, test?: boolean) {
   const { data: photos } = useQuery(photosQuery);
@@ -23,15 +27,15 @@ function useUrls(pid: string, team?: string, test?: boolean) {
  * Round row avatar: face + kit fill the circle as one image (no nested flag/crest).
  * Matches the site's `PlayerAvatar` fill.
  */
-export function PlayerAvatar({ pid, team, test, size = 36, name }: { pid: string; team?: string; test?: boolean; size?: number; /** Shown as initials when there is no picture at all, so an empty circle never reads as broken. */ name?: string }) {
+export function PlayerAvatar({ pid, team, test, size = 36, name }: { pid: string; team?: string; test?: boolean; size?: number; /** The accessibility label of the circle. */ name?: string }) {
   const { faces, shirts, loaded } = useUrls(pid, team, test);
   const [face, setFace] = useState(0), [shirt, setShirt] = useState(0);
   const h = size * WITH_SHIRT;
-  const bare = loaded && !faces[face] && !shirts[shirt]; // initials only once the photos file is in: before that, a picture may still arrive, and a flash of letters before it is worse than an empty circle
+  const noFace = loaded && !faces[face]; // the helmet only once the photos file is in: before that, a picture may still arrive, and a flash of the helmet before it is worse than an empty circle
   return (
-    <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
-      {bare && name ? <Text style={[styles.initials, { fontSize: size * 0.36 }]}>{initials(name)}</Text> : null}
+    <View accessibilityLabel={name} style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
       <View style={{ position: "absolute", left: 0, right: 0, bottom: 0, width: size, height: h }}>
+        {noFace ? <Helmet width={size} height={size * FACE} /> : null}
         {faces[face] ? (
           <Image
             source={{ uri: faces[face] }}
@@ -63,10 +67,11 @@ export function PlayerAvatar({ pid, team, test, size = 36, name }: { pid: string
 
 /** Just the face, as on the market tape. */
 export function PlayerFace({ pid, size = 36 }: { pid: string; size?: number }) {
-  const { faces } = useUrls(pid);
+  const { faces, loaded } = useUrls(pid);
   const [face, setFace] = useState(0);
   return (
     <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
+      {loaded && !faces[face] ? <Helmet width={size} height={size} /> : null}
       {faces[face] ? (
         <Image
           source={{ uri: faces[face] }}
@@ -84,17 +89,17 @@ export function PlayerFace({ pid, size = 36 }: { pid: string; size?: number }) {
 }
 
 const styles = StyleSheet.create({
-  initials: { ...w.strong, color: color["muted-foreground"], textAlign: "center" },
   circle: { overflow: "hidden", backgroundColor: color.secondary },
 });
 
 /** The player standing in his team's shirt, laid out as the source lays out its own pictures (the site's `PlayerPortrait`): not cropped to a circle; the height follows the width. */
 export function PlayerPortrait({ pid, team, test, width = 144 }: { pid: string; team?: string; test?: boolean; width?: number }) {
-  const { faces, shirts } = useUrls(pid, team, test);
+  const { faces, shirts, loaded } = useUrls(pid, team, test);
   const [face, setFace] = useState(0), [shirt, setShirt] = useState(0);
   const h = width * (shirts[shirt] ? WITH_SHIRT : FACE);
   return (
     <View style={{ width, height: h }}>
+      {loaded && !faces[face] ? <Helmet width={width} height={width * FACE} /> : null}
       {faces[face] ? (
         <Image
           source={{ uri: faces[face] }}
