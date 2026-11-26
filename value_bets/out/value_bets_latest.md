@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-26 18:00 IST
+# Cricket value bets - 2026-11-26 19:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1671 prices
+- **moviodds_bet365**: ok, 1705 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
-- **smarkets**: ok, 288 prices
-- **feedl**: ok, 444 prices, 17 events
-- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
+- **smarkets**: ok, 361 prices
+- **feedl**: ok, 432 prices, 16 events
 - **feedk**: ok, 220 prices, 5 events
-- **feede**: ok, 188 prices, 10 events
+- **feede**: ok, 188 prices, 9 events
 - **feedf**: ok, 348 prices, 7 events
-- **feedj**: ok, 629 prices, 8 events
-- **feedh**: ok, 1020 prices, 42 events
+- **feedj**: ok, 600 prices, 6 events
+- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
+- **feedh**: ok, 1089 prices, 44 events
 
-Matches starting in next 168h: **26**, markets priced: **351**, value bets: **5** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **29**, markets priced: **379**, value bets: **5** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -33,8 +33,7 @@ Matches starting in next 168h: **26**, markets priced: **351**, value bets: **5*
 
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-27 20:00 IST Sharjah Warriorz vs Dubai Capitals / Batter Milestones / SW Billings 50+ yes @ 9.00 (moviodds_bet365): edge 32.0%, model 0.1256, market 0.1639
-- 11-28 10:10 IST Melbourne Renegades (W) vs Melbourne Stars (W) / Team - Top Batter / C Webb @ 12.00 (moviodds_bet365): edge 42.7%, model 0.1193, market 0.1188
 
-Unmatched team names (add to mappings/teams.csv): Central (male), Central Hinds (W) (female), Central Hinds (male), Central Zone (W) (female), Central Zone (male), Elite Cricket Academy (male), IAS Invincibles (male), Ias Invincibles (male), Mustafa Fragrance (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (male), Yalla Shabab Giants (male)
+Unmatched team names (add to mappings/teams.csv): Central (male), Central Hinds (W) (female), Central Hinds (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Elite Cricket Academy (male), IAS Invincibles (male), Ias Invincibles (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), South Zone (W) (female), South Zone (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (male), Yalla Shabab Giants (male)
 
-Runtime 210.0s. Snapshot: `odds_20261126T123033Z.jsonl.gz`
+Runtime 115.7s. Snapshot: `odds_20261126T133034Z.jsonl.gz`
