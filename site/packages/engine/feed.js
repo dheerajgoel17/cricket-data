@@ -4,7 +4,6 @@ import { bookFixtures, buildMatch, cardFetchList, cardPageUrl, hasCard, keepGapR
 
 export const BOOKS_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/value_bets/out/book_lines.json";
 export const SCHEDULE_URL = "https://raw.githubusercontent.com/dheerajgoel17/cricket-data/main/data/fixtures/upcoming.csv"; // our own schedule: the match pages of games the source's schedule no longer list
-const MAX_CARDS = 12;
 const FINAL_TTL_MS = 10 * 60e3; // a finished match does not change: its pages are read once in ten minutes, not every 15 seconds
 /** How long a user-facing snapshot waits for cards that are not live. The match-state writer passes Infinity and reads every card. */
 export const CARD_BUDGET_MS = 700;
@@ -50,7 +49,7 @@ export function createFeed({ base, getJson, getText, getHtml, loadIdentity, now 
         pages.set(m, got);
         if (got.live && (got.live.status === "final" || m.status === "final")) finals.set(m.url, { t: now(), pages: got });
       };
-      const wanted = cardFetchList(rows, MAX_CARDS, now(), (m) => { const k = finals.get(m.url); return !!k && now() - k.t < FINAL_TTL_MS; });
+      const wanted = cardFetchList(rows, now());
       const liveCards = wanted.filter((m) => m.status === "live");
       const rest = wanted.filter((m) => m.status !== "live");
       await Promise.allSettled(liveCards.map(loadCard));
