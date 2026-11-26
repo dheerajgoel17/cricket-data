@@ -615,3 +615,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `site/src/components/app/badges.tsx` (`Silhouette` in `PlayerBadge` / `PlayerPhoto`), `site/src/assets/player-helmet.png`
 - **Change:** a player with no photo (or only the source's stock avatar) shows a batter in a helmet, the same head-and-shoulders crop as the source's avatars, instead of the grey circle-and-shoulders SVG. In `PlayerPortrait` / `PlayerAvatar` the team shirt still sits over its bottom third, as for a photo.
 - **Callers:** every `PlayerBadge`, `PlayerPhoto`, `PlayerPortrait` and `PlayerAvatar`. The app's own avatar is a separate component and is not changed here.
+
+### 2026-11-26 — App: the helmet picture for a player with no photo
+- **Path:** `mobile/src/ui/player-avatar.tsx` (`PlayerAvatar`, `PlayerFace`, `PlayerPortrait`), `mobile/assets/images/player-helmet.png`
+- **Change:** the same helmet head-and-shoulders picture as the site's fallback (see the entry above) in the face slot when the player has no photo, under the team shirt as for a photo; it replaces the initials the circle showed. It appears only once the photos file is in, so it never flashes before a photo arrives. `name` is now the circle's accessibility label.
+- **Callers:** every `PlayerAvatar`, `PlayerFace`, `PlayerPortrait` in the app
