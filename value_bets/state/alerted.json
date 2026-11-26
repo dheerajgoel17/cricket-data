@@ -14,35 +14,15 @@
   "start_utc": "2026-11-27T08:15:00Z",
   "alerted_at": "2026-11-24T15:35:07.837058+00:00"
  },
- "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||Andre Russell under 1.5|1.5|under": {
-  "edge": 0.2306,
-  "start_utc": "2026-11-26T14:30:00Z",
-  "alerted_at": "2026-11-25T18:34:18.510582+00:00"
- },
- "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||Nicholas Pooran under 1.5|1.5|under": {
-  "edge": 0.0528,
-  "start_utc": "2026-11-26T14:30:00Z",
-  "alerted_at": "2026-11-25T18:34:18.510582+00:00"
- },
- "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_fours||ADS Fletcher under 1.5|1.5|under": {
-  "edge": 0.0619,
-  "start_utc": "2026-11-26T14:30:00Z",
-  "alerted_at": "2026-11-25T19:34:59.844373+00:00"
- },
- "male|Abu Dhabi Knight Riders|MI Emirates|2026-11-26|batter_sixes||MM Ali under 0.5|0.5|under": {
-  "edge": 0.2743,
-  "start_utc": "2026-11-26T14:30:00Z",
-  "alerted_at": "2026-11-25T22:34:28.812186+00:00"
- },
  "male|Australia|England|2026-11-27|batter_sixes||J Fraser-McGurk under 0.5|0.5|under": {
   "edge": 0.1602,
   "start_utc": "2026-11-27T08:15:00Z",
   "alerted_at": "2026-11-26T01:34:06.421835+00:00"
  },
  "male|Dubai Capitals|Sharjah Warriorz|2026-11-27|batter_sixes||PI Walter under 0.5|0.5|under": {
-  "edge": 0.0885,
+  "edge": 0.162,
   "start_utc": "2026-11-27T14:30:00Z",
-  "alerted_at": "2026-11-25T22:34:28.812186+00:00"
+  "alerted_at": "2026-11-26T14:33:06.121773+00:00"
  },
  "male|Australia|England|2026-11-27|batter_fours||Mitchell Marsh under 2.5|2.5|under": {
   "edge": 0.052,

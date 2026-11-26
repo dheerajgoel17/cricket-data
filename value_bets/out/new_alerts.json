@@ -1,4 +1,67 @@
 {
- "generated_at_ist": "2026-11-26 19:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-26 20:00 IST",
+ "alerts": [
+  {
+   "event_key": "male|Dubai Capitals|Sharjah Warriorz|2026-11-27",
+   "match": "Sharjah Warriorz vs Dubai Capitals",
+   "start_utc": "2026-11-27T14:30:00Z",
+   "start_ist": "2026-11-27 20:00 IST",
+   "format": "T20",
+   "gender": "male",
+   "market_type": "batter_sixes",
+   "market": "Batsman Total Match Sixes",
+   "team_scope": "",
+   "selection": "PI Walter under 0.5",
+   "player_matched_as": "PI Walter",
+   "player_id": "57590dbb",
+   "player_team": "Sharjah Warriorz",
+   "stat": "sixes",
+   "inn": 0,
+   "line": 0.5,
+   "side": "under",
+   "best_odds": 2.625,
+   "best_source": "moviodds_bet365",
+   "effective_odds_after_commission": 2.625,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0733,
+   "implied_prob": 0.381,
+   "fair_odds": 2.259,
+   "fair_prob": 0.4427,
+   "model_prob": 0.4877,
+   "market_prob": 0.4058,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.162,
+   "edge_pct": 16.2,
+   "kelly_quarter_stake_pct": 2.0,
+   "n_sources": 2,
+   "confidence": "medium",
+   "why": "Model 49% vs market 41% for under 0.5 sixes; form 1.1 sixes/inn recency-weighted T20 (n_eff 49.1; last 5: 2, 4, 1, 8, 3), bats in 94% of games played; at Sharjah Cricket Stadium, Sharjah: 4 inns avg 1.5; context adj: venue environment +11%",
+   "notes": "2 market source(s) for fair price; model 0.488 vs market 0.406; assumes bet void if player doesn't bat/bowl - check book rules; price via unofficial Book A mirror - confirm on Book A before betting",
+   "model_detail": {
+    "n_eff": 49.1,
+    "expected": 1.31,
+    "nb_alpha": 1.536,
+    "p_bats_or_bowls": 0.937,
+    "venue_matched": "sharjah cricket stadium",
+    "context_terms": [
+     "env_sixes",
+     "p_bat"
+    ]
+   },
+   "rain_risk": false,
+   "weather": {
+    "rain_prob_max_pct": 0,
+    "rain_mm_in_window": 0.0,
+    "humidity_pct": 68,
+    "cloud_pct": 5,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "f72864da86f1a88c",
+   "alert_key": "male|Dubai Capitals|Sharjah Warriorz|2026-11-27|batter_sixes||PI Walter under 0.5|0.5|under",
+   "alerted_at_ist": "2026-11-26 20:03 IST",
+   "realert": true,
+   "previous_edge": 0.0885
+  }
+ ]
 }
