@@ -63,5 +63,35 @@
   "edge": 0.052,
   "start_utc": "2026-11-27T08:15:00Z",
   "alerted_at": "2026-11-26T01:34:06.421835+00:00"
+ },
+ "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_fours||AK Gardner under 2.5|2.5|under": {
+  "edge": 0.2027,
+  "start_utc": "2026-11-26T08:10:00Z",
+  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
+ },
+ "female|Melbourne Stars Women|Sydney Sixers Women|2026-11-26|batter_milestone||AK Gardner 50+ no|49.5|under": {
+  "edge": 0.0584,
+  "start_utc": "2026-11-26T08:10:00Z",
+  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
+ },
+ "male|Australia|England|2026-11-27|batter_sixes||Philip Salt under 0.5|0.5|under": {
+  "edge": 0.0915,
+  "start_utc": "2026-11-27T08:15:00Z",
+  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
+ },
+ "male|Australia|England|2026-11-27|batter_fours||Harry Brook under 2.5|2.5|under": {
+  "edge": 0.0568,
+  "start_utc": "2026-11-27T08:15:00Z",
+  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
+ },
+ "female|Hobart Hurricanes Women|Perth Scorchers Women|2026-11-27|batter_fours||BL Mooney under 3.5|3.5|under": {
+  "edge": 0.0945,
+  "start_utc": "2026-11-27T10:10:00Z",
+  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
+ },
+ "female|Hobart Hurricanes Women|Perth Scorchers Women|2026-11-27|batter_fours||Beth Mooney under 3.5|3.5|under": {
+  "edge": 0.0623,
+  "start_utc": "2026-11-27T10:10:00Z",
+  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
  }
 }
