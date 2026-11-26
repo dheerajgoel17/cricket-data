@@ -2,6 +2,20 @@
   "date": "2026-11-26",
   "event": "",
   "gender": "male",
+  "innings": [
+    {
+      "balls": 88,
+      "runs": 84,
+      "team": "IAS Invincibles",
+      "wickets": 10
+    },
+    {
+      "balls": 68,
+      "runs": 85,
+      "team": "Yalla Shabab Giants",
+      "wickets": 2
+    }
+  ],
   "match_id": "crex-iai-vs-ysg-3rd-t20-oman-d20-league-2026-match-updates-158K",
   "match_type": "T20",
   "player_of_match": "",
