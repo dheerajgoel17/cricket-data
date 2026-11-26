@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-26 07:25 IST
+# Cricket value bets - 2026-11-26 08:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2187 prices
+- **moviodds_bet365**: ok, 2186 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
 - **smarkets**: ok, 364 prices
-- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=firefox155)
+- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
 - **feedk**: ok, 252 prices, 6 events
 - **feedl**: ok, 548 prices, 40 events
-- **feedh**: ok, 2071 prices, 103 events
+- **feedh**: ok, 2043 prices, 98 events
 - **feede**: ok, 690 prices, 40 events
-- **feedj**: ok, 785 prices, 19 events
+- **feedj**: ok, 755 prices, 16 events
 - **feedf**: ok, 760 prices, 26 events
 
-Matches starting in next 168h: **60**, markets priced: **628**, value bets: **4** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **58**, markets priced: **626**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -33,6 +33,6 @@ Matches starting in next 168h: **60**, markets priced: **628**, value bets: **4*
 - 11-26 13:40 IST Sydney Sixers vs Melbourne Stars / M13704 top_bowler_team / Carly Leeson @ 15.00 (feedj_d): edge 77.8%, model 0.1032, market 0.1268
 - 11-27 20:00 IST Sharjah Warriorz vs Dubai Capitals / Batter Milestones / SW Billings 50+ yes @ 9.00 (moviodds_bet365): edge 32.0%, model 0.1256, market 0.1639
 
-Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), IAS Invincibles (male), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Lokseva Academy (male), Majees Titan (male), Multan Region (male), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (male), Yalla Shabab Giants (male)
+Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), East Zone (W) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), IAS Invincibles (male), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Lokseva Academy (male), Majees Titan (male), Multan Region (male), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North Zone (W) (female), North Zone (male), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (male), Yalla Shabab Giants (male)
 
-Runtime 211.8s. Snapshot: `odds_20261126T015515Z.jsonl.gz`
+Runtime 247.5s. Snapshot: `odds_20261126T023036Z.jsonl.gz`
