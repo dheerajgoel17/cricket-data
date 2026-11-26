@@ -195,6 +195,12 @@ test("parseSchedule: second innings bats the side that did not bat first; toss-t
   assert.equal(won.status, "final");
 });
 
+test("parseSchedule: the schedule's own bare Live is live before the first score; a toss-time row with no word is not", () => {
+  const row = { team1: "Sydney Sixers Women", team2: "Melbourne Stars Women", t: Date.parse("2026-11-26T08:10:00Z"), status: 1, fo: "T20", mf: "12Y2" };
+  assert.equal(parseSchedule(pageHtml({ [FIXTURE]: [{ ...row, statusText: "Live" }] }))[0].status, "live");
+  assert.equal(parseSchedule(pageHtml({ [FIXTURE]: [row] }))[0].status, "upcoming");
+});
+
 test("wantsCard: live rows, and priced rows about to start; not tomorrow's, not finished ones", () => {
   const now = Date.parse("2026-10-27T07:00:00Z");
   const row = (status, start) => ({ status, start });

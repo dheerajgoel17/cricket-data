@@ -488,7 +488,8 @@ export function parseSchedule(html, base = "") {
     const blurb = summary || (fmt === "Test" && !done && scored && row.status === 2 ? "Close of play" : "");
     return [{
       id: String(row.mf || row.matchFkey || row.id || ""),
-      status: done ? "final" : scored ? "live" : "upcoming",
+      // the schedule's own bare "Live" is play on, even before the first score shows: otherwise the row ranks as upcoming and a busy day's card cap never reads its page
+      status: done ? "final" : scored || /^live$/i.test(summary.trim()) ? "live" : "upcoming",
       fmt,
       start: row.t ? new Date(row.t).toISOString() : "",
       summary: blurb,
