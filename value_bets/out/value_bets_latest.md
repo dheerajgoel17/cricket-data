@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-26 07:00 IST
+# Cricket value bets - 2026-11-26 07:25 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 2175 prices
+- **moviodds_bet365**: ok, 2187 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
 - **smarkets**: ok, 364 prices
-- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
+- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=firefox155)
 - **feedk**: ok, 252 prices, 6 events
 - **feedl**: ok, 548 prices, 40 events
 - **feedh**: ok, 2071 prices, 103 events
 - **feede**: ok, 690 prices, 40 events
-- **feedj**: ok, 813 prices, 20 events
+- **feedj**: ok, 785 prices, 19 events
 - **feedf**: ok, 760 prices, 26 events
 
-Matches starting in next 168h: **60**, markets priced: **637**, value bets: **4** (new alerts: 2). Min edge 5%.
+Matches starting in next 168h: **60**, markets priced: **628**, value bets: **4** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -35,4 +35,4 @@ Matches starting in next 168h: **60**, markets priced: **637**, value bets: **4*
 
 Unmatched team names (add to mappings/teams.csv): Central (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Elite Cricket Academy (male), Faisalabad Region (male), IAS Invincibles (male), Ias Invincibles (male), Karachi Region Blues (male), Lahore Region Whites (male), Lokseva Academy (male), Majees Titan (male), Multan Region (male), Muscat Thunders (male), Mustafa Fragrance (male), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), Peshawar Blues (male), Sialkot Blues (male), South Zone (W) (female), South Zone (male), Speedworld Security Solutions (male), Sunny 11 Pratishtan (male), West Zone (W) (female), West Zone (male), Yalla Shabab Giants (male)
 
-Runtime 209.6s. Snapshot: `odds_20261126T013038Z.jsonl.gz`
+Runtime 211.8s. Snapshot: `odds_20261126T015515Z.jsonl.gz`
