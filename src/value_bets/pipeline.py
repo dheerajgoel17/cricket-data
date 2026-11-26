@@ -853,6 +853,12 @@ def run():
 
     unmatched_players = sorted({r["player"] for r in rows if r.get("player") and not r.get("player_id")
                                 and parse_ts(r["start_utc"]) and win_lo <= parse_ts(r["start_utc"]) <= win_hi})
+    unmatched_detail: dict[str, list[dict]] = {}  # every unmatched name with the matches he is priced in (the list above is cut at 200): read by cricket_site.link_suggest
+    for r in rows:
+        if r.get("player") and not r.get("player_id") and parse_ts(r["start_utc"]) and win_lo <= parse_ts(r["start_utc"]) <= win_hi:
+            ms = unmatched_detail.setdefault(r["player"], [])
+            if len(ms) < 3 and not any(m["match"] == r.get("match") for m in ms):
+                ms.append({"match": r.get("match") or "", "competition": r.get("competition") or "", "start": r["start_utc"]})
     events_out = []
     for c in clusters.values():
         if c["start"] and win_lo <= c["start"] <= win_hi:
@@ -864,7 +870,7 @@ def run():
         "data": {**data_status, "history_last_match": str(H.last_date.date()), "commit": history.repo_commit()[:10]},
         "sources": src_status, "snapshot": snap, "settings": {k: config.get(k) for k in config.DEFAULTS},
         "stats": stats, "events_in_window": sorted(events_out, key=lambda e: e["start_ist"]),
-        "value_bets": values, "suspect_not_alerted": suspect, "unmatched_teams": unmatched_teams, "unmatched_players_in_window": unmatched_players[:200],
+        "value_bets": values, "suspect_not_alerted": suspect, "unmatched_teams": unmatched_teams, "unmatched_players_in_window": unmatched_players[:200], "unmatched_players_detail": unmatched_detail,
         "model_backtest": _prop_backtest_summary(), "log": LOG,
     }
     (config.OUT / "value_bets_latest.json").write_text(json.dumps(result, indent=1, default=str))
