@@ -106,3 +106,34 @@ test("a hashed data URL is immutable only when it names this deploy's bytes", as
     else process.env.DATA_WRAP_KEY = prior;
   }
 });
+
+test("a feed answered from the edge cache never carries a long browser lifetime", async () => {
+  const prior = process.env.DATA_WRAP_KEY;
+  process.env.DATA_WRAP_KEY = "test-only";
+  const stored = new Map();
+  const realCaches = globalThis.caches;
+  // the edge returns its stored copy with the zone's 4-hour browser lifetime, an Age and a Last-Modified
+  globalThis.caches = { default: {
+    match: async (key) => (stored.has(key) ? new Response(stored.get(key), { headers: { "Cache-Control": "public, max-age=14400", Age: "6", "Last-Modified": "Thu, 26 Nov 2026 05:31:11 GMT" } }) : undefined),
+    put: async (key, res) => { stored.set(key, await res.text()); },
+  } };
+  const env = { DATA_WRAP_KEY: "test-only", SNAPSHOTS: { getByName: () => ({ fetch: () => new Response("{}", { headers: { "Cache-Control": "public, s-maxage=15" } }) }) } };
+  const browser = { "user-agent": "Mozilla/5.0 Chrome/120.0", "sec-fetch-site": "same-origin" };
+  const ctx = { waitUntil: (p) => p };
+  const get = (path) => worker.fetch(new Request("https://fallback.example" + path, { headers: browser }), env, ctx);
+  try {
+    for (const [path, ttl] of [["/api/live", 3], ["/api/inplay", 15], ["/api/state", 10]]) {
+      const first = await get(path);
+      assert.equal(first.headers.get("cache-control"), `public, max-age=${ttl}`, path);
+      await Promise.resolve(); await new Promise((r) => setTimeout(r, 0));
+      const hit = await get(path);
+      assert.equal(hit.status, 200);
+      assert.equal(hit.headers.get("cache-control"), `public, max-age=${Math.max(1, ttl - 6)}`, `${path} on a cache hit`);
+      assert.equal(hit.headers.get("last-modified"), null);
+    }
+  } finally {
+    globalThis.caches = realCaches;
+    if (prior === undefined) delete process.env.DATA_WRAP_KEY;
+    else process.env.DATA_WRAP_KEY = prior;
+  }
+});

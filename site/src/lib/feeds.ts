@@ -62,7 +62,7 @@ export async function loadProps(): Promise<{ snap: any | null; live: boolean }> 
 export async function loadLive(): Promise<any | null> {
   try {
     const [r, board] = await Promise.all([
-      fetch("/api/live", { credentials: "same-origin", headers: { accept: "application/json" } }),
+      fetch("/api/live", { credentials: "same-origin", cache: "no-store", headers: { accept: "application/json" } }),
       live("board_scores.json", LINES_LIVE_MS),
     ]);
     const body = r.ok ? await readJson(r) : null;
@@ -75,7 +75,7 @@ export async function loadLive(): Promise<any | null> {
 /** In-play lines (player innings runs, a side's innings total) from /api/inplay, or null when the route is down or has nothing: asked only while a match is on. */
 export async function loadInplay(): Promise<any | null> {
   try {
-    const r = await fetch("/api/inplay", { credentials: "same-origin", headers: { accept: "application/json" } });
+    const r = await fetch("/api/inplay", { credentials: "same-origin", cache: "no-store", headers: { accept: "application/json" } });
     return r.ok ? await readJson(r) : null;
   } catch { return null; }
 }
@@ -83,7 +83,7 @@ export async function loadInplay(): Promise<any | null> {
 /** The match-state table (one phase per match) from /api/state, or null when the route is not configured or down: the site then works the phase out itself. */
 export async function loadState(): Promise<any | null> {
   try {
-    const r = await fetch("/api/state", { credentials: "same-origin", headers: { accept: "application/json" } });
+    const r = await fetch("/api/state", { credentials: "same-origin", cache: "no-store", headers: { accept: "application/json" } });
     return r.ok ? await readJson(r) : null;
   } catch { return null; }
 }
