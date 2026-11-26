@@ -610,3 +610,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `mobile/src/ui/prop-row.tsx` (`TrendRow`), `mobile/src/ui/grid-table.tsx` (`TrendList`), `mobile/src/app/fixture/[id]/index.tsx`
 - **Change:** the Custom line list is flat hairline rows built like a prop row (avatar, name and flag, the line under it, a right-hand Hit figure, MiniBars), not a bordered card of its own design. The Custom line page drops the extra top padding and gap, so its stat chips sit under the section chips at the same distance as Match Fancy, Toss and Odd / Even.
 - **Callers:** fixture tab Custom line
+
+### 2026-11-26 — Player picture fallback is a helmet, not a silhouette
+- **Path:** `site/src/components/app/badges.tsx` (`Silhouette` in `PlayerBadge` / `PlayerPhoto`), `site/src/assets/player-helmet.png`
+- **Change:** a player with no photo (or only the source's stock avatar) shows a batter in a helmet, the same head-and-shoulders crop as the source's avatars, instead of the grey circle-and-shoulders SVG. In `PlayerPortrait` / `PlayerAvatar` the team shirt still sits over its bottom third, as for a photo.
+- **Callers:** every `PlayerBadge`, `PlayerPhoto`, `PlayerPortrait` and `PlayerAvatar`. The app's own avatar is a separate component and is not changed here.

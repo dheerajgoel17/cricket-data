@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import helmetUrl from "@/assets/player-helmet.png";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { resolvePlayerLabel } from "@cricket/engine/player-label.js";
 import { cn } from "@/lib/utils";
@@ -87,9 +88,10 @@ export function TeamFlag({ name, className }: { name: string; className?: string
   );
 }
 
-const Silhouette = () => <svg viewBox="0 0 40 40" aria-hidden className="size-3/4 -translate-y-[7%] fill-current text-muted-foreground/50"><circle cx="20" cy="15" r="7" /><path d="M5 40c1-9 7-14 15-14s14 5 15 14z" /></svg>;
+/** No photo of the player: a batter in a helmet (the same head-and-shoulders crop as the source's avatars, so the team shirt in `PlayerPortrait` still sits over its bottom third). */
+const Silhouette = () => <img src={helmetUrl} alt="" aria-hidden draggable={false} className="size-full object-contain object-bottom" />;
 
-/** Avatar for a player index: photo when we have one, silhouette otherwise. */
+/** Avatar for a player index: photo when we have one, a helmet otherwise. */
 export function PlayerBadge({ idx, size = "sm", className }: { idx: number; size?: BadgeSize; className?: string }) {
   const { store, photos, names } = useData();
   const pid = store.P.id[idx];
