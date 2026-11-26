@@ -214,18 +214,13 @@ export function wantsCard(match, now = Date.now()) {
 }
 
 /**
- * Which rows get their page fetches. Every live match, however many are on at once (a domestic day has 20+). A finished match comes before an upcoming one: its props are
- * decided by its scorecard, an upcoming card is only a nicety. A finished match whose pages are already held (`held`) costs no fetch, so it never takes one of the `max`
- * fetches left after the live ones (at least 6, so a day with 20 live still reads finished and upcoming cards, a few more each round).
+ * Which rows get their page fetches: every one that `wantsCard`, with no cap (a domestic day has 20+ live and 30+ upcoming). Order is live, finished, upcoming, so the live
+ * cards are read first and a finished match comes before an upcoming one: its props are decided by its scorecard.
+ * A held finished match costs no fetch (feed.js `loadCard`). The user-facing response never waits for the slow ones (`CARD_BUDGET_MS` in feed.js).
  */
-export function cardFetchList(rows, max = 12, now = Date.now(), held = () => false) {
+export function cardFetchList(rows, now = Date.now()) {
   const rank = { live: 0, final: 1, upcoming: 2 };
-  const need = (rows || []).filter((m) => m.url && wantsCard(m, now)).sort((a, b) => (rank[a.status] ?? 9) - (rank[b.status] ?? 9));
-  const live = need.filter((m) => m.status === "live");
-  const rest = need.filter((m) => m.status !== "live");
-  const free = rest.filter((m) => held(m));
-  const fresh = rest.filter((m) => !held(m)).slice(0, Math.max(max - live.length, 6));
-  return live.concat(free, fresh).sort((a, b) => (rank[a.status] ?? 9) - (rank[b.status] ?? 9));
+  return (rows || []).filter((m) => m.url && wantsCard(m, now)).sort((a, b) => (rank[a.status] ?? 9) - (rank[b.status] ?? 9));
 }
 
 /** Source A format labels ("T20I", "List A", "Youth ODI", "One Day", "First Class", "Multi Day") -> the site's formats. */
@@ -488,7 +483,8 @@ export function parseSchedule(html, base = "") {
     const blurb = summary || (fmt === "Test" && !done && scored && row.status === 2 ? "Close of play" : "");
     return [{
       id: String(row.mf || row.matchFkey || row.id || ""),
-      status: done ? "final" : scored ? "live" : "upcoming",
+      // the schedule's own bare "Live" is play on, even before the first score shows: otherwise the row ranks as upcoming and a busy day's card cap never reads its page
+      status: done ? "final" : scored || /^live$/i.test(summary.trim()) ? "live" : "upcoming",
       fmt,
       start: row.t ? new Date(row.t).toISOString() : "",
       summary: blurb,

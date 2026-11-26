@@ -136,3 +136,86 @@ test("a busy day: 22 live and 12 upcoming do not crowd out a finished match's sc
   const again = await feed.snapshot();
   assert.ok((again.matches.find((m) => m.id === "M200")?.players || []).length > 0, "and it is still there on the next round");
 });
+
+// --- paced reads: a day with 25 live and 40 upcoming ---
+function busyDay({ live = 25, upcoming = 40, final = 10, start = "2026-11-05T03:00:00Z" } = {}) {
+  const row = (i, status, t) => ({
+    team1: `Home ${i}`, team2: `Away ${i}`, t1SName: `H${i}`, t2SName: `A${i}`, t: Date.parse(t), fo: "T20", mf: `M${i}`, link: `/match/m${i}`,
+    ...(status === "live" ? { s1: "50-1", o1: "6.0", status: 1, winningTeam: -1, w: -1, statusText: "Live" } : status === "final" ? { s1: "150-5", o1: "20.0", s2: "151-4", o2: "19.0", status: 2, winningTeam: 1, w: 1, result: "Away won" } : { status: 0, statusText: "Upcoming" }),
+  });
+  const rows = [
+    ...Array.from({ length: live }, (_, i) => row(i, "live", "2026-11-05T02:00:00Z")),
+    ...Array.from({ length: upcoming }, (_, i) => row(100 + i, "upcoming", "2026-11-05T03:20:00Z")),
+    ...Array.from({ length: final }, (_, i) => row(200 + i, "final", "2026-11-05T00:00:00Z")),
+  ];
+  const sched = pageHtml({ [FIXTURE]: rows });
+  const page = (id) => pageHtml({ [LIVE]: Number(id) >= 100 && Number(id) < 200 ? { team1_f_n: `Home ${id}`, team2_f_n: `Away ${id}`, status: 0 } : Number(id) >= 200 ? { team1_f_n: `Home ${id}`, team2_f_n: `Away ${id}`, status: 2, score1: "150-5", over1: "20.0", score2: "151-4", over2: "19.0" } : { team1_f_n: `Home ${id}`, team2_f_n: `Away ${id}`, status: 1, score1: "60-1", over1: "7.0", player_full_name1: "Kavem Hodge", run1: "40", ball1: "(30)" } });
+  const calls = [];
+  let t = Date.parse(start);
+  const mk = (over = {}) => createFeed({
+    now: () => t, cardBudgetMs: 50, liveWaitMs: 200, pageMs: 100, base: () => "https://src.test", booksUrl: "books", scheduleUrl: "schedule.csv",
+    getJson: async () => ({ lines: rows.map((r) => ({ match: `${r.team1} vs ${r.team2}`, start_utc: new Date(r.t).toISOString().replace(".000", ""), fmt: "T20" })) }),
+    getText: async () => "", loadIdentity: async () => NO_IDENTITY,
+    getHtml: async (url) => { calls.push(url); if (url.endsWith("/") || url.endsWith("/schedule")) return sched; const id = /\/match\/m(\d+)/.exec(url)?.[1]; return id ? page(id) : ""; },
+    ...over,
+  });
+  return { mk, calls, advance: (ms) => { t += ms; } };
+}
+
+test("a busy day: every live card is read, the rest are paced inside the budget and nothing is read twice in a round", async () => {
+  const { mk, calls } = busyDay();
+  const feed = mk({ readBudget: 40 });
+  const body = await feed.snapshot();
+  const reads = calls.filter((u) => u.includes("/match/m"));
+  assert.ok(reads.length <= 40 * 2, `at most 2 page reads per match within the budget, got ${reads.length}`);
+  assert.equal(body.matches.filter((m) => m.status === "live").length, 25, "all 25 live");
+  assert.equal(body.reads.live, 25);
+  assert.ok(body.reads.skipped >= 0);
+  for (let i = 0; i < 25; i++) assert.ok(reads.some((u) => u.endsWith(`/match/m${i}`)), `live match ${i} was read`);
+  assert.equal(new Set(reads).size, reads.length, "no page is read twice in one round");
+});
+
+test("upcoming matches are read from 30 minutes before the start, and once in two minutes; finished ones once in ten", async () => {
+  const day = busyDay({ live: 2, upcoming: 3, final: 2, start: "2026-11-05T02:00:00Z" }); // upcoming start 03:20: 80 minutes off
+  const feed = day.mk();
+  await feed.snapshot();
+  assert.equal(day.calls.filter((u) => u.endsWith("/match/m100")).length, 0, "80 minutes before the start: not read");
+  day.advance(60 * 60e3); // 03:00, 20 minutes before
+  await feed.snapshot();
+  assert.equal(day.calls.filter((u) => u.endsWith("/match/m100")).length, 1, "inside 30 minutes: read");
+  day.advance(20_000);
+  await feed.snapshot();
+  assert.equal(day.calls.filter((u) => u.endsWith("/match/m100")).length, 1, "not again within two minutes");
+  const finals = () => day.calls.filter((u) => u.endsWith("/match/m200")).length;
+  const heldAt = finals();
+  day.advance(2 * 60e3);
+  await feed.snapshot();
+  assert.equal(day.calls.filter((u) => u.endsWith("/match/m100")).length, 2, "again after two minutes");
+  assert.equal(finals(), heldAt, "a finished match is held for ten minutes: no read in these rounds");
+});
+
+test("a live page that is slow or fails keeps its last good read, marked stale, and the response still goes out", async () => {
+  const row = (i) => ({ team1: `Home ${i}`, team2: `Away ${i}`, t1SName: `H${i}`, t2SName: `A${i}`, t: Date.parse("2026-11-05T02:00:00Z"), fo: "T20", mf: `M${i}`, link: `/match/m${i}`, s1: "50-1", o1: "6.0", status: 1, winningTeam: -1, w: -1, statusText: "Live" });
+  const rows = [0, 1, 2].map(row);
+  const sched = pageHtml({ [FIXTURE]: rows });
+  const page = (id) => pageHtml({ [LIVE]: { team1_f_n: `Home ${id}`, team2_f_n: `Away ${id}`, status: 1, score1: "60-1", over1: "7.0", player_full_name1: "Kavem Hodge", run1: "40", ball1: "(30)" } });
+  let down = false, t = Date.parse("2026-11-05T03:00:00Z");
+  const feed = createFeed({
+    now: () => t, cardBudgetMs: 50, liveWaitMs: 300, pageMs: 100, base: () => "https://src.test", booksUrl: "books", scheduleUrl: "schedule.csv",
+    getJson: async () => ({ lines: rows.map((r) => ({ match: `${r.team1} vs ${r.team2}`, start_utc: new Date(r.t).toISOString().replace(".000", ""), fmt: "T20" })) }),
+    getText: async () => "", loadIdentity: async () => NO_IDENTITY,
+    getHtml: (url) => (down && url.includes("/match/m1") ? new Promise(() => {}) : Promise.resolve(url.endsWith("/") || url.endsWith("/schedule") ? sched : /\/match\/m(\d+)/.test(url) ? page(/\/match\/m(\d+)/.exec(url)[1]) : "")),
+  });
+  const first = await feed.snapshot();
+  assert.ok(first.matches.find((m) => m.id === "M1").teams.some((x) => x.display), "read fine the first time");
+  down = true;
+  t += 20_000; // past the 15 s the snapshot is held
+  const t0 = Date.now();
+  const second = await feed.snapshot();
+  assert.ok(Date.now() - t0 < 2000, "the response did not wait for the hung page");
+  const m1 = second.matches.find((m) => m.id === "M1");
+  assert.ok(m1.teams.some((x) => x.display), "it still has its last good score");
+  assert.equal(m1.stale, true, "marked stale");
+  assert.equal(second.matches.find((m) => m.id === "M0").stale, undefined, "the others are fresh");
+  assert.equal(second.reads.timedOut, 1);
+});
