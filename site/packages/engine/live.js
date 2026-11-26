@@ -213,12 +213,19 @@ export function wantsCard(match, now = Date.now()) {
   return match?.status === "upcoming" && Number.isFinite(t) && t - now < 90 * 60e3 && now - t < BOOK_WINDOW_MS;
 }
 
-/** Live matches always get a page fetch; finished/upcoming ones fill the remaining slots up to `max`. */
-export function cardFetchList(rows, max = 12, now = Date.now()) {
-  const rank = { live: 0, upcoming: 1, final: 2 };
+/**
+ * Which rows get their page fetches. Every live match, however many are on at once (a domestic day has 20+). A finished match comes before an upcoming one: its props are
+ * decided by its scorecard, an upcoming card is only a nicety. A finished match whose pages are already held (`held`) costs no fetch, so it never takes one of the `max`
+ * fetches left after the live ones (at least 6, so a day with 20 live still reads finished and upcoming cards, a few more each round).
+ */
+export function cardFetchList(rows, max = 12, now = Date.now(), held = () => false) {
+  const rank = { live: 0, final: 1, upcoming: 2 };
   const need = (rows || []).filter((m) => m.url && wantsCard(m, now)).sort((a, b) => (rank[a.status] ?? 9) - (rank[b.status] ?? 9));
   const live = need.filter((m) => m.status === "live");
-  return live.concat(need.filter((m) => m.status !== "live")).slice(0, Math.max(max, live.length));
+  const rest = need.filter((m) => m.status !== "live");
+  const free = rest.filter((m) => held(m));
+  const fresh = rest.filter((m) => !held(m)).slice(0, Math.max(max - live.length, 6));
+  return live.concat(free, fresh).sort((a, b) => (rank[a.status] ?? 9) - (rank[b.status] ?? 9));
 }
 
 /** Source A format labels ("T20I", "List A", "Youth ODI", "One Day", "First Class", "Multi Day") -> the site's formats. */
