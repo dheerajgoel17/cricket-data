@@ -55,13 +55,18 @@
   "alerted_at": "2026-11-25T22:34:28.812186+00:00"
  },
  "male|Australia|England|2026-11-27|batter_sixes||J Fraser-McGurk under 0.5|0.5|under": {
-  "edge": 0.0951,
+  "edge": 0.1602,
   "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-25T22:34:28.812186+00:00"
+  "alerted_at": "2026-11-26T01:34:06.421835+00:00"
  },
  "male|Dubai Capitals|Sharjah Warriorz|2026-11-27|batter_sixes||PI Walter under 0.5|0.5|under": {
   "edge": 0.0885,
   "start_utc": "2026-11-27T14:30:00Z",
   "alerted_at": "2026-11-25T22:34:28.812186+00:00"
+ },
+ "male|Australia|England|2026-11-27|batter_fours||Mitchell Marsh under 2.5|2.5|under": {
+  "edge": 0.052,
+  "start_utc": "2026-11-27T08:15:00Z",
+  "alerted_at": "2026-11-26T01:34:06.421835+00:00"
  }
 }
