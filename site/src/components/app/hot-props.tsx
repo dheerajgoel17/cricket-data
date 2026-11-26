@@ -44,7 +44,7 @@ import { ActiveChip } from "./chip";
 import { ScreenerFilters } from "./screener-filters";
 import { PropStar } from "./star";
 import { PlayerName } from "./player-name";
-import { BatterSpot, InPlayBadge } from "./live-spot";
+import { BatterSpot, InPlayBadge, LineMove } from "./live-spot";
 import { PlayerAvatar } from "./portrait";
 import { DEFAULTS, activeFilters, clearFilter, enoughHistory, narrow, options, order, parseScreener, screenerParams, type Screener } from "@/lib/screener";
 
@@ -57,7 +57,7 @@ const pct = (p: number | null) => (p == null ? "–" : `${Math.round(p * 100)}%`
 const pctClass = (p: number | null) => (p == null ? "text-muted-foreground" : p >= 0.7 ? "text-primary" : p <= 0.4 ? "text-miss" : "text-foreground");
 
 /** One book's own line and over price for the row's player and stat (`bookQuotes`); `best` marks the friendliest one when 2+ books quote. */
-type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; live?: boolean; opened?: number; underAt?: { line: number; price: number }; underOnly?: boolean };
+type Quote = { source: string; name: string; line: number; over: number | null; under: number | null; best: boolean; live?: boolean; opened?: number; underAt?: { line: number; price: number }; underOnly?: boolean; moved?: { from: number; to: number; at: string; n: number } };
 interface Row { gender: number | null; comp: string; day: number; idx: number; pid: string; inn: number; name: string; bookName: string; settled?: number | null; stored?: number | null; team: string; opp: string; stat: string; line: number; fmt: string; match: string; start: string; over: number; under: number; quotes: Quote[]; prior: number | null; l5: any; l10: any; season: any; h2h: any; ven: any; venue: string; edge: number | null; side?: "over" | "under"; last: { v: number | null; s: string }[]; max: number }
 type HistorySeed = { v: number; build: string; generated_at_utc: string; rows: Record<string, any> };
 
@@ -274,11 +274,13 @@ const rowKey = (r: Row) => `${r.idx}${r.stat}${r.fmt}${r.start}${r.inn}${r.quote
 /** Shared: avatar · name · flag · In play line (when line/odds are in-play). Match Live stays on fixtures; Not in XI / void covers non-playing. */
 export function PropLineIdentity({ r, out, linkClass, onNameClick }: { r: Row; out: boolean; linkClass?: string; onNameClick?: (e: MouseEvent) => void }) {
   const inPlay = !out && r.quotes.some((q: Quote) => q.live);
+  const moved = out ? undefined : r.quotes.find((q: Quote) => q.moved && q.line === r.line)?.moved;
   return (
     <span className="flex min-w-0 items-center gap-tight text-body font-emphasis leading-snug">
       <Link to={propHref(r)} className={cn("truncate", linkClass)} onClick={onNameClick}><PlayerName idx={r.idx} fallback={r.name} /></Link>
       <TeamFlag name={r.team} />
       {inPlay ? <InPlayBadge /> : null}
+      {!inPlay && moved ? <LineMove from={moved.from} line={r.line} /> : null}
     </span>
   );
 }

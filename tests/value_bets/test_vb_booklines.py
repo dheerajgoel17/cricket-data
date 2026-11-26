@@ -536,3 +536,53 @@ def test_a_match_the_file_lost_is_restored_from_the_archive_while_the_source_has
     assert len(out["fancy"]) == 1
     over = [{**SCHEDULE[0], "status": "Completed"}]
     assert archive.heal_book(empty, tmp_path, now, None, over, __import__("value_bets.booklines", fromlist=["schedule_active"]).schedule_active(over)) == empty
+
+
+# ---- pre-match line moves
+def _book(line, source="bet365", start="2026-10-27T07:00:00Z", fancy=None):
+    return {"generated_at_utc": "t", "events": [], "fancy": fancy or [], "lines": [{
+        "match": "Melbourne Stars vs Perth", "start_utc": start, "pid": "ab12", "player": "H Kerr", "team": "Melbourne Stars", "fmt": "T20", "stat": "fours", "line": line,
+        "books": [{"source": source, "kind": "bookmaker", "over": 1.85, "under": 1.95}]}]}
+
+
+def test_a_line_that_moves_before_the_start_is_tracked_from_its_opening_line():
+    from value_bets.booklines import track_moves
+    now = dt.datetime(2026, 10, 27, 1, tzinfo=dt.timezone.utc)
+    (m,) = track_moves(_book(17.5), _book(16.5), now)
+    assert (m["t"], m["pid"], m["stat"], m["source"], m["open"], m["line"], m["n"], m["at"]) == ("line", "ab12", "fours", "bet365", 16.5, 17.5, 1, "2026-10-27T01:00:00Z")
+    later = dt.datetime(2026, 10, 27, 2, tzinfo=dt.timezone.utc)
+    (m2,) = track_moves(_book(18.5), {**_book(17.5), "moves": [m]}, later)
+    assert (m2["open"], m2["line"], m2["n"]) == (16.5, 18.5, 2)  # opening stays, the count grows
+    assert track_moves(_book(16.5), {**_book(18.5), "moves": [m2]}, later) == []  # back to where it opened is no move
+
+
+def test_an_unchanged_line_a_ladder_a_started_match_and_a_second_source_are_not_moves():
+    from value_bets.booklines import track_moves
+    now = dt.datetime(2026, 10, 27, 1, tzinfo=dt.timezone.utc)
+    assert track_moves(_book(16.5), _book(16.5), now) == []
+    ladder = _book(16.5)
+    ladder["lines"].append({**ladder["lines"][0], "line": 20.5})
+    assert track_moves(ladder, _book(16.5), now) == []  # two lines from one source are alternatives
+    assert track_moves(_book(17.5, start="2026-10-27T00:30:00Z"), _book(16.5, start="2026-10-27T00:30:00Z"), now) == []  # started: nothing pre-match left to move
+    assert track_moves(_book(17.5, source="smarkets"), _book(16.5), now) == []  # another book appearing is not the first one moving
+
+
+def test_the_old_line_carried_beside_the_new_one_does_not_hide_the_next_move():
+    from value_bets.booklines import track_moves
+    now = dt.datetime(2026, 10, 27, 5, tzinfo=dt.timezone.utc)
+    prev = _book(17.5)
+    prev["lines"].append({**prev["lines"][0], "line": 16.5})  # carried inside the last 3 h
+    prev["moves"] = [{"t": "line", "match": "Melbourne Stars vs Perth", "start_utc": "2026-10-27T07:00:00Z", "pid": "ab12", "stat": "fours", "source": "bet365", "kind": "bookmaker", "fmt": "T20", "open": 16.5, "line": 17.5, "at": "x", "n": 1}]
+    (m,) = track_moves(_book(18.5), prev, now)
+    assert (m["open"], m["line"], m["n"]) == (16.5, 18.5, 2)
+
+
+def test_a_fancy_line_move_is_tracked_and_moves_go_with_their_match():
+    from value_bets.booklines import track_moves
+    def f(line):
+        return {"match": "Melbourne Stars vs Perth", "start_utc": "2026-10-27T07:00:00Z", "key": "team_total_fours", "scope": "team", "team": "Perth", "line": line, "over": 1.9, "under": 1.9, "source": "Dafabet", "kind": "bookmaker", "fmt": "T20"}
+    now = dt.datetime(2026, 10, 27, 1, tzinfo=dt.timezone.utc)
+    (m,) = track_moves(_book(16.5, fancy=[f(5.5)]), _book(16.5, fancy=[f(4.5)]), now)
+    assert (m["t"], m["key"], m["team"], m["open"], m["line"]) == ("fancy", "team_total_fours", "Perth", 4.5, 5.5)
+    gone = dt.datetime(2026, 10, 29, tzinfo=dt.timezone.utc)
+    assert track_moves(_book(16.5), {"moves": [m]}, gone) == []

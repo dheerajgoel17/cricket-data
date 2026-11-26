@@ -41,7 +41,7 @@ from .util import parse_ts
 
 CLOSE = dt.timedelta(hours=3)  # prices are refreshed inside this window before the start: the last pull is the closing price
 SAME = 14 * 3600  # seconds: books and the schedule disagree on kick-off by hours
-KINDS = ("events", "lines", "fancy", "catalogue")
+KINDS = ("events", "lines", "fancy", "catalogue", "moves")
 SHARED = ("match", "competition", "start_utc")  # carried once per file, not on every line
 
 
@@ -120,12 +120,14 @@ KEY = {
     "events": lambda x: (x.get("match"), x.get("start_utc")),
     "fancy": lambda x: (x.get("key"), x.get("scope"), x.get("team") or "", x.get("inn", 0), x.get("line"), x.get("source"), x.get("kind")),
     "catalogue": lambda x: (x.get("name"), x.get("player") or "", x.get("team") or "", x.get("line") or 0, x.get("source") or ""),
+    "moves": lambda x: (x.get("t"), x.get("pid") or x.get("key"), x.get("stat") or x.get("scope"), x.get("team") or "", x.get("inn", 0), x.get("source"), x.get("kind")),
 }
 ORDER = {
     "lines": lambda x: (x.get("player") or "", x["stat"], x.get("inn", 0), x["line"]),
     "events": lambda x: (x.get("match") or "", x.get("start_utc") or ""),
     "fancy": lambda x: (x.get("key") or "", x.get("scope") or "", x.get("team") or "", x.get("inn", 0), x.get("line") or 0, x.get("source") or ""),
     "catalogue": lambda x: (x.get("name") or "", x.get("player") or "", x.get("team") or "", x.get("line") or 0, x.get("source") or ""),
+    "moves": lambda x: (x.get("at") or "", x.get("pid") or x.get("key") or "", x.get("source") or ""),
 }
 
 
@@ -140,6 +142,8 @@ def _combine(kind: str, old: dict, new: dict, refresh: bool) -> dict:
     if kind == "events":
         return {**(new if refresh else old), "markets": sorted({*old.get("markets", []), *new.get("markets", [])}),
                 "sources": sorted({*old.get("sources", []), *new.get("sources", [])}), "n": max(old.get("n", 0), new.get("n", 0))}
+    if kind == "moves":
+        return new  # the latest word on a source's line: ``open`` stays the first line seen, ``n`` counts every move
     return new if refresh else old
 
 
@@ -193,8 +197,9 @@ def update(root: Path, book: dict, now: dt.datetime, fx_of: dict | None = None, 
                **({"results": old["results"]} if (old or {}).get("results") else {}),  # stored by ``settle``, never touched here
                **({"held_in_play": old["held_in_play"]} if (old or {}).get("held_in_play") else {}),  # set aside by hand, carried as it is
                **({"settled_at": old["settled_at"]} if (old or {}).get("settled_at") else {})}
-        if not new.get("catalogue") and not (old or {}).get("catalogue"):
-            new.pop("catalogue", None)  # do not rewrite every older file just to add an empty key
+        for k in ("catalogue", "moves"):
+            if not new.get(k) and not (old or {}).get(k):
+                new.pop(k, None)  # do not rewrite every older file just to add an empty key
         if old is not None and {k: v for k, v in new.items() if k != "updated"} == {k: v for k, v in old.items() if k != "updated"}:
             continue
         new["updated"] = now.strftime("%Y-%m-%dT%H:%M:%SZ")

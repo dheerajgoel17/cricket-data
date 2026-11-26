@@ -5,7 +5,7 @@ import { edgeTag } from "@cricket/engine/props-view.js";
 import { TeamBadge } from "./badges";
 import { FancyGround, FancyHitRate, FancyLineMeta } from "./fancy-lines";
 import { PropBarsSlot, PropLineIdentity, PropLineMeta, PropProgress, RateCell, propLineHref } from "./hot-props";
-import { InPlayBadge } from "./live-spot";
+import { InPlayBadge, LineMove } from "./live-spot";
 import { MiniBars, MiniBarsSlot } from "./mini-bars";
 import { PlayerAvatar } from "./portrait";
 import { Tick } from "./tick";
@@ -115,7 +115,7 @@ function FancyDenseRow({ r, onOpen }: { r: any; onOpen: () => void }) {
           <span className="grid min-w-0 flex-1 gap-hair">
             <span className="flex min-w-0 items-center gap-tight text-body font-emphasis leading-snug">
               <span className="min-w-0 truncate">{r.label}</span>
-              {r.live ? <InPlayBadge /> : null}
+              {r.live ? <InPlayBadge /> : r.moved ? <LineMove from={r.moved.from} line={r.moved.to} /> : null}
             </span>
             {!voided ? <FancyLineMeta r={r} standing={mark} /> : null}
           </span>

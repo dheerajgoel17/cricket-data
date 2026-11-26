@@ -46,6 +46,11 @@ test("a market row is the better side's shrunk chance x best price - 1, hand-com
   assert.deepEqual(r.at, { n: 10, over: 0, under: 10, side: "under" }); // the last ten at the ground, all under
   assert.deepEqual(r.last.map((x) => x.s), Array(10).fill("miss"));
   assert.equal(r.batFirst, false);
+  assert.equal(r.moved, null); // no line moved
+  const d = doc(row("match_runs", 300.5, 1.8));
+  const moved = { from: 290.5, to: 300.5, at: "x", n: 1 };
+  const m = marketRow({ store, doc: { ...d, fancy: d.fancy.map((l) => ({ ...l, moved })) }, fxInfo: { a: "Alpha", b: "Beta", fmt: "T20", startMs: Date.parse(START) }, ms, scope: -1, teamName: null, key: "match_runs", ground });
+  assert.deepEqual(m.moved, moved); // a moved book line shows on the market's row
 });
 
 test("available over and under lines: over@4.5 with under@3.5 when that is how the books list them", () => {

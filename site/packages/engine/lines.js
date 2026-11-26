@@ -68,7 +68,7 @@ export function bookQuotes(lines) {
       if (b.under > 1 && !(unders.get(b.source)?.line >= l.line)) unders.set(b.source, { line: l.line, price: b.under });
       continue;
     }
-    const q = { source: b.source, name: bookName(b.source), line: l.line, over: b.over, under: b.under > 1 ? b.under : null, ...(b.live ? { live: true, ...(b.opened != null ? { opened: b.opened } : {}) } : {}) };
+    const q = { source: b.source, name: bookName(b.source), line: l.line, over: b.over, under: b.under > 1 ? b.under : null, ...(b.live ? { live: true, ...(b.opened != null ? { opened: b.opened } : {}) } : {}), ...(b.moved ? { moved: b.moved } : {}) };
     const cur = mine.get(b.source);
     if (!cur || far(q) < far(cur) - 1e-9 || (Math.abs(far(q) - far(cur)) <= 1e-9 && q.line < cur.line)) mine.set(b.source, q);
   }
@@ -294,7 +294,31 @@ export function fancyFor(doc, fixture, key, team = null, inn = 0, live = null) {
     if (l.key !== base || !!l.bat_first !== bf || lineScope(l) !== inn || (team ? teamKey(l.team) !== teamKey(team) : l.scope !== "match")) return false;
     if (live !== null && !!l.live !== live) return false; // true: only the live lines, false: only the pre-match ones, null: both
     return sameFixture(l, fixture, doc);
-  }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source, bat_first: !!l.bat_first, ...(l.live ? { live: true, ...(l.opened != null ? { opened: l.opened } : {}) } : {}) })).sort((x, y) => x.line - y.line);
+  }).map((l) => ({ line: l.line, over: l.over, under: l.under, source: l.source, bat_first: !!l.bat_first, ...(l.live ? { live: true, ...(l.opened != null ? { opened: l.opened } : {}) } : {}), ...(l.moved ? { moved: l.moved } : {}) })).sort((x, y) => x.line - y.line);
+}
+
+/**
+ * The doc with each pre-match line a source moved (`doc.moves`, written by `track_moves` in src/value_bets/booklines.py) stamped `moved: { from, to, at, n }` on that source's entry:
+ * `books[i]` of a player line, the row itself for a fancy line. Only the line the source quotes now carries it, and only before the match starts (a started match's lines are held and in-play
+ * ones are not moves). Nothing is priced or changed: the rows read `moved` to show "was 16.5".
+ */
+export function withMoves(doc, now = Date.now()) {
+  const moves = (doc?.moves || []).filter((m) => m && m.line != null && m.open != null && m.start_utc && Date.parse(m.start_utc) > now);
+  if (!moves.length) return doc;
+  const lineKey = (m, src, kind, line) => [m.match, m.pid, m.stat, m.inn || 0, src, kind, line].join("|");
+  const fancyKey = (m, src, kind, line) => [m.match, m.key, m.scope, m.team || "", m.inn || 0, src, kind, line].join("|");
+  const by = new Map(moves.map((m) => [m.t === "fancy" ? fancyKey(m, m.source, m.kind, m.line) : lineKey(m, m.source, m.kind, m.line), { from: m.open, to: m.line, at: m.at, n: m.n }]));
+  const lines = (doc.lines || []).map((l) => {
+    if (!l.books?.some((b) => by.has(lineKey({ match: l.match, pid: l.pid || l.player, stat: l.stat, inn: l.inn }, b.source, b.kind, l.line)))) return l;
+    return { ...l, books: l.books.map((b) => { const m = by.get(lineKey({ match: l.match, pid: l.pid || l.player, stat: l.stat, inn: l.inn }, b.source, b.kind, l.line)); return m ? { ...b, moved: m } : b; }) };
+  });
+  const fancy = (doc.fancy || []).map((l) => { const m = by.get(fancyKey({ match: l.match, key: l.key, scope: l.scope, team: l.team, inn: l.inn }, l.source, l.kind, l.line)); return m && !l.live ? { ...l, moved: m } : l; });
+  return { ...doc, lines, fancy };
+}
+
+/** The moves that belong to a fixture (`sameFixture`), for a card's "lines moved" mark; each `{ ..., open, line }`, newest first. */
+export function fixtureMoves(doc, fixture, now = Date.now()) {
+  return (doc?.moves || []).filter((m) => m && m.open != null && m.line != null && Date.parse(m.start_utc) > now && sameFixture(m, fixture, doc)).sort((a, b) => (b.at || "").localeCompare(a.at || ""));
 }
 
 /** The best price of a side among the books quoting it, or null when none does (an exchange quotes Yes and No on lines a gap apart, so a line can be one-sided). */
