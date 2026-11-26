@@ -90,7 +90,14 @@ async function snapshot(path, request, env, ctx) {
   const url = new URL(path, request.url);
   const cache = globalThis.caches?.default;
   const cached = await cache?.match(url.href);
-  if (cached) return cached;
+  if (cached) {
+    // The edge hands back its stored copy with the zone's browser lifetime (4 hours) in place of the one stored with it, and a browser that keeps that copy shows an hours-old feed that a hard refresh does not clear:
+    // a hit is sent on with the short lifetime, minus the seconds it has already spent in the cache.
+    const headers = new Headers(cached.headers);
+    headers.set("Cache-Control", `public, max-age=${Math.max(1, ttl.get(path) - (Number(headers.get("age")) || 0))}`);
+    headers.delete("Last-Modified");
+    return new Response(cached.body, { status: cached.status, headers });
+  }
   const response = await env.SNAPSHOTS.getByName(path).fetch(url.href);
   if (!response.ok || !cache || response.headers.get("Cache-Control") === "no-store") return response;
   const headers = new Headers(response.headers);
