@@ -18,5 +18,10 @@
   "edge": 0.0572,
   "start_utc": "2026-11-28T04:40:00Z",
   "alerted_at": "2026-11-27T05:33:24.397287+00:00"
+ },
+ "male|Australia|England|2026-11-29|batter_milestone||Aneurin Donald 50+ yes|49.5|over": {
+  "edge": 0.1705,
+  "start_utc": "2026-11-29T08:15:00Z",
+  "alerted_at": "2026-11-27T13:32:50.013358+00:00"
  }
 }
