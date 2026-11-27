@@ -1,43 +1,8 @@
 {
- "male|Australia|England|2026-11-27|batter_milestone||Aneurin Donald 50+ yes|49.5|over": {
-  "edge": 0.2159,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-24T12:55:22.936080+00:00"
- },
- "male|Australia|England|2026-11-27|batter_sixes||Aneurin Donald under 0.5|0.5|under": {
-  "edge": 0.1518,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-24T15:35:07.837058+00:00"
- },
- "male|Australia|England|2026-11-27|batter_sixes||Jake Fraser-McGurk under 0.5|0.5|under": {
-  "edge": 0.1472,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-24T15:35:07.837058+00:00"
- },
- "male|Australia|England|2026-11-27|batter_sixes||J Fraser-McGurk under 0.5|0.5|under": {
-  "edge": 0.1602,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-26T01:34:06.421835+00:00"
- },
  "male|Dubai Capitals|Sharjah Warriorz|2026-11-27|batter_sixes||PI Walter under 0.5|0.5|under": {
   "edge": 0.162,
   "start_utc": "2026-11-27T14:30:00Z",
   "alerted_at": "2026-11-26T14:33:06.121773+00:00"
- },
- "male|Australia|England|2026-11-27|batter_fours||Mitchell Marsh under 2.5|2.5|under": {
-  "edge": 0.052,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-26T01:34:06.421835+00:00"
- },
- "male|Australia|England|2026-11-27|batter_sixes||Philip Salt under 0.5|0.5|under": {
-  "edge": 0.0915,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
- },
- "male|Australia|England|2026-11-27|batter_fours||Harry Brook under 2.5|2.5|under": {
-  "edge": 0.0568,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-26T05:50:11.232072+00:00"
  },
  "female|Hobart Hurricanes Women|Perth Scorchers Women|2026-11-27|batter_fours||BL Mooney under 3.5|3.5|under": {
   "edge": 0.0945,
@@ -53,16 +18,6 @@
   "edge": 0.0906,
   "start_utc": "2026-11-27T10:10:00Z",
   "alerted_at": "2026-11-26T05:57:34.678595+00:00"
- },
- "male|Australia|England|2026-11-27|batter_fours||J Fraser-McGurk over 1.5|1.5|over": {
-  "edge": 0.1985,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-27T02:32:33.033779+00:00"
- },
- "male|Australia|England|2026-11-27|batter_fours||SB Harper under 1.5|1.5|under": {
-  "edge": 0.0686,
-  "start_utc": "2026-11-27T08:15:00Z",
-  "alerted_at": "2026-11-27T02:32:33.033779+00:00"
  },
  "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-28|batter_runs||Tess Flintoff under 15.5|15.5|under": {
   "edge": 0.1025,
