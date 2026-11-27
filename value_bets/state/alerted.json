@@ -53,5 +53,20 @@
   "edge": 0.0906,
   "start_utc": "2026-11-27T10:10:00Z",
   "alerted_at": "2026-11-26T05:57:34.678595+00:00"
+ },
+ "male|Australia|England|2026-11-27|batter_fours||J Fraser-McGurk over 1.5|1.5|over": {
+  "edge": 0.1985,
+  "start_utc": "2026-11-27T08:15:00Z",
+  "alerted_at": "2026-11-27T02:32:33.033779+00:00"
+ },
+ "male|Australia|England|2026-11-27|batter_fours||SB Harper under 1.5|1.5|under": {
+  "edge": 0.0686,
+  "start_utc": "2026-11-27T08:15:00Z",
+  "alerted_at": "2026-11-27T02:32:33.033779+00:00"
+ },
+ "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-28|batter_runs||Tess Flintoff under 15.5|15.5|under": {
+  "edge": 0.1025,
+  "start_utc": "2026-11-28T04:40:00Z",
+  "alerted_at": "2026-11-27T02:32:33.033779+00:00"
  }
 }
