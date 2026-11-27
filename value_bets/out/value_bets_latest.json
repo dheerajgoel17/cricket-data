@@ -1,72 +1,72 @@
 {
- "generated_at_utc": "2026-11-27T16:30:41Z",
- "generated_at_ist": "2026-11-27 22:00 IST",
- "runtime_secs": 242.4,
+ "generated_at_utc": "2026-11-27T17:30:38Z",
+ "generated_at_ist": "2026-11-27 23:00 IST",
+ "runtime_secs": 190.1,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-27",
-  "commit": "7600f7fd37"
+  "commit": "05e3f8b8af"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1293,
-   "secs": 0.9
+   "rows": 1390,
+   "secs": 0.2
   },
   "feedg": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}",
-   "secs": 1.7
+   "secs": 1.6
   },
   "smarkets": {
    "status": "ok",
-   "rows": 424,
-   "secs": 3.0
+   "rows": 446,
+   "secs": 2.1
   },
   "feedl": {
    "status": "ok",
    "rows": 314,
-   "secs": 11.4,
+   "secs": 9.5,
    "events": 18
   },
   "feedk": {
    "status": "ok",
    "rows": 166,
-   "secs": 14.3,
+   "secs": 14.5,
    "events": 5
   },
   "feede": {
    "status": "ok",
-   "rows": 284,
-   "secs": 32.4,
-   "events": 12
+   "rows": 324,
+   "secs": 33.8,
+   "events": 13
   },
   "feedf": {
    "status": "ok",
    "rows": 214,
-   "secs": 37.9,
+   "secs": 34.5,
    "events": 6
   },
   "feedj": {
    "status": "ok",
-   "rows": 402,
-   "secs": 56.4,
-   "events": 5
+   "rows": 671,
+   "secs": 67.8,
+   "events": 9
   },
   "feedh": {
    "status": "ok",
-   "rows": 1148,
-   "secs": 90.1,
-   "events": 66
+   "rows": 1230,
+   "secs": 98.6,
+   "events": 71
   },
   "feedi": {
    "status": "ok",
-   "rows": 1467,
-   "secs": 166.5,
-   "events": 45
+   "rows": 1454,
+   "secs": 138.3,
+   "events": 50
   }
  },
- "snapshot": "odds_20261127T163041Z.jsonl.gz",
+ "snapshot": "odds_20261127T173038Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -148,51 +148,52 @@
   "CROSS_FORMAT_WEIGHT": 0.0
  },
  "stats": {
-  "events_in_window": 42,
-  "rows_in_window": 5588,
-  "selections_with_model": 2377,
-  "selections_with_market_fair": 2961,
-  "markets_in_window": 417,
+  "events_in_window": 44,
+  "rows_in_window": 6094,
+  "selections_with_model": 2500,
+  "selections_with_market_fair": 3120,
+  "markets_in_window": 433,
   "value_bets": 2,
   "dropped_by_filter": {
-   "odds_range": 102,
-   "model_market_gap": 1307,
+   "odds_range": 105,
+   "model_market_gap": 1398,
    "suspect_edge": 2,
-   "rarely_selected": 2,
-   "model_disagrees": 7,
-   "model_only_no_market": 142,
-   "top_wide_book": 1,
+   "rarely_selected": 3,
+   "model_disagrees": 8,
+   "model_only_no_market": 138,
+   "top_wide_book": 2,
    "market_disabled": 1,
-   "policy_max_odds": 2,
-   "loose_name_match": 4,
-   "policy_min_edge": 1
+   "policy_max_odds": 1,
+   "loose_name_match": 2,
+   "policy_min_edge": 1,
+   "small_sample": 1
   },
   "suspect_edges": 2,
-  "innings_milestones_unmodelled": 98,
+  "innings_milestones_unmodelled": 112,
   "model_vs_market": {
    "top_batter_team": {
-    "n_prices": 560,
-    "mean_model_p": 0.046,
+    "n_prices": 683,
+    "mean_model_p": 0.049,
     "mean_market_p": 0.066,
-    "mean_logit_diff_model_minus_market": -0.02,
-    "mean_abs_logit_diff": 0.888,
-    "corr": 0.731
+    "mean_logit_diff_model_minus_market": 0.022,
+    "mean_abs_logit_diff": 0.867,
+    "corr": 0.717
    },
    "top_bowler_team": {
-    "n_prices": 371,
-    "mean_model_p": 0.099,
-    "mean_market_p": 0.102,
-    "mean_logit_diff_model_minus_market": -0.062,
-    "mean_abs_logit_diff": 0.388,
-    "corr": 0.619
+    "n_prices": 442,
+    "mean_model_p": 0.101,
+    "mean_market_p": 0.103,
+    "mean_logit_diff_model_minus_market": -0.056,
+    "mean_abs_logit_diff": 0.383,
+    "corr": 0.637
    },
    "batter_runs": {
-    "n_prices": 598,
+    "n_prices": 684,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.598,
-    "corr": 0.145
+    "mean_abs_logit_diff": 0.579,
+    "corr": 0.14
    },
    "batter_sixes": {
     "n_prices": 160,
@@ -211,19 +212,19 @@
     "corr": 0.408
    },
    "bowler_wickets": {
-    "n_prices": 106,
+    "n_prices": 92,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.359,
-    "corr": 0.931
+    "mean_abs_logit_diff": 0.353,
+    "corr": 0.934
    },
    "batter_milestone": {
-    "n_prices": 730,
-    "mean_model_p": 0.416,
-    "mean_market_p": 0.442,
-    "mean_logit_diff_model_minus_market": -0.184,
-    "mean_abs_logit_diff": 0.648,
+    "n_prices": 786,
+    "mean_model_p": 0.421,
+    "mean_market_p": 0.445,
+    "mean_logit_diff_model_minus_market": -0.17,
+    "mean_abs_logit_diff": 0.659,
     "corr": 0.985
    },
    "bowler_milestone": {
@@ -235,20 +236,20 @@
     "corr": 0.982
    },
    "top_batter_match": {
-    "n_prices": 687,
-    "mean_model_p": 0.019,
-    "mean_market_p": 0.03,
-    "mean_logit_diff_model_minus_market": -0.24,
-    "mean_abs_logit_diff": 1.113,
+    "n_prices": 734,
+    "mean_model_p": 0.018,
+    "mean_market_p": 0.029,
+    "mean_logit_diff_model_minus_market": -0.248,
+    "mean_abs_logit_diff": 1.11,
     "corr": 0.454
    },
    "top_bowler_match": {
-    "n_prices": 457,
+    "n_prices": 526,
     "mean_model_p": 0.03,
-    "mean_market_p": 0.036,
-    "mean_logit_diff_model_minus_market": -0.132,
-    "mean_abs_logit_diff": 1.755,
-    "corr": 0.152
+    "mean_market_p": 0.035,
+    "mean_logit_diff_model_minus_market": -0.204,
+    "mean_abs_logit_diff": 1.541,
+    "corr": 0.182
    }
   }
  },
@@ -340,6 +341,7 @@
    ],
    "sources": [
     "feedi_d",
+    "feedj_d",
     "smarkets"
    ]
   },
@@ -440,6 +442,16 @@
     "feedf_p",
     "feedh_d",
     "feedl"
+   ]
+  },
+  {
+   "event": "male|elite academy|omr checker|2026-11-28",
+   "start_ist": "2026-11-28 09:30 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
    ]
   },
   {
@@ -693,6 +705,7 @@
    "sources": [
     "feede_lb",
     "feedi_d",
+    "feedj_d",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -723,6 +736,7 @@
    "sources": [
     "feede_lb",
     "feedi_d",
+    "feedj_d",
     "moviodds_bet365",
     "smarkets"
    ]
@@ -753,6 +767,7 @@
     "feede_lb",
     "feedh_d",
     "feedi_d",
+    "feedj_d",
     "feedk_leoal",
     "feedl",
     "moviodds_bet365",
@@ -815,6 +830,21 @@
     "feede_lb",
     "feedh_d",
     "feedi_d",
+    "smarkets"
+   ]
+  },
+  {
+   "event": "male|Andhra|Mumbai|2026-11-30",
+   "start_ist": "2026-11-30 13:30 IST",
+   "format": "T20",
+   "format_source": "fixtures",
+   "teams_matched": [
+    "Andhra",
+    "Mumbai"
+   ],
+   "sources": [
+    "feede_lb",
+    "feedh_d",
     "smarkets"
    ]
   }
@@ -902,18 +932,18 @@
    "back_liquidity": null,
    "overround": 0.0929,
    "implied_prob": 0.2,
-   "fair_odds": 4.38,
-   "fair_prob": 0.2283,
+   "fair_odds": 4.247,
+   "fair_prob": 0.2354,
    "model_prob": 0.2199,
-   "market_prob": 0.2352,
+   "market_prob": 0.2481,
    "fair_basis": "blend 0.45 model + 0.55 market",
-   "edge": 0.1416,
-   "edge_pct": 14.16,
-   "kelly_quarter_stake_pct": 0.88,
-   "n_sources": 5,
+   "edge": 0.1772,
+   "edge_pct": 17.72,
+   "kelly_quarter_stake_pct": 1.11,
+   "n_sources": 6,
    "confidence": "medium",
-   "why": "Model 22% vs market 24% for 50+ runs; form 30.1 runs/inn recency-weighted T20 (n_eff 35.1; last 5: 32, 85, 10, 13, 21), bats in 98% of games played; vs Australia: 3 inns avg 42.3; weather: rain chance up to 57%, high humidity 90%",
-   "notes": "5 market source(s) for fair price; model 0.220 vs market 0.235; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); RAIN RISK: up to 57% rain chance, 1.5 mm forecast during the match - shortened match or void props possible",
+   "why": "Model 22% vs market 25% for 50+ runs; form 30.1 runs/inn recency-weighted T20 (n_eff 35.1; last 5: 32, 85, 10, 13, 21), bats in 98% of games played; vs Australia: 3 inns avg 42.3; weather: rain chance up to 57%, high humidity 90%",
+   "notes": "6 market source(s) for fair price; model 0.220 vs market 0.248; milestone: assumes loses if player doesn't bat/bowl (void if not in XI); RAIN RISK: up to 57% rain chance, 1.5 mm forecast during the match - shortened match or void props possible",
    "model_detail": {
     "n_eff": 35.1,
     "expected": 32.72,
@@ -979,6 +1009,7 @@
   "East Zone (W) (female)",
   "East Zone (Women) (female)",
   "East Zone (male)",
+  "Elite Cricket Academy (male)",
   "Fidelity Titans (W) (female)",
   "Garden Route Badgers (W) (female)",
   "Lions (W) (female)",
@@ -991,6 +1022,7 @@
   "North Zone (W) (female)",
   "North Zone (Women) (female)",
   "North Zone (male)",
+  "Omr Checker (male)",
   "Peshawar Blues (male)",
   "South Zone (W) (female)",
   "South Zone (Women) (female)",
@@ -1020,6 +1052,7 @@
   "Arushi Goel",
   "B Berry",
   "B Leishman",
+  "B.Munish Varma",
   "Bandile Mbatha",
   "Bella James",
   "Bharati Fulmali",
@@ -1032,6 +1065,7 @@
   "Dayalan Hemalatha",
   "Debasmita Debabrata Dutta",
   "Deepti Sharma",
+  "Divyaansh Saxena",
   "E Hunter",
   "Ella Drumm",
   "Ella GC Drumm",
@@ -1040,7 +1074,6 @@
   "Emma McLeod",
   "Ethan Holman",
   "F Dawoodzai",
-  "F Sana",
   "Faridoon Dawoodzai",
   "Flora Devonshire",
   "G Lyons",
@@ -1066,7 +1099,7 @@
   "Jemimah Rodrigues",
   "Jintimani Kalita",
   "Jintimoni Kalita",
-  "Karthik B Nair",
+  "Kadiyam Pavana Sai Rahul",
   "KarthikB Nair",
   "Keith Dudgeon",
   "Khushi Sharma",
@@ -1085,6 +1118,7 @@
   "MB Azam",
   "ME Clark",
   "Maggie Clark",
+  "Marathala Dhanush",
   "Matt Rowe",
   "Matthew Buchanan Rowe",
   "Max O Dowd",
@@ -1125,6 +1159,7 @@
   "Ramnivas Golada",
   "Ranga Lakshmi",
   "Renuka Singh",
+  "Revanth Reddy",
   "Richa Ghosh",
   "Ross Adair",
   "S Safi",
@@ -1138,6 +1173,7 @@
   "Sangeeta Premchand Kumawat",
   "Sanika Chalke",
   "Satheesh Shubha",
+  "Satyanarayana Raju",
   "Sayali Ganesh Satghare",
   "Sayali Satghare",
   "Scott Currie",
@@ -1160,7 +1196,10 @@
   "Smriti Mandhana",
   "Stalenberg",
   "Sushree Pradhan",
+  "Suved Parkar",
   "Suzie Bates",
+  "Sylvester Dsouza",
+  "T Bharath",
   "T Davidge",
   "T Rew",
   "Tanisha Singh",
@@ -1337,13 +1376,6 @@
     "start": "2026-11-29T01:00:00Z"
    }
   ],
-  "F Sana": [
-   {
-    "match": "Brisbane Heat (W) vs Perth Scorchers (W)",
-    "competition": "T20 Big Bash Women",
-    "start": "2026-11-29T01:00:00Z"
-   }
-  ],
   "ME Clark": [
    {
     "match": "Adelaide Strikers (W) vs Hobart Hurricanes (W)",
@@ -1359,7 +1391,7 @@
    },
    {
     "match": "Adelaide Strikers vs Hobart Hurricanes",
-    "competition": " /  / ",
+    "competition": "Big Bash League, Women",
     "start": "2026-11-29T04:30:00Z"
    },
    {
@@ -1380,156 +1412,6 @@
     "match": "Australia vs England",
     "competition": "Australia v England - 4th T20 Match",
     "start": "2026-11-29T08:15:00Z"
-   }
-  ],
-  "Pooja Vastrakar": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone (Women) vs West Zone (Women)",
-    "competition": "India. Interzonal. Women",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Pratika Pradeep Rawal": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Prema Rawat": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone (Women) vs West Zone (Women)",
-    "competition": "India. Interzonal. Women",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Sangeeta Premchand Kumawat": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Shipra Ramdular Giri": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone (Women) vs West Zone (Women)",
-    "competition": "India. Interzonal. Women",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Vaishnavi Narendra Sharma": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Varnika Choudhary": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone (Women) vs West Zone (Women)",
-    "competition": "India. Interzonal. Women",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Renuka Singh": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone (Women) vs West Zone (Women)",
-    "competition": "India. Interzonal. Women",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Anushka Brijmohan Sharma": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   }
-  ],
-  "Arushi Goel": [
-   {
-    "match": "Central Zone (W) vs West Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone vs West Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T03:00:00Z"
-   },
-   {
-    "match": "Central Zone (Women) vs West Zone (Women)",
-    "competition": "India. Interzonal. Women",
-    "start": "2026-11-28T03:00:00Z"
    }
   ],
   "Bharati Fulmali": [
@@ -1604,6 +1486,156 @@
    {
     "match": "Central Zone vs West Zone",
     "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Pooja Vastrakar": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone (Women) vs West Zone (Women)",
+    "competition": "India. Interzonal. Women",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Pratika Pradeep Rawal": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Prema Rawat": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone (Women) vs West Zone (Women)",
+    "competition": "India. Interzonal. Women",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Renuka Singh": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone (Women) vs West Zone (Women)",
+    "competition": "India. Interzonal. Women",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Sangeeta Premchand Kumawat": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Shipra Ramdular Giri": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone (Women) vs West Zone (Women)",
+    "competition": "India. Interzonal. Women",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Vaishnavi Narendra Sharma": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Varnika Choudhary": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone (Women) vs West Zone (Women)",
+    "competition": "India. Interzonal. Women",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Anushka Brijmohan Sharma": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   }
+  ],
+  "Arushi Goel": [
+   {
+    "match": "Central Zone (W) vs West Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone vs West Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T03:00:00Z"
+   },
+   {
+    "match": "Central Zone (Women) vs West Zone (Women)",
+    "competition": "India. Interzonal. Women",
     "start": "2026-11-28T03:00:00Z"
    }
   ],
@@ -1825,127 +1857,6 @@
     "start": "2026-11-28T03:00:00Z"
    }
   ],
-  "Indigo Noble": [
-   {
-    "match": "Melbourne Renegades (W) vs Melbourne Stars (W)",
-    "competition": "big-bash-league-women",
-    "start": "2026-11-28T04:40:00Z"
-   },
-   {
-    "match": "Melbourne Renegades vs Melbourne Stars",
-    "competition": "Big Bash League, Women",
-    "start": "2026-11-28T04:40:00Z"
-   },
-   {
-    "match": "Melbourne Renegades (Women) vs Melbourne Stars (Women)",
-    "competition": "Big Bash League. Women",
-    "start": "2026-11-28T04:40:00Z"
-   }
-  ],
-  "Grace Lyons": [
-   {
-    "match": "Sydney Thunder (W) vs Sydney Sixers (W)",
-    "competition": "big-bash-league-women",
-    "start": "2026-11-28T08:10:00Z"
-   },
-   {
-    "match": "Sydney Thunder vs Sydney Sixers",
-    "competition": "Big Bash League, Women",
-    "start": "2026-11-28T08:10:00Z"
-   },
-   {
-    "match": "Sydney Thunder (Women) vs Sydney Sixers (Women)",
-    "competition": "Big Bash League. Women",
-    "start": "2026-11-28T08:10:00Z"
-   }
-  ],
-  "Elsa Hunter": [
-   {
-    "match": "Sydney Thunder (W) vs Sydney Sixers (W)",
-    "competition": "big-bash-league-women",
-    "start": "2026-11-28T08:10:00Z"
-   },
-   {
-    "match": "Sydney Thunder vs Sydney Sixers",
-    "competition": "Big Bash League, Women",
-    "start": "2026-11-28T08:10:00Z"
-   },
-   {
-    "match": "Sydney Thunder (Women) vs Sydney Sixers (Women)",
-    "competition": "Big Bash League. Women",
-    "start": "2026-11-28T08:10:00Z"
-   }
-  ],
-  "Samantha Bates": [
-   {
-    "match": "Sydney Thunder (W) vs Sydney Sixers (W)",
-    "competition": "big-bash-league-women",
-    "start": "2026-11-28T08:10:00Z"
-   },
-   {
-    "match": "Sydney Thunder vs Sydney Sixers",
-    "competition": "Big Bash League, Women",
-    "start": "2026-11-28T08:10:00Z"
-   },
-   {
-    "match": "Sydney Thunder (Women) vs Sydney Sixers (Women)",
-    "competition": "Big Bash League. Women",
-    "start": "2026-11-28T08:10:00Z"
-   }
-  ],
-  "Aishwarya S Singh": [
-   {
-    "match": "East Zone (W) vs South Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T07:00:00Z"
-   },
-   {
-    "match": "East Zone vs South Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T07:00:00Z"
-   }
-  ],
-  "Jintimoni Kalita": [
-   {
-    "match": "East Zone (W) vs South Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T07:00:00Z"
-   },
-   {
-    "match": "East Zone vs South Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T07:00:00Z"
-   }
-  ],
-  "Khushi Sharma": [
-   {
-    "match": "East Zone (W) vs South Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T07:00:00Z"
-   },
-   {
-    "match": "East Zone vs South Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T07:00:00Z"
-   },
-   {
-    "match": "East Zone (Women) vs South Zone (Women)",
-    "competition": "India. Interzonal. Women",
-    "start": "2026-11-28T07:00:00Z"
-   }
-  ],
-  "Mita G Paul": [
-   {
-    "match": "East Zone (W) vs South Zone (W)",
-    "competition": "inter-zonal-t20-trophy-women",
-    "start": "2026-11-28T07:00:00Z"
-   },
-   {
-    "match": "East Zone vs South Zone",
-    "competition": " /  / ",
-    "start": "2026-11-28T07:00:00Z"
-   }
-  ],
   "Mouchaity Debnath": [
    {
     "match": "East Zone (W) vs South Zone (W)",
@@ -2089,7 +2000,31 @@
     "start": "2026-11-28T07:00:00Z"
    }
   ],
-  "Gunalan Kamalini": [
+  "Aishwarya S Singh": [
+   {
+    "match": "East Zone (W) vs South Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T07:00:00Z"
+   },
+   {
+    "match": "East Zone vs South Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T07:00:00Z"
+   }
+  ],
+  "Jintimoni Kalita": [
+   {
+    "match": "East Zone (W) vs South Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T07:00:00Z"
+   },
+   {
+    "match": "East Zone vs South Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T07:00:00Z"
+   }
+  ],
+  "Khushi Sharma": [
    {
     "match": "East Zone (W) vs South Zone (W)",
     "competition": "inter-zonal-t20-trophy-women",
@@ -2106,7 +2041,104 @@
     "start": "2026-11-28T07:00:00Z"
    }
   ],
+  "Mita G Paul": [
+   {
+    "match": "East Zone (W) vs South Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T07:00:00Z"
+   },
+   {
+    "match": "East Zone vs South Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T07:00:00Z"
+   }
+  ],
+  "Indigo Noble": [
+   {
+    "match": "Melbourne Renegades (W) vs Melbourne Stars (W)",
+    "competition": "big-bash-league-women",
+    "start": "2026-11-28T04:40:00Z"
+   },
+   {
+    "match": "Melbourne Renegades vs Melbourne Stars",
+    "competition": "Big Bash League, Women",
+    "start": "2026-11-28T04:40:00Z"
+   },
+   {
+    "match": "Melbourne Renegades (Women) vs Melbourne Stars (Women)",
+    "competition": "Big Bash League. Women",
+    "start": "2026-11-28T04:40:00Z"
+   }
+  ],
+  "Elsa Hunter": [
+   {
+    "match": "Sydney Thunder (W) vs Sydney Sixers (W)",
+    "competition": "big-bash-league-women",
+    "start": "2026-11-28T08:10:00Z"
+   },
+   {
+    "match": "Sydney Thunder vs Sydney Sixers",
+    "competition": "Big Bash League, Women",
+    "start": "2026-11-28T08:10:00Z"
+   },
+   {
+    "match": "Sydney Thunder (Women) vs Sydney Sixers (Women)",
+    "competition": "Big Bash League. Women",
+    "start": "2026-11-28T08:10:00Z"
+   }
+  ],
+  "Grace Lyons": [
+   {
+    "match": "Sydney Thunder (W) vs Sydney Sixers (W)",
+    "competition": "big-bash-league-women",
+    "start": "2026-11-28T08:10:00Z"
+   },
+   {
+    "match": "Sydney Thunder vs Sydney Sixers",
+    "competition": "Big Bash League, Women",
+    "start": "2026-11-28T08:10:00Z"
+   },
+   {
+    "match": "Sydney Thunder (Women) vs Sydney Sixers (Women)",
+    "competition": "Big Bash League. Women",
+    "start": "2026-11-28T08:10:00Z"
+   }
+  ],
+  "Samantha Bates": [
+   {
+    "match": "Sydney Thunder (W) vs Sydney Sixers (W)",
+    "competition": "big-bash-league-women",
+    "start": "2026-11-28T08:10:00Z"
+   },
+   {
+    "match": "Sydney Thunder vs Sydney Sixers",
+    "competition": "Big Bash League, Women",
+    "start": "2026-11-28T08:10:00Z"
+   },
+   {
+    "match": "Sydney Thunder (Women) vs Sydney Sixers (Women)",
+    "competition": "Big Bash League. Women",
+    "start": "2026-11-28T08:10:00Z"
+   }
+  ],
   "Dayalan Hemalatha": [
+   {
+    "match": "East Zone (W) vs South Zone (W)",
+    "competition": "inter-zonal-t20-trophy-women",
+    "start": "2026-11-28T07:00:00Z"
+   },
+   {
+    "match": "East Zone vs South Zone",
+    "competition": " /  / ",
+    "start": "2026-11-28T07:00:00Z"
+   },
+   {
+    "match": "East Zone (Women) vs South Zone (Women)",
+    "competition": "India. Interzonal. Women",
+    "start": "2026-11-28T07:00:00Z"
+   }
+  ],
+  "Gunalan Kamalini": [
    {
     "match": "East Zone (W) vs South Zone (W)",
     "competition": "inter-zonal-t20-trophy-women",
@@ -2372,7 +2404,7 @@
    },
    {
     "match": "Brisbane Heat vs Perth Scorchers",
-    "competition": " /  / ",
+    "competition": "Big Bash League, Women",
     "start": "2026-11-29T01:00:00Z"
    },
    {
@@ -2389,7 +2421,7 @@
    },
    {
     "match": "Brisbane Heat vs Perth Scorchers",
-    "competition": " /  / ",
+    "competition": "Big Bash League, Women",
     "start": "2026-11-29T01:00:00Z"
    },
    {
@@ -2402,6 +2434,11 @@
    {
     "match": "Brisbane Heat (W) vs Perth Scorchers (W)",
     "competition": "big-bash-league-women",
+    "start": "2026-11-29T01:00:00Z"
+   },
+   {
+    "match": "Brisbane Heat vs Perth Scorchers",
+    "competition": "Big Bash League, Women",
     "start": "2026-11-29T01:00:00Z"
    },
    {
@@ -2418,7 +2455,7 @@
    },
    {
     "match": "Adelaide Strikers vs Hobart Hurricanes",
-    "competition": " /  / ",
+    "competition": "Big Bash League, Women",
     "start": "2026-11-29T04:30:00Z"
    },
    {
@@ -2452,7 +2489,7 @@
    },
    {
     "match": "Adelaide Strikers vs Hobart Hurricanes",
-    "competition": " /  / ",
+    "competition": "Big Bash League, Women",
     "start": "2026-11-29T04:30:00Z"
    },
    {
@@ -2495,6 +2532,69 @@
     "match": "Kerala vs Vidarbha",
     "competition": " /  / ",
     "start": "2026-11-30T05:30:00Z"
+   }
+  ],
+  "Suved Parkar": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Sylvester Dsouza": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Divyaansh Saxena": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "B.Munish Varma": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Kadiyam Pavana Sai Rahul": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Marathala Dhanush": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Revanth Reddy": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Satyanarayana Raju": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "T Bharath": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
    }
   ],
   "Ur Rahman,Mujeeb": [
@@ -2660,6 +2760,18 @@
     "match": "Lions vs North West Dragons",
     "competition": "CSA Four-Day Series Division One 2026-27",
     "start": "2026-11-28T08:00:00Z"
+   }
+  ],
+  "Ella Drumm": [
+   {
+    "match": "Northern Brave vs Auckland Hearts",
+    "competition": "One Day Competition, Women",
+    "start": "2026-11-27T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-27T21:30:00Z"
    }
   ],
   "Anna Browning": [
@@ -2879,13 +2991,6 @@
     "start": "2026-11-30T05:30:00Z"
    }
   ],
-  "Karthik B Nair": [
-   {
-    "match": "Kerala vs Vidarbha",
-    "competition": " /  / ",
-    "start": "2026-11-30T05:30:00Z"
-   }
-  ],
   "Sharafuddeen N M": [
    {
     "match": "Kerala vs Vidarbha",
@@ -2969,13 +3074,6 @@
     "match": "Melbourne Renegades (Women) vs Melbourne Stars (Women)",
     "competition": "Big Bash League. Women",
     "start": "2026-11-28T04:40:00Z"
-   }
-  ],
-  "Ella Drumm": [
-   {
-    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-27T21:30:00Z"
    }
   ],
   "Sangeeta Kumawat": [
@@ -3375,28 +3473,28 @@
   }
  },
  "log": [
-  "[22:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[22:00 IST] history: 24351 matches, last 2026-11-27, players 439799",
-  "[22:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1293, 'secs': 0.9}",
-  "[22:03 IST] source feedg: {'status': 'error', 'reason': 'HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}', 'secs': 1.7}",
-  "[22:03 IST] source smarkets: {'status': 'ok', 'rows': 424, 'secs': 3.0}",
-  "[22:03 IST] source feedl: {'status': 'ok', 'rows': 314, 'secs': 11.4, 'events': 18}",
-  "[22:03 IST] source feedk: {'status': 'ok', 'rows': 166, 'secs': 14.3, 'events': 5}",
-  "[22:03 IST] source feede: {'status': 'ok', 'rows': 284, 'secs': 32.4, 'events': 12}",
-  "[22:03 IST] source feedf: {'status': 'ok', 'rows': 214, 'secs': 37.9, 'events': 6}",
-  "[22:03 IST] source feedj: {'status': 'ok', 'rows': 402, 'secs': 56.4, 'events': 5}",
-  "[22:03 IST] source feedh: {'status': 'ok', 'rows': 1148, 'secs': 90.1, 'events': 66}",
-  "[22:03 IST] source feedi: {'status': 'ok', 'rows': 1467, 'secs': 166.5, 'events': 45}",
-  "[22:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[22:03 IST] 75 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[22:03 IST] 140 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[22:03 IST] 98 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[22:03 IST] name map: Kerala vs Vidarbha CT -> Kerala vs Vidarbha (2026-11-30T05:30:00Z)",
-  "[22:03 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
-  "[22:03 IST] book lines: 403 player lines from 8 source(s)",
-  "[22:03 IST] 52 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[22:04 IST] weather: forecasts for 8 events, 0 failed",
-  "[22:04 IST] prop model: 1178 prop selections modelled, 447 milestone ladder prices anchored to O/U",
-  "[22:04 IST] ledger upsert model: {'upserted': 2, 'skipped_settled': 0}"
+  "[23:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[23:00 IST] history: 24351 matches, last 2026-11-27, players 439799",
+  "[23:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1390, 'secs': 0.2}",
+  "[23:03 IST] source feedg: {'status': 'error', 'reason': 'HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}', 'secs': 1.6}",
+  "[23:03 IST] source smarkets: {'status': 'ok', 'rows': 446, 'secs': 2.1}",
+  "[23:03 IST] source feedl: {'status': 'ok', 'rows': 314, 'secs': 9.5, 'events': 18}",
+  "[23:03 IST] source feedk: {'status': 'ok', 'rows': 166, 'secs': 14.5, 'events': 5}",
+  "[23:03 IST] source feede: {'status': 'ok', 'rows': 324, 'secs': 33.8, 'events': 13}",
+  "[23:03 IST] source feedf: {'status': 'ok', 'rows': 214, 'secs': 34.5, 'events': 6}",
+  "[23:03 IST] source feedj: {'status': 'ok', 'rows': 671, 'secs': 67.8, 'events': 9}",
+  "[23:03 IST] source feedh: {'status': 'ok', 'rows': 1230, 'secs': 98.6, 'events': 71}",
+  "[23:03 IST] source feedi: {'status': 'ok', 'rows': 1454, 'secs': 138.3, 'events': 50}",
+  "[23:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[23:03 IST] 73 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[23:03 IST] 168 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[23:03 IST] 112 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[23:03 IST] name map: Kerala vs Vidarbha CT -> Kerala vs Vidarbha (2026-11-30T05:30:00Z)",
+  "[23:03 IST] held back 9 player and 1 fancy lines first priced after their match started (not pre-match prices)",
+  "[23:03 IST] book lines: 440 player lines from 8 source(s)",
+  "[23:03 IST] 66 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[23:03 IST] weather: forecasts for 9 events, 0 failed",
+  "[23:03 IST] prop model: 1252 prop selections modelled, 452 milestone ladder prices anchored to O/U",
+  "[23:03 IST] ledger upsert model: {'upserted': 2, 'skipped_settled': 0}"
  ]
 }
