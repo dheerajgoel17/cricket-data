@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-27T18:35:59Z",
+ "generated_at_utc": "2026-11-27T19:34:40Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -21,12 +21,12 @@
    "line": 43.5,
    "best_odds": 2.56,
    "best_source": "Dafabet",
-   "hits": 13,
-   "played": 21,
+   "hits": 14,
+   "played": 22,
    "window": 20,
-   "chance": 0.535,
-   "edge": 0.3695,
-   "edge_pct": 37,
+   "chance": 0.5495,
+   "edge": 0.4067,
+   "edge_pct": 40.7,
    "bat_first": false
   },
   {
@@ -67,12 +67,12 @@
    "line": 73.5,
    "best_odds": 2.38,
    "best_source": "Dafabet",
-   "hits": 13,
-   "played": 21,
+   "hits": 14,
+   "played": 22,
    "window": 20,
-   "chance": 0.5441,
-   "edge": 0.2949,
-   "edge_pct": 29.5,
+   "chance": 0.5583,
+   "edge": 0.3288,
+   "edge_pct": 32.9,
    "bat_first": false
   },
   {
