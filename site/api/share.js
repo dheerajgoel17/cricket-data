@@ -1,4 +1,4 @@
-// GET /share/player/<idx>[/<stat>/<line>]  or  /share/fixture/<id>  or  /share/venue/<idx>
+// GET /share/player/<idx>[/<stat>/<line>[/under]]  or  /share/fixture/<id>  or  /share/venue/<idx>
 // (vercel.json rewrites to /api/share?path=...) -> a tiny page link previews read:
 // the title, description and the dynamic card. The JPEG is in the body too (tap it for the real page).
 // No meta-refresh and no location.replace: crawlers that run scripts would follow those and then read the app shell.
@@ -10,14 +10,17 @@ import { loadData } from "./load-data.js";
 
 const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-/** "player/12/runs/24.5" -> { query for the card, path of the real page }; null for anything else. */
+/** "player/12/runs/24.5" or "…/24.5/under" -> { query for the card, path of the real page }; null for anything else. */
 export function parseShare(path) {
   let raw = String(path || "");
   try { raw = decodeURIComponent(raw); } catch { /* keep raw */ }
   const seg = raw.split("/").filter(Boolean);
   if (seg[0] === "player" && /^\d+$/.test(seg[1] || "")) {
     const withLine = seg[2] && seg[3] && Number.isFinite(Number(seg[3]));
-    return { card: withLine ? { p: seg[1], stat: seg[2], line: seg[3] } : { p: seg[1] }, page: `/player/${seg[1]}${withLine ? `?stat=${encodeURIComponent(seg[2])}&line=${encodeURIComponent(seg[3])}` : ""}` };
+    const side = seg[4] === "under" || seg[4] === "over" ? seg[4] : null;
+    const card = withLine ? { p: seg[1], stat: seg[2], line: seg[3], ...(side ? { side } : {}) } : { p: seg[1] };
+    const q = withLine ? `?stat=${encodeURIComponent(seg[2])}&line=${encodeURIComponent(seg[3])}${side === "under" ? "&side=under" : ""}` : "";
+    return { card, page: `/player/${seg[1]}${q}` };
   }
   if (seg[0] === "fixture" && seg[1] && seg[2] === "fancy" && seg[3]) {
     const sc = Number.isFinite(Number(seg[4])) ? Number(seg[4]) : -1;

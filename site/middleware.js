@@ -7,12 +7,15 @@ export const CRAWLER = new RegExp(`${PREVIEW.source}|${ASSISTANT_UA.source}`, "i
 
 export const config = { matcher: ["/data/:path*", "/api/:path*", "/player/:path*", "/fixture/:path*", "/venue/:path*"] };
 
-/** `/player/12?stat=runs&line=24.5` -> `player/12/runs/24.5` so a copied player-page URL still draws the prop, not an empty name card. */
+/** `/player/12?stat=runs&line=24.5[&side=under]` -> `player/12/runs/24.5[/under]` so a copied player-page URL still draws the prop, not an empty name card. */
 export function crawlerSharePath(url) {
   const path = url.pathname.replace(/^\//, "");
   const stat = url.searchParams.get("stat");
   const line = url.searchParams.get("line");
-  if (/^player\/\d+$/.test(path) && stat && Number.isFinite(Number(line))) return `${path}/${stat}/${line}`;
+  if (/^player\/\d+$/.test(path) && stat && Number.isFinite(Number(line))) {
+    const side = url.searchParams.get("side") === "under" ? "/under" : "";
+    return `${path}/${stat}/${line}${side}`;
+  }
   const fm = url.searchParams.get("fm");
   if (/^fixture\/[^/]+\/fancy$/.test(path) && /^[\w-]{1,100}(?::[12])?$/.test(fm || "")) return `${path}/${fm}/${/^-?\d{1,6}$/.test(url.searchParams.get("sc") || "") ? Number(url.searchParams.get("sc")) : -1}`;
   return path;

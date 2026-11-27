@@ -51,8 +51,10 @@ export async function renderPoster(f, { photo = null, jersey = null, teamLogo = 
     if (opts.sub) text(opts.sub, vx + w + 10, vy, 24, MUTED, num, "left", cw - (vx - x) - w - 10);
   };
   const season = f.season;
+  const play = f.side === "under" ? "under" : "over";
+  const playWord = play === "under" ? "Under" : "Over";
   cell(0, 0, `${f.year || ""} AVG`, season?.mean != null ? fmtAvg(season.mean) : "--", season?.mean != null ? (season.mean > f.line ? GREEN : RED) : MUTED, season?.mean != null ? { arrow: season.mean > f.line ? "up" : "down" } : {});
-  cell(1, 0, "LINE", `Over ${f.line}`);
+  cell(1, 0, "LINE", `${playWord} ${f.line}`);
   cell(2, 0, "PROP", f.stat || "--", "#ffffff", { font: bold, size: 27 });
   cell(0, 1, `${f.year || ""} HIT RATE`, season?.p != null ? pct(season.p) : "--", season?.p != null ? tone(season.p) : MUTED, season?.p != null ? { arrow: season.p >= 0.5 ? "up" : "down", sub: `${season.hits}/${season.played}` } : {});
   cell(1, 1, f.fair ? `FAIR · ${f.fair.label}` : "FAIR", f.fair?.odds ? f.fair.odds.toFixed(2) : "--");
@@ -90,7 +92,8 @@ export async function renderPoster(f, { photo = null, jersey = null, teamLogo = 
     text("0", M, cb, 30, MUTED, num);
     bars.forEach((b, i) => {
       const x = x0 + i * (bw + gap), fill = Math.max(0, (b.value / ymax) * (cb - ct));
-      g.fillStyle = b.value === f.line ? AMBER : b.value > f.line ? GREEN : RED;
+      const overHit = b.value > f.line, hit = play === "under" ? !overHit && b.value !== f.line : overHit;
+      g.fillStyle = b.value === f.line ? AMBER : hit ? GREEN : RED;
       g.beginPath(); g.roundRect(x, cb - fill, bw, fill, 6); g.fill();
       text(String(b.value), x + bw / 2, cb - 12, 40, fill >= 56 ? BG : "#ffffff", num, "center", bw);
       text(b.date || "", x + bw / 2, cb + 40, 24, MUTED, reg, "center", bw + gap);

@@ -49,13 +49,19 @@ export function propCardHtml(f, { origin = "", css = "" } = {}) {
   const meta = [f.team, f.fmt, f.opp ? `v ${f.opp}` : ""].filter(Boolean).join("  ·  ");
   const l5 = f.l5 && f.l5.played >= 3 ? f.l5 : null;
   const bars = (f.last5 || []).slice(-5);
-  const colour = (b) => (Number(b.value) === f.line ? "a" : Number(b.value) > f.line ? "g" : "r");
+  const play = f.side === "under" ? "UNDER" : "OVER";
+  const colour = (b) => {
+    const v = Number(b.value);
+    if (v === f.line) return "a";
+    const overHit = v > f.line;
+    return (f.side === "under" ? !overHit : overHit) ? "g" : "r";
+  };
   const stem = f.source ? bookLogoStem(f.source) : "";
   const body = `<div class="green">${face ? `<div class="abs" style="left:0;bottom:0;width:580px"><img id="face" src="${esc(face)}" style="display:block;width:580px">${kit ? `<img id="kit" src="${esc(kit)}" style="display:block;width:580px">` : ""}</div>` : `<div class="n abs" style="left:0;right:0;top:230px;text-align:center;font-size:160px;color:#0f0f0f">${esc(f.initials)}</div>`}
-${l5 ? `<div class="sticker"><div class="n g">${l5.hits}/${l5.played}</div><div class="n mut">OVER IN LAST ${l5.played}</div></div>` : ""}</div>
+${l5 ? `<div class="sticker"><div class="n g">${l5.hits}/${l5.played}</div><div class="n mut">${play} IN LAST ${l5.played}</div></div>` : ""}</div>
 ${BRAND}
 <div class="abs name">${esc(f.name)}</div>${meta ? `<div class="abs meta mut">${esc(meta)}</div>` : ""}
-<div class="abs label n g">${esc(String(f.stat || ""))}</div><div class="abs head n">OVER ${esc(f.line)}</div>
+<div class="abs label n g">${esc(String(f.stat || ""))}</div><div class="abs head n">${play} ${esc(f.line)}</div>
 ${f.price ? `<div class="abs row">${bookChip(origin, stem, f.book)}<span class="price n g">${f.price.toFixed(2)}</span></div>` : ""}
 ${bars.length ? `<div class="abs chart"><div class="n mut" style="font-size:20px">LAST 5 INNINGS</div>${chart(bars, f.line, colour)}</div>` : ""}`;
   return shell(body, { css, script: `{const w=()=>{const k=document.getElementById('kit'),a=document.getElementById('face');if(k&&a)k.style.marginTop=-(a.offsetHeight*.334)+'px'};window.addEventListener('load',w);document.querySelectorAll('img').forEach((i)=>i.addEventListener('load',w))}` });

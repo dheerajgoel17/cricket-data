@@ -11,10 +11,11 @@ export async function attachForm(f, store) {
   if (f.kind !== "prop" || f.idx == null || !f.statKey || !store) return f;
   const def = STATS[f.statKey];
   if (!def) return f;
-  const opts = { year: f.year || String(new Date().getUTCFullYear()), ground: f.ground, opp: f.opp };
+  const play = f.side === "under" ? "under" : "over";
+  const opts = { year: f.year || String(new Date().getUTCFullYear()), ground: f.ground, opp: f.opp, side: play };
   // the same games the site's row reads: the plan's chart (one format, the stat's own rows), so the card and the row say the same numbers
   try {
-    const r = await runPlan(store, new Resolver(store), { kind: "player_prop", stat: f.statKey, line: f.line, side: "over", filters: { format: f.fmt || null, team_innings: null, innings: null }, split_by: [] }, { playerIdx: f.idx });
+    const r = await runPlan(store, new Resolver(store), { kind: "player_prop", stat: f.statKey, line: f.line, side: play, filters: { format: f.fmt || null, team_innings: null, innings: null }, split_by: [] }, { playerIdx: f.idx });
     const entries = r?.ok ? r.chart?.entries || [] : [];
     if (entries.length) return { ...f, ...propForm(entries.map((e) => ({ value: e.value, date: e.date, opp: e.opp, venueName: e.venueName })), f.line, (n) => n, opts) };
   } catch { /* fall back to the rows below */ }

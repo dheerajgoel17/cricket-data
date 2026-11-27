@@ -27,6 +27,7 @@ function normalizeCard(url) {
   if (player && Object.hasOwn(STATS, query.stat) && query.line && Number.isFinite(Number(query.line))) {
     out.set("stat", query.stat);
     out.set("line", String(Number(query.line)));
+    if (query.side === "under") out.set("side", "under");
   }
   if (query.poster === "1" && player) out.set("poster", "1");
   else if (out.has("f") && /^[\w-]{1,100}(?::[12])?$/.test(query.fm || "")) { // one Match Fancy market: the poster, or without `poster` the link-preview card

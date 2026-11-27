@@ -41,6 +41,7 @@ test("link-preview crawlers of every app we care about get the share HTML; brows
 
 test("a copied player page with a line in the query still names that prop", () => {
   assert.equal(crawlerSharePath(new URL("https://x.test/player/12?stat=runs&line=24.5")), "player/12/runs/24.5");
+  assert.equal(crawlerSharePath(new URL("https://x.test/player/12?stat=runs&line=24.5&side=under")), "player/12/runs/24.5/under");
   assert.equal(crawlerSharePath(new URL("https://x.test/player/12")), "player/12");
   assert.equal(crawlerSharePath(new URL("https://x.test/fixture/a-v-b")), "fixture/a-v-b");
 });
