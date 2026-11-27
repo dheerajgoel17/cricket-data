@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-27 15:00 IST
+# Cricket value bets - 2026-11-27 16:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1554 prices
+- **moviodds_bet365**: ok, 1266 prices
+- **smarkets**: ok, 333 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
-- **smarkets**: ok, 300 prices
-- **feedl**: ok, 266 prices, 16 events
-- **feedk**: ok, 130 prices, 5 events
-- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=firefox155)
-- **feede**: ok, 130 prices, 9 events
-- **feedf**: ok, 152 prices, 4 events
-- **feedj**: ok, 497 prices, 10 events
-- **feedh**: ok, 797 prices, 37 events
+- **feedl**: ok, 299 prices, 13 events
+- **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
+- **feedk**: ok, 96 prices, 4 events
+- **feedf**: ok, 148 prices, 3 events
+- **feede**: ok, 122 prices, 8 events
+- **feedj**: ok, 529 prices, 8 events
+- **feedh**: ok, 789 prices, 35 events
 
-Matches starting in next 168h: **32**, markets priced: **346**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **28**, markets priced: **300**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -26,7 +26,8 @@ Matches starting in next 168h: **32**, markets priced: **346**, value bets: **1*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-28 10:10 IST Melbourne Renegades (W) vs Melbourne Stars (W) / Team - Top Batter / C Webb @ 13.00 (moviodds_bet365): edge 45.5%, model 0.0991, market 0.1188
 - 11-28 10:10 IST Melbourne Renegades vs Melbourne Stars / M13704 top_bowler_team / Carly Leeson @ 15.00 (feedj_d): edge 64.7%, model 0.0809, market 0.1254
+- 11-28 13:40 IST Sydney Thunder (W) vs Sydney Sixers (W) / Batsman Total Match Sixes / AK Gardner under 0.5 @ 2.50 (moviodds_bet365): edge 30.9%, model 0.6029, market 0.459
 
-Unmatched team names (add to mappings/teams.csv): Central Hinds (W) (female), Central Hinds (female), Central Hinds (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Lokseva Academy (male), Majees Titan (male), Muscat Shaheens (W) (female), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), Roma Gladiatori (male), South Zone (W) (female), South Zone (male), Speedworld Security Solutions (male), Wadi Kabir Royals (W) (female), West Zone (W) (female), West Zone (male)
+Unmatched team names (add to mappings/teams.csv): Central Hinds (W) (female), Central Hinds (female), Central Hinds (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Lokseva Academy (male), Majees Titan (male), Muscat Shaheens (W) (female), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), South Zone (W) (female), South Zone (male), Speedworld Security Solutions (male), Wadi Kabir Royals (W) (female), West Zone (W) (female), West Zone (male)
 
-Runtime 121.2s. Snapshot: `odds_20261127T093042Z.jsonl.gz`
+Runtime 116.0s. Snapshot: `odds_20261127T103032Z.jsonl.gz`
