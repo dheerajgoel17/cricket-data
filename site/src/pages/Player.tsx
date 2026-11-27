@@ -202,16 +202,17 @@ function PlayerScreen({ idx }: { idx: number }) {
   const sharePrice = Math.max(0, ...(book?.lines?.find((l: any) => shareLine != null && Math.abs(l.line - shareLine) < 0.01)?.books || []).map((b: any) => b[plan.side] || 0)) || null; // best price of the side on show at that line
   const share = () => {
     track("share", { kind: "player" });
-    const u = sharePlayerUrl(location.origin, idx, stat, shareLine);
-    // the card carries the pick; the words are the numbers behind it, then the link (one string, so every app keeps both)
+    const u = sharePlayerUrl(location.origin, idx, stat, shareLine, plan.side);
+    // the card carries the pick (over or under); the words are the numbers behind it, then the link (one string, so every app keeps both)
     const text = shareText({ entries: res.data?.ok ? res.data.chart?.entries : [], line: shareLine, side: plan.side, fmt: FORMATS[fmtVal], price: sharePrice, ground: nextMatch?.ground, opp: nextMatch?.opp, url: u }) || u;
-    if (shareLine == null || plan.side === "under") { void sendShare(text, name, () => toast("Copied")); return; }
-    // the shareable picture is the server's poster (same numbers as the card and the row), shared as a file where the browser can, else saved
+    if (shareLine == null) { void sendShare(text, name, () => toast("Copied")); return; }
+    // the shareable picture is the server's poster (same numbers as the card and the row; over or under as the play on show)
     void (async () => {
       try {
-        const r = await fetch(`/api/og?p=${idx}&stat=${encodeURIComponent(stat)}&line=${shareLine}&poster=1`);
+        const sideQ = plan.side === "under" ? "&side=under" : "";
+        const r = await fetch(`/api/og?p=${idx}&stat=${encodeURIComponent(stat)}&line=${shareLine}${sideQ}&poster=1`);
         if (!r.ok || !/^image\//.test(r.headers.get("content-type") || "")) throw new Error("poster");
-        await sendShareImage({ file: await r.blob(), text, title: name, filename: `fancy-${idx}-${stat}-${shareLine}.png`, copied: () => toast("Copied"), saved: () => toast("Image saved") });
+        await sendShareImage({ file: await r.blob(), text, title: name, filename: `fancy-${idx}-${stat}-${shareLine}${plan.side === "under" ? "-under" : ""}.png`, copied: () => toast("Copied"), saved: () => toast("Image saved") });
       } catch {
         void sendShare(text, name, () => toast("Copied"));
       }

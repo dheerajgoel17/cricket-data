@@ -22,7 +22,7 @@ const data = {
 
 test("a prop card has the player, the line, and the best over price with its book; the numbers come only from the data", () => {
   const f = cardFields({ p: "0", stat: "runs", line: "24.5" }, data);
-  assert.deepEqual([f.kind, f.name, f.team, f.stat, f.line, f.price, f.book, f.source, f.books, f.match, f.opp, f.fmt, f.role], ["prop", "Harry Brook", "England", "Runs", 24.5, 1.9, "Smarkets", "smarkets", 2, "England vs India", "India", "T20", "Batter"]);
+  assert.deepEqual([f.kind, f.name, f.team, f.stat, f.line, f.side, f.price, f.book, f.source, f.books, f.match, f.opp, f.fmt, f.role], ["prop", "Harry Brook", "England", "Runs", 24.5, "over", 1.9, "Smarkets", "smarkets", 2, "England vs India", "India", "T20", "Batter"]);
   assert.equal(f.when, undefined); // kickoff time stays off the picture
   assert.equal(f.last.value, 25);
   assert.equal(f.hit.p, 0.6);
@@ -30,6 +30,27 @@ test("a prop card has the player, the line, and the best over price with its boo
   assert.equal(f.last5.length, 5);
   assert.match(cardText(f).title, /^Harry Brook: runs over 24\.5 at 1\.90$/);
   assert.match(cardText(f).description, /listed 1\.90 at Smarkets in England vs India/);
+});
+
+test("an under prop card uses the best under price and under wording (same line, other play)", () => {
+  const f = cardFields({ p: "0", stat: "runs", line: "24.5", side: "under" }, data);
+  assert.equal(f.side, "under");
+  assert.equal(f.price, 1.90); // bet365 under 1.90 beats smarkets 1.85
+  assert.equal(f.book, "bet365");
+  assert.match(cardText(f).title, /^Harry Brook: runs under 24\.5 at 1\.90$/);
+  assert.match(cardText(f).description, /runs under 24\.5, listed 1\.90 at bet365/);
+  assert.equal(cardPath({ p: "0", stat: "runs", line: "24.5", side: "under" }), `/card/v${CARD_V}/player/0/runs/24.5/under.jpg`);
+  assert.deepEqual(cardQuery(cardPath({ p: "0", stat: "runs", line: "24.5", side: "under" })), { p: "0", stat: "runs", line: "24.5", side: "under" });
+});
+
+test("propForm hit rates follow the play: under counts games under the line", () => {
+  // last five: 20, DNP, 5, 30, 25 vs 16.5 under: 4 played, hits only 5 = 1/4
+  const rows = [{ value: 10, date: "2026-09-01", opp: "A" }, { value: 20, date: "2026-09-08", opp: "B" }, { value: null, date: "2026-09-15", opp: "C" },
+    { value: 5, date: "2026-09-22", opp: "D" }, { value: 30, date: "2026-10-01", opp: "E" }, { value: 25, date: "2026-10-25", opp: "India" }];
+  const u = propForm(rows, 16.5, undefined, { side: "under" });
+  assert.equal(u.l5.played, 4);
+  assert.equal(u.l5.hits, 1);
+  assert.equal(u.l5.p, 0.25);
 });
 
 test("a line the books do not price has no price, a player alone is a player card, an unknown stat or player or fixture gives nothing", () => {
@@ -102,6 +123,7 @@ test("a prop card draws the site mark from public/icon-192.png", async () => {
 
 test("share paths name the player, his stat and line, or a fixture, and nothing else", () => {
   assert.deepEqual(parseShare("player/12/runs/24.5"), { card: { p: "12", stat: "runs", line: "24.5" }, page: "/player/12?stat=runs&line=24.5" });
+  assert.deepEqual(parseShare("player/12/runs/24.5/under"), { card: { p: "12", stat: "runs", line: "24.5", side: "under" }, page: "/player/12?stat=runs&line=24.5&side=under" });
   assert.deepEqual(parseShare("player/12"), { card: { p: "12" }, page: "/player/12" });
   assert.deepEqual(parseShare("fixture/2026-10-29-a-v-b"), { card: { f: "2026-10-29-a-v-b" }, page: "/fixture/2026-10-29-a-v-b" });
   assert.deepEqual(parseShare("venue/3"), { card: { v: "3" }, page: "/venue/3" });
@@ -112,7 +134,7 @@ test("share paths name the player, his stat and line, or a fixture, and nothing 
 });
 
 test("a card's file-like path and its query are each other's inverse", () => {
-  for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12" }, { f: "2026-10-29-a-v-b" }, { v: "3" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
+  for (const q of [{ p: "12", stat: "runs", line: "24.5" }, { p: "12", stat: "runs", line: "24.5", side: "under" }, { p: "12" }, { f: "2026-10-29-a-v-b" }, { v: "3" }]) assert.deepEqual(cardQuery(cardPath(q)), q);
   assert.equal(cardPath({ p: "12", stat: "runs", line: "24.5" }), `/card/v${CARD_V}/player/12/runs/24.5.jpg`);
   assert.deepEqual(cardQuery("player/12/runs/24.5.jpg"), { p: "12", stat: "runs", line: "24.5" }); // older /card/player/...jpg still draws
   assert.deepEqual(cardQuery("admin/1.jpg"), {});

@@ -1,7 +1,7 @@
 // Turns a pasted link into what the poster endpoint takes (pure; shared by the card tool page and its tests).
-//   player: /player/<idx>?stat=runs&line=24.5 · /share/player/<idx>/<stat>/<line> · /card/vN/player|pid/<..>/<stat>/<line>.jpg
+//   player: /player/<idx>?stat=runs&line=24.5[&side=under] · /share/player/<idx>/<stat>/<line>[/under] · /card/vN/player|pid/<..>/<stat>/<line>[/under].jpg
 //   fancy:  /fixture/<id>/fancy?fm=match_sixes&sc=-1 (sc = team index, absent = the whole match)
-// Returns { kind: "player", p | pid, stat, line } | { kind: "fancy", f, fm, sc } | null. A player link with no stat/line has `stat` and `line` null (the endpoint then uses his booked prop).
+// Returns { kind: "player", p | pid, stat, line, side? } | { kind: "fancy", f, fm, sc } | null. A player link with no stat/line has `stat` and `line` null (the endpoint then uses his booked prop).
 const num = (s) => (s != null && s !== "" && Number.isFinite(Number(s)) ? Number(s) : null);
 
 export function parseCardLink(input) {
@@ -19,8 +19,10 @@ export function parseCardLink(input) {
     const who = /^\d+$/.test(id) && seg[0] === "player" ? { p: Number(id) } : /^[0-9a-f]{8}$/.test(id) ? { pid: id } : null;
     if (!who) return null;
     const stat = seg[2] || sp.get("stat") || null, line = num(seg[3] ?? sp.get("line"));
+    const sideRaw = seg[4] || sp.get("side") || null;
+    const side = sideRaw === "under" || sideRaw === "over" ? sideRaw : null;
     const priced = stat && line != null;
-    return { kind: "player", ...who, stat: priced ? stat : null, line: priced ? line : null };
+    return { kind: "player", ...who, stat: priced ? stat : null, line: priced ? line : null, ...(priced && side === "under" ? { side: "under" } : {}) };
   }
   return null;
 }
@@ -33,6 +35,7 @@ export function posterPath(link) {
   else {
     if (link.pid != null) q.set("pid", link.pid); else q.set("p", String(link.p));
     if (link.stat) { q.set("stat", link.stat); q.set("line", String(link.line)); }
+    if (link.side === "under") q.set("side", "under");
   }
   q.set("poster", "1");
   return `/api/og?${q}`;

@@ -10,7 +10,8 @@ import { atGround } from "./next-match.js";
 import { fairOdds } from "./stats.js";
 import { labelOf } from "./fancy-poster.js";
 import { parseFm } from "./fancy-edge.js";
-export { CARD_V, cardPath, cardQuery } from "./card-path.js";
+import { cardSide } from "./card-path.js";
+export { CARD_V, cardPath, cardQuery, cardSide } from "./card-path.js";
 
 const num = (v) => (v == null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
 const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
@@ -41,10 +42,12 @@ const fmtAvg = (n) => (Math.abs(n - Math.round(n)) < 0.05 ? String(Math.round(n)
  * Form of one prop: last five played innings vs the line (L5 mean, hit rate, last innings), the calendar-year hit rate,
  * fair odds (1 / hit rate of the biggest sample) and his games at the match's ground. `rows` are oldest → newest
  * `{ value, date, opp, venueName }`; DNP / VOID (`value == null`) never count. Numbers come from the rows, never invented.
- * `opts`: `year` (calendar year of the match), `ground` (its venue name), `opp` (the other side: his record against it).
+ * `opts`: `year` (calendar year of the match), `ground` (its venue name), `opp` (the other side: his record against it),
+ * `side` (`over` | `under`: hit rates for that play; default over).
  */
 export function propForm(rows, line, teamName, opts = {}) {
   // every game, DNP / VOID included (value null): the windows count them the way the site's row does (the last 5 games, of which those he played)
+  const side = cardSide(opts.side);
   const entries = (rows || []).filter(Boolean).map((r) => ({
     value: r.value != null && Number.isFinite(Number(r.value)) ? Number(r.value) : null,
     date: r.date,
@@ -54,7 +57,7 @@ export function propForm(rows, line, teamName, opts = {}) {
   const playedOnly = entries.filter((e) => e.value != null);
   if (!playedOnly.length || !Number.isFinite(Number(line))) return {};
   const ln = Number(line);
-  const l5 = windowRate(entries, 5, ln);
+  const l5 = windowRate(entries, 5, ln, side);
   const last = playedOnly[playedOnly.length - 1];
   const out = {
     l5,
@@ -64,21 +67,21 @@ export function propForm(rows, line, teamName, opts = {}) {
   };
   const year = String(opts.year || "");
   if (year) {
-    const sr = windowRate(entries.filter((e) => String(e.date || "").startsWith(year)), 0, ln);
+    const sr = windowRate(entries.filter((e) => String(e.date || "").startsWith(year)), 0, ln, side);
     if (sr.played) out.season = { year, p: sr.p, played: sr.played, hits: sr.hits, mean: sr.mean };
   }
   out.recent = playedOnly.slice(-8).map((e) => ({ value: e.value, date: dateShort(e.date), vs: e.opp })); // the poster's big chart
-  const l10 = windowRate(entries, 10, ln);
+  const l10 = windowRate(entries, 10, ln, side);
   if (l10.played) out.l10 = { p: l10.p, played: l10.played, hits: l10.hits };
   if (opts.opp) {
-    const want = teamKey(opts.opp), h = windowRate(entries.filter((e) => teamKey(e.opp) === want), 0, ln);
+    const want = teamKey(opts.opp), h = windowRate(entries.filter((e) => teamKey(e.opp) === want), 0, ln, side);
     if (h.played) out.h2h = { name: opts.opp, p: h.p, played: h.played, hits: h.hits };
   }
   const basis = out.season && out.season.played >= 5 ? { p: out.season.p, label: year } : l5.played >= 3 ? { p: l5.p, label: "L5" } : null;
   if (basis && basis.p > 0) out.fair = { odds: fairOdds(basis.p), label: basis.label };
   const here = atGround(playedOnly, opts.ground);
   if (here.length) {
-    const r = windowRate(here, 0, ln);
+    const r = windowRate(here, 0, ln, side);
     out.atGround = { name: String(opts.ground).split(",")[0].trim(), bars: here.slice(-5).map((e) => ({ value: e.value, vs: e.opp })), played: r.played, hits: r.hits, p: r.p };
   }
   return out;
@@ -118,6 +121,7 @@ export function cardFields(q, data) {
     f.kitPhotos = teamJerseys(data.photos, indexTeam, false); // a prop card below swaps in the format's kit
     if (f.kind === "prop") {
       f.statKey = stat; f.stat = STATS[stat].label; f.line = line; f.role = ROLE[STATS[stat].side] || "";
+      f.side = cardSide(q.side); // over | under: the play the share / link preview is for
       const hits = (data.lines?.lines || []).filter((l) => l.pid === pid && l.stat === stat && Math.abs(l.line - line) < 0.01);
       const row = hits[0];
       if (row?.team) f.team = row.team;
@@ -126,36 +130,39 @@ export function cardFields(q, data) {
         f.fmt = row.fmt || "";
         f.opp = otherSide(row.match, f.team);
       }
-      const prices = hits.flatMap((l) => (l.books || []).filter((b) => b.over > 1 && !/^fancy$/i.test(bookVariant(b.source) || "")).map((b) => ({ over: b.over, under: b.under, book: bookName(b.source), source: b.source })));
-      const best = prices.sort((x, y) => y.over - x.over)[0];
+      const play = f.side; // the side's own best listed price (under card uses under, over card uses over)
+      const prices = hits.flatMap((l) => (l.books || []).filter((b) => b[play] > 1 && !/^fancy$/i.test(bookVariant(b.source) || "")).map((b) => ({ over: b.over, under: b.under, book: bookName(b.source), source: b.source })));
+      const best = prices.sort((x, y) => (y[play] || 0) - (x[play] || 0))[0];
       if (best) {
-        f.price = best.over; f.book = best.book; f.source = best.source; f.books = prices.length;
-        if (best.under > 1) { f.under = best.under; f.market = overProb(best.over, best.under); }
+        f.price = best[play]; f.book = best.book; f.source = best.source; f.books = prices.length;
+        if (best.over > 1 && best.under > 1) f.market = overProb(best.over, best.under);
+        if (play === "over" && best.under > 1) f.under = best.under;
+        if (play === "under" && best.over > 1) f.over = best.over;
       }
       const start = Date.parse(row?.start_utc || "");
       if (Number.isFinite(start)) f.year = String(new Date(start).getUTCFullYear());
       const fx = Number.isFinite(start) ? (Array.isArray(data.fixtures) ? data.fixtures : []).find((x) => Math.abs(Date.parse(x.start) - start) < 90 * 60e3 && x.venue && (teamKey(x.a) === teamKey(f.team) || teamKey(x.b) === teamKey(f.team))) : null;
       if (fx) f.ground = fx.venue;
-      // every line the books list for this stat in this match, best over price at each: differing book lines side by side. `bookLinesFor` is what the page's ladder reads (a fixture the books spell several ways is one match)
+      // every line the books list for this stat in this match, best price of the play at each: differing book lines side by side. `bookLinesFor` is what the page's ladder reads (a fixture the books spell several ways is one match)
       const lf = f.fmt || bookFormatFor(data.lines, pid, stat, undefined, keepMsFor("Test")) || "";
       const bk = lf ? bookLinesFor(data.lines, pid, stat, lf, Number.isFinite(start) ? start - 3600e3 : Date.now(), keepMsFor(lf), 0, { start: row?.start_utc, line, stat }) : null;
       // Premium / exchange prices only: a book's Fancy market is a different bet from the line, so it is not set beside it
-      const comparable = (l) => (l.books || []).filter((b) => b.over > 1 && !/^fancy$/i.test(bookVariant(b.source) || ""));
+      const comparable = (l) => (l.books || []).filter((b) => b[play] > 1 && !/^fancy$/i.test(bookVariant(b.source) || ""));
       const byLine = (bk?.lines || []).map((l) => {
-        const top = comparable(l).sort((x, y) => y.over - x.over)[0];
-        return top ? { line: l.line, price: top.over, book: bookName(top.source), stem: bookLogoStem(top.source), best: Math.abs(l.line - line) < 0.01 } : null;
+        const top = comparable(l).sort((x, y) => (y[play] || 0) - (x[play] || 0))[0];
+        return top ? { line: l.line, price: top[play], book: bookName(top.source), stem: bookLogoStem(top.source), best: Math.abs(l.line - line) < 0.01 } : null;
       }).filter(Boolean).sort((x, y) => Math.abs(x.line - line) - Math.abs(y.line - line)).slice(0, 4).sort((x, y) => x.line - y.line);
       const here = (bk?.lines || []).find((l) => Math.abs(l.line - line) < 0.01);
-      const atLine = here ? comparable(here).sort((x, y) => y.over - x.over).slice(0, 4).map((b, i) => ({ line: here.line, price: b.over, book: bookName(b.source), stem: bookLogoStem(b.source), best: i === 0 })) : [];
+      const atLine = here ? comparable(here).sort((x, y) => (y[play] || 0) - (x[play] || 0)).slice(0, 4).map((b, i) => ({ line: here.line, price: b[play], book: bookName(b.source), stem: bookLogoStem(b.source), best: i === 0 })) : [];
       // several lines: each line's best price; one line: each book's price at it (never two rows from one book's other market)
       if (byLine.length > 1) { f.bookLines = byLine; f.bookTitle = "BOOK LINES"; }
       else if (atLine.length > 1) { f.bookLines = atLine; f.bookTitle = `BOOKS AT ${line}`; }
       else f.bookLines = [];
       f.female = fx?.gender === "female"; // a women's fixture: the women's sides' own logos (the "<name> women" team), not the men's
-      const side = (n) => (f.female && !/\bwomen\b|\(w\)/i.test(n) ? `${n} Women` : n);
-      f.teamPhotos = teamLogos(data.photos, side(f.team));
+      const crestSide = (n) => (f.female && !/\bwomen\b|\(w\)/i.test(n) ? `${n} Women` : n);
+      f.teamPhotos = teamLogos(data.photos, crestSide(f.team));
       f.kitPhotos = teamJerseys(data.photos, f.team, f.fmt === "Test");
-      f.oppPhotos = f.opp ? teamLogos(data.photos, side(f.opp)) : [];
+      f.oppPhotos = f.opp ? teamLogos(data.photos, crestSide(f.opp)) : [];
       if (data.form?.[pid]) Object.assign(f, data.form[pid]); // last / hit, only when the caller already computed them from the data
     }
     return f;
@@ -177,7 +184,10 @@ export function cardFields(q, data) {
 /** The title and description of the page that carries the card (what a link preview prints under the picture). */
 export function cardText(f, brand = "Fancy.cash") {
   if (!f) return null;
-  if (f.kind === "prop") return { title: `${f.name}: ${f.stat.toLowerCase()} over ${f.line}${f.price ? ` at ${f.price.toFixed(2)}` : ""}`, description: `${f.name}${f.team ? ` (${f.team})` : ""}, ${f.stat.toLowerCase()} over ${f.line}${f.price ? `, listed ${f.price.toFixed(2)} at ${f.book}` : ""}${f.match ? ` in ${f.match}` : ""}. Hit rates and form on ${brand}.` };
+  if (f.kind === "prop") {
+    const verb = cardSide(f.side) === "under" ? "under" : "over";
+    return { title: `${f.name}: ${f.stat.toLowerCase()} ${verb} ${f.line}${f.price ? ` at ${f.price.toFixed(2)}` : ""}`, description: `${f.name}${f.team ? ` (${f.team})` : ""}, ${f.stat.toLowerCase()} ${verb} ${f.line}${f.price ? `, listed ${f.price.toFixed(2)} at ${f.book}` : ""}${f.match ? ` in ${f.match}` : ""}. Hit rates and form on ${brand}.` };
+  }
   if (f.kind === "player") return { title: `${f.name}: stats, hit rates and form`, description: `${f.name}${f.team ? ` (${f.team})` : ""}: hit rates over any line, recent form and listed lines on ${brand}.` };
   if (f.kind === "fancyLink") return { title: `${f.a} v ${f.b}: ${f.label.toLowerCase()}, over or under`, description: `${f.label} in ${f.a} v ${f.b}${f.when ? `, ${f.when}` : ""}: listed lines, prices and the last ten results against the line on ${brand}.` };
   if (f.kind === "venue") return { title: `${f.name}: ground stats`, description: `Runs, sixes, fours and match totals at ${f.name}. Free cricket ground stats on ${brand}.` };
@@ -290,18 +300,19 @@ function drawProp(g, f, { img, kit, bookImg, text, bold, reg, num }) {
   text(f.name, L, 176, 54, "#ffffff", bold, "left", W);
   const meta = [f.team, f.fmt, f.opp ? `v ${f.opp}` : ""].filter(Boolean).join("  ·  ");
   if (meta) text(meta, L, 210, 22, MUTED, reg, "left", W);
+  const play = cardSide(f.side) === "under" ? "UNDER" : "OVER";
   text(String(f.stat || "").toUpperCase(), L, 256, 24, GREEN, num, "left", W);
-  text(`OVER ${f.line}`, L, 328, 80, "#ffffff", num, "left", W);
+  text(`${play} ${f.line}`, L, 328, 80, "#ffffff", num, "left", W);
   if (f.price) { const cw = bookChipAt(g, f, bookImg, L, 352, 52, text, bold); text(f.price.toFixed(2), L + cw + 16, 396, 48, GREEN, num, "left", 140); }
   if (f.last5?.length) { // the chart is the main body of the panel
     text("LAST 5 INNINGS", L, 452, 20, MUTED, num, "left", 240);
-    drawLast5(g, { line: f.line, last5: f.last5 }, null, text, bold, reg, num, L, 510, 470, 68);
+    drawLast5(g, { line: f.line, last5: f.last5, side: f.side }, null, text, bold, reg, num, L, 510, 470, 68);
   }
   const l5 = f.l5 && f.l5.played >= 3 ? f.l5 : null;
   if (l5) { // the hit count as a black sticker on the green side
     g.fillStyle = BG; g.beginPath(); g.roundRect(1136 - 200, 48, 200, 84, 20); g.fill();
     text(`${l5.hits}/${l5.played}`, 1136 - 100, 106, 60, GREEN, num, "center", 190);
-    text("OVER IN LAST 5", 1136 - 100, 124, 14, MUTED, num, "center", 190);
+    text(`${play} IN LAST 5`, 1136 - 100, 124, 14, MUTED, num, "center", 190);
   }
 }
 
@@ -432,7 +443,8 @@ function drawLast5(g, f, last, text, bold, reg, num, x, y, chartW = 200, chartH 
     const bx = x + i * (w + gap);
     const fill = Math.max(4, (v / max) * h);
     g.fillStyle = "#1c1c1e"; g.beginPath(); g.roundRect(bx, y, w, h, 8); g.fill();
-    const tone = v === f.line ? "#f5a524" : v > f.line ? GREEN : RED;
+    const overHit = v > f.line, hit = cardSide(f.side) === "under" ? !overHit && v !== f.line : overHit;
+    const tone = v === f.line ? "#f5a524" : hit ? GREEN : RED;
     g.fillStyle = tone;
     g.beginPath(); g.roundRect(bx, y + h - fill, w, fill, 8); g.fill();
     text(String(v), bx + w / 2, y - 7, 20, tone, num, "center", w + 8); // the figure rides above the track, clear of the dashed line

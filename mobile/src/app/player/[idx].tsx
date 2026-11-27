@@ -1,6 +1,6 @@
 import { push } from "@/lib/nav";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useMemo, useRef, useState, type ComponentRef } from "react";
+import { useEffect, useMemo, useRef, useState, type ComponentRef, type MutableRefObject } from "react";
 import { Share, StyleSheet, View } from "react-native";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
@@ -100,12 +100,15 @@ export default function PlayerPage() {
   // cached plan / lines: never blank the page on a background refetch; wait for matches.json before first plan
   const loading = !bodyReady || s.loadingStore || !s.matchesReady || (!res && !s.res.isError);
   const patch = (p: Record<string, string>) => { setFilters((f) => ({ ...f, ...p })); setLineQ(undefined); };
+  // Loaded writes the O/U play on show so Share matches the chart (not always over)
+  const sharePick = useRef<{ side: "over" | "under"; line: number | null }>({ side: "over", line: null });
   const share = () => {
     const entries = res?.ok ? res.chart?.entries : [];
-    const line = lineQ ?? (s.book ? s.book.main.line : null);
-    const price = Math.max(0, ...(s.book?.lines?.find((l: any) => line != null && Math.abs(l.line - line) < 0.01)?.books || []).map((b: any) => b.over || 0)) || null;
-    const url = sharePlayerUrl(SITE_URL, idx, s.stat, line);
-    void Share.share({ message: shareText({ entries, line, side: "over", fmt: s.fmt, price, ground: s.next?.ground, opp: s.next?.opp, url }) || url, title: s.name });
+    const line = sharePick.current.line ?? lineQ ?? (s.book ? s.book.main.line : null);
+    const side = sharePick.current.side;
+    const price = Math.max(0, ...(s.book?.lines?.find((l: any) => line != null && Math.abs(l.line - line) < 0.01)?.books || []).map((b: any) => b[side] || 0)) || null;
+    const url = sharePlayerUrl(SITE_URL, idx, s.stat, line, side);
+    void Share.share({ message: shareText({ entries, line, side, fmt: s.fmt, price, ground: s.next?.ground, opp: s.next?.opp, url }) || url, title: s.name });
   };
   const game = (e: any, st: string, label: string, auxLabel?: string) => push({ pathname: "/info/[topic]", params: { topic: "game", d: e.date, o: e.opp, v: e.venueName ?? "", x: e.value == null ? ({ void: "VOID: in the XI, did not bat/bowl", na: "N/A: XI not recorded", dnp: "DNP: not in the XI" } as any)[st] ?? "–" : String(e.value), l: label, a: auxLabel && e.value != null ? `${auxLabel}: ${e.aux ?? "–"}` : "", p: e.pos ? `No. ${e.pos}` : "", n: s.name } });
   const chromePad = Math.max(barH, 1);
@@ -139,7 +142,7 @@ export default function PlayerPage() {
               ) : !res?.ok ? (
                 <View style={styles.pad}><ErrorState title="Could not load games" body={res?.error ? String(res.error) : undefined} onRetry={s.refetchPlan} /></View>
               ) : (
-                <Loaded key={`${s.stat}-${s.fmtVal}-${JSON.stringify(s.plan.filters)}-${s.plan.venue}-${s.book ? 1 : 0}`} s={s} filters={filters} onFilters={patch} onGame={game} />
+                <Loaded key={`${s.stat}-${s.fmtVal}-${JSON.stringify(s.plan.filters)}-${s.plan.venue}-${s.book ? 1 : 0}`} s={s} filters={filters} onFilters={patch} onGame={game} sharePick={sharePick} />
               )}
             </>
           )}
@@ -177,11 +180,12 @@ function HitCell({ p }: { p: number | null }) {
   return <Pill text={p == null ? "–" : pc(p)} tone={p == null ? "none" : p >= 0.6 ? "up" : p <= 0.4 ? "down" : "mid"} />;
 }
 
-function Loaded({ s, filters, onFilters, onGame }: { s: ReturnType<typeof usePlayerScreen>; filters: Filters; onFilters: (p: Record<string, string>) => void; onGame: (e: any, st: string, label: string, aux?: string) => void }) {
+function Loaded({ s, filters, onFilters, onGame, sharePick }: { s: ReturnType<typeof usePlayerScreen>; filters: Filters; onFilters: (p: Record<string, string>) => void; onGame: (e: any, st: string, label: string, aux?: string) => void; sharePick: MutableRefObject<{ side: "over" | "under"; line: number | null }> }) {
   const res = s.res.data, c = res.chart, entries: any[] = c ? c.entries : [];
   const { book, next, fmt, stat, idx, pid, name } = s;
   const [line, setLine] = useState<number>(c ? c.line : 0.5);
   const [side, setSide] = useState<"over" | "under">(c ? c.side : "over");
+  useEffect(() => { sharePick.current = { side, line }; }, [sharePick, side, line]);
   const [win, setWin] = useState<number>(entries.length > 10 ? 10 : 0);
   const [tab, setTab] = useState("lines");
   const [logCount, setLogCount] = useState(30);
