@@ -1,4 +1,69 @@
 {
- "generated_at_ist": "2026-11-27 10:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-27 11:00 IST",
+ "alerts": [
+  {
+   "event_key": "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-28",
+   "match": "Melbourne Renegades (Women) vs Melbourne Stars (Women)",
+   "start_utc": "2026-11-28T04:40:00Z",
+   "start_ist": "2026-11-28 10:10 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_fours",
+   "market": "G9182 batter_fours",
+   "team_scope": "",
+   "selection": "Tess Flintoff under 1.5",
+   "player_matched_as": "Tess Flintoff",
+   "player_id": "5471b94a",
+   "player_team": "Melbourne Renegades Women",
+   "stat": "fours",
+   "inn": 0,
+   "line": 1.5,
+   "side": "under",
+   "best_odds": 1.8,
+   "best_source": "feedi_d",
+   "effective_odds_after_commission": 1.8,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0794,
+   "implied_prob": 0.5556,
+   "fair_odds": 1.703,
+   "fair_prob": 0.5874,
+   "model_prob": 0.6559,
+   "market_prob": 0.5313,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0572,
+   "edge_pct": 5.72,
+   "kelly_quarter_stake_pct": 1.79,
+   "n_sources": 3,
+   "confidence": "medium",
+   "why": "Model 66% vs market 53% for under 1.5 fours; form 1.5 fours/inn recency-weighted T20 (n_eff 18.2; last 5: 2, 1, 1, 5, 0), bats in 72% of games played; at Junction Oval, Melbourne: 14 inns avg 1.2; vs Melbourne Stars Women: 1 inns avg 5.0; context adj: venue environment +11%, at this venue -4%, team H2H context +5%; weather: rain chance up to 73%",
+   "notes": "3 market source(s) for fair price; model 0.656 vs market 0.531; assumes bet void if player doesn't bat/bowl - check book rules; RAIN RISK: up to 73% rain chance, 0.1 mm forecast during the match - shortened match or void props possible",
+   "model_detail": {
+    "n_eff": 18.2,
+    "expected": 1.41,
+    "nb_alpha": 0.958,
+    "p_bats_or_bowls": 0.718,
+    "venue_matched": "junction oval",
+    "context_terms": [
+     "p_bat",
+     "env_fours",
+     "ven_fours",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": true,
+   "weather": {
+    "rain_prob_max_pct": 73,
+    "rain_mm_in_window": 0.1,
+    "humidity_pct": 72,
+    "cloud_pct": 38,
+    "source": "Open-Meteo forecast"
+   },
+   "alert_id": "41ab86d94fee0012",
+   "alert_key": "female|Melbourne Renegades Women|Melbourne Stars Women|2026-11-28|batter_fours||Tess Flintoff under 1.5|1.5|under",
+   "alerted_at_ist": "2026-11-27 11:03 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }
