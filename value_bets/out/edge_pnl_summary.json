@@ -1,6 +1,6 @@
 {
- "generated_at_utc": "2026-11-27T17:36:17Z",
- "n": 105,
+ "generated_at_utc": "2026-11-27T18:37:19Z",
+ "n": 106,
  "pnl_u": 21.934,
  "by": {
   "model|?|batter_runs": {
@@ -44,11 +44,11 @@
    "pnl_u": 0.0
   },
   "model|?|batter_sixes": {
-   "n": 13,
+   "n": 14,
    "won": 4,
    "lost": 6,
    "push": 0,
-   "void": 3,
+   "void": 4,
    "pnl_u": -1.1
   }
  }
