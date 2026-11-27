@@ -38,5 +38,10 @@
   "edge": 0.0574,
   "start_utc": "2026-11-28T08:10:00Z",
   "alerted_at": "2026-11-27T20:34:55.246828+00:00"
+ },
+ "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-28|batter_sixes||Ashleigh Gardner under 0.5|0.5|under": {
+  "edge": 0.1742,
+  "start_utc": "2026-11-28T08:10:00Z",
+  "alerted_at": "2026-11-27T21:34:23.019676+00:00"
  }
 }
