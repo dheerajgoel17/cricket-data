@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-27 17:00 IST
+# Cricket value bets - 2026-11-27 18:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1266 prices
-- **smarkets**: ok, 291 prices
+- **moviodds_bet365**: ok, 1522 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
+- **smarkets**: ok, 289 prices
 - **feedi**: skipped - Feed I Cloudflare challenge (tried ['chrome', 'chrome152', 'chrome146', 'chrome136', 'chrome133a', 'chrome_android', 'chrome131_android', 'safari270', 'firefox155', 'chrome131']: Cloudflare challenge with impersonate=chrome131)
 - **feedl**: ok, 306 prices, 13 events
 - **feedk**: ok, 138 prices, 5 events
-- **feedf**: ok, 148 prices, 3 events
 - **feede**: ok, 122 prices, 7 events
-- **feedj**: ok, 529 prices, 8 events
-- **feedh**: ok, 789 prices, 35 events
+- **feedf**: ok, 234 prices, 4 events
+- **feedj**: ok, 616 prices, 9 events
+- **feedh**: ok, 789 prices, 39 events
 
-Matches starting in next 168h: **28**, markets priced: **301**, value bets: **1** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **29**, markets priced: **342**, value bets: **1** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -30,4 +30,4 @@ Matches starting in next 168h: **28**, markets priced: **301**, value bets: **1*
 
 Unmatched team names (add to mappings/teams.csv): Central Hinds (W) (female), Central Hinds (female), Central Hinds (male), Central Zone (W) (female), Central Zone (male), East Zone (W) (female), East Zone (male), Majees Titan (male), Muscat Shaheens (W) (female), North East Zone (W) (female), North East Zone (male), North Zone (W) (female), North Zone (male), South Zone (W) (female), South Zone (male), Wadi Kabir Royals (W) (female), West Zone (W) (female), West Zone (male)
 
-Runtime 111.8s. Snapshot: `odds_20261127T113036Z.jsonl.gz`
+Runtime 119.3s. Snapshot: `odds_20261127T123039Z.jsonl.gz`
