@@ -635,3 +635,7 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** Web `IosTabBar`, app `TabBar`, and the Navigation design reference.
 - **Change:** The floating dock collapses to the current tab’s icon on downward scroll. Tap the icon or scroll back up to expand it.
 - **Callers:** Product and design-host mobile web chrome, iOS, Android and the Expo web preview.
+
+### 2026-11-28 — Animate the floating dock surface
+- **Path:** Web `IosTabBar` styles and app `TabBar`.
+- **Change:** The capsule visibly shrinks toward its compact position and grows back as one surface. List clearance stays fixed and reduced motion removes the shape animation.
