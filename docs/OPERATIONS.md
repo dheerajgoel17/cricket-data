@@ -286,3 +286,13 @@ A successful paged refresh now records its checked interval in `data/fixtures/co
 For a confirmed bad odds listing, add the exact archive filename stem to `config/withdrawn_fixtures.json` and include the evidence in the PR. The 28 November entry is included so the fix works on the first rebuild, before the next paged refresh. Keep the archive file for historical access. If the source itself still lists the match, verify the official schedule and check the fresh scrape separately.
 
 After deployment, check that the protected fixture feed omits the withdrawn date and pair, that the genuine historical match still resolves, and that the next successful paged scrape advances `coverage.txt`. For a repeat incident, check the official fixture date, the current schedule CSV and its coverage interval, and the archive entry’s start, schedule link and result before deciding which input to correct.
+
+## Incident review — live cards hid a WBBL interruption, 28 November 2026
+
+During a reported WBBL rain delay, both the website and mobile app still showed Live. The source can send a chase update and a separate interruption message at the same time. The match-page parser and snapshot builder could give the chase update precedence, and the card looked for a session label in that text. When the home list and schedule disagreed, selecting the row with the better score could also drop the other row's interruption.
+
+The shared feed now checks the status fields for interruptions and carries the selected message in `summary` and its badge in `session`. A match that is already underway retains its live phase and score while its card shows the interruption. Rain and ground delays have distinct badges. Other reported delays use Delayed, with the source's wording in the status text. A completed or abandoned match takes its final result.
+
+For a recurrence, compare the source's home list, schedule and match page with the same fixture in the decoded `/api/live` response. Check `summary`, `session`, `status` and whether the snapshot is stale. If the feed carries the expected interruption, check the web and mobile fixture card and match header. During resumption, verify that a fresh poll clears the badge and restores Live. A healthy endpoint with no interrupted fixture confirms service health only.
+
+When changing live-status parsing, add fixtures with simultaneous chase and interruption messages. Cover an interruption carried by only one listing, a fresh snapshot after play resumes, and a final result after a delay. Run `node --test tests/live.test.mjs tests/feed.test.mjs` from `site/`. The feed-level test follows a priced T20 from the source listings through two successive public snapshots.
