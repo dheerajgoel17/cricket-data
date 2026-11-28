@@ -240,3 +240,27 @@ def test_verified_player_links_replace_conflicting_photo_matches():
         )
         assert table["s"] == {pid: sid}
         assert added == {pid: sid}
+
+
+def test_checked_photo_links_cover_spelling_variants_and_reclaim_namesakes():
+    from pathlib import Path
+
+    from cricket_site import build as B
+    from value_bets.names import PlayerResolver
+
+    data = Path(__file__).resolve().parents[2] / "data"
+    overrides = I.load_overrides(data)
+    expected = {"a3690f55": "D25", "9b3b9987": "KAG", "9103ecdb": "A5R", "f21043a5": "FD", "6f02fe2a": "3DX"}
+    sitemap = [("D25", "khuzaima bin tanvir"), ("KAG", "anushka sharma"), ("A5R", "muhammad rohid khan"),
+               ("FD", "kusal perera"), ("3DX", "muhammad waseem")]
+    photo_map = {"106fe7a6": "c:FD", "09653658": "c:3DX"}
+    names = {"a3690f55": "Khuzaima Tanveer", "106fe7a6": "KKV Perera", "09653658": "Mariam Waseem"}
+    table, review, added, _ = I.build(photo_map, sitemap, names, {}, {pid: overrides[pid] for pid in expected})
+    assert table["s"] == expected
+    assert review == []
+    assert B.faces({"p": {pid: f"c:{sid}" for pid, sid in added.items()}}, set(expected), set()) == {
+        pid: f"c:{sid}" for pid, sid in expected.items()
+    }
+
+    resolver = PlayerResolver({"Desert Vipers": [("Khuzaima Tanveer", "a3690f55", "2026-11-27", 1)]})
+    assert resolver.resolve("Khuzaima Bin Tanvir", ["Desert Vipers"])["player_id"] == "a3690f55"
