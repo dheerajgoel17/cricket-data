@@ -29,7 +29,7 @@ import { PropRow } from "@/ui/prop-row";
 import { ScreenerFilters } from "@/ui/screener-filters";
 import { Text } from "@/ui/text";
 import { color, control, font, radius, space, tint, type, t } from "@/ui/tokens";
-import { TabFade } from "@/ui/tab-fade";
+import { useTabDockScroll } from "@/components/tab-dock-scroll";
 import { hitSlopFor } from "@/ui/platform";
 
 const WINS = Object.entries(WIN_LABEL) as [string, string][];
@@ -37,6 +37,7 @@ const NEED: Record<string, number> = { l5: 3, l10: 5, season: 5, h2h: 3, ven: 3 
 
 /** Player props: day's lines with screener filters (site Props / ScreenerFilters). */
 function PlayerProps() {
+  const onDockScroll = useTabDockScroll();
   mark("render:PlayerProps");
   const inset = useScreenInsets();
   const [sc, setSc] = useState<Screener>({ ...DEFAULTS });
@@ -109,6 +110,8 @@ function PlayerProps() {
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <AppHeader title="Player props" info={<InfoButton topic="player-props" />} />
       <FlashList
+        onScroll={onDockScroll}
+        scrollEventThrottle={16}
         data={isLoading ? [] : (shown as any[])}
         extraData={soFarOf}
         keyExtractor={(r: any) => `${r.idx}${r.stat}${r.start}${r.inn}`}
@@ -138,7 +141,6 @@ function PlayerProps() {
         renderScrollComponent={Scroller}
       />
       <ScreenerFilters open={filtersOpen} onOpenChange={setFiltersOpen} state={{ ...sc, match: pick }} onApply={setSc} choices={choices} />
-      <TabFade />
     </View>
   );
 }

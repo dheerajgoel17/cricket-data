@@ -28,7 +28,7 @@
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/status-label.tsx",
       "mobile/src/ui/team-badge.tsx",
-      "mobile/src/ui/tab-fade.tsx"
+      "mobile/src/components/tab-dock-scroll.tsx"
     ]
   },
   {
@@ -45,7 +45,7 @@
       "mobile/src/ui/lazy-tab.tsx",
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/phase-bar.tsx",
-      "mobile/src/ui/tab-fade.tsx"
+      "mobile/src/components/tab-dock-scroll.tsx"
     ]
   },
   {
@@ -65,7 +65,7 @@
       "mobile/src/ui/motion.tsx",
       "mobile/src/ui/team-badge.tsx",
       "mobile/src/ui/tournament-stats.tsx",
-      "mobile/src/ui/tab-fade.tsx"
+      "mobile/src/components/tab-dock-scroll.tsx"
     ]
   },
   {
@@ -87,7 +87,7 @@
       "mobile/src/ui/prop-row.tsx",
       "mobile/src/ui/screener-filters.tsx",
       "mobile/src/ui/text.tsx",
-      "mobile/src/ui/tab-fade.tsx"
+      "mobile/src/components/tab-dock-scroll.tsx"
     ]
   },
   {
@@ -333,7 +333,8 @@
       "AppTabs"
     ],
     "dependencies": [
-      "mobile/src/components/tab-bar.tsx"
+      "mobile/src/components/tab-bar.tsx",
+      "mobile/src/components/tab-dock-scroll.tsx"
     ]
   },
   {
@@ -344,9 +345,19 @@
       "TabBar"
     ],
     "dependencies": [
+      "mobile/src/components/tab-dock-scroll.tsx",
       "mobile/src/ui/press.tsx",
       "mobile/src/ui/text.tsx"
     ]
+  },
+  {
+    "path": "mobile/src/components/tab-dock-scroll.tsx",
+    "platform": "native",
+    "route": false,
+    "exports": [
+      "TabDockProvider"
+    ],
+    "dependencies": []
   },
   {
     "path": "mobile/src/ui/accordion.tsx",

@@ -23,7 +23,7 @@ import { Working } from "@/ui/motion";
 import { LeagueBadge } from "@/ui/team-badge";
 import { TournamentStats } from "@/ui/tournament-stats";
 import { cap, color, font, radius, space, type, fs, rhythm, t, w, icon } from "@/ui/tokens";
-import { TabFade } from "@/ui/tab-fade";
+import { useTabDockScroll } from "@/components/tab-dock-scroll";
 import { hitSlopFor } from "@/ui/platform";
 
 /** Listed first, in this order, when they are live or due to start: Big Bash on top (the women's season live, the men's due). */
@@ -31,6 +31,7 @@ const PIN_FIRST = ["big bash"];
 
 /** Leagues: pick one (live ones and those about to start first, Big Bash on top), then its season's leaders, lists and trends. Any other league is under "All competitions". */
 function Leagues() {
+  const onDockScroll = useTabDockScroll();
   mark("render:Leagues");
   const inset = useScreenInsets();
   const stats = useStore(), fx = useQuery(fixturesQuery);
@@ -48,7 +49,7 @@ function Leagues() {
           <Text style={styles.allText}>All competitions</Text><ChevronRight color={color["muted-foreground"]} size={icon.sm} />
         </Press>
       } />
-      <LiquidScroll contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} onRefresh={() => Promise.all([stats.refetch(), fx.refetch()])}>
+      <LiquidScroll onScroll={onDockScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingBottom: inset.bottom + 24 }} onRefresh={() => Promise.all([stats.refetch(), fx.refetch()])}>
         {stats.isError && !matchesReady ? <ErrorState title="Could not load history" onRetry={() => void stats.refetch()} /> : !store || !matchesReady ? <Working label="Loading leagues…" fill shape="league" /> : e == null ? <View style={styles.emptyPad}><EmptyState title="No leagues to show yet" body="Live and upcoming competitions appear here once the schedule and data are in." /></View> : (
           <>
             <HScroll contentContainerStyle={styles.chips}>
@@ -76,7 +77,6 @@ function Leagues() {
           </>
         )}
       </LiquidScroll>
-      <TabFade />
     </View>
   );
 }

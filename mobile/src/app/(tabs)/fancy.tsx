@@ -26,13 +26,14 @@ import { Working } from "@/ui/motion";
 import { StatusLabel } from "@/ui/status-label";
 import { TeamBadge } from "@/ui/team-badge";
 import { color, font, radius, space, type, surface, t, d, icon } from "@/ui/tokens";
-import { TabFade } from "@/ui/tab-fade";
+import { useTabDockScroll } from "@/components/tab-dock-scroll";
 
 const SHOWN_ROWS = 4; // the best-edge markets on the card; the rest are one tap away on the match's Fancy tab
 const fxChip = (f: any) => matchChipId(`${f.a} vs ${f.b}`, f.start, f.fmt);
 
 /** Fancy: every priced match with its best-edge markets (the book's line, the edge and the last ten results against it), each match linking to its own Fancy tab. Matches in play lead, as on the Home rail. Day + match chips mirror Props. */
 function Fancy() {
+  const onDockScroll = useTabDockScroll();
   mark("render:Fancy");
   const inset = useScreenInsets();
   const { cards, ready, error, refetch } = useFancyCards();
@@ -62,6 +63,8 @@ function Fancy() {
     <View style={[styles.root, { paddingTop: inset.top }]}>
       <AppHeader title="Fancy" />
       <FlashList
+        onScroll={onDockScroll}
+        scrollEventThrottle={16}
         renderScrollComponent={Scroller}
         data={ready ? shown : []}
         keyExtractor={(c) => c.f.id || `${c.f.a}${c.f.b}${c.f.start}`}
@@ -79,7 +82,6 @@ function Fancy() {
         drawDistance={Platform.OS === "android" ? 280 : 480}
         removeClippedSubviews={Platform.OS === "android"}
       />
-      <TabFade />
     </View>
   );
 }
