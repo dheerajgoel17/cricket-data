@@ -88,5 +88,15 @@
   "edge": 0.0554,
   "start_utc": "2026-11-29T08:15:00Z",
   "alerted_at": "2026-11-28T02:34:29.280056+00:00"
+ },
+ "male|Australia|England|2026-11-29|batter_sixes||Nikhil Chaudhary under 0.5|0.5|under": {
+  "edge": 0.1116,
+  "start_utc": "2026-11-29T08:15:00Z",
+  "alerted_at": "2026-11-28T03:34:29.148955+00:00"
+ },
+ "male|Australia|England|2026-11-29|batter_fours||Jake Fraser-McGurk under 1.5|1.5|under": {
+  "edge": 0.0615,
+  "start_utc": "2026-11-29T08:15:00Z",
+  "alerted_at": "2026-11-28T03:34:29.148955+00:00"
  }
 }

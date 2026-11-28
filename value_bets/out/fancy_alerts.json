@@ -1,5 +1,5 @@
 {
- "generated_at_utc": "2026-11-28T02:35:40Z",
+ "generated_at_utc": "2026-11-28T03:35:40Z",
  "window": 20,
  "min_edge": 0.15,
  "max_edge": 0.6,
@@ -326,6 +326,29 @@
    "chance": 0.7192,
    "edge": 0.1988,
    "edge_pct": 19.9,
+   "bat_first": false
+  },
+  {
+   "alert_id": "2026-11-29-adelaide-strikers-women-v-hobart-hurricanes-women|team_total_boundaries|Hobart Hurricanes Women|0|under",
+   "fixture_id": "2026-11-29-adelaide-strikers-women-v-hobart-hurricanes-women",
+   "match": "Adelaide Strikers Women vs Hobart Hurricanes Women",
+   "format": "T20",
+   "series": "Womens Big Bash League 2026",
+   "start_utc": "2026-11-29T04:30:00Z",
+   "start_ist": "2026-11-29 10:00 IST",
+   "key": "team_total_boundaries",
+   "team": "Hobart Hurricanes Women",
+   "inn": 0,
+   "side": "under",
+   "line": 18.5,
+   "best_odds": 2,
+   "best_source": "bet365",
+   "hits": 13,
+   "played": 20,
+   "window": 20,
+   "chance": 0.5878,
+   "edge": 0.1756,
+   "edge_pct": 17.6,
    "bat_first": false
   },
   {
