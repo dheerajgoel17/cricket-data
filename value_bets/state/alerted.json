@@ -9,11 +9,6 @@
   "start_utc": "2026-11-29T08:15:00Z",
   "alerted_at": "2026-11-27T22:17:44.329802+00:00"
  },
- "male|Desert Vipers|MI Emirates|2026-11-28|batter_fours||Joe Clarke over 1.5|1.5|over": {
-  "edge": 0.0818,
-  "start_utc": "2026-11-28T10:00:00Z",
-  "alerted_at": "2026-11-27T22:34:58.338112+00:00"
- },
  "male|Dubai Capitals|Gulf Giants|2026-11-28|batter_sixes||Faf du Plessis under 0.5|0.5|under": {
   "edge": 0.1365,
   "start_utc": "2026-11-28T14:30:00Z",
@@ -73,5 +68,10 @@
   "edge": 0.0706,
   "start_utc": "2026-11-29T08:15:00Z",
   "alerted_at": "2026-11-28T08:33:12.754749+00:00"
+ },
+ "male|Dubai Capitals|Gulf Giants|2026-11-28|batter_sixes||Francois du Plessis under 0.5|0.5|under": {
+  "edge": 0.1193,
+  "start_utc": "2026-11-28T14:30:00Z",
+  "alerted_at": "2026-11-28T10:33:56.175004+00:00"
  }
 }
