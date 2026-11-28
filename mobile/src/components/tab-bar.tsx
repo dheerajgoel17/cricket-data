@@ -1,6 +1,6 @@
 import { useEffect, type ComponentProps } from "react";
 import { StyleSheet, View } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withTiming } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import type { Tabs } from "expo-router";
@@ -9,12 +9,11 @@ import { useTabDock } from "@/components/tab-dock-scroll";
 import { TABS } from "@/lib/tabs";
 import { Press } from "@/ui/press";
 import { Text } from "@/ui/text";
+import { easeOutExpo } from "@/ui/curves";
 import { TAB_DOCK_MARGIN } from "@/ui/insets";
-import { color, duration, ease, icon, radius, TAB_BAR_HEIGHT, t, tint } from "@/ui/tokens";
+import { color, duration, icon, radius, TAB_BAR_HEIGHT, t, tint } from "@/ui/tokens";
 
 type Props = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
-
-const DOCK_EASE = Easing.bezier(...ease.out);
 
 export function TabBar({ state, emitter, navigateToTab, insets }: Props) {
   const route = state.routes[state.index];
@@ -31,7 +30,7 @@ export function TabBar({ state, emitter, navigateToTab, insets }: Props) {
     transform: [{ scale: reduceMotion ? 1 : 0.96 + 0.04 * progress.get() }],
   }));
   useEffect(() => {
-    progress.set(withTiming(compact ? 1 : 0, { duration: duration.fast, easing: DOCK_EASE }));
+    progress.set(withTiming(compact ? 1 : 0, { duration: duration.fast, easing: easeOutExpo }));
   }, [compact, progress]);
 
   function select(index: number) {
