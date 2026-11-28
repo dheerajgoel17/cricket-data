@@ -73,5 +73,20 @@
   "edge": 0.0613,
   "start_utc": "2026-11-29T04:30:00Z",
   "alerted_at": "2026-11-28T01:34:35.573911+00:00"
+ },
+ "male|Australia|England|2026-11-29|batter_sixes||Jake Fraser-McGurk under 0.5|0.5|under": {
+  "edge": 0.091,
+  "start_utc": "2026-11-29T08:15:00Z",
+  "alerted_at": "2026-11-28T02:34:29.280056+00:00"
+ },
+ "male|Australia|England|2026-11-29|batter_sixes||Philip Salt under 0.5|0.5|under": {
+  "edge": 0.082,
+  "start_utc": "2026-11-29T08:15:00Z",
+  "alerted_at": "2026-11-28T02:34:29.280056+00:00"
+ },
+ "male|Australia|England|2026-11-29|batter_fours||Harry Brook under 2.5|2.5|under": {
+  "edge": 0.0554,
+  "start_utc": "2026-11-29T08:15:00Z",
+  "alerted_at": "2026-11-28T02:34:29.280056+00:00"
  }
 }
