@@ -127,17 +127,15 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: .sitecache
-          key: fancy-dl1-${{ steps.day.outputs.d }}  # not the Site workflow's key: that cache also holds the people register, which this one never downloads
+          key: fancy-dl2-${{ steps.day.outputs.d }}  # separate from the Site cache, which also holds the people register
       - name: Download Base ball-by-ball (once a day)
+        id: base_download
         if: github.event.schedule != '0 7 * * 0' && steps.dl.outputs.cache-hit != 'true'
         continue-on-error: true
-        run: |
-          mkdir -p .sitecache
-          curl -fsSL --retry 4 --retry-delay 20 -o .sitecache/all_json.zip.part "$BASE_DATA_URL/downloads/all_json.zip"
-          mv .sitecache/all_json.zip.part .sitecache/all_json.zip
+        run: python scripts/download_base_archive.py .sitecache/all_json.zip
       - name: Keep today's Base download
-        # saved only when the whole file arrived: a failed download must not be cached for the rest of the day
-        if: github.event.schedule != '0 7 * * 0' && steps.dl.outputs.cache-hit != 'true' && hashFiles('.sitecache/all_json.zip') != ''
+        # The downloader creates the final path only after validating the ZIP and its members.
+        if: steps.base_download.outcome == 'success'
         uses: actions/cache/save@v4
         with:
           path: .sitecache

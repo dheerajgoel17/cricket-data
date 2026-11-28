@@ -131,7 +131,7 @@ def check_live_gap(fixtures: list[dict], live: dict | None, now: float) -> Check
 
 
 # ------------------------------------------------------------------ b: keep windows
-def check_keep_window(fixtures: list[dict], lines: dict | None, now: float) -> Check:
+def check_keep_window(fixtures: list[dict], lines: dict | None, now: float, schedule: list[dict] | None = None) -> Check:
     c = Check("b", "Nothing finished or long gone is flagged in play (24 h; a Test 6 days)", HARD)
     for f in fixtures:
         if f.get("status") not in ("Live", "Started"):
@@ -148,7 +148,12 @@ def check_keep_window(fixtures: list[dict], lines: dict | None, now: float) -> C
     tests = {x.get("match") for x in rows if x.get("fmt") == "Test"}
     # the pipeline keeps a match the schedule has not called over for up to 6 days whatever its format (25 Nov 2026: four-day matches the source left open held the deploy at 40 h):
     # a row whose match is an open fixture of the schedule (not Completed, same sides, same women's marker, start within 12 h) has the 6-day window too
-    open_ = [(frozenset((side_key(f.get("a")), side_key(f.get("b")))), _ts(f.get("start")), f.get("gender") == "female") for f in fixtures if f.get("status") not in ("Completed", None)]
+    if schedule is None:
+        open_ = [(frozenset((side_key(f.get("a")), side_key(f.get("b")))), _ts(f.get("start")), f.get("gender") == "female")
+                 for f in fixtures if f.get("source") == "src" and f.get("status") != "Completed"]
+    else:
+        open_ = [(frozenset((side_key(r.get("team_a")), side_key(r.get("team_b")))), _ts(r.get("start_utc")), r.get("gender") == "female")
+                 for r in schedule if r.get("status") != "Completed"]
 
     def is_open(x: dict, t: float) -> bool:
         a, b = (re.split(r"\s+vs\s+", str(x.get("match") or ""), maxsplit=1, flags=re.I) + ["", ""])[:2]
@@ -474,7 +479,12 @@ def run(site: Path, data: Path, live: dict | None = None, now: float | None = No
     if M is None:
         raise FileNotFoundError(f"{site / 'matches.json'} is missing or unreadable")
     meta = _read(site / "meta.json", {})
-    checks = [*check_live_evidence(fixtures, live), *([check_live_gap(fixtures, live, now)] if live is not None else []), check_keep_window(fixtures, lines, now), check_lines_fresh(lines, now), check_book_sides(lines)]
+    schedule = None
+    schedule_path = data / "fixtures" / "upcoming.csv"
+    if schedule_path.is_file():
+        with schedule_path.open(encoding="utf-8", newline="") as fh:
+            schedule = list(csv.DictReader(fh))
+    checks = [*check_live_evidence(fixtures, live), *([check_live_gap(fixtures, live, now)] if live is not None else []), check_keep_window(fixtures, lines, now, schedule), check_lines_fresh(lines, now), check_book_sides(lines)]
     checks.append(check_bat_first(M, engine_editions(site) if editions == "run" else editions))
     checks += [check_complete_not_void(M), check_void_share(M, today), check_toss(M)]
     docs = [d for f in sorted((data / "provisional").glob("*.json")) if (d := _read(f))]
