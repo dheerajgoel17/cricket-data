@@ -314,6 +314,26 @@ def test_a_missing_build_is_an_error_not_a_pass(tmp_path, capsys):
     assert "::error" in capsys.readouterr().out
 
 
+def test_guard_uses_the_full_schedule_for_book_rows_excluded_from_site_fixtures(tmp_path):
+    site = site_dir(tmp_path, [])
+    data = tmp_path / "data"
+    schedule = data / "fixtures" / "upcoming.csv"
+    schedule.parent.mkdir(parents=True)
+    header = "start_utc,format,gender,team_a,team_b,status\n"
+    row = "2026-11-26T08:00Z,FC,male,Western Province,Titans,"
+    (site / "lines.json").write_text(json.dumps({
+        "generated_at_utc": "2026-11-28T00:30:39Z",
+        "fancy": [{"match": "Western Province vs Titans", "start_utc": "2026-11-26T07:30:00Z"}],
+    }))
+    now = G._ts("2026-11-28T00:50:00Z")
+    schedule.write_text(header + row + "Live\n")
+    checks = G.run(site, data, now=now, editions=[])
+    assert next(c for c in checks if c.id == "b").problems == []
+    schedule.write_text(header + row + "Completed\n")
+    checks = G.run(site, data, now=now, editions=[])
+    assert "were written 41 h after the start" in next(c for c in checks if c.id == "b").problems[0]
+
+
 def test_the_live_body_is_read_from_a_file_and_an_unreadable_one_is_skipped(tmp_path):
     p = tmp_path / "live.json"
     p.write_text(json.dumps({"matches": []}))

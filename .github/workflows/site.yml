@@ -23,9 +23,9 @@ on:
         default: false
   push:
     branches: [main]
-    paths: ["site/**", "src/cricket_site/**", ".github/workflows/site.yml"]
+    paths: ["site/**", "src/cricket_site/**", "src/cricket_data/cricsheet.py", "scripts/download_base_archive.py", ".github/workflows/site.yml"]
   pull_request:
-    paths: ["site/**", "src/cricket_site/**", "tests/site/**", "scripts/make_site_fixture.py", ".github/workflows/site.yml"]
+    paths: ["site/**", "src/cricket_site/**", "tests/site/**", "src/cricket_data/cricsheet.py", "scripts/download_base_archive.py", "scripts/make_site_fixture.py", ".github/workflows/site.yml"]
 
 # Hosts are deployment configuration (repository secrets, masked in logs), never code. See docs/OPERATIONS.md.
 env:
@@ -91,12 +91,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .sitecache
-          key: site-dl6-${{ steps.day.outputs.d }}
+          key: site-dl7-${{ steps.day.outputs.d }}
       - name: Download Base ball-by-ball and the people register (once a day)
         if: steps.dl.outputs.cache-hit != 'true'
         run: |
-          mkdir -p .sitecache
-          curl -fsSL --retry 4 --retry-delay 20 -o .sitecache/all_json.zip "$BASE_DATA_URL/downloads/all_json.zip"
+          python scripts/download_base_archive.py .sitecache/all_json.zip
           curl -fsSL --retry 3 -o .sitecache/people.csv "$BASE_DATA_URL/register/people.csv" || echo "::warning::people.csv unavailable, so no player photos"
       - name: Build site data
         env:

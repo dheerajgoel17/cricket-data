@@ -57,3 +57,21 @@ def test_download_reports_what_came_back_instead_of_a_zip(monkeypatch):
         cricsheet.download("all_json.zip", retries=1)
     msg = str(e.value)
     assert "text/html" in msg and "rate limited" in msg
+
+
+def test_download_retries_an_html_response_before_returning_a_valid_archive(monkeypatch, make_zip):
+    import io
+
+    from cricket_data import cricsheet
+
+    invalid = io.BytesIO(b"<html>temporarily unavailable</html>")
+    invalid.headers = {"Content-Type": "text/html"}
+    valid = io.BytesIO(make_zip(make_match()).read_bytes())
+    valid.headers = {"Content-Type": "application/zip"}
+    responses = iter((invalid, valid))
+    monkeypatch.setattr(cricsheet.urllib.request, "urlopen", lambda *a, **k: next(responses))
+    archive = cricsheet.download("all_json.zip", retries=2, backoff=0)
+    try:
+        assert len(list(iter_zip(archive))) == 1
+    finally:
+        archive.unlink()
