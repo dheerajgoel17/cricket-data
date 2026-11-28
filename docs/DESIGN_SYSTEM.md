@@ -147,7 +147,7 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | Sheets / drawers | shadcn `Sheet` | Filters, game detail — not primary navigation |
 | Tab bar / sidebar | `IosTabBar`, desktop source list | Shell chrome |
 
-On mobile web and in the app, the tabs form a centered group with equal space at each side when the dock is wider than the group. Tap a destination or swipe horizontally across the dock to move one tab. On a screen with an active tab, the floating dock collapses to that tab’s icon when scrolling down and expands on tap or when scrolling back up. Desktop web uses the sidebar.
+See [Floating navigation dock](#floating-navigation-dock) for the shared app and mobile web behavior.
 | Star / save | `star.tsx` (Heroicons) | Saved props / players / teams |
 | Ads | `AdSlot` | Catalogue cleared; remount when remapped; empty = no layout |
 
@@ -302,6 +302,23 @@ Full `App.tsx` route checklist:
 | Next match (on player) | DataTable `bleed` books; ChoiceChip NextFilters |
 
 ---
+
+## Floating navigation dock
+
+The phone dock groups Fixtures, Player props, Fancy and Leagues in a centered floating capsule. Tap a destination to open it, or swipe horizontally on the expanded dock to move one tab. When you scroll down past the first part of a screen, the dock collapses to the current tab’s icon at the bottom-left. Tap that icon, scroll back up, or return to the top to bring the full dock back. Desktop web uses the sidebar.
+
+### Layout, input and motion
+
+- Reserve the expanded dock’s clearance, including the bottom safe area, in both states. The last row can scroll above the dock, and changing the dock’s state leaves the list viewport steady.
+- Keep the hidden controls out of touch, keyboard and screen-reader navigation. The compact button announces the current section and that it opens the tab list.
+- The web uses CSS transitions. The app animates opacity and scale on Reanimated’s UI thread and uses a tinted surface for iOS and Android. Reduced motion keeps the fade and removes the scale change.
+- Apply collapse only to screens with an active destination. The design host shows the expanded dock as part of the sample product chrome. App detail pages render outside the tab navigator.
+
+### Implementation and release
+
+The web renders [IosTabBar](../site/src/components/layout/IosTabBar.tsx). The app renders [TabBar](../mobile/src/components/tab-bar.tsx) and observes the existing scroll stream through [the tab dock scroll hook](../mobile/src/components/tab-dock-scroll.tsx). Both use the same [scroll thresholds](../site/src/lib/tab-dock.ts). The app’s list recycling and pull-to-refresh continue to receive their scroll events.
+
+To review a change, scroll a long list down and back up, reopen the compact icon by tapping it, switch tabs, and check that the last row clears the dock. Check reduced motion and the bottom safe area on both iOS and Android. This release uses the normal site deploy and the Expo production OTA channel for matching installed runtimes. The change shipped through [PR #350](https://github.com/dheerajgoel17/cricket-data/pull/350).
 
 ## Living catalogue (web)
 
