@@ -323,6 +323,33 @@ def test_a_priced_match_the_schedule_has_not_reached_yet_gets_a_stop_gap_fixture
     assert (f["source"], f["venue"]) == ("src", "Sharjah")
 
 
+def test_schedule_coverage_prevents_odds_only_fixtures_from_resurfacing(tmp_path):
+    from datetime import datetime, timezone
+
+    fixtures = tmp_path / "fixtures"
+    fixtures.mkdir()
+    (fixtures / "upcoming.csv").write_text("start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result\n")
+    (fixtures / "coverage.txt").write_text("2026-11-27T06:00Z 2026-12-01T06:00Z\n")
+    archive = tmp_path / "archive" / "2026-11"
+    archive.mkdir(parents=True)
+    entries = {
+        "2026-11-28-sri-lanka-w-v-pakistan-w": ("Sri Lanka (W) vs Pakistan (W)", "2026-11-28T05:00Z", "T20", None),
+        "moved": ("Eagles vs Tuskers", "2026-11-28T07:00Z", "T20", None),
+        "stumps": ("India vs Australia", "2026-11-28T05:00Z", "Test", {"id": "test", "fmt": "Test"}),
+        "beyond": ("England vs Pakistan", "2026-12-02T05:00Z", "T20", None),
+    }
+    for name, (match, start, fmt, fixture) in entries.items():
+        (archive / f"{name}.json").write_text(json.dumps({
+            "match": match, "start_utc": start, "fixture": fixture, "lines": [{"fmt": fmt}],
+        }))
+    for hour in (6, 8):  # the missing fixture stays hidden on either side of its nominal start
+        now = datetime(2026, 11, 28, hour, tzinfo=timezone.utc)
+        rows = B.build_fixtures(tmp_path, tmp_path / "out", {}, now)
+        assert [(r["a"], r["status"]) for r in rows] == [("India", "Started"), ("England", "Upcoming")]
+    (fixtures / "coverage.txt").unlink()
+    assert {r["a"] for r in B.build_fixtures(tmp_path, tmp_path / "out", {}, now)} == {"India", "England", "Eagles"}
+
+
 def test_book_lines_are_copied_into_the_site_data_and_a_missing_or_broken_file_never_fails_the_build(tmp_path):
     z, data, out, _ = _out(tmp_path)
     vb = tmp_path / "vb"

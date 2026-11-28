@@ -6,7 +6,7 @@ import csv
 import io
 import sqlite3
 import sys
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from . import __version__
@@ -309,6 +309,8 @@ def _merge_fixtures(fresh: list[dict], path: Path, now_dt: datetime | None = Non
         if not (since < r["start_utc"] <= now) or key(r) in seen:
             continue
         result = (r.get("result") or "").strip()
+        if r.get("status") == "Upcoming" and not result:
+            continue  # a missing fixture that was never seen playing has no finish to carry
         if r.get("format") in ("Test", "FC") and not result:
             done.append({**r, "status": "Live"})
         else:
@@ -332,9 +334,11 @@ def cmd_fixtures(a: argparse.Namespace) -> int:
         write_fixtures(out, found)
         rows = [f.row() for f in found]
     else:
+        checked = datetime.now(timezone.utc)
+        through = ""
         try:  # the first page only reaches ~1-2 days; the paged read goes 10 days ahead and must never cost us the plain one
             from .crex_schedule import fetch_schedule_paged
-            rows = fetch_schedule_paged()
+            rows, through = fetch_schedule_paged(now=checked)
         except Exception as exc:  # noqa: BLE001
             print(f"paged schedule failed ({type(exc).__name__}: {exc}); using the first page only", file=sys.stderr)
             rows = []
@@ -349,13 +353,16 @@ def cmd_fixtures(a: argparse.Namespace) -> int:
             fill_venues(rows, held, PoliteFetcher(min_interval=2.0))
         except Exception as exc:  # noqa: BLE001  a missing venue must never cost the schedule
             print(f"venues not filled ({type(exc).__name__}: {exc})", file=sys.stderr)
-        rows = _merge_fixtures(rows, out)
+        rows = _merge_fixtures(rows, out, checked)
         buf = io.StringIO(newline="")
         w = csv.DictWriter(buf, fieldnames=FIELDS, lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(buf.getvalue(), encoding="utf-8")
+        if through:
+            since = (checked - timedelta(days=1)).strftime("%Y-%m-%dT%H:%MZ")
+            out.with_name("coverage.txt").write_text(f"{since} {through}\n", encoding="utf-8")
     print(f"{len(rows)} upcoming fixtures -> {out}")
     for r in rows[:20]:
         print(f"  {r['start_utc']}  {r['team_a']} v {r['team_b']}  ({r['format']}, {r['venue']})")

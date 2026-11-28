@@ -99,7 +99,8 @@ def test_a_match_that_has_dropped_off_the_page_is_kept_for_three_days_as_complet
     with path.open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=FIELDS, lineterminator="\n")
         w.writeheader()
-        w.writerows([row("2026-10-27T07:00Z", "New Zealand", "India", "Live"), row("2026-10-22T07:00Z", "Long", "Ago"), row("2026-10-27T05:00Z", "Still", "Listed")])
+        w.writerows([row("2026-10-27T07:00Z", "New Zealand", "India", "Live"), row("2026-10-22T07:00Z", "Long", "Ago"), row("2026-10-27T05:00Z", "Still", "Listed"),
+                     row("2026-10-27T08:00Z", "Withdrawn", "Fixture")])
     fresh = [row("2026-10-27T05:00Z", "Still", "Listed", "Live"), row("2026-10-28T08:30Z", "India Women", "Zimbabwe Women")]
     merged = _merge_fixtures(fresh, path, datetime(2026, 10, 27, 12, 0))
     assert [(r["team_a"], r["status"]) for r in merged] == [("Still", "Live"), ("New Zealand", "Completed"), ("India Women", "Upcoming")]  # 5 days ago is gone
