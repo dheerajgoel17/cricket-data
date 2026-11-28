@@ -7,6 +7,7 @@ import { ease } from "@/ui/tokens";
  */
 export const easeOutCubic = Easing.out(Easing.cubic);
 export const easeOutExpo = Easing.bezier(...ease.out);
+export const easeInOut = Easing.bezier(...ease.inOut);
 
 /** `withSpring` configs for overshoot moments (a star filling, the splash ball landing). */
 export const bounce = {

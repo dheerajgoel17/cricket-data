@@ -311,7 +311,7 @@ The phone dock groups Fixtures, Player props, Fancy and Leagues in a centered fl
 
 - Reserve the expanded dock’s clearance, including the bottom safe area, in both states. The last row can scroll above the dock, and changing the dock’s state leaves the list viewport steady.
 - Keep the hidden controls out of touch, keyboard and screen-reader navigation. The compact button announces the current section and that it opens the tab list.
-- The web uses CSS transitions. The app animates opacity and scale on Reanimated’s UI thread and uses a tinted surface for iOS and Android. Reduced motion keeps the fade and removes the scale change.
+- The web animates the capsule’s CSS clip path. The app animates the position and width of a single SVG surface on Reanimated’s UI thread. Tab controls fade between states while the capsule stays visible. Reduced motion switches the capsule shape immediately and keeps a short fade for the controls.
 - Apply collapse only to screens with an active destination. The design host shows the expanded dock as part of the sample product chrome. App detail pages render outside the tab navigator.
 
 ### Implementation and release

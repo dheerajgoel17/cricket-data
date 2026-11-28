@@ -81,7 +81,7 @@ export function IosTabBar() {
   return (
     <div ref={dock} className="phone-tab-dock fixed inset-x-0 bottom-0 z-60 lg:hidden" data-collapsed={compact}>
       <div className="phone-tab-dock-expanded" inert={compact}>
-        <ion-tab-bar className="phone-tab-bar" translucent selected-tab={current} aria-label="Sections"
+        <ion-tab-bar className="phone-tab-bar" selected-tab={current} aria-label="Sections"
           onPointerDown={startSwipe} onPointerUp={finishSwipe} onPointerCancel={() => { touchStart.current = null; }}
           onClickCapture={(event) => {
             if (!suppressClick.current || event.detail === 0) return;
