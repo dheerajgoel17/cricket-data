@@ -1,4 +1,63 @@
 {
- "generated_at_ist": "2026-11-28 11:00 IST",
- "alerts": []
+ "generated_at_ist": "2026-11-28 12:00 IST",
+ "alerts": [
+  {
+   "event_key": "female|Adelaide Strikers Women|Hobart Hurricanes Women|2026-11-29",
+   "match": "Adelaide Strikers (Women) vs Hobart Hurricanes (Women)",
+   "start_utc": "2026-11-29T04:30:00Z",
+   "start_ist": "2026-11-29 10:00 IST",
+   "format": "T20",
+   "gender": "female",
+   "market_type": "batter_fours",
+   "market": "G9182 batter_fours",
+   "team_scope": "",
+   "selection": "Nicola Carey under 2.5",
+   "player_matched_as": "Nicola Carey",
+   "player_id": "dff806f4",
+   "player_team": "Hobart Hurricanes Women",
+   "stat": "fours",
+   "inn": 0,
+   "line": 2.5,
+   "side": "under",
+   "best_odds": 1.8,
+   "best_source": "feedi_d",
+   "effective_odds_after_commission": 1.8,
+   "lay_odds": null,
+   "back_liquidity": null,
+   "overround": 0.0794,
+   "implied_prob": 0.5556,
+   "fair_odds": 1.712,
+   "fair_prob": 0.5842,
+   "model_prob": 0.6564,
+   "market_prob": 0.5252,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "edge": 0.0516,
+   "edge_pct": 5.16,
+   "kelly_quarter_stake_pct": 1.61,
+   "n_sources": 3,
+   "confidence": "medium",
+   "why": "Model 66% vs market 53% for under 2.5 fours; form 2.3 fours/inn recency-weighted T20 (n_eff 47.9; last 5: 7, 3, 3, 0, 9), bats in 84% of games played; at Karen Rolton Oval, Adelaide, South Australia: 3 inns avg 1.3; context adj: venue environment +16%, at this venue -4%",
+   "notes": "3 market source(s) for fair price; model 0.656 vs market 0.525; assumes bet void if player doesn't bat/bowl - check book rules",
+   "model_detail": {
+    "n_eff": 47.9,
+    "expected": 2.32,
+    "nb_alpha": 0.958,
+    "p_bats_or_bowls": 0.842,
+    "venue_matched": "karen rolton oval",
+    "context_terms": [
+     "p_bat",
+     "env_fours",
+     "ven_fours",
+     "h2h_runs"
+    ]
+   },
+   "rain_risk": null,
+   "weather": null,
+   "alert_id": "74988405d3828b17",
+   "alert_key": "female|Adelaide Strikers Women|Hobart Hurricanes Women|2026-11-29|batter_fours||Nicola Carey under 2.5|2.5|under",
+   "alerted_at_ist": "2026-11-28 12:03 IST",
+   "realert": false,
+   "previous_edge": null
+  }
+ ]
 }

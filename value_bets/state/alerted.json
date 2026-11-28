@@ -88,5 +88,10 @@
   "edge": 0.0615,
   "start_utc": "2026-11-29T08:15:00Z",
   "alerted_at": "2026-11-28T03:34:29.148955+00:00"
+ },
+ "female|Adelaide Strikers Women|Hobart Hurricanes Women|2026-11-29|batter_fours||Nicola Carey under 2.5|2.5|under": {
+  "edge": 0.0516,
+  "start_utc": "2026-11-29T04:30:00Z",
+  "alerted_at": "2026-11-28T06:33:35.993353+00:00"
  }
 }
