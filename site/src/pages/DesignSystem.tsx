@@ -402,6 +402,7 @@ export function DesignSystemPage() {
               <StatusLabel tone="live" surface="plain" />
               <StatusLabel tone="inPlay" surface="plain" />
               <StatusLabel tone="session" surface="plain">Rain delay</StatusLabel>
+              <StatusLabel tone="session" surface="plain">Toss delay</StatusLabel>
               <StatusLabel tone="muted" surface="plain">Upcoming</StatusLabel>
             </div>
           </div>

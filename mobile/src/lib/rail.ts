@@ -53,7 +53,8 @@ export interface RailItem { fixture: any; state: FixtureState; live: any | null;
 
 /**
  * The rail in display order: matches in play, then those starting within 24 hours, then later games up to 10 days, then finished ones (`rankFixtures` / `arrangeFixtures`).
- * Books-priced only; a started/live/final row also needs live/board team totals — holding prices alone is not enough. Upcoming priced stays.
+ * Books-priced only. Finished rows need live/board team totals. Live/started with a session interruption or still
+ * inside the keep window stay without totals (toss/rain delay, pre-first-ball). Upcoming priced stays.
  */
 export function buildRail({ fixtures, lines, live, rail = DEFAULT_RAIL, home = null, now = Date.now() }: { fixtures: any[]; lines: any; live: any; rail?: RailConfig; home?: string | null; now?: number }): RailItem[] {
   const feed = feedOf(lines);
@@ -65,7 +66,9 @@ export function buildRail({ fixtures, lines, live, rail = DEFAULT_RAIL, home = n
     if (!fixtureInBooks(feed, f)) return false;
     const st = stateOf(f);
     if (st === "upcoming") return true;
-    return teamTotalsPresent(liveOf(f));
+    const hit = liveOf(f);
+    if (hit?.session || ((st === "live" || st === "started") && startedSince(f, keepMsFor(f.fmt), now))) return true;
+    return teamTotalsPresent(hit);
   };
   // Empty book feed → empty rail (do not fall back to the whole schedule).
   const list = feed.length ? shownFixtures(fixtures, stateOf, showable, now) : [];

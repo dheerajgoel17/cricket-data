@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  ballsToOvers, bookFixtures, cardFetchList, clockStartedMs, formatBall, formatOf, buildMatch, ensureOverNumbers, keepGapRow, mergeBoardLive, mergeOversTape, mergeSchedule, notInXI, onNow, ongoingOverBalls, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
+  ballsToOvers, bookFixtures, cardFetchList, clockStartedMs, formatBall, formatOf, buildMatch, ensureOverNumbers, keepGapRow, mergeBoardLive, mergeOversTape, mergeSchedule, notInXI, onNow, ongoingOverBalls, playingXI, cardPageUrl, fixtureInBooks, hasCard, isResultLine, isSessionLine, isTossComplete, fancyStanding, fancyState, lineNotIn, lineStanding, lineVerdict, liveBlurb, liveBoard, liveCard, liveForFixture, liveMarket, livePlayer, liveState, liveStat,
   matchWindow, namesMatch, nextTestDayLine, nextTestDayStart, oversToBalls, parseFixtureCsv, parseMatchPage, parseOvers, parseSchedule, parseCardPage, parseScore, pricedLive, scoreLabel, sessionBadge, sessionLabel, sessionMeta, settleLines, strikeRate, teamKey, teamScore, TEST_WINDOW_MS, unlistedRows, wantsCard,
 } from "@cricket/engine/live.js";
 import { identityIndex } from "@cricket/engine/identity.js";
@@ -122,11 +122,18 @@ test("sessionLabel: the source's badge, not a Live pulse", () => {
   assert.equal(sessionLabel("Lunch"), "Lunch");
   assert.equal(sessionLabel("Innings Break"), "Innings break");
   assert.equal(sessionLabel("Rain Delay"), "Rain delay");
+  assert.equal(sessionLabel("Toss delayed due to rain"), "Rain delay");
+  assert.equal(sessionLabel("Toss Delay"), "Toss delay");
+  assert.equal(sessionLabel("Delayed toss"), "Toss delay");
   assert.equal(sessionLabel("Match paused due to bad weather"), "Weather");
   assert.equal(sessionLabel("Match delayed by bad light"), "Bad light");
   assert.equal(sessionLabel("Team Break"), "Team break");
   assert.equal(sessionLabel("Match Paused"), "Paused");
   assert.equal(sessionLabel("IND need 12 runs"), "");
+  assert.equal(isTossComplete("Sydney Thunder Women won the toss and elected to bowl"), true);
+  assert.equal(isTossComplete("OMA opt to Bowl"), true);
+  assert.equal(isTossComplete("Toss Delay"), false);
+  assert.equal(isTossComplete("Live"), false);
 });
 
 test("sessionBadge keeps the Test day; next dig is day-1 kick-off + N days", () => {
@@ -199,6 +206,29 @@ test("parseSchedule: the schedule's own bare Live is live before the first score
   const row = { team1: "Sydney Sixers Women", team2: "Melbourne Stars Women", t: Date.parse("2026-11-26T08:10:00Z"), status: 1, fo: "T20", mf: "12Y2" };
   assert.equal(parseSchedule(pageHtml({ [FIXTURE]: [{ ...row, statusText: "Live" }] }))[0].status, "live");
   assert.equal(parseSchedule(pageHtml({ [FIXTURE]: [row] }))[0].status, "upcoming");
+});
+
+test("parseSchedule: toss delay / rain delay / toss-complete are live before the first ball", () => {
+  const base = { team1: "Sydney Thunder Women", team2: "Sydney Sixers Women", t: Date.parse("2026-11-28T08:10:00Z"), fo: "T20", mf: "12Y5" };
+  const [tossDelay] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...base, status: 0, statusText: "Toss Delay" }] }));
+  assert.equal(tossDelay.status, "live");
+  assert.equal(tossDelay.session, "Toss delay");
+  assert.equal(tossDelay.teams[0].display, "");
+  const [rain] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...base, status: 0, statusText: "Rain Delay" }] }));
+  assert.equal(rain.status, "live");
+  assert.equal(rain.session, "Rain delay");
+  const [tossDone] = parseSchedule(pageHtml({ [FIXTURE]: [{ ...base, status: 1, statusText: "Sydney Thunder Women won the toss and elected to bowl" }] }));
+  assert.equal(tossDone.status, "live");
+  assert.equal(tossDone.session, "");
+  assert.equal(tossDone.summary, "Sydney Thunder Women won the toss and elected to bowl");
+  const page = parseMatchPage(pageHtml({ [LIVE]: {
+    team1_f_n: "Sydney Thunder Women", team2_f_n: "Sydney Sixers Women", status: 0, comment1: "Toss Delay",
+  } }));
+  assert.equal(page.status, "live");
+  assert.equal(page.session, "Toss delay");
+  const built = buildMatch(tossDelay, page, null);
+  assert.equal(built.status, "live");
+  assert.equal(built.session, "Toss delay");
 });
 
 test("wantsCard: live rows, and priced rows about to start; not tomorrow's, not finished ones", () => {

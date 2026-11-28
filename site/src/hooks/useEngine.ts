@@ -80,9 +80,9 @@ export function shownFixtures(fx: any[], stateOf: (f: any) => string, inBooks: (
 }
 
 /** Books-priced fixtures that the front may list.
- *  Source-only rows stay off. A priced match that has already begun (or finished) also needs live/board
- *  team totals (`teamTotalsPresent`) — holding book lines alone is not enough. Upcoming priced matches
- *  stay (no score expected yet). Empty book feed → empty list.
+ *  Source-only rows stay off. A finished match still needs live/board team totals. A live/started row
+ *  with a session interruption (toss/rain delay) or still inside the keep window stays without totals
+ *  (pre-first-ball toss or a delay before scores). Upcoming priced matches stay. Empty book feed → empty list.
  *  Archive settle still keeps every priced match off-screen. */
 export function usePricedFixtures() {
   const fx = useFixtures();
@@ -98,7 +98,9 @@ export function usePricedFixtures() {
       if (!fixtureInBooks(feed, f)) return false;
       const st = stateOf(f);
       if (st === "upcoming") return true;
-      return teamTotalsPresent(liveForFixture(live.data, f));
+      const hit = liveForFixture(live.data, f);
+      if (hit?.session || ((st === "live" || st === "started") && startedSince(f, keepMsFor(f.fmt), now))) return true;
+      return teamTotalsPresent(hit);
     };
     const fixtures = !ready || !haveBooks ? [] : shownFixtures(fx.data || [], stateOf, showable, now);
     const priced = all.filter((f) => fixtureInBooks(feed, f));

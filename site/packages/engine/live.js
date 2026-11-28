@@ -41,10 +41,18 @@ export function sessionLabel(s) {
   if (/\brain\b|wet outfield/i.test(t)) return "Rain delay";
   if (/bad light/i.test(t)) return "Bad light";
   if (/bad weather/i.test(t)) return "Weather";
+  if (/\btoss\b.*\bdelay(?:ed)?\b|\bdelay(?:ed)?\b.*\btoss\b/i.test(t)) return "Toss delay";
   if (/\bground\b.*\bdelay(?:ed)?\b|\bdelay(?:ed)?\b.*\bground\b/i.test(t)) return "Ground delay";
   if (/\bpaused\b|match delayed|play (?:stopped|suspended)/i.test(t)) return "Paused";
   if (/\bdelay(?:ed)?\b|\b(?:play|match) (?:interrupted|halted|on hold)\b/i.test(t)) return "Delayed";
   return "";
+}
+
+/** Source says the toss is done (won / elected / opt to bat|bowl), before the first ball. Not a toss delay. */
+export function isTossComplete(s) {
+  const t = String(s || "");
+  if (!t || isSessionLine(t)) return false;
+  return /\bwon the toss\b|\belected to\b|\bopt(?:ed)? to (?:bat|bowl)\b/i.test(t);
 }
 
 /** Session kind plus an optional Test day number from "Stumps - Day 3". */
@@ -484,10 +492,12 @@ export function parseSchedule(html, base = "") {
     const bat = t1.display && t2.display ? 1 - first : t1.display ? 0 : t2.display ? 1 : -1;
     const link = row.link || "";
     const blurb = summary || (fmt === "Test" && !done && scored && row.status === 2 ? "Close of play" : "");
+    // session interruption (toss/rain delay) is live even while source status is still 0; toss-complete text with status 1 is live before the first ball
+    const liveWord = scored || session || (isTossComplete(summary) && Number(row.status) === 1) || /^live$/i.test(summary.trim());
     return [{
       id: String(row.mf || row.matchFkey || row.id || ""),
       // the schedule's own bare "Live" is play on, even before the first score shows: otherwise the row ranks as upcoming and a busy day's card cap never reads its page
-      status: done ? "final" : scored || (session && Number(row.status) === 1) || /^live$/i.test(summary.trim()) ? "live" : "upcoming",
+      status: done ? "final" : liveWord ? "live" : "upcoming",
       fmt,
       start: row.t ? new Date(row.t).toISOString() : "",
       summary: blurb,
@@ -567,10 +577,13 @@ export function parseMatchPage(html) {
   const comment = text(sv.comment1), statusText = text(sv.B);
   const result = [statusText, comment].find(isResultLine);
   const interruption = [comment, statusText].find(isSessionLine);
+  const tossDone = isTossComplete(comment) || isTossComplete(statusText);
   const done = !!result || (Number(sv.status) === 2 && !interruption);
+  // interruption (any source status) or toss-complete with status 1: live before the first real score
+  const liveWord = !!(t1.display || t2.display || interruption || (tossDone && Number(sv.status) === 1));
   return {
     id: String(sv.mf || ""),
-    status: done ? "final" : t1.display || t2.display || (interruption && Number(sv.status) === 1) ? "live" : "upcoming",
+    status: done ? "final" : liveWord ? "live" : "upcoming",
     start: "",
     summary: result || interruption || comment || (done ? statusText : ""),
     note: "",
@@ -792,11 +805,13 @@ export function buildMatch(row, live, card, prior = null) {
   });
   const scored = lined.some((t) => t.display);
   const session = isSessionLine(live?.summary) || isSessionLine(row.summary);
+  const tossDone = isTossComplete(live?.summary) || isTossComplete(row.summary);
   const over = isResultLine(live?.summary) || isResultLine(row.summary) || ((row.status === "final" || live?.status === "final") && row.fmt !== "Test" && !session);
-  const status = over ? "final" : scored || (session && (live?.status === "live" || row.status === "live")) ? "live" : "upcoming";
+  // keep schedule/match-page live (bare Live, session delay, toss done) even with no totals yet
+  const status = over ? "final" : scored || session || tossDone || live?.status === "live" || row.status === "live" ? "live" : "upcoming";
   const rawLive = String(live?.summary || "").trim();
   const rawRow = String(row.summary || "").trim();
-  const raw = (over ? [rawLive, rawRow].find(isResultLine) : [rawLive, rawRow].find(isSessionLine))
+  const raw = (over ? [rawLive, rawRow].find(isResultLine) : [rawLive, rawRow].find(isSessionLine) || [rawLive, rawRow].find(isTossComplete))
     || (rawLive && !/^live$/i.test(rawLive) ? rawLive : rawRow);
   const summary = raw && !/^live$/i.test(raw) ? raw
     : (status === "live" && row.fmt === "Test" && (live?.status === "final" || row.status === "final") ? "Close of play" : raw);

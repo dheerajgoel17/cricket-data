@@ -254,3 +254,28 @@ test("the published T20 feed shows a ground delay and clears it when play resume
   assert.equal(resumed.session, "");
   assert.equal(resumed.summary, "Side B need 20 runs");
 });
+
+test("a priced toss delay with no score stays live on the published feed", async () => {
+  const start = "2026-11-28T08:10:00Z";
+  const list = pageHtml({ [FIXTURE]: [{
+    team1: "Sydney Thunder Women", team2: "Sydney Sixers Women", fo: "T20", mf: "12Y5",
+    link: "/match/wbbl", t: Date.parse(start), status: 0, statusText: "Toss Delay",
+  }] });
+  const feed = createFeed({
+    now: () => Date.parse("2026-11-28T08:25:00Z"), base: () => "https://src.test", cardBudgetMs: Infinity,
+    getJson: async () => ({ lines: [{ match: "Sydney Thunder Women vs Sydney Sixers Women", start_utc: start, fmt: "T20" }] }),
+    getText: async () => "", loadIdentity: async () => NO_IDENTITY,
+    getHtml: async (url) => {
+      if (url.endsWith("/") || url.endsWith("/schedule")) return list;
+      if (url.endsWith("/match/wbbl")) return pageHtml({ [LIVE]: {
+        team1_f_n: "Sydney Thunder Women", team2_f_n: "Sydney Sixers Women", status: 0, comment1: "Toss Delay",
+      } });
+      return "";
+    },
+  });
+  const [m] = (await feed.snapshot()).matches;
+  assert.equal(m.status, "live");
+  assert.equal(m.session, "Toss delay");
+  assert.equal(m.summary, "Toss Delay");
+  assert.equal(m.teams.every((t) => !t.display), true);
+});
