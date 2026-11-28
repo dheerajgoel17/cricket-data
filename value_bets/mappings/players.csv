@@ -1,4 +1,4 @@
-# raw source player name (case-insensitive), cricket-data player_id (8-hex base registry id)
+# raw source player name (case-insensitive), cricket-data player_id (8-hex base registry id), optional canonical team
 # Checked by hand 2026-11-25 (web: full name and team, plus the source's profile page). A spelling the books use -> the Base id.
 Hasini Perera,53068b45
 GWHM Perera,53068b45
@@ -302,10 +302,13 @@ Tymal Mills,245c97cb
 # link_suggest 2026-11-27: the fixture's sides settle the Base player
 Imtiaz Khan,1500d104
 L Tucker,3979b5e0
-Yasir Ali,79209272
+Yasir Ali,5791b840,Bangladesh A
 # link_suggest 2026-11-27: the fixture's sides settle the Base player
 C Campher,478a63e7
 PVD Chameera,327b58d3
+Khuzaima Bin Tanvir,a3690f55
+Finn Allen,bf74b130
+Yasir Ali Chowdhury,5791b840
 # link_suggest 2026-11-28: the fixture's sides settle the Base player
 Ashtuti Kumar,8aa62462
 PJ Watkins,a2d53c59

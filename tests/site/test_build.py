@@ -765,3 +765,20 @@ def test_a_player_only_scraped_matches_know_is_named_in_the_index(tmp_path):
     nm = dict(zip(IX["players"]["id"], IX["players"]["nm"], strict=True))
     assert nm["5e72ffe1"] == "MD Aftab"
     assert nm[bro] == "HC Brook" and nm[bro] != "Harry B"
+
+
+def test_checked_profile_missing_from_sitemap_is_linked_and_gets_a_photo(tmp_path):
+    mappings = tmp_path / "mappings"
+    mappings.mkdir()
+    (mappings / "player_source_profiles.csv").write_text("source_id,name\nS1,checked player\nS2,old name\n", encoding="utf-8")
+    (mappings / "player_identity.csv").write_text("player_id,source_id,note\np1,S1,verified profile\n", encoding="utf-8")
+    cx = {"p": {}, "names": {}, "index": {"players": [["S2", "current name", None]]}}
+
+    B.add_checked_source_profiles(cx, tmp_path)
+    B.add_checked_source_profiles(cx, tmp_path)
+    table, review, _ = B.link_identity(cx, {"p1": "C Player"}, None, tmp_path)
+
+    assert table["s"] == {"p1": "S1"}
+    assert not review
+    assert cx["index"]["players"] == [["S2", "current name", None], ["S1", "checked player", "p1"]]
+    assert B.faces(cx, {"p1"}, set()) == {"p1": "c:S1"}

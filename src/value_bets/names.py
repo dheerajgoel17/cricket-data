@@ -94,7 +94,7 @@ class PlayerResolver:
     def __init__(self, rosters):
         """rosters: {team: [(name, player_id, last_date_str, n_apps)]} (recent players for each canonical team)."""
         self.rosters = rosters
-        self.map = _load_map("players.csv", 2)  # raw_name, player_id
+        self.map = _load_map("players.csv", 2)  # raw_name, player_id, optional team
         self.cache = {}
 
     def resolve(self, raw, teams):
@@ -129,17 +129,20 @@ class PlayerResolver:
         return None
 
     def _resolve1(self, raw, teams):
-        res = self._resolve1_core(raw, teams)
         m = self.map.get(raw.lower())
+        if m and len(m) > 1 and m[1]:
+            if m[1] in teams and (match := self._moved(m[0], [m[1]])):
+                return match
+            m = None
+        res = self._resolve1_core(raw, teams, m)
         if res is None and m and teams and not self._full_name(raw):  # "C Wilson", "L Shaw": the roster decides first, the checked id only when it finds nobody
             return self._moved(m[0], teams)
         return res
 
-    def _resolve1_core(self, raw, teams):
+    def _resolve1_core(self, raw, teams, m):
         cands = [(t, *p) for t in teams for p in self.rosters.get(t, [])]
-        if not cands and not (teams and self.map.get(raw.lower())):
+        if not cands and not (teams and m):
             return None
-        m = self.map.get(raw.lower())
         if m:
             for t, name, pid, last, n in cands:
                 if pid == m[0]:

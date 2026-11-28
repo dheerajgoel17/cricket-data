@@ -750,6 +750,22 @@ def faces(cx: dict, keep: set[str], placeholders: set[str]) -> dict[str, str]:
     return out
 
 
+def add_checked_source_profiles(cx: dict, data_dir: Path) -> None:
+    """Keep hand-verified public profiles available when the source player sitemap omits them."""
+    path = data_dir / "mappings" / "player_source_profiles.csv"
+    if not path.exists():
+        return
+    players = cx["index"]["players"]
+    known = {sid for sid, _, _ in players}
+    with path.open(encoding="utf-8", newline="") as fh:
+        for row in csv.DictReader(fh):
+            sid = row["source_id"].strip()
+            name = row["name"].strip()
+            if sid and name and sid not in known:
+                players.append([sid, name, None])
+                known.add(sid)
+
+
 def link_identity(cx: dict, names: dict[str, str], vb_dir: Path | None, data_dir: Path, stock: set[str] | None = None) -> tuple[dict, list[dict], dict]:
     """Build the player-identity table (``identity.py``) and hand its links to everything that matched players by name before:
     the photo map (a linked player gets his source photo), the source-id index (who holds which id) and the scraped-name linker."""
@@ -1065,6 +1081,8 @@ def build(zpath: Path, data_dir: Path, out: Path, vb_dir: Path | None = None, wo
     remembered, stock = source_memory() if photos else ([], set())
     scraped = provisional_people(data_dir, names)
     cx = crex_cached(crex_cache, canonical, names, load_cricinfo(people_path), scraped, remembered, stock) if photos else {"p": {}, "t": {}, "l": {}, "w": {}, "names": {}, "index": {"players": [], "teams": []}}
+    if cx["index"]["players"]:
+        add_checked_source_profiles(cx, data_dir)
     ident, review, cover = link_identity(cx, names, vb_dir, data_dir, stock)
     pdoc = profiles.build_json(profiles.load(data_dir), ident["s"])  # role / batting hand / bowling style per player, from data/profiles (fetched by cricket_site.profiles)
     prov, pstat = load_provisional(data_dir, canonical, cx["names"])

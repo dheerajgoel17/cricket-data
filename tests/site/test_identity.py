@@ -113,15 +113,19 @@ def test_the_review_reads_as_a_table_with_the_line_to_add():
     assert "Every priced player is linked" in I.to_markdown([])
 
 
-def test_the_committed_overrides_file_gives_each_player_and_each_source_id_once():
-    """Hand-checked links: a player or a source id listed twice would make one silently win."""
+def test_the_committed_overrides_file_lists_each_player_once_and_marks_shared_photos():
+    """An intentional second record shares the portrait of the first player listed for the source id."""
     import csv
     from pathlib import Path
 
     f = Path(__file__).resolve().parents[2] / "data" / "mappings" / "player_identity.csv"
     rows = [r for r in csv.reader(x for x in f.read_text(encoding="utf-8").splitlines() if x.strip() and not x.lstrip().startswith("#")) if r[0] != "player_id"]
     assert all(len(r) >= 3 and r[2].strip() for r in rows), "every link says who he is and why"
-    assert len({r[0] for r in rows}) == len(rows) and len({r[1] for r in rows}) == len(rows)
+    assert len({r[0] for r in rows}) == len(rows)
+    seen = set()
+    for _, source_id, note, *_ in rows:
+        assert (source_id in seen) == note.startswith("Second record for ")
+        seen.add(source_id)
     assert {r[0]: r[1] for r in rows}["85e0cf10"] == "EF"   # M Prasidh Krishna is Prasidh Krishna, not another Krishna
     by = {r[0]: r[1] for r in rows}
     assert by["740742ef"] == "2X" and by["d12143bf"] == "IB" and by["89bbc67a"] == "PA" and by["18fac429"] == "1C0"
@@ -240,3 +244,50 @@ def test_verified_player_links_replace_conflicting_photo_matches():
         )
         assert table["s"] == {pid: sid}
         assert added == {pid: sid}
+
+
+def test_checked_photo_links_cover_spelling_variants_and_reclaim_namesakes():
+    from pathlib import Path
+
+    from cricket_site import build as B
+    from value_bets.names import PlayerResolver
+
+    data = Path(__file__).resolve().parents[2] / "data"
+    overrides = I.load_overrides(data)
+    expected = {"a3690f55": "D25", "9b3b9987": "KAG", "9103ecdb": "A5R", "f21043a5": "FD", "6f02fe2a": "3DX"}
+    sitemap = [("D25", "khuzaima bin tanvir"), ("KAG", "anushka sharma"), ("A5R", "muhammad rohid khan"),
+               ("FD", "kusal perera"), ("3DX", "muhammad waseem")]
+    photo_map = {"106fe7a6": "c:FD", "09653658": "c:3DX"}
+    names = {"a3690f55": "Khuzaima Tanveer", "106fe7a6": "KKV Perera", "09653658": "Mariam Waseem"}
+    table, review, added, _ = I.build(photo_map, sitemap, names, {}, {pid: overrides[pid] for pid in expected})
+    assert table["s"] == expected
+    assert review == []
+    assert B.faces({"p": {pid: f"c:{sid}" for pid, sid in added.items()}}, set(expected), set()) == {
+        pid: f"c:{sid}" for pid, sid in expected.items()
+    }
+
+    resolver = PlayerResolver({"Desert Vipers": [("Khuzaima Tanveer", "a3690f55", "2026-11-27", 1)]})
+    assert resolver.resolve("Khuzaima Bin Tanvir", ["Desert Vipers"])["player_id"] == "a3690f55"
+
+
+def test_checked_links_distinguish_finn_and_fabian_allen_and_share_duplicate_portraits():
+    from pathlib import Path
+
+    from value_bets.names import PlayerResolver
+
+    overrides = I.load_overrides(Path(__file__).resolve().parents[2] / "data")
+    pids = ("bf74b130", "b52ffbbd", "8e554b6b", "0cf0e57d")
+    table, review, _, shared = I.build(
+        {"b52ffbbd": "c:4W4"},
+        [("4W4", "finn allen"), ("L0", "fabian allen"), ("CMY", "abdul samad")],
+        {}, {}, {pid: overrides[pid] for pid in pids},
+    )
+    assert table["s"] == {"bf74b130": "4W4", "b52ffbbd": "L0", "8e554b6b": "CMY"}
+    assert shared == {"0cf0e57d": "CMY"}
+    assert review == []
+
+    resolver = PlayerResolver({
+        "New Zealand": [("FH Allen", "bf74b130", "2026-11-27", 20)],
+        "Abu Dhabi Knight Riders": [("FA Allen", "b52ffbbd", "2026-11-27", 20)],
+    })
+    assert resolver.resolve("Finn Allen", ["Abu Dhabi Knight Riders"])["player_id"] == "bf74b130"

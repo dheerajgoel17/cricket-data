@@ -19,6 +19,7 @@ import time
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 from cricket_data.hosts import host
 
@@ -72,7 +73,7 @@ def stored_ids(base: str, key: str, http=_req) -> dict[str, set[str]]:
 PLACEHOLDER_COPIES = 20  # one picture stored for this many different players is the source's stock avatar, not anybody's face
 
 
-def placeholder_ids(base: str, key: str, http=_req) -> set[str]:
+def placeholder_images(base: str, key: str, http=_req) -> dict[str, str]:
     """Source player ids whose stored picture is shared by PLACEHOLDER_COPIES or more players. The source serves its stock helmet-and-grey-head avatar under every
     player id it has no photo for (3 pictures, about half of everything we had stored), and a copy of it looks like a photo to a map of ids. Found by content, from the
     hashes the `assets` table already keeps, so a new variant is recognised once enough players carry it and no hash is written down."""
@@ -88,7 +89,11 @@ def placeholder_ids(base: str, key: str, http=_req) -> set[str]:
     counts: dict[str, int] = {}
     for _, sha in rows:
         counts[sha] = counts.get(sha, 0) + 1
-    return {ref for ref, sha in rows if counts[sha] >= PLACEHOLDER_COPIES}
+    return {ref: sha for ref, sha in rows if counts[sha] >= PLACEHOLDER_COPIES}
+
+
+def placeholder_ids(base: str, key: str, http=_req) -> set[str]:
+    return set(placeholder_images(base, key, http))
 
 
 def remembered_players(base: str, key: str, http=_req) -> list[tuple[str, str]]:
@@ -148,6 +153,21 @@ def upsert(base: str, key: str, table: str, rows: list[dict], http=_req) -> None
              {"Content-Type": "application/json", "Prefer": "resolution=merge-duplicates,return=minimal"})
 
 
+def refresh_stock(base: str, key: str, refs: list[str], http=_req, fetch=None) -> int:
+    """Replace checked stock copies only when the source now serves a different image."""
+    stock = placeholder_images(base, key, http)
+    hashes = set(stock.values())
+    rows = []
+    for cid in dict.fromkeys(refs):
+        if cid not in stock:
+            continue
+        got = download("player", cid, fetch)
+        if got is not None and hashlib.sha256(got[0]).hexdigest() not in hashes:
+            rows.append(upload(base, key, "player", cid, *got, http))
+    upsert(base, key, "assets", rows, http)
+    return len(rows)
+
+
 def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: int = 1500, pause: float = 0.05,
          http=_req, fetch=None, workers: int = 6) -> dict:
     ph = json.load(open(photos_path, encoding="utf-8"))
@@ -155,6 +175,8 @@ def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: i
     want = {"player": sorted({v[2:] for v in ph.get("p", {}).values() if v.startswith("c:")}),
             "team": teams + [f"{t}:{k}" for t in [*teams, PLACEHOLDER_KIT] for k in KITS]}  # logos, then each team's two shirts and the plain placeholder shirt
     have = stored_ids(base, key, http)  # a bad key / unreachable project raises here, before anything is changed
+    stock = placeholder_images(base, key, http)
+    stock_hashes = set(stock.values())
     stats = {"downloaded": 0, "missing_at_crex": 0, "already": sum(len(v) for v in have.values()), "pending": 0}
     todo: list[tuple[str, str]] = []
     for kind in ("team", "player"):  # logos first: few and the most visible
@@ -188,6 +210,8 @@ def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: i
                 have.setdefault(kind, set()).add(cid)
                 stats["downloaded"] += 1
                 pending_rows.append(res)
+                if kind == "player" and res["sha256"] in stock_hashes:
+                    stock[cid] = res["sha256"]
                 if len(pending_rows) >= 200:  # persist progress as we go: a cancelled or timed-out run keeps what it copied
                     upsert(base, key, "assets", pending_rows, http)
                     pending_rows = []
@@ -197,6 +221,8 @@ def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: i
         idx = json.load(open(index_path, encoding="utf-8"))
         upsert(base, key, "crex_players", [{"crex_id": c, "name": n, "cricsheet_id": p or None} for c, n, p in idx.get("players", [])], http)
         upsert(base, key, "crex_teams", [{"crex_id": c, "name": n, "folded_name": f} for c, n, f in idx.get("teams", [])], http)
+    if stock:
+        ph["p"] = {pid: ref for pid, ref in ph.get("p", {}).items() if not (ref.startswith("c:") and ref[2:] in stock)}
     ph["base"] = f"{base}/storage/v1/object/public/avatars"
     held_teams = have.get("team", set())
     ph["s"] = {"p": sorted(have.get("player", set())), "t": sorted(r for r in held_teams if ":" not in r), "j": sorted(r for r in held_teams if ":" in r)}
@@ -206,7 +232,9 @@ def sync(photos_path: str, index_path: str | None, base: str, key: str, limit: i
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--photos", required=True)
+    mode = ap.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--photos")
+    mode.add_argument("--refresh-stock", type=Path)
     ap.add_argument("--index", default="")
     ap.add_argument("--url", default=os.environ.get("SUPABASE_URL", ""))
     ap.add_argument("--limit", type=int, default=int(os.environ.get("SYNC_LIMIT", "1500")))
@@ -216,7 +244,11 @@ def main(argv: list[str] | None = None) -> int:
         print("assets_sync: SUPABASE_URL / SUPABASE_SERVICE_KEY not set, skipping")
         return 0
     try:
-        print(json.dumps(sync(a.photos, a.index or None, a.url.rstrip("/"), key, a.limit)))
+        if a.refresh_stock:
+            refs = a.refresh_stock.read_text(encoding="utf-8").split()
+            print(json.dumps({"stock_refreshed": refresh_stock(a.url.rstrip("/"), key, refs)}))
+        else:
+            print(json.dumps(sync(a.photos, a.index or None, a.url.rstrip("/"), key, a.limit)))
     except (urllib.error.URLError, OSError, ValueError) as exc:
         detail = ""
         if isinstance(exc, urllib.error.HTTPError):
