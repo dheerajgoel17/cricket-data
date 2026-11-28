@@ -63,5 +63,15 @@
   "edge": 0.0811,
   "start_utc": "2026-11-28T14:30:00Z",
   "alerted_at": "2026-11-27T22:34:58.338112+00:00"
+ },
+ "female|Brisbane Heat Women|Perth Scorchers Women|2026-11-29|batter_runs||BL Mooney under 29.5|29.5|under": {
+  "edge": 0.0536,
+  "start_utc": "2026-11-29T01:00:00Z",
+  "alerted_at": "2026-11-28T01:34:35.573911+00:00"
+ },
+ "female|Adelaide Strikers Women|Hobart Hurricanes Women|2026-11-29|batter_runs||E de Broughe under 18.5|18.5|under": {
+  "edge": 0.0613,
+  "start_utc": "2026-11-29T04:30:00Z",
+  "alerted_at": "2026-11-28T01:34:35.573911+00:00"
  }
 }
