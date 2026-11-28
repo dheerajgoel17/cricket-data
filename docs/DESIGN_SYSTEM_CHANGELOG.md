@@ -630,3 +630,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `IosTabBar`, mobile `TabBar`, and the Navigation design reference.
 - **Change:** Center the destinations in the dock and support horizontal swipes to adjacent tabs.
 - **Callers:** Mobile web and its design-host preview, iOS, Android, and the Expo browser preview.
+
+### 2026-11-28 — Collapsing navigation dock
+- **Path:** Web `IosTabBar`, app `TabBar`, and the Navigation design reference.
+- **Change:** The floating dock collapses to the current tab’s icon on downward scroll. Tap the icon or scroll back up to expand it.
+- **Callers:** Product and design-host mobile web chrome, iOS, Android and the Expo web preview.

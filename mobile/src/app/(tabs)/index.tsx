@@ -17,7 +17,7 @@ import { keptTab } from "@/ui/lazy-tab";
 import { Appear, CardSkeleton, Rise, SkeletonGroup } from "@/ui/motion";
 import { PhaseBar } from "@/ui/phase-bar";
 import { color, FIXTURE_CARD_SHARE, space } from "@/ui/tokens";
-import { TabFade } from "@/ui/tab-fade";
+import { useTabDockScroll } from "@/components/tab-dock-scroll";
 
 /** Fallback until the first card reports height — enough for meta + two sides + foot. */
 const RAIL_MIN_H = 168;
@@ -28,6 +28,7 @@ const RAIL_MIN_H = 168;
  * it, and every cell is then held to that height so the cards are equal (the site's `h-full`). The first cards of a phase spring up into place, one after another (`Rise`).
  */
 function Fixtures() {
+  const onDockScroll = useTabDockScroll();
   mark("render:Fixtures");
   const { ready: railReady, settled, liveKnown, items, error, refetch } = useRail();
   const ready = railReady && settled; // wait for the live feed: which phase opens depends on what is in play
@@ -57,6 +58,8 @@ function Fixtures() {
       <PhaseBar value={phase} counts={counts} onChange={setAsked} />
       <View style={styles.propsScroll}>
       <LiquidScroll
+        onScroll={onDockScroll}
+        scrollEventThrottle={16}
         style={styles.propsScroll}
         contentContainerStyle={{ paddingBottom: inset.bottom + 24 }}
         onRefresh={refetch}
@@ -108,7 +111,6 @@ function Fixtures() {
         </View>
         {ready && propsReady ? <Profiler id="hothome" onRender={onRender}><Appear><HotHome phase={phase} /></Appear></Profiler> : error ? null : <HotHomeSkeleton />}
       </LiquidScroll>
-      <TabFade />
       </View>
     </View>
   );

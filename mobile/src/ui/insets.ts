@@ -1,10 +1,11 @@
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-/**
- * The room a screen leaves for the system around it: the status bar on top and, below, the home indicator. A tab screen ends where the docked tab bar begins (the bar is the
- * navigator's own and holds the bottom safe area itself), so it leaves nothing below; a detail page (`false`) has no tab bar and leaves the home indicator's room.
- */
+import { TAB_BAR_HEIGHT } from "@/ui/tokens";
+
+export const TAB_DOCK_MARGIN = 10;
+
+/** Keep the last row above the floating dock and the system home indicator. */
 export function useScreenInsets(withTabBar = true) {
   const i = useSafeAreaInsets();
-  return { top: i.top, bottom: withTabBar ? 0 : i.bottom };
+  return { top: i.top, bottom: withTabBar ? TAB_BAR_HEIGHT + Math.max(TAB_DOCK_MARGIN, i.bottom) : i.bottom };
 }

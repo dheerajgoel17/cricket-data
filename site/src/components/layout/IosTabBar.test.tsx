@@ -39,3 +39,27 @@ it("switches one tab per horizontal swipe and ignores vertical and edge swipes",
     vi.unstubAllGlobals();
   }
 });
+
+it("collapses on downward scroll and reopens on tap or upward scroll", () => {
+  vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+  vi.stubGlobal("scrollY", 0);
+  try {
+    const { container } = render(<MemoryRouter><IosTabBar /></MemoryRouter>);
+    const dock = container.querySelector(".phone-tab-dock");
+    const scroll = (y: number) => {
+      vi.stubGlobal("scrollY", y);
+      fireEvent.scroll(window);
+    };
+
+    scroll(96);
+    expect(dock).toHaveAttribute("data-collapsed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Show navigation tabs, current section Fixtures" }));
+    expect(dock).toHaveAttribute("data-collapsed", "false");
+    scroll(132);
+    expect(dock).toHaveAttribute("data-collapsed", "true");
+    scroll(110);
+    expect(dock).toHaveAttribute("data-collapsed", "false");
+  } finally {
+    vi.unstubAllGlobals();
+  }
+});

@@ -80,7 +80,7 @@ Same tokens, same jobs; the idiom of the platform decides the feel. Values live 
 | Selection feedback | colour / thumb transition | `Haptics.selectionAsync` on chip, tab, segment | Same (system haptic) |
 | Text | Satoshi / Barlow Condensed, `rem` zoom | Same faces; width-fit under 375 | Same + `includeFontPadding: false`, greedy line breaking (`ui/text.tsx`) |
 | Shadow / elevation | `--shadow-*` | `shadow*` | `elevation` (shadow props are ignored) |
-| Chrome | Header + sidebar at `lg`, docked tab bar on phone | Docked `TabBar`, solid, no glass | Same docked `TabBar`; no blur anywhere |
+| Chrome | Header + sidebar at `lg`, floating dock on phone | Floating `TabBar` | Same floating `TabBar` |
 | Lists | DOM scroll | FlashList | FlashList |
 | Motion | `motion/react` springs, CSS transitions | Reanimated 4 springs / CSS transitions on the UI thread | Same; only transform + opacity; no layout animation in list rows |
 
@@ -147,7 +147,7 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | Sheets / drawers | shadcn `Sheet` | Filters, game detail — not primary navigation |
 | Tab bar / sidebar | `IosTabBar`, desktop source list | Shell chrome |
 
-On mobile web and in the app, the tabs form a centered group with equal space at each side when the dock is wider than the group. Tap a destination or swipe horizontally across the dock to move one tab. Desktop web uses the sidebar.
+On mobile web and in the app, the tabs form a centered group with equal space at each side when the dock is wider than the group. Tap a destination or swipe horizontally across the dock to move one tab. On a screen with an active tab, the floating dock collapses to that tab’s icon when scrolling down and expands on tap or when scrolling back up. Desktop web uses the sidebar.
 | Star / save | `star.tsx` (Heroicons) | Saved props / players / teams |
 | Ads | `AdSlot` | Catalogue cleared; remount when remapped; empty = no layout |
 
@@ -186,7 +186,7 @@ Phone bleed: `-mx-gutter border-y border-hairline`. From `lg`: `lg:mx-0`. Consta
 | Game log list | `Bleed` + press rows | Twin of web list |
 | Skeletons | `ui/skeletons` + Reanimated | Twin |
 | Segmented control | `Segmented` (JS twin; no system glass Picker) | **Native-exclusive** |
-| Tab bar | Docked `TabBar` (`mobile/src/components/tab-bar.tsx`) | **Native-exclusive** (web preview uses the same docked bar) |
+| Tab bar | Floating `TabBar` (`mobile/src/components/tab-bar.tsx`) | **Native-exclusive** (web preview uses the same floating bar) |
 | Long lists | FlashList | **Native-exclusive** |
 | Sticky chrome | `BlurBar merge` + `useChromeScrim` (clear → solid elevated; no liquid glass) | **Native-exclusive** — universal, not player-only |
 | Page header | `PageHeader` | Native chrome (unfilled; sits on `PageAtmosphere`) |
@@ -219,7 +219,7 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 | Game log | bleed list | bleed list — **twin** |
 | Skeletons | CSS shapes | Reanimated shapes — twin |
 | Segmented control | PillGroup / Tabs | **Native-exclusive** JS `Segmented` |
-| Tab bar | IosTabBar / sidebar | **Native-exclusive** docked `TabBar` |
+| Tab bar | IosTabBar / sidebar | Floating `TabBar` |
 | Lists (long) | DOM scroll | **Native-exclusive** FlashList |
 | Sticky chrome | CSS / limited | **Native-exclusive** `BlurBar merge` + `useChromeScrim` |
 | Sheets | Radix Sheet | Native form sheet / RN modal |
@@ -235,7 +235,7 @@ Screens declare which app-DS pieces they use; never import DOM/shadcn into Expo.
 
 When adding a web-only widget the app also needs, design the twin here first; do not force the web component into Metro.
 
-**Filled:** dense `DataTable` + `Bleed` / `TABLE_BLEED` across Player, ResultView, Markets, Simple, team/league/ground/fancy; space/type/radius/control via `remPx`. Segmented, FlashList, BlurBar, and the docked `TabBar` stay native-exclusive by design.
+**Filled:** dense `DataTable` + `Bleed` / `TABLE_BLEED` across Player, ResultView, Markets, Simple, team/league/ground/fancy; space/type/radius/control via `remPx`. Segmented, FlashList and BlurBar stay native-exclusive.
 
 ---
 
