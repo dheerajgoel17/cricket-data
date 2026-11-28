@@ -639,3 +639,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 ### 2026-11-28 — Animate the floating dock surface
 - **Path:** Web `IosTabBar` styles and app `TabBar`.
 - **Change:** The capsule visibly shrinks toward its compact position and grows back as one surface. List clearance stays fixed and reduced motion removes the shape animation.
+
+### 2026-11-28 — Toss delay session badge
+- **Path:** `site/packages/engine/live.js` (`sessionLabel`), `site/src/pages/DesignSystem.tsx` (StatusLabel catalogue)
+- **Change:** Source "Toss delay" / "Delayed toss" maps to a distinct session badge (before generic Delayed). Catalogue stage shows Toss delay next to Rain delay. No new `StatusLabel` variant — same `tone="session"`.
+- **Callers:** FixtureCard / match header session badges on web and app; design-host StatusLabel stage.

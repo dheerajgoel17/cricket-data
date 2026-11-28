@@ -296,3 +296,36 @@ The shared feed now checks the status fields for interruptions and carries the s
 For a recurrence, compare the source's home list, schedule and match page with the same fixture in the decoded `/api/live` response. Check `summary`, `session`, `status` and whether the snapshot is stale. If the feed carries the expected interruption, check the web and mobile fixture card and match header. During resumption, verify that a fresh poll clears the badge and restores Live. A healthy endpoint with no interrupted fixture confirms service health only.
 
 When changing live-status parsing, add fixtures with simultaneous chase and interruption messages. Cover an interruption carried by only one listing, a fresh snapshot after play resumes, and a final result after a delay. Run `node --test tests/live.test.mjs tests/feed.test.mjs` from `site/`. The feed-level test follows a priced T20 from the source listings through two successive public snapshots.
+
+## Incident review — pre-toss / toss-delay card dropped from the rail, 28 November 2026
+
+### What users saw
+
+Sydney Thunder Women vs Sydney Sixers Women (WBBL, kickoff `2026-11-28T08:10Z`, Drummoyne) was still priced in the books file. Rain held the toss. The match disappeared from the mobile Home rail (and the same `usePricedFixtures` / `buildRail` path on the site) even though it was the live derby for the evening.
+
+### What actually happened (two bugs stacked)
+
+1. **Feed status vs first ball.** After the rain-delay work (PR #352), a session line with source status `1` could mark the match `live` with no team totals. A **Toss delay** / **Rain delay** while source status was still `0` (toss never started on time) stayed `upcoming`. Toss-complete wording (`won the toss`, `elected to`, `opt to bat/bowl`) with status `1` and toss-time `0/0` also stayed `upcoming` by design — the product waited for a real score or a bare `Live` string before In play.
+
+2. **Rail gate.** Home only allows non-`upcoming` rows when `teamTotalsPresent` is true (holding book lines alone must not invent a live card). As soon as the feed flipped the row to `live` without scores, `fixtureState` left `upcoming` and `showable` dropped the fixture from every Home phase. That is how a priced, delayed match vanished instead of sitting under In play with a session badge.
+
+Silent past-kickoff with source still `Upcoming` and no delay text did not hit the drop path the same way (`upcoming` stays showable) but stayed in Pre-match as Delayed (`playState`) — easy to miss if the viewer was on In play.
+
+### Fix (keep + promote)
+
+| Situation | Rail | Home phase |
+|---|---|---|
+| Past kickoff, source still Upcoming, no delay/toss text | Keep | Pre-match, Delayed |
+| Toss delay / Rain delay / Ground delay / Delayed (any status code) | Keep without totals | In play + session badge |
+| Toss complete or schedule Live, before first real score | Keep without totals | In play |
+| Finished | Needs totals (unchanged) | Completed |
+
+Engine (`site/packages/engine/live.js`): distinct `Toss delay` in `sessionLabel`; any session interruption → `live` even at status `0`; `isTossComplete` + status `1` → `live` without inventing a score. Rail (`usePricedFixtures`, mobile `buildRail`): session badge or live/started inside the keep window → show without totals.
+
+### How to avoid a repeat
+
+- **Never require team totals for a row the feed already calls live/started solely because play has not scored yet.** Totals gate finished (and long-gone garbage) cards; delays and pre-first-ball live are the exception. Change `showable` in web and app together (they are still duplicated until Phase 1).
+- **When adding a session badge path (rain, ground, toss, floodlight), add the status-0 / no-score fixture in the same PR** — both `parseSchedule` / `parseMatchPage` / `buildMatch` and a rail test with empty `display`. PR #352 covered in-play interruptions with scores; it did not cover pre-toss.
+- **Do not wait for the first ball to move a match to In play** once the source reports toss done or a delay status. Silent clock-only delay stays Pre-match Delayed on purpose.
+- **Regression suite:** Toss delay status `0`, rain delay status `0`, toss-won text status `1` with no score, published feed snapshot with no totals, mobile `rail.test` session-without-totals. From `site/`: `node --test tests/live.test.mjs tests/feed.test.mjs`. From `mobile/`: `npx jest src/lib/rail.test.ts`.
+- **Live check:** decode `/api/live` for the pair — `status`, `session`, empty team displays; confirm books still price it; Home In play should show the session badge; Pre-match Delayed only when the source is still silent Upcoming.

@@ -27,15 +27,15 @@ describe("buildRail", () => {
     expect(ids(buildRail({ fixtures, lines: noBooks, live: null, now: NOW }))).toEqual([]);
   });
 
-  test("in play first, then what starts soon, then finished — started/final need scores", () => {
+  test("in play first, then what starts soon, then finished — final still needs scores", () => {
     const r = buildRail({ fixtures, lines: FIXTURE_BOOKS, live: FIXTURE_LIVE, now: NOW });
     expect(ids(r)).toEqual(["pak-sl", "ind-nz", "ire-nam"]);
     expect(r.map((x) => x.state)).toEqual(["live", "upcoming", "final"]);
   });
 
-  test("priced live/final without team totals stay off the rail", () => {
-    // Schedule says Live/Completed but no live/board totals → only upcoming India remains.
-    expect(ids(buildRail({ fixtures, lines: FIXTURE_BOOKS, live: null, now: NOW }))).toEqual(["ind-nz"]);
+  test("priced final without team totals stays off; live inside the keep window stays", () => {
+    // Schedule Live with no totals: still listed (pre-first-ball / delay). Completed with no totals: off.
+    expect(ids(buildRail({ fixtures, lines: FIXTURE_BOOKS, live: null, now: NOW }))).toEqual(["pak-sl", "ind-nz"]);
   });
 
   test("the live feed's word beats the schedule's", () => {
@@ -76,14 +76,33 @@ describe("a started match (begun, no word that play is on)", () => {
     expect(fixtureState(begun, "live", NOW)).toBe("live"); // the live feed's word wins
   });
 
-  test("without scores it stays off; with scores it counts under In play", () => {
+  test("without scores it stays on In play inside the keep window; with scores the live feed word wins", () => {
     const lines = books(["Eagles vs Tuskers", -3], ["India vs New Zealand", 3], ["Pakistan vs Sri Lanka", -1]);
-    expect(ids(buildRail({ fixtures: [begun, ...fixtures], lines, live: null, now: NOW }))).not.toContain("eag-tus");
+    const bare = buildRail({ fixtures: [begun, ...fixtures], lines, live: null, now: NOW });
+    expect(ids(bare)).toContain("eag-tus");
+    expect(bare.find((x) => x.fixture.id === "eag-tus")?.state).toBe("started");
+    // eag-tus started + pak-sl schedule Live (both inside keep window, no totals needed)
+    expect(phaseView(bare).counts.live).toBe(2);
     const live = scored(["Eagles", "Tuskers", -3, "live"], ["Pakistan", "Sri Lanka", -1]);
     const r = buildRail({ fixtures: [begun, ...fixtures], lines, live, now: NOW });
     expect(ids(r)).toContain("eag-tus");
     expect(r.find((x) => x.fixture.id === "eag-tus")?.state).toBe("live"); // live feed word
     expect(phaseView(r).counts.live).toBe(2);
+  });
+
+  test("a session delay without team totals stays on In play", () => {
+    const delayed = fx("syt-sys", "Sydney Thunder Women", "Sydney Sixers Women", -1, { status: "Upcoming" });
+    const lines = books(["Sydney Thunder Women vs Sydney Sixers Women", -1], ["India vs New Zealand", 3]);
+    const live = {
+      matches: [{
+        status: "live", session: "Toss delay", summary: "Toss Delay", start: delayed.start, fmt: "T20",
+        teams: [{ name: "Sydney Thunder Women", display: "" }, { name: "Sydney Sixers Women", display: "" }],
+      }],
+    };
+    const r = buildRail({ fixtures: [delayed, ...fixtures], lines, live, now: NOW });
+    expect(ids(r)).toContain("syt-sys");
+    expect(r.find((x) => x.fixture.id === "syt-sys")?.state).toBe("live");
+    expect(phaseView(r).counts.live).toBeGreaterThanOrEqual(1);
   });
 
   test("it stays on the rail past the twelve-hour window when scores are present", () => {
