@@ -93,5 +93,10 @@
   "edge": 0.0516,
   "start_utc": "2026-11-29T04:30:00Z",
   "alerted_at": "2026-11-28T06:33:35.993353+00:00"
+ },
+ "male|Abu Dhabi Knight Riders|Sharjah Warriorz|2026-11-29|batter_milestone||G Naib 50+ no|49.5|under": {
+  "edge": 0.0626,
+  "start_utc": "2026-11-29T10:00:00Z",
+  "alerted_at": "2026-11-28T07:33:53.209072+00:00"
  }
 }
