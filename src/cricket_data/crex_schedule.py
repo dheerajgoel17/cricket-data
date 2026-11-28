@@ -157,11 +157,11 @@ def row_from_card(c: dict) -> dict | None:
             "team_a": c["teams"][0], "team_b": c["teams"][1], "venue": "", "status": "Upcoming", "result": "", "url": rel(link)}
 
 
-def fetch_schedule_paged(days: int = 10, max_pages: int = 24, now: datetime | None = None) -> list[dict]:
+def fetch_schedule_paged(days: int = 10, max_pages: int = 24, now: datetime | None = None) -> tuple[list[dict], str]:
     """The schedule page's first 20 matches (from its HTML, complete rows) plus the following pages, until the page reaches ``days`` ahead.
 
     Later pages load in the browser when "Next" is pressed, as for any visitor, so the page is opened in Chromium (set to UTC) and each page's cards are read
-    from what it shows. Paging stops at the horizon, at the last page or after ``max_pages``. A later page's row has no venue."""
+    from what it shows. Paging stops at the horizon, at the last page or after ``max_pages``. A later page's row has no venue. Return the last upcoming time read from the schedule pages as well."""
     from datetime import timedelta
 
     from .crex_browser import CREXBrowser
@@ -189,7 +189,7 @@ def fetch_schedule_paged(days: int = 10, max_pages: int = 24, now: datetime | No
         front = parse_schedule(_fetch("/"))
     except Exception:  # noqa: BLE001  the schedule pages are enough if home will not load
         front = []
-    return merge_rows(cards, parse_schedule(html), front)  # home still lists a Test at stumps; first 20 carry the venue
+    return merge_rows(cards, parse_schedule(html), front), min(horizon, max((r["start_utc"] for r in cards), default=""))
 
 
 def fill_venues(rows: list[dict], held: list[dict], fetcher=None, cap: int = 30) -> int:

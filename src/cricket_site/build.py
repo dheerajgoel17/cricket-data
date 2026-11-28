@@ -851,7 +851,7 @@ def build_sitemap(out: Path, A: dict, names: dict[str, str], site_url: str, fixt
     return len(urls)
 
 
-def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | None = None) -> list[dict]:
+def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | None = None, *, coverage: tuple[int, int] | None = None) -> list[dict]:
     """Stop-gap fixture rows for archived matches the schedule has no row for: an upcoming game, or a priced Test still in the 6-day window.
 
     The schedule page drops a Test at stumps; the archive still has the fixture the books priced, so the rail can show it until the next scrape
@@ -868,9 +868,12 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
     now_min = now.timestamp() // 60
     held = [(frozenset((_side(r["a"]), _side(r["b"]))), _minutes(r["start"]), 6 * 24 * 60 if r["fmt"] in ("Test", "FC") else 14 * 60) for r in rows]  # a Test is priced day by day: any day is the same match
     sched = [(r, r["a"], r["b"], _minutes(r["start"]) * 60, r.get("gender") == "female") for r in rows if r["fmt"] not in ("Test", "FC")]  # for a name no side key joins (``find_scheduled``)
+    withdrawn = set(json.loads((UNTRACKED.parent / "withdrawn_fixtures.json").read_text(encoding="utf-8")))
     out = []
     archived_starts: list[tuple[frozenset[str], int, int, str]] = []
     for f in sorted((vb_dir.parent / "archive").glob("*/*.json")):
+        if f.stem in withdrawn:
+            continue
         try:
             d = json.loads(f.read_text(encoding="utf-8"))
             a, b = re.split(r"\s+vs\s+", d["match"], maxsplit=1, flags=re.I)
@@ -887,6 +890,9 @@ def _unscheduled_priced(vb_dir: Path | None, rows: list[dict], now: datetime | N
         women = bool(re.search(r"\(w\)|women", f"{a} {b}", re.I))
         if fmt not in ("Test", "FC") and find_scheduled(a, b, mins * 60, (fx.get("gender") == "female") if fx.get("gender") else women, sched) is not None:
             continue  # the schedule lists this match under the names it uses (the book said "Bangla Tigers v Royal Champs" for United Tigers v Royal Desert Champions): one fixture, not two
+        if coverage and coverage[0] <= mins <= coverage[1] and not (fx.get("result") or "").strip():
+            if fmt not in ("Test", "FC") or not fx or mins > now_min:
+                continue  # the checked schedule covers this start; preserve a previously linked multi-day match
         keep_min = 6 * 24 * 60 if fmt in ("Test", "FC") else 24 * 60
         if mins > now_min:
             if fx:
@@ -978,7 +984,13 @@ def build_fixtures(data_dir: Path, vb_dir: Path | None, team_ix: dict, now: date
                              "status": r.get("status", ""), "result": r.get("result", ""), "source": "src"})
     _name_series(rows)
     now = now or datetime.now(timezone.utc)
-    rows += _unscheduled_priced(vb_dir, rows, now)
+    coverage = None
+    try:
+        since, through = p.with_name("coverage.txt").read_text(encoding="utf-8").split()
+        coverage = (_minutes(since), _minutes(through))
+    except (OSError, ValueError):
+        pass
+    rows += _unscheduled_priced(vb_dir, rows, now, coverage=coverage)
     rows = _drop_ended_tests(rows, vb_dir, now)
     skip_fmt, skip_series = _untracked()
     rows = [r for r in rows if r["fmt"] not in skip_fmt and not any(x in (r.get("series") or "").lower() for x in skip_series)]

@@ -276,3 +276,13 @@ The Android app ships its JavaScript through `expo-updates` (the maintained succ
   5. Set the app's settings as repository variables / secret too, because an update carries them inlined: variables `EXPO_PUBLIC_SITE_URL`, `EXPO_PUBLIC_IMG_CDN`, `EXPO_PUBLIC_SUPABASE_URL`, secret `EXPO_PUBLIC_SUPABASE_ANON_KEY` (same values as `mobile/.env.local`). The workflow refuses to publish without them.
   6. Build the APK once with `EXPO_UPDATES_URL` set (an APK built before this cannot receive updates), then publish JavaScript-only changes from Actions → "Mobile OTA update".
   Check the free plan's monthly update allowance on expo.dev/pricing.
+
+## Incident review — phantom Sri Lanka Women vs Pakistan Women fixture, 28 November 2026
+
+The tournament’s Sri Lanka–Pakistan match took place on 23 November and the final took place on 25 November. The odds archive held a separate entry for 28 November at 10:30 IST with no schedule link or result. The fixture builder used that archived entry to fill a gap in the schedule, so the wrong card could show before its listed start and remain as Started afterward.
+
+A successful paged refresh now records its checked interval in `data/fixtures/coverage.txt`. Within that interval, a match missing from the schedule needs a recorded result or a previous schedule link for a Test or first-class match already underway to appear via the archive fallback. The first-page fallback and failed refreshes leave the last checked interval in place. At the scraper, an expired Upcoming row that disappeared without a result is dropped instead of being promoted at its nominal start.
+
+For a confirmed bad odds listing, add the exact archive filename stem to `config/withdrawn_fixtures.json` and include the evidence in the PR. The 28 November entry is included so the fix works on the first rebuild, before the next paged refresh. Keep the archive file for historical access. If the source itself still lists the match, verify the official schedule and check the fresh scrape separately.
+
+After deployment, check that the protected fixture feed omits the withdrawn date and pair, that the genuine historical match still resolves, and that the next successful paged scrape advances `coverage.txt`. For a repeat incident, check the official fixture date, the current schedule CSV and its coverage interval, and the archive entry’s start, schedule link and result before deciding which input to correct.
