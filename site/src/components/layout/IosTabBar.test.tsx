@@ -29,7 +29,7 @@ it("switches one tab per horizontal swipe and ignores vertical and edge swipes",
     touch(bar, "pointerdown", 100, 20);
     touch(bar, "pointerup", 50, 20);
     expect(screen.getByRole("status")).toHaveTextContent(/^\/props$/);
-    fireEvent.click(screen.getByText("Fixtures"), { detail: 1 });
+    fireEvent.click(bar.querySelector("ion-tab-button")!, { detail: 1 });
     expect(screen.getByRole("status")).toHaveTextContent(/^\/props$/);
 
     touch(bar, "pointerdown", 50, 20);
