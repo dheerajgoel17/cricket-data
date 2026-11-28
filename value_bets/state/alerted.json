@@ -1,38 +1,8 @@
 {
- "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-28|batter_runs||P Litchfield under 25.5|25.5|under": {
-  "edge": 0.0509,
-  "start_utc": "2026-11-28T08:10:00Z",
-  "alerted_at": "2026-11-27T03:10:39.317734+00:00"
- },
  "male|Australia|England|2026-11-29|batter_milestone||Aneurin Donald 50+ yes|49.5|over": {
   "edge": 0.1705,
   "start_utc": "2026-11-29T08:15:00Z",
   "alerted_at": "2026-11-27T13:32:50.013358+00:00"
- },
- "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-28|batter_fours||Tahlia Wilson under 1.5|1.5|under": {
-  "edge": 0.0782,
-  "start_utc": "2026-11-28T08:10:00Z",
-  "alerted_at": "2026-11-27T18:34:48.018255+00:00"
- },
- "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-28|batter_fours||Anika Learoyd under 1.5|1.5|under": {
-  "edge": 0.0591,
-  "start_utc": "2026-11-28T08:10:00Z",
-  "alerted_at": "2026-11-27T18:34:48.018255+00:00"
- },
- "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-28|batter_sixes||AK Gardner under 0.5|0.5|under": {
-  "edge": 0.2292,
-  "start_utc": "2026-11-28T08:10:00Z",
-  "alerted_at": "2026-11-27T19:33:44.357549+00:00"
- },
- "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-28|batter_runs||Ellyse Perry under 28.5|28.5|under": {
-  "edge": 0.0574,
-  "start_utc": "2026-11-28T08:10:00Z",
-  "alerted_at": "2026-11-27T20:34:55.246828+00:00"
- },
- "female|Sydney Sixers Women|Sydney Thunder Women|2026-11-28|batter_sixes||Ashleigh Gardner under 0.5|0.5|under": {
-  "edge": 0.1742,
-  "start_utc": "2026-11-28T08:10:00Z",
-  "alerted_at": "2026-11-27T21:34:23.019676+00:00"
  },
  "male|Australia|England|2026-11-29|batter_sixes||Aneurin Donald under 0.5|0.5|under": {
   "edge": 0.0958,
@@ -98,5 +68,10 @@
   "edge": 0.0626,
   "start_utc": "2026-11-29T10:00:00Z",
   "alerted_at": "2026-11-28T07:33:53.209072+00:00"
+ },
+ "male|Australia|England|2026-11-29|batter_fours||Nikhil Chaudhary under 1.5|1.5|under": {
+  "edge": 0.0706,
+  "start_utc": "2026-11-29T08:15:00Z",
+  "alerted_at": "2026-11-28T08:33:12.754749+00:00"
  }
 }
