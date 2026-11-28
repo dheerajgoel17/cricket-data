@@ -219,3 +219,38 @@ test("a live page that is slow or fails keeps its last good read, marked stale, 
   assert.equal(second.matches.find((m) => m.id === "M0").stale, undefined, "the others are fresh");
   assert.equal(second.reads.timedOut, 1);
 });
+
+test("the published T20 feed shows a ground delay and clears it when play resumes", async () => {
+  let t = Date.parse(START);
+  let delayed = true;
+  const list = (comment1) => pageHtml({ [FIXTURE]: [{
+    team1: "Side A", team2: "Side B", fo: "T20", mf: "T20-1", link: "/match/t20",
+    t: Date.parse(START), s1: "120-5", status: 1, statusText: "Live", comment1,
+  }] });
+  const feed = createFeed({
+    now: () => t, base: () => "https://src.test", cardBudgetMs: Infinity,
+    getJson: async () => ({ lines: [{ match: "Side A vs Side B", start_utc: START, fmt: "T20" }] }),
+    getText: async () => "", loadIdentity: async () => NO_IDENTITY,
+    getHtml: async (url) => {
+      if (url.endsWith("/schedule")) return list("");
+      if (url.endsWith("/")) return list(delayed ? "Ground delay" : "");
+      if (url.endsWith("/match/t20")) return pageHtml({ [LIVE]: {
+        team1_f_n: "Side A", team2_f_n: "Side B", score1: "120-5", score2: "101-4",
+        status: 1, comment1: "Side B need 20 runs",
+      } });
+      return "";
+    },
+  });
+
+  const [paused] = (await feed.snapshot()).matches;
+  assert.equal(paused.status, "live");
+  assert.equal(paused.session, "Ground delay");
+  assert.equal(paused.summary, "Ground delay");
+  assert.equal(paused.teams[1].runs, 101);
+  delayed = false;
+  t += 20_000;
+  const [resumed] = (await feed.snapshot()).matches;
+  assert.equal(resumed.status, "live");
+  assert.equal(resumed.session, "");
+  assert.equal(resumed.summary, "Side B need 20 runs");
+});

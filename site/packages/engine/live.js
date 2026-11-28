@@ -514,7 +514,11 @@ export function mergeSchedule(a, b) {
     if (!k) { out.push(m); continue; }
     const i = ix.get(k);
     if (i == null) { ix.set(k, out.length); out.push(m); continue; }
-    if (score(m) >= score(out[i])) out[i] = m;
+    const prev = out[i];
+    const [best, other] = score(m) >= score(prev) ? [m, prev] : [prev, m];
+    out[i] = best.status === "live" && other.status === "live" && !best.session && other.session
+      ? { ...best, summary: other.summary, session: other.session }
+      : best;
   }
   return out;
 }
