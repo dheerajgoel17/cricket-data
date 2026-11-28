@@ -162,3 +162,42 @@ def test_a_picture_stored_for_many_players_is_the_sources_stock_avatar():
     ids = s.placeholder_ids(BASE, "anon-key", _paged({"assets": rows}))
     assert ids == {f"S{i}" for i in range(s.PLACEHOLDER_COPIES)}, "two copies are a namesake photo, not the stock avatar; a real photo is stored once"
     assert s.placeholder_ids(BASE, "anon-key", _paged({"assets": []})) == set()
+
+
+def test_refresh_stock_replaces_only_checked_copies_that_now_have_a_photo(monkeypatch):
+    monkeypatch.setenv("IMG_CDN_BASE", "https://images.example")
+    placeholder = b"stock" * 100
+    portrait = b"portrait" * 100
+    db = FakeDB()
+    db.assets = [
+        {"ref": f"S{i}", "sha256": s.hashlib.sha256(placeholder).hexdigest()}
+        for i in range(s.PLACEHOLDER_COPIES)
+    ]
+    fetch = fake_fetch({
+        "https://images.example/players/org/S0.png": portrait,
+        "https://images.example/players/org/S1.png": placeholder,
+        "https://images.example/players/org/R1.png": portrait,
+    })
+
+    assert s.refresh_stock(BASE, "service-key", ["S0", "S0", "S1", "S2", "R1"], http=db, fetch=fetch) == 1
+    assert db.objects == {"players/S0.png": (portrait, "image/webp")}
+    assert [row["ref"] for row in db.tables["assets"]] == ["S0"]
+
+
+def test_sync_keeps_identity_but_omits_newly_copied_stock_avatar(tmp_path, monkeypatch):
+    monkeypatch.setenv("IMG_CDN_BASE", "https://images.example")
+    photos = write_photos(tmp_path)
+    db = FakeDB()
+    placeholder = b"stock" * 100
+    db.assets = [
+        {"kind": "player", "ref": f"S{i}", "sha256": s.hashlib.sha256(placeholder).hexdigest()}
+        for i in range(s.PLACEHOLDER_COPIES)
+    ]
+    fetch = fake_fetch({"https://images.example/players/org/AAA.png": placeholder})
+    index = tmp_path / "index.json"
+    index.write_text(json.dumps({"players": [["AAA", "checked player", "1"]]}))
+
+    s.sync(photos, str(index), BASE, "service-key", pause=0, http=db, fetch=fetch)
+
+    assert json.loads(open(photos).read())["p"] == {"2": "c:BBB", "3": "w:Some.jpg"}
+    assert db.tables["crex_players"] == [{"crex_id": "AAA", "name": "checked player", "cricsheet_id": "1"}]

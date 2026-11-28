@@ -97,6 +97,13 @@ jobs:
         run: |
           python scripts/download_base_archive.py .sitecache/all_json.zip
           curl -fsSL --retry 3 -o .sitecache/people.csv "$BASE_DATA_URL/register/people.csv" || echo "::warning::people.csv unavailable, so no player photos"
+      - name: Refresh verified player portraits stored as stock avatars
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: python -m cricket_site.assets_sync --refresh-stock data/mappings/player_photo_refresh.txt
       - name: Build site data
         env:
           SUPABASE_URL: ${{ vars.SUPABASE_URL }}  # public read of our own copy of the source's player list and picture hashes (no key that can write)
