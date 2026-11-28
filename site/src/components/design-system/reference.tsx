@@ -151,7 +151,7 @@ export function DesignReference({ section }: { section?: string } = {}) {
         ["Section selection", "PillTabs", "Segmented", "Selection and typography"],
         ["Data table", "DataTable", "DataTable", "Alignment, spacing, bleed"],
         ["Loading", "Skeletons", "Working and skeletons", "Shape and reduced motion"],
-        ["Navigation", "Shell and IosTabBar", "Docked TabBar (never floating, no glass)", "Destinations and semantic color"],
+        ["Navigation", "Shell and IosTabBar", "Docked TabBar", "Centered tabs, active color, and touch swipes"],
         ["Actions", "Button", "Press-based controls", "Accessible labels and feedback"],
       ]} />
     </section>}

@@ -146,6 +146,8 @@ Reuse → extend → create (and create a native twin when web cannot run on RN)
 | Skeletons | `skeletons.tsx` | Route-shaped loading |
 | Sheets / drawers | shadcn `Sheet` | Filters, game detail — not primary navigation |
 | Tab bar / sidebar | `IosTabBar`, desktop source list | Shell chrome |
+
+On mobile web and in the app, the tabs form a centered group with equal space at each side when the dock is wider than the group. Tap a destination or swipe horizontally across the dock to move one tab. Desktop web uses the sidebar.
 | Star / save | `star.tsx` (Heroicons) | Saved props / players / teams |
 | Ads | `AdSlot` | Catalogue cleared; remount when remapped; empty = no layout |
 

@@ -625,3 +625,8 @@ Agents and humans: add an entry in the same PR as the change (see `.cursor/rules
 - **Path:** `site/src/components/app/live-spot.tsx` (`LineMove`), `site/src/components/app/line-moves.tsx` (`LineMovesStrip`), `hot-props.tsx` (`PropLineIdentity`), `fancy-lines.tsx`, `home-mix-table.tsx`, `site/src/pages/Fixtures.tsx`, `site/src/pages/DesignSystem.tsx`
 - **Change:** when a book moves a pre-match line (fours 16.5 to 17.5) the row carries an amber arrow chip "was 16.5" beside the name, in the slot the In play line badge uses (never both: in-play wins). The match page shows a scrolling strip of one chip per moved market above its tabs. Amber like the session marks; no new `Badge` variant. The match card is not changed.
 - **Callers:** Props and Hot props rows, Match Fancy rows (scored and dense), Home mix, the match page
+
+### 2026-11-28 — Centered bottom tabs
+- **Path:** `IosTabBar`, mobile `TabBar`, and the Navigation design reference.
+- **Change:** Center the destinations in the dock and support horizontal swipes to adjacent tabs.
+- **Callers:** Mobile web and its design-host preview, iOS, Android, and the Expo browser preview.

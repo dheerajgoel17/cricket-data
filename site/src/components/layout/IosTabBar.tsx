@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type PointerEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { initialize } from "@ionic/core/components";
 import { defineCustomElement as defineLabel } from "@ionic/core/components/ion-label.js";
@@ -28,6 +28,30 @@ export function IosTabBar() {
   // Catalogue host is not a product route — never light a tab as selected (clicks still goProduct).
   const current = isDesignHost() ? "" : (TAB_NAV.find((t) => t.match(pathname))?.to ?? "");
   const dock = useRef<HTMLDivElement>(null);
+  const touchStart = useRef<{ id: number; x: number; y: number } | null>(null);
+  const suppressClick = useRef(false);
+  const open = (to: string) => isDesignHost() ? goProduct(to) : nav(to);
+
+  function startSwipe(event: PointerEvent) {
+    if (!event.isPrimary) return;
+    suppressClick.current = false;
+    if (event.pointerType !== "touch") return;
+    touchStart.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+  }
+
+  function finishSwipe(event: PointerEvent) {
+    const start = touchStart.current;
+    if (start?.id !== event.pointerId) return;
+    touchStart.current = null;
+    const dx = event.clientX - start.x;
+    const dy = event.clientY - start.y;
+    if (Math.abs(dx) < 36 || Math.abs(dx) <= Math.abs(dy)) return;
+    suppressClick.current = true;
+    const index = TAB_NAV.findIndex(({ to }) => to === current);
+    const next = index >= 0 ? TAB_NAV[index + (dx < 0 ? 1 : -1)] : undefined;
+    if (next) open(next.to);
+  }
+
   useEffect(() => {
     const el = dock.current;
     if (!el) return;
@@ -39,11 +63,18 @@ export function IosTabBar() {
   }, [pathname]);
   return (
     <div ref={dock} className="fixed inset-x-0 bottom-0 z-60 lg:hidden">
-      <ion-tab-bar translucent selected-tab={current} aria-label="Sections">
+      <ion-tab-bar className="phone-tab-bar" translucent selected-tab={current} aria-label="Sections"
+        onPointerDown={startSwipe} onPointerUp={finishSwipe} onPointerCancel={() => { touchStart.current = null; }}
+        onClickCapture={(event) => {
+          if (!suppressClick.current || event.detail === 0) return;
+          suppressClick.current = false;
+          event.preventDefault();
+          event.stopPropagation();
+        }}>
         {TAB_NAV.map(({ to, label }) => {
           const on = to === current, [outline, filled] = ICON[to] ?? ICON["/"];
           return (
-            <ion-tab-button key={to} tab={to} selected={on} aria-current={on ? "page" : undefined} onClick={() => (isDesignHost() ? goProduct(to) : nav(to))}>
+            <ion-tab-button key={to} tab={to} selected={on} aria-current={on ? "page" : undefined} onClick={() => open(to)}>
               <ion-icon icon={on ? filled : outline} aria-hidden="true" />
               <ion-label>{label}</ion-label>
             </ion-tab-button>

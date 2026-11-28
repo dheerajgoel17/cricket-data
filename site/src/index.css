@@ -193,6 +193,18 @@ ion-tab-bar {
   font-family: var(--font-sans);
 }
 
+.phone-tab-bar {
+  justify-content: center;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
+}
+
+.phone-tab-bar ion-tab-button {
+  flex: 0 1 80px;
+  min-width: 0;
+  touch-action: pan-y pinch-zoom;
+}
+
 /* Unlayered so it beats Ionic's `body { background: var(--ion-background-color) }` (core.css is imported above; @layer base would lose). */
 html, body, #root {
   background-color: var(--background);
