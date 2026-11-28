@@ -237,3 +237,13 @@ def test_a_test_relisted_on_a_later_morning_joins_its_schedule_fixture():
     assert fixture_for_cluster(before, fixtures, tres) is None
     odi = [{**fixtures[0], "format": "ODI"}]
     assert fixture_for_cluster(day2, odi, tres) is None  # only a multi-day match is restamped day by day
+
+
+def test_team_specific_alias_keeps_yasir_ali_namesakes_separate():
+    resolver = PlayerResolver({
+        "Bangladesh": [("Yasir Ali Chowdhury", "5791b840", "2026-11-27", 30)],
+        "Spain": [("Yasir Ali", "79209272", "2026-11-27", 30)],
+    })
+    bangladesh = resolver.resolve("Yasir Ali", ["Bangladesh A", "Pakistan A"])
+    assert (bangladesh["player_id"], bangladesh["team"]) == ("5791b840", "Bangladesh A")
+    assert resolver.resolve("Yasir Ali", ["Spain"])["player_id"] == "79209272"
