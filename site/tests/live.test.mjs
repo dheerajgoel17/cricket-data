@@ -1161,6 +1161,35 @@ test("a Test at close of play stays live with its scores and the session line, n
   assert.equal(merged[0].session, "Stumps");
 });
 
+test("T20 interruptions take precedence over normal score summaries", () => {
+  const [row] = parseSchedule(pageHtml({ [FIXTURE]: [{
+    team1: "Side A", team2: "Side B", fo: "T20", s1: "120-5", status: 1,
+    statusText: "Live", comment1: "Ground delay",
+  }] }));
+  assert.equal(row.session, "Ground delay");
+  const live = (B) => parseMatchPage(pageHtml({ [LIVE]: {
+    team1_f_n: "Side A", team2_f_n: "Side B", score1: "120-5",
+    status: 1, comment1: "Side B need 20 runs", B,
+  } }));
+  for (const [message, badge] of [
+    ["Play delayed due to rain", "Rain delay"],
+    ["Ground delay", "Ground delay"],
+    ["Start delayed due to floodlight failure", "Delayed"],
+  ]) {
+    const built = buildMatch(row, live(message), null);
+    assert.equal(built.status, "live");
+    assert.equal(built.session, badge);
+    assert.equal(liveBlurb(built), message);
+  }
+  assert.equal(liveBlurb(buildMatch(row, live("Live"), null)), "Ground delay");
+  assert.equal(liveBlurb({ status: "live", summary: "Side B need 20 runs", session: "Delayed" }), "Delayed");
+  const finished = buildMatch(row, live("Side B won by 4 wickets"), null);
+  assert.equal(finished.status, "final");
+  assert.equal(finished.session, "");
+  assert.equal(liveBlurb(finished), "Side B won by 4 wickets");
+  assert.equal(buildMatch(row, live("Match abandoned due to rain"), null).status, "final");
+});
+
 test("unlistedRows keeps a Test through the day break, and pricedLive matches a later day's book start", () => {
   const csv = ["start_utc,match_id,series,format,gender,team_a,team_b,venue,status,url,result",
     '2026-10-27T08:30Z,aus-vs-sa-3rd-test,Australia tour of South Africa 2026,Test,male,South Africa,Australia,"Newlands, Cape Town",Completed,/cricket-live-score/aus-vs-sa-3rd-test,'].join("\n");

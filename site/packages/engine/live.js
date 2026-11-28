@@ -41,7 +41,9 @@ export function sessionLabel(s) {
   if (/\brain\b|wet outfield/i.test(t)) return "Rain delay";
   if (/bad light/i.test(t)) return "Bad light";
   if (/bad weather/i.test(t)) return "Weather";
+  if (/\bground\b.*\bdelay(?:ed)?\b|\bdelay(?:ed)?\b.*\bground\b/i.test(t)) return "Ground delay";
   if (/\bpaused\b|match delayed|play (?:stopped|suspended)/i.test(t)) return "Paused";
+  if (/\bdelay(?:ed)?\b|\b(?:play|match) (?:interrupted|halted|on hold)\b/i.test(t)) return "Delayed";
   return "";
 }
 
@@ -102,6 +104,7 @@ export function isSessionLine(s) {
 /** A real result, not lunch / stumps / a rain delay. */
 export function isResultLine(s) {
   const t = String(s || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+  if (/\b(?:abandoned|no result)\b/.test(t)) return true;
   if (!t || isSessionLine(t)) return false;
   return /\bwon by\b|\bmatch (drawn|tied|abandoned)\b|\bdrawn\b|\bno result\b|\babandoned\b|\btied\b/.test(t);
 }
@@ -471,11 +474,11 @@ export function parseSchedule(html, base = "") {
     const t1 = sideScore(row, 1), t2 = sideScore(row, 2);
     const scored = !!t1.display || !!t2.display;
     const fmt = formatOf(row.fo || row.formats);
-    const summary = row.result || row.statusText || row.comment1 || "";
+    const summary = row.result || [row.statusText, row.comment1].find(isSessionLine) || row.statusText || row.comment1 || "";
     const winner = [row.winningTeam, row.w].some((x) => x != null && x !== "" && x !== -1 && x !== "-1");
     const session = isSessionLine(summary);
     // a finished match: a result line, a winner, or status 2 — except a Test at close of play, or any format on a session break (stumps / rain / paused)
-    const done = !!row.result || winner || isResultLine(summary) || (row.status === 2 && !session && fmt !== "Test");
+    const done = (!!row.result && !session) || winner || isResultLine(summary) || (row.status === 2 && !session && fmt !== "Test");
     // `bf` is the side that batted first; once both have a score the other one is in.
     const first = String(row.bf || "") === String(row.t1f || row.team1fkey || "") ? 0 : 1;
     const bat = t1.display && t2.display ? 1 - first : t1.display ? 0 : t2.display ? 1 : -1;
@@ -484,7 +487,7 @@ export function parseSchedule(html, base = "") {
     return [{
       id: String(row.mf || row.matchFkey || row.id || ""),
       // the schedule's own bare "Live" is play on, even before the first score shows: otherwise the row ranks as upcoming and a busy day's card cap never reads its page
-      status: done ? "final" : scored || /^live$/i.test(summary.trim()) ? "live" : "upcoming",
+      status: done ? "final" : scored || (session && Number(row.status) === 1) || /^live$/i.test(summary.trim()) ? "live" : "upcoming",
       fmt,
       start: row.t ? new Date(row.t).toISOString() : "",
       summary: blurb,
@@ -496,7 +499,7 @@ export function parseSchedule(html, base = "") {
       ],
       innings: [],
       players: [],
-      session: sessionLabel(blurb),
+      session: done ? "" : sessionLabel(blurb),
     }];
   });
 }
@@ -557,16 +560,17 @@ export function parseMatchPage(html) {
   const text = (x) => String(x || "").replace(/<[^>]*>/g, "").replace(/[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/gu, "").replace(/\s+/g, " ").trim();
   // `status` is the schedule's own code (0 not started, 1 in play, 2 finished); `B` is the line the page shows under the score ("Sri Lanka won by 8 wickets")
   // status 2 at stumps / lunch is a session break, not the end of a Test — buildMatch then keeps it live when the row is a Test with no result
-  const blurb = text(sv.comment1) || text(sv.B);
-  const session = isSessionLine(blurb);
-  const done = isResultLine(text(sv.B) || blurb) || (Number(sv.status) === 2 && !session);
+  const comment = text(sv.comment1), statusText = text(sv.B);
+  const result = [statusText, comment].find(isResultLine);
+  const interruption = [comment, statusText].find(isSessionLine);
+  const done = !!result || (Number(sv.status) === 2 && !interruption);
   return {
     id: String(sv.mf || ""),
-    status: done ? "final" : t1.display || t2.display ? "live" : "upcoming",
+    status: done ? "final" : t1.display || t2.display || (interruption && Number(sv.status) === 1) ? "live" : "upcoming",
     start: "",
-    summary: text(sv.comment1) || ((done || session) ? text(sv.B) : ""),
+    summary: result || interruption || comment || (done ? statusText : ""),
     note: "",
-    session: sessionLabel(blurb) || sessionLabel(sv.B),
+    session: done ? "" : sessionLabel(interruption),
     url: "",
     teams: [
       { name: aName, abbr: sv.team1short || sv.team1 || "", batting: batIsA, ...t1 },
@@ -785,13 +789,14 @@ export function buildMatch(row, live, card, prior = null) {
   const scored = lined.some((t) => t.display);
   const session = isSessionLine(live?.summary) || isSessionLine(row.summary);
   const over = isResultLine(live?.summary) || isResultLine(row.summary) || ((row.status === "final" || live?.status === "final") && row.fmt !== "Test" && !session);
-  const status = over ? "final" : scored ? "live" : "upcoming";
+  const status = over ? "final" : scored || (session && (live?.status === "live" || row.status === "live")) ? "live" : "upcoming";
   const rawLive = String(live?.summary || "").trim();
   const rawRow = String(row.summary || "").trim();
-  const raw = rawLive && !/^live$/i.test(rawLive) ? rawLive : rawRow;
+  const raw = (over ? [rawLive, rawRow].find(isResultLine) : [rawLive, rawRow].find(isSessionLine))
+    || (rawLive && !/^live$/i.test(rawLive) ? rawLive : rawRow);
   const summary = raw && !/^live$/i.test(raw) ? raw
     : (status === "live" && row.fmt === "Test" && (live?.status === "final" || row.status === "final") ? "Close of play" : raw);
-  const badge = sessionLabel(rawLive) || sessionLabel(rawRow) || (status === "live" && row.fmt === "Test" && (live?.status === "final" || row.status === "final" || /close of play/i.test(summary)) ? "Stumps" : "");
+  const badge = over ? "" : sessionLabel(summary) || (status === "live" && row.fmt === "Test" && (live?.status === "final" || row.status === "final" || /close of play/i.test(summary)) ? "Stumps" : "");
   const freshOvers = live?.overs || [];
   const overs = oversTapeReset(prior, lined) ? freshOvers : mergeOversTape(prior?.overs, freshOvers);
   return {
@@ -878,7 +883,12 @@ export function scoreLabel(s) {
 
 /** The status line Source A gives: "IND need 179 runs in 115 balls", "OMA opt to Bowl", "Stumps - Day 3". Bare "Live" says nothing the badge doesn't. */
 export function liveBlurb(match) {
-  for (const x of [match?.summary, match?.note]) {
+  const blurbs = [match?.summary, match?.note];
+  if (match?.status !== "final") {
+    const session = blurbs.find(isSessionLine) || match?.session;
+    if (session) return session;
+  }
+  for (const x of blurbs) {
     const t = String(x || "").trim();
     if (t && !/^live$/i.test(t)) return t;
   }
