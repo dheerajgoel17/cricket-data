@@ -1,20 +1,20 @@
-# Cricket value bets - 2026-11-28 17:00 IST
+# Cricket value bets - 2026-11-28 18:00 IST
 
 Decimal odds. Edge = fair probability x odds (after exchange commission) - 1. Stake = quarter-Kelly % of bankroll (capped). Not betting advice; models are rough.
 
 ## Sources
-- **moviodds_bet365**: ok, 1529 prices
-- **smarkets**: ok, 546 prices
+- **moviodds_bet365**: ok, 1572 prices
 - **feedg**: error - HTTPError: HTTP Error 402: {"error": {"code": "402", "message": "Payment required"}}
-- **feedl**: ok, 504 prices, 16 events
-- **feedk**: ok, 156 prices, 5 events
-- **feede**: ok, 422 prices, 12 events
+- **smarkets**: ok, 570 prices
+- **feedl**: ok, 506 prices, 15 events
+- **feedk**: ok, 188 prices, 6 events
+- **feede**: ok, 414 prices, 12 events
 - **feedf**: ok, 354 prices, 7 events
-- **feedj**: ok, 703 prices, 10 events
-- **feedh**: ok, 1472 prices, 52 events
-- **feedi**: ok, 1829 prices, 51 events
+- **feedj**: ok, 707 prices, 9 events
+- **feedh**: ok, 1464 prices, 53 events
+- **feedi**: ok, 1716 prices, 50 events
 
-Matches starting in next 168h: **30**, markets priced: **489**, value bets: **7** (new alerts: 0). Min edge 5%.
+Matches starting in next 168h: **30**, markets priced: **481**, value bets: **7** (new alerts: 0). Min edge 5%.
 
 | Start (IST) | Match | Market | Selection | Odds @ source | Fair | Model p | Edge | Stake | Conf |
 |---|---|---|---|---|---|---|---|---|---|
@@ -38,7 +38,9 @@ Matches starting in next 168h: **30**, markets priced: **489**, value bets: **7*
 ### Suspect edges (> 30%, NOT alerted - likely a pricing/mapping error)
 - 11-29 10:00 IST Adelaide Strikers (W) vs Hobart Hurricanes (W) / Batsman Total Match Sixes / ME Bouchier over 0.5 @ 6.00 (moviodds_bet365): edge 46.0%, model 0.3001, market 0.197
 - 11-29 10:00 IST Adelaide Strikers (Women) vs Hobart Hurricanes (Women) / G9181 batter_sixes / Maia Bouchier over 0.5 @ 6.00 (feedi_d): edge 46.0%, model 0.3001, market 0.197
+- 11-29 15:30 IST Abu Dhabi Knight Riders vs Sharjah Warriorz / To score 50 - Alishan Sharafu / Alishan Sharafu 50+ yes @ 7.60 (feedi_d): edge 53.1%, model 0.1603, market 0.235
+- 11-29 15:30 IST Abu Dhabi Knight Riders vs Sharjah Warriorz / To score at least 50 Runs / James Rew 50+ yes @ 8.00 (feedk_leoal): edge 36.9%, model 0.1396, market 0.1969
 
-Unmatched team names (add to mappings/teams.csv): Central Hinds (W) (female), Central Hinds (Women) (female), Central Hinds (female), Central Hinds (male), Dolphins (W) (female), Garden Route Badgers (W) (female), Lions (W) (female), Roma Gladiatori (male), Titans (W) (female)
+Unmatched team names (add to mappings/teams.csv): Central Hinds (W) (female), Central Hinds (Women) (female), Central Hinds (female), Central Hinds (male), Dolphins (W) (female), Elite Cricket Academy (male), Garden Route Badgers (W) (female), Lions (W) (female), Sunny 11 Pratishtan (male), Titans (W) (female)
 
-Runtime 223.2s. Snapshot: `odds_20261128T113032Z.jsonl.gz`
+Runtime 216.3s. Snapshot: `odds_20261128T123032Z.jsonl.gz`

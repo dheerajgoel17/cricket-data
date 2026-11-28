@@ -1,72 +1,72 @@
 {
- "generated_at_utc": "2026-11-28T11:30:32Z",
- "generated_at_ist": "2026-11-28 17:00 IST",
- "runtime_secs": 223.2,
+ "generated_at_utc": "2026-11-28T12:30:32Z",
+ "generated_at_ist": "2026-11-28 18:00 IST",
+ "runtime_secs": 216.3,
  "data": {
   "status": "refresh disabled (running against a local cricket-data checkout)",
   "history_last_match": "2026-11-28",
-  "commit": "ea2fe631cc"
+  "commit": "e7974d14d6"
  },
  "sources": {
   "moviodds_bet365": {
    "status": "ok",
-   "rows": 1529,
-   "secs": 0.5
-  },
-  "smarkets": {
-   "status": "ok",
-   "rows": 546,
-   "secs": 1.7
+   "rows": 1572,
+   "secs": 0.8
   },
   "feedg": {
    "status": "error",
    "reason": "HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}",
-   "secs": 1.7
+   "secs": 1.8
+  },
+  "smarkets": {
+   "status": "ok",
+   "rows": 570,
+   "secs": 3.0
   },
   "feedl": {
    "status": "ok",
-   "rows": 504,
-   "secs": 10.1,
-   "events": 16
+   "rows": 506,
+   "secs": 10.0,
+   "events": 15
   },
   "feedk": {
    "status": "ok",
-   "rows": 156,
-   "secs": 13.8,
-   "events": 5
+   "rows": 188,
+   "secs": 15.6,
+   "events": 6
   },
   "feede": {
    "status": "ok",
-   "rows": 422,
-   "secs": 32.4,
+   "rows": 414,
+   "secs": 33.0,
    "events": 12
   },
   "feedf": {
    "status": "ok",
    "rows": 354,
-   "secs": 40.2,
+   "secs": 43.5,
    "events": 7
   },
   "feedj": {
    "status": "ok",
-   "rows": 703,
-   "secs": 73.3,
-   "events": 10
+   "rows": 707,
+   "secs": 76.0,
+   "events": 9
   },
   "feedh": {
    "status": "ok",
-   "rows": 1472,
-   "secs": 88.5,
-   "events": 52
+   "rows": 1464,
+   "secs": 85.2,
+   "events": 53
   },
   "feedi": {
    "status": "ok",
-   "rows": 1829,
-   "secs": 146.4,
-   "events": 51
+   "rows": 1716,
+   "secs": 141.2,
+   "events": 50
   }
  },
- "snapshot": "odds_20261128T113032Z.jsonl.gz",
+ "snapshot": "odds_20261128T123032Z.jsonl.gz",
  "settings": {
   "MIN_EDGE": 0.05,
   "WINDOW_HOURS": 168.0,
@@ -149,83 +149,83 @@
  },
  "stats": {
   "events_in_window": 30,
-  "rows_in_window": 7410,
-  "selections_with_model": 3091,
-  "selections_with_market_fair": 3620,
-  "markets_in_window": 489,
+  "rows_in_window": 7382,
+  "selections_with_model": 3107,
+  "selections_with_market_fair": 3617,
+  "markets_in_window": 481,
   "value_bets": 7,
   "dropped_by_filter": {
-   "model_market_gap": 1784,
-   "odds_range": 142,
-   "market_disabled": 5,
-   "policy_min_edge": 4,
-   "model_disagrees": 3,
+   "model_market_gap": 1823,
+   "odds_range": 140,
+   "market_disabled": 3,
+   "policy_min_edge": 3,
+   "model_disagrees": 4,
    "policy_max_odds": 7,
-   "rarely_selected": 1,
+   "rarely_selected": 2,
    "model_only_no_market": 138,
    "top_wide_book": 1,
-   "suspect_edge": 2,
-   "loose_name_match": 2,
+   "suspect_edge": 4,
+   "loose_name_match": 3,
    "small_sample": 2
   },
-  "suspect_edges": 2,
-  "innings_milestones_unmodelled": 96,
+  "suspect_edges": 4,
+  "innings_milestones_unmodelled": 80,
   "model_vs_market": {
    "top_batter_team": {
     "n_prices": 843,
     "mean_model_p": 0.055,
     "mean_market_p": 0.063,
-    "mean_logit_diff_model_minus_market": 0.223,
-    "mean_abs_logit_diff": 0.872,
+    "mean_logit_diff_model_minus_market": 0.224,
+    "mean_abs_logit_diff": 0.873,
     "corr": 0.7
    },
    "top_bowler_team": {
     "n_prices": 495,
-    "mean_model_p": 0.107,
+    "mean_model_p": 0.106,
     "mean_market_p": 0.101,
-    "mean_logit_diff_model_minus_market": 0.008,
-    "mean_abs_logit_diff": 0.383,
-    "corr": 0.636
+    "mean_logit_diff_model_minus_market": 0.006,
+    "mean_abs_logit_diff": 0.385,
+    "corr": 0.635
    },
    "batter_runs": {
-    "n_prices": 994,
+    "n_prices": 1020,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.566,
-    "corr": 0.12
+    "mean_abs_logit_diff": 0.565,
+    "corr": 0.126
    },
    "batter_sixes": {
-    "n_prices": 237,
+    "n_prices": 221,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.0,
-    "mean_abs_logit_diff": 0.292,
-    "corr": 0.912
+    "mean_abs_logit_diff": 0.298,
+    "corr": 0.916
    },
    "batter_fours": {
-    "n_prices": 241,
+    "n_prices": 225,
     "mean_model_p": 0.498,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": -0.005,
-    "mean_abs_logit_diff": 0.247,
-    "corr": 0.655
+    "mean_abs_logit_diff": 0.249,
+    "corr": 0.667
    },
    "bowler_wickets": {
-    "n_prices": 146,
+    "n_prices": 102,
     "mean_model_p": 0.5,
     "mean_market_p": 0.5,
     "mean_logit_diff_model_minus_market": 0.0,
-    "mean_abs_logit_diff": 0.276,
-    "corr": 0.939
+    "mean_abs_logit_diff": 0.27,
+    "corr": 0.947
    },
    "batter_milestone": {
-    "n_prices": 1083,
-    "mean_model_p": 0.433,
-    "mean_market_p": 0.453,
-    "mean_logit_diff_model_minus_market": -0.135,
+    "n_prices": 1106,
+    "mean_model_p": 0.431,
+    "mean_market_p": 0.452,
+    "mean_logit_diff_model_minus_market": -0.136,
     "mean_abs_logit_diff": 0.699,
-    "corr": 0.982
+    "corr": 0.981
    },
    "bowler_milestone": {
     "n_prices": 180,
@@ -236,49 +236,24 @@
     "corr": 0.984
    },
    "top_batter_match": {
-    "n_prices": 892,
+    "n_prices": 907,
     "mean_model_p": 0.016,
     "mean_market_p": 0.029,
-    "mean_logit_diff_model_minus_market": -0.23,
-    "mean_abs_logit_diff": 1.118,
-    "corr": 0.501
+    "mean_logit_diff_model_minus_market": -0.232,
+    "mean_abs_logit_diff": 1.134,
+    "corr": 0.495
    },
    "top_bowler_match": {
-    "n_prices": 631,
-    "mean_model_p": 0.037,
-    "mean_market_p": 0.039,
-    "mean_logit_diff_model_minus_market": -0.075,
-    "mean_abs_logit_diff": 1.795,
-    "corr": 0.066
+    "n_prices": 645,
+    "mean_model_p": 0.036,
+    "mean_market_p": 0.038,
+    "mean_logit_diff_model_minus_market": -0.045,
+    "mean_abs_logit_diff": 1.808,
+    "corr": 0.109
    }
   }
  },
  "events_in_window": [
-  {
-   "event": "male|Brescia Lions|roma gladiatori|2026-11-28",
-   "start_ist": "2026-11-28 17:30 IST",
-   "format": null,
-   "format_source": "unknown",
-   "teams_matched": null,
-   "sources": [
-    "feedh_d"
-   ]
-  },
-  {
-   "event": "male|Brescia Lions|Rome Gladiators|2026-11-28",
-   "start_ist": "2026-11-28 18:00 IST",
-   "format": null,
-   "format_source": "fixtures",
-   "teams_matched": [
-    "Brescia Lions",
-    "Rome Gladiators"
-   ],
-   "sources": [
-    "feede_lb",
-    "moviodds_bet365",
-    "smarkets"
-   ]
-  },
   {
    "event": "male|Dubai Capitals|Gulf Giants|2026-11-28",
    "start_ist": "2026-11-28 20:00 IST",
@@ -315,6 +290,18 @@
    ]
   },
   {
+   "event": "female|Otago|central hinds|2026-11-28",
+   "start_ist": "2026-11-29 03:00 IST",
+   "format": "MULTI",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "feedi_d",
+    "feedj_d",
+    "smarkets"
+   ]
+  },
+  {
    "event": "female|Canterbury|Wellington|2026-11-28",
    "start_ist": "2026-11-29 03:00 IST",
    "format": "MULTI",
@@ -325,7 +312,6 @@
    ],
    "sources": [
     "feedi_d",
-    "feedj_d",
     "smarkets"
    ]
   },
@@ -338,18 +324,6 @@
     "Auckland",
     "Northern Districts"
    ],
-   "sources": [
-    "feedi_d",
-    "feedj_d",
-    "smarkets"
-   ]
-  },
-  {
-   "event": "female|Otago|central hinds|2026-11-28",
-   "start_ist": "2026-11-29 03:00 IST",
-   "format": "MULTI",
-   "format_source": "name",
-   "teams_matched": null,
    "sources": [
     "feedi_d",
     "feedj_d",
@@ -484,6 +458,16 @@
    ]
   },
   {
+   "event": "male|elite academy|sunny 11 pratishtan|2026-11-29",
+   "start_ist": "2026-11-29 10:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": null,
+   "sources": [
+    "smarkets"
+   ]
+  },
+  {
    "event": "male|Adelaide Strikers|Hobart Hurricanes|2026-11-29",
    "start_ist": "2026-11-29 10:00 IST",
    "format": "T20",
@@ -548,6 +532,7 @@
    "sources": [
     "feedh_d",
     "feedi_d",
+    "feedk_leoal",
     "moviodds_bet365"
    ]
   },
@@ -564,6 +549,7 @@
     "feede_lb",
     "feedh_d",
     "feedi_d",
+    "feedj_d",
     "feedl",
     "moviodds_bet365",
     "smarkets"
@@ -707,6 +693,19 @@
     "feedi_d",
     "smarkets"
    ]
+  },
+  {
+   "event": "female|England|India|2026-12-01",
+   "start_ist": "2026-12-01 18:00 IST",
+   "format": "T20",
+   "format_source": "name",
+   "teams_matched": [
+    "England",
+    "India"
+   ],
+   "sources": [
+    "smarkets"
+   ]
   }
  ],
  "value_bets": [
@@ -763,7 +762,7 @@
     "rain_prob_max_pct": 0,
     "rain_mm_in_window": 0.0,
     "humidity_pct": 64,
-    "cloud_pct": 17,
+    "cloud_pct": 9,
     "source": "Open-Meteo forecast"
    }
   },
@@ -1132,6 +1131,38 @@
    "edge_pct": 46.04,
    "fair_basis": "blend 0.45 model + 0.55 market",
    "market_fair_from": null
+  },
+  {
+   "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
+   "start_ist": "2026-11-29 15:30 IST",
+   "market_type": "batter_milestone",
+   "market": "To score 50 - Alishan Sharafu",
+   "selection": "Alishan Sharafu 50+ yes",
+   "odds": 7.6,
+   "source": "feedi_d",
+   "fair_prob": 0.2014,
+   "model_prob": 0.1603,
+   "market_prob": 0.235,
+   "edge_pct": 53.06,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "market_fair_from": [
+    "anchored on moviodds_bet365 O/U 21.5 (de-vigged 0.500)"
+   ]
+  },
+  {
+   "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
+   "start_ist": "2026-11-29 15:30 IST",
+   "market_type": "batter_milestone",
+   "market": "To score at least 50 Runs",
+   "selection": "James Rew 50+ yes",
+   "odds": 8.0,
+   "source": "feedk_leoal",
+   "fair_prob": 0.1711,
+   "model_prob": 0.1396,
+   "market_prob": 0.1969,
+   "edge_pct": 36.89,
+   "fair_basis": "blend 0.45 model + 0.55 market",
+   "market_fair_from": "anchored on feedk_leoal O/U 19.5 (de-vigged 0.500)"
   }
  ],
  "unmatched_teams": [
@@ -1140,9 +1171,10 @@
   "Central Hinds (female)",
   "Central Hinds (male)",
   "Dolphins (W) (female)",
+  "Elite Cricket Academy (male)",
   "Garden Route Badgers (W) (female)",
   "Lions (W) (female)",
-  "Roma Gladiatori (male)",
+  "Sunny 11 Pratishtan (male)",
   "Titans (W) (female)"
  ],
  "unmatched_players_in_window": [
@@ -1164,7 +1196,6 @@
   "Anika Tauwhare",
   "Anika Todd",
   "Anna Browning",
-  "Anthony Joseph Mosca",
   "Anvi Verma",
   "Arun Selvaraj",
   "Ashraf Sharafuddin",
@@ -1262,7 +1293,6 @@
   "MJ Siddique",
   "Maggie Clark",
   "Marathala Dhanush",
-  "Marcus Campopiano",
   "Matty James Potts",
   "Matty Potts",
   "Mikayla Friday",
@@ -1277,7 +1307,6 @@
   "Olivia Gain",
   "PJ Watkins",
   "PaulIan Walter",
-  "Philip Salt",
   "Polly Inglis",
   "Q Ahmad",
   "R Gleeson",
@@ -1328,13 +1357,11 @@
   "WanujaSahan Kumara",
   "Wengappuli Achchilage Dulaj Samuditha",
   "WengappuliAchchilageDulaj Samuditha",
-  "Will Smeed",
   "Yasa Cullen",
   "Yasir Ali",
   "Yasmeen Kareem",
   "Yaz Kareem",
   "Yssa Cullen",
-  "Yuvraj Samra",
   "du Plessis",
   "van Beek,Logan"
  ],
@@ -1765,6 +1792,18 @@
     "start": "2026-11-29T04:30:00Z"
    }
   ],
+  "Curtis Campher": [
+   {
+    "match": "Dubai Capitals vs Gulf Giants",
+    "competition": "international-league-t20",
+    "start": "2026-11-28T14:30:00Z"
+   },
+   {
+    "match": "Gulf Giants vs Dubai Capitals",
+    "competition": "",
+    "start": "2026-11-28T14:30:00Z"
+   }
+  ],
   "Imran": [
    {
     "match": "Dubai Capitals vs Gulf Giants",
@@ -1784,18 +1823,6 @@
     "start": "2026-11-28T14:30:00Z"
    }
   ],
-  "Curtis Campher": [
-   {
-    "match": "Dubai Capitals vs Gulf Giants",
-    "competition": "international-league-t20",
-    "start": "2026-11-28T14:30:00Z"
-   },
-   {
-    "match": "Gulf Giants vs Dubai Capitals",
-    "competition": "",
-    "start": "2026-11-28T14:30:00Z"
-   }
-  ],
   "Matty Potts": [
    {
     "match": "Dubai Capitals vs Gulf Giants",
@@ -1806,512 +1833,6 @@
     "match": "Gulf Giants vs Dubai Capitals",
     "competition": "",
     "start": "2026-11-28T14:30:00Z"
-   }
-  ],
-  "James Rew": [
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
-    "competition": "international-league-t20",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "James Vince": [
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
-    "competition": "international-league-t20",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "Richard Gleeson": [
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
-    "competition": "international-league-t20",
-    "start": "2026-11-29T10:00:00Z"
-   },
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah",
-    "competition": "",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "Sharafuddin Ashraf": [
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
-    "competition": "international-league-t20",
-    "start": "2026-11-29T10:00:00Z"
-   },
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
-    "competition": " /  / ",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "Tanish Suri": [
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
-    "competition": "international-league-t20",
-    "start": "2026-11-29T10:00:00Z"
-   },
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
-    "competition": " /  / ",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "Tim Seifert": [
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
-    "competition": "international-league-t20",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "Abdullah Tarakhail": [
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
-    "competition": "international-league-t20",
-    "start": "2026-11-29T10:00:00Z"
-   },
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah",
-    "competition": "",
-    "start": "2026-11-29T10:00:00Z"
-   },
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
-    "competition": " /  / ",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "Krishna Devan": [
-   {
-    "match": "Keralam vs Vidarbha",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T05:30:00Z"
-   },
-   {
-    "match": "Kerala vs Vidarbha",
-    "competition": " /  / ",
-    "start": "2026-11-30T05:30:00Z"
-   }
-  ],
-  "Biju Narayanan": [
-   {
-    "match": "Keralam vs Vidarbha",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T05:30:00Z"
-   },
-   {
-    "match": "Kerala vs Vidarbha CT",
-    "competition": "",
-    "start": "2026-11-30T05:30:00Z"
-   },
-   {
-    "match": "Kerala vs Vidarbha",
-    "competition": " /  / ",
-    "start": "2026-11-30T05:30:00Z"
-   }
-  ],
-  "Jalaj Saxena": [
-   {
-    "match": "Keralam vs Vidarbha",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T05:30:00Z"
-   }
-  ],
-  "Divyaansh Saxena": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "Suved Parkar": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "Sylvester Dsouza": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "B.Munish Varma": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "Kadiyam Pavana Sai Rahul": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "Marathala Dhanush": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "Revanth Reddy": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "Satyanarayana Raju": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "T Bharath": [
-   {
-    "match": "Andhra vs Mumbai",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T08:00:00Z"
-   }
-  ],
-  "Ayush Doseja": [
-   {
-    "match": "Baroda vs Delhi",
-    "competition": "syed-mushtaq-ali-trophy-elite",
-    "start": "2026-11-30T11:00:00Z"
-   }
-  ],
-  "Yasir Ali": [
-   {
-    "match": "South Africa vs Bangladesh",
-    "competition": "odi-series-south-africa-vs-bangladesh",
-    "start": "2026-12-01T11:30:00Z"
-   }
-  ],
-  "Sharujan Shanmuganathan": [
-   {
-    "match": "Sri Lanka A vs Pakistan A",
-    "competition": "list-a-acc-asia-cup-rising-stars",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "Wengappuli Achchilage Dulaj Samuditha": [
-   {
-    "match": "Sri Lanka A vs Pakistan A",
-    "competition": "list-a-acc-asia-cup-rising-stars",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "Isy Parry": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Anvi Verma": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Neha Ramanathan": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Emma Parker": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Yssa Cullen": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Abby McCissock": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Ciara Elizabeth Hartland": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Hannah Ryan": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": "One Day Competition, Women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Izzy Fox": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Olivia Gain": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": "One Day Competition, Women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Samantha Borcoski": [
-   {
-    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze vs Canterbury Magicians",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Ella GC Drumm": [
-   {
-    "match": "Northern Districts Women vs Auckland Hearts (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts vs Auckland Hearts",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Eve Louise Meachen": [
-   {
-    "match": "Northern Districts Women vs Auckland Hearts (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts vs Auckland Hearts",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Jessica Smith": [
-   {
-    "match": "Northern Districts Women vs Auckland Hearts (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts vs Auckland Hearts",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Kat Thomas": [
-   {
-    "match": "Northern Districts Women vs Auckland Hearts (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts vs Auckland Hearts",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Talia Hurley": [
-   {
-    "match": "Northern Districts Women vs Auckland Hearts (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts vs Auckland Hearts",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Anika Tauwhare": [
-   {
-    "match": "Northern Districts Women vs Auckland Hearts (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts vs Auckland Hearts",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Rishika Jaswal": [
-   {
-    "match": "Northern Districts Women vs Auckland Hearts (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts vs Auckland Hearts",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Sophie Court": [
-   {
-    "match": "Northern Districts Women vs Auckland Hearts (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts vs Auckland Hearts",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Cate Pedersen": [
-   {
-    "match": "Central Hinds (W) vs Otago Sparks (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Central Hinds vs Otago Sparks",
-    "competition": "One Day Competition, Women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Central Hinds (Women) vs Otago Sparks (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
    }
   ],
   "Elizabeth Jaine Cohr": [
@@ -2486,18 +2007,6 @@
     "start": "2026-11-28T21:30:00Z"
    }
   ],
-  "Yasmeen Kareem": [
-   {
-    "match": "Central Hinds (W) vs Otago Sparks (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Central Hinds vs Otago Sparks",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
   "Rosemary Mair": [
    {
     "match": "Central Hinds (W) vs Otago Sparks (W)",
@@ -2512,6 +2021,18 @@
    {
     "match": "Central Hinds (Women) vs Otago Sparks (Women)",
     "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Yasmeen Kareem": [
+   {
+    "match": "Central Hinds (W) vs Otago Sparks (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Central Hinds vs Otago Sparks",
+    "competition": " /  / ",
     "start": "2026-11-28T21:30:00Z"
    }
   ],
@@ -2553,6 +2074,23 @@
    {
     "match": "Central Hinds vs Otago Sparks",
     "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Central Hinds (Women) vs Otago Sparks (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Cate Pedersen": [
+   {
+    "match": "Central Hinds (W) vs Otago Sparks (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Central Hinds vs Otago Sparks",
+    "competition": "One Day Competition, Women",
     "start": "2026-11-28T21:30:00Z"
    },
    {
@@ -2659,23 +2197,6 @@
    }
   ],
   "Gemma Burleigh": [
-   {
-    "match": "Central Hinds (W) vs Otago Sparks (W)",
-    "competition": "hallyburton-johnstone-shield-women",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Central Hinds vs Otago Sparks",
-    "competition": " /  / ",
-    "start": "2026-11-28T21:30:00Z"
-   },
-   {
-    "match": "Central Hinds (Women) vs Otago Sparks (Women)",
-    "competition": "Hallyburton Johnstone Shield. Women",
-    "start": "2026-11-28T21:30:00Z"
-   }
-  ],
-  "Georgie McEwan": [
    {
     "match": "Central Hinds (W) vs Otago Sparks (W)",
     "competition": "hallyburton-johnstone-shield-women",
@@ -2801,6 +2322,23 @@
     "start": "2026-11-28T21:30:00Z"
    }
   ],
+  "Georgie McEwan": [
+   {
+    "match": "Central Hinds (W) vs Otago Sparks (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Central Hinds vs Otago Sparks",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Central Hinds (Women) vs Otago Sparks (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
   "Abby Fookes": [
    {
     "match": "Central Hinds (W) vs Otago Sparks (W)",
@@ -2818,49 +2356,496 @@
     "start": "2026-11-28T21:30:00Z"
    }
   ],
-  "G Linde": [
+  "Krishna Devan": [
+   {
+    "match": "Keralam vs Vidarbha",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T05:30:00Z"
+   },
+   {
+    "match": "Kerala vs Vidarbha",
+    "competition": " /  / ",
+    "start": "2026-11-30T05:30:00Z"
+   }
+  ],
+  "Biju Narayanan": [
+   {
+    "match": "Keralam vs Vidarbha",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T05:30:00Z"
+   },
+   {
+    "match": "Kerala vs Vidarbha CT",
+    "competition": "",
+    "start": "2026-11-30T05:30:00Z"
+   },
+   {
+    "match": "Kerala vs Vidarbha",
+    "competition": " /  / ",
+    "start": "2026-11-30T05:30:00Z"
+   }
+  ],
+  "Jalaj Saxena": [
+   {
+    "match": "Keralam vs Vidarbha",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T05:30:00Z"
+   }
+  ],
+  "Divyaansh Saxena": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Suved Parkar": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Sylvester Dsouza": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "B.Munish Varma": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Kadiyam Pavana Sai Rahul": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Marathala Dhanush": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Revanth Reddy": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Satyanarayana Raju": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "T Bharath": [
+   {
+    "match": "Andhra vs Mumbai",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T08:00:00Z"
+   }
+  ],
+  "Ayush Doseja": [
+   {
+    "match": "Baroda vs Delhi",
+    "competition": "syed-mushtaq-ali-trophy-elite",
+    "start": "2026-11-30T11:00:00Z"
+   }
+  ],
+  "Yasir Ali": [
+   {
+    "match": "South Africa vs Bangladesh",
+    "competition": "odi-series-south-africa-vs-bangladesh",
+    "start": "2026-12-01T11:30:00Z"
+   }
+  ],
+  "James Rew": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
+    "competition": "international-league-t20",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "James Vince": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
+    "competition": "international-league-t20",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "Richard Gleeson": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
+    "competition": "international-league-t20",
+    "start": "2026-11-29T10:00:00Z"
+   },
    {
     "match": "Abu Dhabi Knight Riders vs Sharjah",
     "competition": "",
     "start": "2026-11-29T10:00:00Z"
    }
   ],
-  "A Naseer": [
+  "Sharafuddin Ashraf": [
    {
-    "match": "Abu Dhabi Knight Riders vs Sharjah",
-    "competition": "",
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
+    "competition": "international-league-t20",
+    "start": "2026-11-29T10:00:00Z"
+   },
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
+    "competition": " /  / ",
     "start": "2026-11-29T10:00:00Z"
    }
   ],
-  "M Nabi": [
+  "Tanish Suri": [
    {
-    "match": "Abu Dhabi Knight Riders vs Sharjah",
-    "competition": "",
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
+    "competition": "international-league-t20",
+    "start": "2026-11-29T10:00:00Z"
+   },
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
+    "competition": " /  / ",
     "start": "2026-11-29T10:00:00Z"
    }
   ],
-  "W Salamkheil": [
+  "Tim Seifert": [
    {
-    "match": "Abu Dhabi Knight Riders vs Sharjah",
-    "competition": "",
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
+    "competition": "international-league-t20",
     "start": "2026-11-29T10:00:00Z"
    }
   ],
-  "R Gleeson": [
+  "Abdullah Tarakhail": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriors",
+    "competition": "international-league-t20",
+    "start": "2026-11-29T10:00:00Z"
+   },
    {
     "match": "Abu Dhabi Knight Riders vs Sharjah",
     "competition": "",
     "start": "2026-11-29T10:00:00Z"
+   },
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
+    "competition": " /  / ",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "Wengappuli Achchilage Dulaj Samuditha": [
+   {
+    "match": "Sri Lanka A vs Pakistan A",
+    "competition": "list-a-acc-asia-cup-rising-stars",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "Sharujan Shanmuganathan": [
+   {
+    "match": "Sri Lanka A vs Pakistan A",
+    "competition": "list-a-acc-asia-cup-rising-stars",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "Anvi Verma": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Emma Parker": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Isy Parry": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Neha Ramanathan": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Abby McCissock": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Ciara Elizabeth Hartland": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Hannah Ryan": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Izzy Fox": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Olivia Gain": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Samantha Borcoski": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze (Women) vs Canterbury Magicians (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Yssa Cullen": [
+   {
+    "match": "Wellington Blaze (W) vs Canterbury Magicians (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Wellington Blaze vs Canterbury Magicians",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Ella GC Drumm": [
+   {
+    "match": "Northern Districts Women vs Auckland Hearts (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts vs Auckland Hearts",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Eve Louise Meachen": [
+   {
+    "match": "Northern Districts Women vs Auckland Hearts (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts vs Auckland Hearts",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Jessica Smith": [
+   {
+    "match": "Northern Districts Women vs Auckland Hearts (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts vs Auckland Hearts",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Kat Thomas": [
+   {
+    "match": "Northern Districts Women vs Auckland Hearts (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts vs Auckland Hearts",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Talia Hurley": [
+   {
+    "match": "Northern Districts Women vs Auckland Hearts (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts vs Auckland Hearts",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Anika Tauwhare": [
+   {
+    "match": "Northern Districts Women vs Auckland Hearts (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts vs Auckland Hearts",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Rishika Jaswal": [
+   {
+    "match": "Northern Districts Women vs Auckland Hearts (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts vs Auckland Hearts",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   }
+  ],
+  "Sophie Court": [
+   {
+    "match": "Northern Districts Women vs Auckland Hearts (W)",
+    "competition": "hallyburton-johnstone-shield-women",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts vs Auckland Hearts",
+    "competition": " /  / ",
+    "start": "2026-11-28T21:30:00Z"
+   },
+   {
+    "match": "Northern Districts (Women) vs Auckland Hearts (Women)",
+    "competition": "Hallyburton Johnstone Shield. Women",
+    "start": "2026-11-28T21:30:00Z"
    }
   ],
   "J Rew": [
-   {
-    "match": "Abu Dhabi Knight Riders vs Sharjah",
-    "competition": "",
-    "start": "2026-11-29T10:00:00Z"
-   }
-  ],
-  "van Beek,Logan": [
    {
     "match": "Abu Dhabi Knight Riders vs Sharjah",
     "competition": "",
@@ -2874,7 +2859,49 @@
     "start": "2026-11-29T10:00:00Z"
    }
   ],
-  "WengappuliAchchilageDulaj Samuditha": [
+  "van Beek,Logan": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah",
+    "competition": "",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "A Naseer": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah",
+    "competition": "",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "R Gleeson": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah",
+    "competition": "",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "G Linde": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah",
+    "competition": "",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "W Salamkheil": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah",
+    "competition": "",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "M Nabi": [
+   {
+    "match": "Abu Dhabi Knight Riders vs Sharjah",
+    "competition": "",
+    "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "Mohammad Imran": [
    {
     "match": "Sri Lanka A vs Pakistan A",
     "competition": "",
@@ -2888,11 +2915,18 @@
     "start": "2026-11-29T10:00:00Z"
    }
   ],
-  "Mohammad Imran": [
+  "WengappuliAchchilageDulaj Samuditha": [
    {
     "match": "Sri Lanka A vs Pakistan A",
     "competition": "",
     "start": "2026-11-29T10:00:00Z"
+   }
+  ],
+  "KarthikB Nair": [
+   {
+    "match": "Kerala vs Vidarbha CT",
+    "competition": "",
+    "start": "2026-11-30T05:30:00Z"
    }
   ],
   "Vignesh Puthur": [
@@ -2908,13 +2942,6 @@
    }
   ],
   "SharafuddeenN M": [
-   {
-    "match": "Kerala vs Vidarbha CT",
-    "competition": "",
-    "start": "2026-11-30T05:30:00Z"
-   }
-  ],
-  "KarthikB Nair": [
    {
     "match": "Kerala vs Vidarbha CT",
     "competition": "",
@@ -3185,34 +3212,6 @@
     "start": "2026-11-30T05:30:00Z"
    }
   ],
-  "Anthony Joseph Mosca": [
-   {
-    "match": "Brescia Lions vs Roma Gladiatori",
-    "competition": " /  / ",
-    "start": "2026-11-28T12:00:00Z"
-   }
-  ],
-  "Will Smeed": [
-   {
-    "match": "Brescia Lions vs Roma Gladiatori",
-    "competition": " /  / ",
-    "start": "2026-11-28T12:00:00Z"
-   }
-  ],
-  "Yuvraj Samra": [
-   {
-    "match": "Brescia Lions vs Roma Gladiatori",
-    "competition": " /  / ",
-    "start": "2026-11-28T12:00:00Z"
-   }
-  ],
-  "Marcus Campopiano": [
-   {
-    "match": "Brescia Lions vs Roma Gladiatori",
-    "competition": " /  / ",
-    "start": "2026-11-28T12:00:00Z"
-   }
-  ],
   "Matty James Potts": [
    {
     "match": "Dubai Capitals vs Gulf Giants",
@@ -3221,13 +3220,6 @@
    }
   ],
   "Luke Wood": [
-   {
-    "match": "Dubai Capitals vs Gulf Giants",
-    "competition": "UAE. International League T20",
-    "start": "2026-11-28T14:30:00Z"
-   }
-  ],
-  "Philip Salt": [
    {
     "match": "Dubai Capitals vs Gulf Giants",
     "competition": "UAE. International League T20",
@@ -3248,7 +3240,7 @@
     "start": "2026-11-29T10:00:00Z"
    }
   ],
-  "Fareed Malik": [
+  "Ashraf Sharafuddin": [
    {
     "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
     "competition": "UAE. International League T20",
@@ -3276,7 +3268,7 @@
     "start": "2026-11-29T10:00:00Z"
    }
   ],
-  "Ashraf Sharafuddin": [
+  "Fareed Malik": [
    {
     "match": "Abu Dhabi Knight Riders vs Sharjah Warriorz",
     "competition": "UAE. International League T20",
@@ -3540,32 +3532,31 @@
   }
  },
  "log": [
-  "[17:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
-  "[17:00 IST] history: 24356 matches, last 2026-11-28, players 439911",
-  "[17:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1529, 'secs': 0.5}",
-  "[17:03 IST] source smarkets: {'status': 'ok', 'rows': 546, 'secs': 1.7}",
-  "[17:03 IST] source feedg: {'status': 'error', 'reason': 'HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}', 'secs': 1.7}",
-  "[17:03 IST] source feedl: {'status': 'ok', 'rows': 504, 'secs': 10.1, 'events': 16}",
-  "[17:03 IST] source feedk: {'status': 'ok', 'rows': 156, 'secs': 13.8, 'events': 5}",
-  "[17:03 IST] source feede: {'status': 'ok', 'rows': 422, 'secs': 32.4, 'events': 12}",
-  "[17:03 IST] source feedf: {'status': 'ok', 'rows': 354, 'secs': 40.2, 'events': 7}",
-  "[17:03 IST] source feedj: {'status': 'ok', 'rows': 703, 'secs': 73.3, 'events': 10}",
-  "[17:03 IST] source feedh: {'status': 'ok', 'rows': 1472, 'secs': 88.5, 'events': 52}",
-  "[17:03 IST] source feedi: {'status': 'ok', 'rows': 1829, 'secs': 146.4, 'events': 51}",
-  "[17:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
-  "[17:03 IST] 69 unmatched players kept in their team top-batter/bowler market (team taken from market)",
-  "[17:03 IST] 144 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
-  "[17:03 IST] 96 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
-  "[17:03 IST] name map: Eastern Storm vs Northern Cape -> Eastern Storm vs Northern Cape Heat (2026-11-29T08:00:00Z)",
-  "[17:03 IST] name map: Abu Dhabi Knight Riders vs Sharjah Warriors -> Abu Dhabi Knight Riders vs Sharjah Warriorz (2026-11-29T10:00:00Z)",
-  "[17:03 IST] name map: Brescia Lions vs Roma Gladiators -> Brescia Lions vs Rome Gladiators (2026-11-28T12:30:00Z)",
-  "[17:03 IST] name map: Abu Dhabi Knight Riders vs Sharjah -> Abu Dhabi Knight Riders vs Sharjah Warriorz (2026-11-29T10:00:00Z)",
-  "[17:03 IST] name map: Kerala vs Vidarbha CT -> Kerala vs Vidarbha (2026-11-30T05:30:00Z)",
-  "[17:03 IST] held back 28 player and 13 fancy lines first priced after their match started (not pre-match prices)",
-  "[17:03 IST] book lines: 513 player lines from 8 source(s)",
-  "[17:03 IST] 48 innings-scoped prices published as book lines, kept out of the value-bet pricing",
-  "[17:04 IST] weather: forecasts for 10 events, 0 failed",
-  "[17:04 IST] prop model: 1579 prop selections modelled, 542 milestone ladder prices anchored to O/U",
-  "[17:04 IST] ledger upsert model: {'upserted': 7, 'skipped_settled': 0}"
+  "[18:00 IST] data: {'status': 'refresh disabled (running against a local cricket-data checkout)'}",
+  "[18:00 IST] history: 24356 matches, last 2026-11-28, players 439911",
+  "[18:03 IST] source moviodds_bet365: {'status': 'ok', 'rows': 1572, 'secs': 0.8}",
+  "[18:03 IST] source feedg: {'status': 'error', 'reason': 'HTTPError: HTTP Error 402: {\"error\": {\"code\": \"402\", \"message\": \"Payment required\"}}', 'secs': 1.8}",
+  "[18:03 IST] source smarkets: {'status': 'ok', 'rows': 570, 'secs': 3.0}",
+  "[18:03 IST] source feedl: {'status': 'ok', 'rows': 506, 'secs': 10.0, 'events': 15}",
+  "[18:03 IST] source feedk: {'status': 'ok', 'rows': 188, 'secs': 15.6, 'events': 6}",
+  "[18:03 IST] source feede: {'status': 'ok', 'rows': 414, 'secs': 33.0, 'events': 12}",
+  "[18:03 IST] source feedf: {'status': 'ok', 'rows': 354, 'secs': 43.5, 'events': 7}",
+  "[18:03 IST] source feedj: {'status': 'ok', 'rows': 707, 'secs': 76.0, 'events': 9}",
+  "[18:03 IST] source feedh: {'status': 'ok', 'rows': 1464, 'secs': 85.2, 'events': 53}",
+  "[18:03 IST] source feedi: {'status': 'ok', 'rows': 1716, 'secs': 141.2, 'events': 50}",
+  "[18:03 IST] prop model: trained through 2026-10-14, 12 stat/format models",
+  "[18:03 IST] 69 unmatched players kept in their team top-batter/bowler market (team taken from market)",
+  "[18:03 IST] 112 multi-day player prices from books that do not quote the match total tagged as 1st-innings lines",
+  "[18:03 IST] 80 multi-day single-innings milestone prices kept separate from match-aggregate markets (not modelled)",
+  "[18:03 IST] name map: Eastern Storm vs Northern Cape -> Eastern Storm vs Northern Cape Heat (2026-11-29T08:00:00Z)",
+  "[18:03 IST] name map: Abu Dhabi Knight Riders vs Sharjah Warriors -> Abu Dhabi Knight Riders vs Sharjah Warriorz (2026-11-29T10:00:00Z)",
+  "[18:03 IST] name map: Abu Dhabi Knight Riders vs Sharjah -> Abu Dhabi Knight Riders vs Sharjah Warriorz (2026-11-29T10:00:00Z)",
+  "[18:03 IST] name map: Kerala vs Vidarbha CT -> Kerala vs Vidarbha (2026-11-30T05:30:00Z)",
+  "[18:03 IST] held back 23 player and 11 fancy lines first priced after their match started (not pre-match prices)",
+  "[18:03 IST] book lines: 520 player lines from 8 source(s)",
+  "[18:03 IST] 32 innings-scoped prices published as book lines, kept out of the value-bet pricing",
+  "[18:04 IST] weather: forecasts for 10 events, 0 failed",
+  "[18:04 IST] prop model: 1593 prop selections modelled, 566 milestone ladder prices anchored to O/U",
+  "[18:04 IST] ledger upsert model: {'upserted': 7, 'skipped_settled': 0}"
  ]
 }
